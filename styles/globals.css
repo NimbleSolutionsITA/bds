@@ -1,26 +1,65 @@
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+@font-face {
+  font-family: 'Ogg Roman';
+  src: url('../public/fonts/OggRoman-Regular.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Apercu';
+  src: url('../public/fonts/Apercu-Light.woff2') format('woff2');
+  font-weight: 300;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Apercu';
+  src: url('../public/fonts/Apercu-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
 }
 
-a {
+h1 {
+  font-family: 'Ogg Roman', serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-family: inherit;
   color: inherit;
-  text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
+h2, h3, h4, h5, h6 {
+  font-family: 'Apercu', sans-serif;
+  font-weight: 500 !important;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
+h3 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.title {
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  font-size: 4vw;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  font-weight: 500 !important;
+  line-height: 1.2;
+  font-family: "Ogg Roman", serif;
+}
+
+.preTitle {
+  font-size: 1rem;
+  border: 0 solid;
+  padding: 0;
+  font-family: 'Apercu', sans-serif;
+  text-transform: uppercase;
+}
+
+.preTitle strong, .preTitle b {
+  font-weight: 500;
 }
