@@ -1,7 +1,7 @@
 import {Grid} from "@mui/material";
-import Carousel from "./Carousel";
 import React from "react";
 import HtmlBlock from "./HtmlBlock";
+import Carousel from "react-material-ui-carousel";
 
 type SliderWithTextProps = {
 	body: string
@@ -22,9 +22,39 @@ const SliderWithText = ({body, images}: SliderWithTextProps) => {
 			</Grid>
 			<Grid item xs={12} lg={8} sx={{width: '100%'}}>
 				<Carousel
-					height="85%"
-					images={images ?? []}
-				/>
+					animation="slide"
+					navButtonsAlwaysInvisible={true}
+					indicatorContainerProps={{
+						style: {
+							position: 'absolute',
+							bottom: '10px',
+							zIndex: 1,
+						}
+					}}
+					indicatorIconButtonProps={{
+						style: {
+							color: 'transparent',
+							border: '2px solid white',
+							margin: '0 5px',
+							width: '15px',
+							height: '15px',
+						}
+					}}
+					activeIndicatorIconButtonProps={{
+						style: {
+							color: 'rgba(255, 255, 255, 0.5)',
+						}
+					}}
+				>
+					{images.map((image) => (
+						<div key={image} style={{
+							width: '100%',
+							height: 'calc(100vh - 150px)',
+							backgroundImage: `url(${image})`,
+							backgroundSize: 'cover',
+						}} />
+					))}
+				</Carousel>
 			</Grid>
 		</Grid>
   );
