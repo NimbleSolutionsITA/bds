@@ -16,27 +16,18 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
     return (
         <>
             <AppBar
+                color="secondary"
                 elevation={0}
                 position="sticky"
                 sx={{
                     zIndex: 1201,
-                    height: '50px'
+                    height: '80px'
             }}
             >
-                <Toolbar>
+                <Toolbar sx={{position: 'relative', width: '100%', height: '100%', justifyContent: 'space-between'}}>
+                    <LogoButton />
                     <IconButton onClick={() => setOpen(open => !open)}>
                         <MenuToggle isOpen={open} />
-                    </IconButton>
-                    <IconButton sx={{
-                        '&:hover': {
-                            backgroundColor: 'inherit'
-                        }
-                    }}>
-                        <Image
-                            src={logo}
-                            alt="Logo Bottega di Sguardi"
-                            style={{ width: '40px', height: 'auto' }}
-                        />
                     </IconButton>
                     <IconButton>
                         <CartIcon />
@@ -61,7 +52,7 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                     }
                 }}
             >
-                <Box display="flex" flexDirection="column">
+                <Box display="flex" flexDirection="column" padding="20px">
                     {mobileMenu.map(nav => (
                         <Button
                             key={nav.id}
@@ -76,3 +67,19 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
         </>
     )
 }
+
+const LogoButton = () => (
+    <IconButton sx={{
+        position: 'absolute',
+        left: 'calc(50% - 30px)',
+        '&:hover': {
+            backgroundColor: 'inherit'
+        }
+    }}>
+        <Image
+            src={logo}
+            alt="Logo Bottega di Sguardi"
+            style={{ width: '60px', height: 'auto' }}
+        />
+    </IconButton>
+)

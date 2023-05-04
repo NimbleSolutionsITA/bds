@@ -1,12 +1,18 @@
 import React from "react";
+import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
 import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
 import {Menus} from "../src/types/settings";
 import {AcfAdvancedLink, AcfImage, AcfProduct, AcfProductCategory} from "../src/types/woocommerce";
-import SliderWithText from "../src/components/SliderWithText";
-import OurSelection from "../src/pages/home/OurSelection";
-import BannerNewsletter from "../src/components/BannerNewsletter";
-import bannerNewsletter from "../src/components/BannerNewsletter";
+
+const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
+const OurSelection = dynamic(() => import("../src/pages/home/OurSelection"));
+const BannerNewsletter = dynamic(() => import("../src/components/BannerNewsletter"));
+const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
+const BannerDesigners = dynamic(() => import("../src/pages/home/BannerDesigners"));
+const BannerTop = dynamic(() => import("../src/pages/home/BannerTop"));
+const BannerBottom = dynamic(() => import("../src/pages/home/BannerBottom"));
+const BannerBottom2 = dynamic(() => import("../src/pages/home/BannerBottom2"));
 
 export type HomeProps = {
     page: {
@@ -57,12 +63,18 @@ export type HomeProps = {
     },
     menus: Menus
 }
-export default function Home({page: {sliderWithText, ourSelection, newsletter}, menus}: HomeProps) {
+
+export default function Home({page, menus}: HomeProps) {
     return (
       <Layout menus={menus}>
-          <SliderWithText body={sliderWithText.body} images={sliderWithText.images} />
-          <OurSelection ourSelection={ourSelection} />
-          <BannerNewsletter body={newsletter.body} ctaText={newsletter.cta} />
+          <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
+          <OurSelection ourSelection={page.ourSelection} />
+          <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
+          <BannerShipping shipping={page.shipping} />
+          <BannerDesigners designers={page.designers} />
+          <BannerTop bannerTop={page.bannerTop} />
+          <BannerBottom bannerBottom={page.bannerBottom} />
+          <BannerBottom2 bannerBottom2={page.bannerBottom2} />
       </Layout>
     );
 }

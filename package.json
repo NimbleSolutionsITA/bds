@@ -21,9 +21,11 @@
     "@types/woocommerce__woocommerce-rest-api": "^1.0.2",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "framer-motion": "^10.10.0",
+    "lodash": "^4.17.21",
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
+    "react-material-ui-carousel": "^3.4.2",
     "react-redux": "^8.0.5",
     "sanitize-html": "^2.10.0"
   },

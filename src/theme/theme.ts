@@ -31,10 +31,10 @@ export const secondaryFont = localFont({
 const theme = createTheme({
     palette: {
         primary: {
-            main: '#ffffff',
+            main: '#000000',
         },
         secondary: {
-            main: '#19857b',
+            main: '#ffffff',
         },
         error: {
             main: red.A400,
@@ -52,18 +52,24 @@ const theme = createTheme({
                 maxWidth: 'xl'
             }
         },
-        MuiCssBaseline: {
-            styleOverrides: (themeParam) => `
-                h2 {
-                    font-size: 2rem;
+        MuiButton: {
+            defaultProps: {
+                variant: 'contained',
+                disableElevation: true,
+            },
+            styleOverrides: {
+                contained: {
+                    padding: '20px 40px',
+                    fontWeight: 600,
+                    textTransform: 'uppercase',
+                    fontSize: '15px',
+                    lineHeight: 1
+                },
+                containedPrimary: {
+                    color: '#ffffff',
                 }
-                body {
-                    color: black;
-                    font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-                    font-size: 14px;
-                }
-            `,
-        }
+            }
+        },
     }
 });
 

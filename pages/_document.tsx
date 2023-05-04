@@ -28,8 +28,8 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
                 {emotionStyleTags}
             </Head>
             <body>
-                <Main />
-                <NextScript />
+            <Main />
+            <NextScript />
             </body>
         </Html>
     );
