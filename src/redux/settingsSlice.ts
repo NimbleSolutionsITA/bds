@@ -1,6 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
-import {i18n} from "../types/settings";
 
 type SettingsType = {
 
