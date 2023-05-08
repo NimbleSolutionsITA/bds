@@ -1,5 +1,6 @@
 import {WORDPRESS_API_ENDPOINT, WORDPRESS_MENUS_ENDPOINT, WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "./endpoints"
 import {AcfImage, Category, Image, Product} from "../types/woocommerce";
+import {getGooglePlaces} from "../../pages/api/google-places";
 function mapMenuItem(item: any) {
 	return {
 		id: item.ID,
@@ -17,7 +18,8 @@ export const getPageProps = async<T> (slug: string, locale: string) => {
 		mobileMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-mobile${locale !== 'it' ? '-'+locale : ''}`).then(response => response.json())).items.map(mapMenuItem),
 		privacyMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/policy${locale !== 'it' ? '-'+locale : ''}`).then(response => response.json())).items.map(mapMenuItem)
 	}
-	return { page, seo, menus }
+	const googlePlaces = await getGooglePlaces(locale)
+	return { page, seo, menus, googlePlaces }
 }
 
 export const mapProduct = ({

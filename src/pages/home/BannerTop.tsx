@@ -1,5 +1,5 @@
 import {HomeProps} from "../../../pages";
-import {Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
 
 type BannerTopProps = {
@@ -11,7 +11,7 @@ const BannerTop = ({bannerTop}: BannerTopProps) => {
 	return (
 		<Grid
 			container
-			sx={{minHeight: '60vh'}}
+			sx={{minHeight: '60vh', flexDirection: {xs: 'column-reverse', md: 'row'}}}
 		>
 			<Grid item xs={12} md={4}>
 				<div
@@ -32,16 +32,23 @@ const BannerTop = ({bannerTop}: BannerTopProps) => {
 						display: 'flex',
 						flexDirection: 'column',
 						justifyContent: 'end',
-						padding: '0% 10% 5% 10%'
+						padding: '0% 10% 5% 10%',
+						marginTop: {
+							xs: '5%',
+							md: 0
+						}
 					}}
 					html={bannerTop.body}
 				/>
 			</Grid>
 			<Grid item xs={12} md={4}>
-				<div
-					style={{
+				<Box
+					sx={{
 						width: '100%',
-						height: '100%',
+						height: {
+							xs: '70vw',
+							lg: '100%'
+						},
 						backgroundImage: `url(${bannerTop.imageRight.url})`,
 						backgroundRepeat: 'no-repeat',
 						backgroundSize: 'cover',

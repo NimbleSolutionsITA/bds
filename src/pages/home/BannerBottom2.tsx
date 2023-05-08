@@ -1,13 +1,20 @@
 import {HomeProps} from "../../../pages";
-import {Button, Grid} from "@mui/material";
+import {Box, Button, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
+import React from "react";
 
 type BannerBottom2Props = {
 	bannerBottom2: HomeProps['page']['bannerBottom2']
 }
 
 const BannerBottom2 = ({bannerBottom2: {leftColumn, image}}: BannerBottom2Props) => (
-	<Grid container sx={{minHeight: '60vh'}}>
+	<Grid container sx={{
+		minHeight: '60vh',
+		flexDirection: {
+			xs: 'column-reverse',
+			md: 'row'
+		},
+	}}>
 		<Grid
 			item
 			xs={12}
@@ -23,8 +30,8 @@ const BannerBottom2 = ({bannerBottom2: {leftColumn, image}}: BannerBottom2Props)
 			</Button>
 		</Grid>
 		<Grid item xs={12} md={8}>
-			<div
-				style={{
+			<Box
+				sx={{
 					width: '100%',
 					minHeight: '60vh',
 					backgroundImage: `url(${image.url})`,

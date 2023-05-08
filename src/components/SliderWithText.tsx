@@ -1,4 +1,4 @@
-import {Grid} from "@mui/material";
+import {Box, Grid} from "@mui/material";
 import React from "react";
 import HtmlBlock from "./HtmlBlock";
 import Carousel from "react-material-ui-carousel";
@@ -18,7 +18,12 @@ const SliderWithText = ({body, images}: SliderWithTextProps) => {
 			}}
 		>
 			<Grid item xs={12} lg={4}>
-				<HtmlBlock html={body} sx={{margin: '0% 10% 05% 10%'}} />
+				<HtmlBlock html={body} sx={{
+					margin: {
+						xs: '5% 10%',
+						lg: '0% 10% 5% 10%'
+					}
+				}} />
 			</Grid>
 			<Grid item xs={12} lg={8} sx={{width: '100%'}}>
 				<Carousel
@@ -47,11 +52,15 @@ const SliderWithText = ({body, images}: SliderWithTextProps) => {
 					}}
 				>
 					{images.map((image) => (
-						<div key={image} style={{
+						<Box key={image} sx={{
 							width: '100%',
-							height: 'calc(100vh - 150px)',
+							height: {
+								md: 'calc(100vh - 160px)',
+								xs: 'calc(100vh - 80px)',
+							},
 							backgroundImage: `url(${image})`,
 							backgroundSize: 'cover',
+							backgroundPosition: 'center center'
 						}} />
 					))}
 				</Carousel>

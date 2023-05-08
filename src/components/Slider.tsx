@@ -1,10 +1,12 @@
 import React, {useEffect, useRef, useState} from "react";
 import {motion, useAnimation, useDragControls, useScroll} from "framer-motion";
 import Bullet from "./Bullet";
-import {IconButton} from "@mui/material";
 
-const SLIDES = 3
-const GAP = 20
+type SliderProps = {
+	children: React.ReactNode[]
+	gap?: number
+	slides?: number
+}
 
 // @ts-ignore
 const translateXForElement = (element) => {
@@ -21,7 +23,7 @@ const translateXForElement = (element) => {
 		: 0;
 }
 
-const Slider = ({children}: {children: React.ReactNode[]}) => {
+const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 	const ref = useRef(null);
 	const [constraint, setConstraint] = useState(0);
 	const animation = useAnimation()
@@ -39,8 +41,8 @@ const Slider = ({children}: {children: React.ReactNode[]}) => {
 
 	const goToSlide = (index: number) => {
 		// @ts-ignore
-		const slideWidth = (ref?.current?.offsetWidth - GAP * (SLIDES - 1)) / SLIDES
-		animation.start({ x: -(index * (slideWidth+GAP)) })
+		const slideWidth = (ref?.current?.offsetWidth - gap * (slides - 1)) / slides
+		animation.start({ x: -(index * (slideWidth+gap)) })
 	}
 
 	return (
@@ -52,20 +54,20 @@ const Slider = ({children}: {children: React.ReactNode[]}) => {
 				dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
 				dragElastic={0}
 				key={constraint}
-				style={{display: 'flex', gap: GAP}}
+				style={{display: 'flex', gap: gap}}
 				animate={animation}
 				onDragTransitionEnd={() => {
 					const xPos = translateXForElement(ref.current);
 					// @ts-ignore
-					const slideWidth = (ref.current.offsetWidth - GAP * (SLIDES - 1)) / SLIDES + GAP
+					const slideWidth = (ref.current.offsetWidth - gap * (slides - 1)) / slides + gap
 					const targetX = -Math.abs(Math.round(xPos / (slideWidth)) * slideWidth)
 					animation.start({ x: targetX, transition: { type: "spring" } });
 				}}
 			>
-				{[...children, ...children.slice(0,SLIDES)].map((slide, index) => (
+				{[...children, ...children.slice(0,slides)].map((slide, index) => (
 					<div
 						key={index}
-						style={{ flexShrink: 0,  width: 'calc((100% - '+GAP+'px * ('+SLIDES+' - 1)) / '+SLIDES+')' }}
+						style={{ flexShrink: 0,  width: 'calc((100% - '+gap+'px * ('+slides+' - 1)) / '+slides+')' }}
 					>
 						{slide}
 					</div>

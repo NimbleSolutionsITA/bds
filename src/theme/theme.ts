@@ -42,6 +42,36 @@ const theme = createTheme({
     },
     typography: {
         fontFamily: primaryFont.style.fontFamily,
+        body1: {
+            fontSize: '14px',
+            fontWeight: 300,
+        },
+        h1: {
+            fontFamily: secondaryFont.style.fontFamily,
+            fontWeight: 500,
+            fontSize: '2.5rem',
+            lineHeight: 1.2,
+        },
+        h2: {
+            fontSize: '2rem',
+            fontFamily: primaryFont.style.fontFamily,
+            fontWeight: 500,
+        },
+        h3: {
+            fontSize: '1.75rem',
+            fontWeight: 500,
+            lineHeight: 1.2,
+        },
+        h4: {
+            fontSize: '1.5rem',
+            fontWeight: 500,
+            lineHeight: 1.2,
+        },
+        h6: {
+            fontSize: '1rem',
+            fontWeight: 500,
+            lineHeight: 1.2,
+        }
     },
     shape: {
         borderRadius: 0
@@ -70,6 +100,26 @@ const theme = createTheme({
                 }
             }
         },
+        MuiInputBase: {
+            styleOverrides: {
+                colorSecondary: {
+                    color: '#ffffff',
+                    '&:before': {
+                        borderColor: 'rgba(255,255,255,0.5) !important'
+                    },
+                    '& input::placeholder': {
+                        color: 'rgba(255,255,255,0.5)'
+                    }
+                }
+            }
+        },
+        MuiInputLabel: {
+            styleOverrides: {
+                root: {
+                    color: 'rgba(255,255,255,0.5)',
+                }
+            }
+        }
     }
 });
 

@@ -4,6 +4,9 @@ import Layout from "../src/layout/Layout";
 import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
 import {Menus} from "../src/types/settings";
 import {AcfAdvancedLink, AcfImage, AcfProduct, AcfProductCategory} from "../src/types/woocommerce";
+import {GooglePlaces} from "./api/google-places";
+import BannerTestimonials from "../src/pages/home/BannerTestimonials";
+import BannerContact from "../src/pages/home/BannerContact";
 
 const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
 const OurSelection = dynamic(() => import("../src/pages/home/OurSelection"));
@@ -61,12 +64,13 @@ export type HomeProps = {
             image: AcfImage
         }
     },
-    menus: Menus
+    menus: Menus,
+    googlePlaces: GooglePlaces
 }
 
-export default function Home({page, menus}: HomeProps) {
+export default function Home({page, menus, googlePlaces}: HomeProps) {
     return (
-      <Layout menus={menus}>
+      <Layout menus={menus} googlePlaces={googlePlaces}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
           <OurSelection ourSelection={page.ourSelection} />
           <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
@@ -74,7 +78,9 @@ export default function Home({page, menus}: HomeProps) {
           <BannerDesigners designers={page.designers} />
           <BannerTop bannerTop={page.bannerTop} />
           <BannerBottom bannerBottom={page.bannerBottom} />
+          <BannerTestimonials reviews={googlePlaces.main.reviews} />
           <BannerBottom2 bannerBottom2={page.bannerBottom2} />
+          <BannerContact />
       </Layout>
     );
 }
@@ -90,7 +96,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: st
             bannerTop: { imageLeft, body, imageRight },
             bannerBottom: { leftColumn, imageCenter, rightColumn },
             bannerBottom2
-        } }, seo, menus }
+        } }, seo, menus, googlePlaces }
     ] = await Promise.all([
         getPageProps('home', locale)
     ]);
@@ -115,7 +121,8 @@ export async function getStaticProps({ locale }: { locales: string[], locale: st
                 bannerBottom2
             },
             seo,
-            menus
+            menus,
+            googlePlaces: googlePlaces
         },
         revalidate: 10
     }

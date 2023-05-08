@@ -1,7 +1,7 @@
 import {SvgIcon} from "@mui/material";
 import {SvgIconProps} from "@mui/material/SvgIcon/SvgIcon";
 
-export default function CartCartIconIcon(props: SvgIconProps) {
+export default function CartIcon(props: SvgIconProps) {
     return (
         <SvgIcon {...props}>
             <path

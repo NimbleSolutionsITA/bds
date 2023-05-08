@@ -72,7 +72,7 @@ const BannerDesigners = ({designers}: BannerDesignersProps) => {
 						display: 'flex',
 						flexDirection: 'column',
 						justifyContent: 'end',
-						padding: '0% 10% 5% 10%'
+						padding: '5% 10%'
 					}}
 					html={designers.body}
 				/>

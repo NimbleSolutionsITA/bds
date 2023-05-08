@@ -7,7 +7,6 @@ type ProductCardProps = {
 }
 
 const ProductCard = ({ product, width = '100%' }: ProductCardProps) => {
-
     return (
         <Card
             sx={{width, height: 'auto'}}
@@ -17,7 +16,7 @@ const ProductCard = ({ product, width = '100%' }: ProductCardProps) => {
                 sx={{ width: '100%', height: '100%', minHeight: 200 }}
                 image={product.image}
             />
-            <CardContent sx={{textAlign: 'center'}}>
+            <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
                 <Typography sx={{}}>{product.category.name}</Typography>
                 <Typography variant="h3" sx={{
                     fontFamily: 'Ogg Roman',

@@ -3,8 +3,12 @@ import {Box, AppBar, Button, IconButton, SwipeableDrawer, Toolbar} from "@mui/ma
 import {MenuToggle} from "./MenuToggle";
 import Image from "next/image";
 import logo from "../../../images/bottega-di-sguardi-logo.png";
-import CartIcon from "../../../icons/CartIcon";
-import {Menus} from "../../../types/settings";
+import {MenuItem, Menus} from "../../../types/settings";
+import CartIndicator from "../../../components/CartIndicator";
+import LanguageButton from "../../../components/LanguageButton";
+import {Facebook, Instagram} from "@mui/icons-material";
+import {useRouter} from "next/router";
+import {IconButtonProps} from "@mui/material/IconButton/IconButton";
 
 type NavBarMobileProps = {
     mobileMenu: Menus['mobileMenu']
@@ -13,6 +17,11 @@ type NavBarMobileProps = {
 const drawerBleeding = 56;
 export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
     const [open, setOpen] = useState(false)
+    const router = useRouter()
+    function handleClick(nav: MenuItem) {
+        setOpen(false)
+    }
+
     return (
         <>
             <AppBar
@@ -25,13 +34,15 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
             }}
             >
                 <Toolbar sx={{position: 'relative', width: '100%', height: '100%', justifyContent: 'space-between'}}>
-                    <LogoButton />
+                    <LogoButton onClick={() => {
+                        setOpen(false)
+                        router.push('/')
+
+                    }} />
                     <IconButton onClick={() => setOpen(open => !open)}>
                         <MenuToggle isOpen={open} />
                     </IconButton>
-                    <IconButton>
-                        <CartIcon />
-                    </IconButton>
+                    <CartIndicator iconProps={{fontSize: 'large'}} amount={10} />
                 </Toolbar>
             </AppBar>
             <SwipeableDrawer
@@ -46,6 +57,7 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                     keepMounted: true,
                 }}
                 sx={{
+                    position: 'relative',
                     '& .MuiPaper-root': {
                         paddingTop: '80px',
                         height: '100%'
@@ -58,24 +70,35 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                             key={nav.id}
                             variant="text"
                             sx={{color: 'black'}}
+                            onClick={() => handleClick(nav)}
+
                         >
                             {nav.title}
                         </Button>
                     ))}
+                </Box>
+                <Box sx={{position: 'absolute', bottom: '20px', width: '100%', textAlign: 'right', paddingRight: '20px'}}>
+                    <LanguageButton onClick={() => setOpen(false)} />
+                    <IconButton size="small">
+                        <Facebook fontSize="small" />
+                    </IconButton>
+                    <IconButton size="small">
+                        <Instagram fontSize="small" />
+                    </IconButton>
                 </Box>
             </SwipeableDrawer>
         </>
     )
 }
 
-const LogoButton = () => (
+const LogoButton = (props: IconButtonProps) => (
     <IconButton sx={{
         position: 'absolute',
         left: 'calc(50% - 30px)',
         '&:hover': {
             backgroundColor: 'inherit'
         }
-    }}>
+    }} {...props}>
         <Image
             src={logo}
             alt="Logo Bottega di Sguardi"
