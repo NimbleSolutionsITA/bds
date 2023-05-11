@@ -23,7 +23,7 @@ export const cartSlice = createSlice({
 	name: 'cart',
 	initialState,
 	reducers: {
-		initCart: (state, action) => {
+		initCart: (state) => {
 			state = JSON.parse( localStorage.getItem( 'bdg-cart' ) || '{ "items": [] }' )
 			return state
 		},
