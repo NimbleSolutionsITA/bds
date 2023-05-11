@@ -113,9 +113,9 @@ const theme = createTheme({
                 }
             }
         },
-        MuiInputLabel: {
+        MuiFormLabel: {
             styleOverrides: {
-                root: {
+                colorSecondary: {
                     color: 'rgba(255,255,255,0.5)',
                 }
             }

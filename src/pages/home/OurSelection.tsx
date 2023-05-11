@@ -1,5 +1,5 @@
 import Slider from "../../components/Slider";
-import ProductCard from "../../components/ProductCard";
+import AcfProductCard from "../../components/AcfProductCard";
 import {Container, Theme, useMediaQuery} from "@mui/material";
 import React from "react";
 import {HomeProps} from "../../../pages";
@@ -21,7 +21,7 @@ const OurSelection = ({ourSelection}: OurSelectionProps) => {
 				<strong>{ourSelection.title}</strong>
 			</h3>
 			<Slider slides={getSlides()}>
-				{ourSelection.products.map((product) => <ProductCard product={product} key={product.id} />)}
+				{ourSelection.products.map((product) => <AcfProductCard product={product} key={product.id} />)}
 			</Slider>
 		</Container>
 	);

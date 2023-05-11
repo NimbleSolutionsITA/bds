@@ -1,24 +1,31 @@
-import React from "react";
+import React, {useEffect} from "react";
 import NavBar from "./nav/NavBar";
 import {useMediaQuery, useTheme} from "@mui/material";
 import NavBarMobile from "./nav/mobile/NavBarMobile";
-import {Menus} from "../types/settings";
+import {BreadCrumb, Menus} from "../types/settings";
 import Footer from "./footer/Footer";
 import {GooglePlaces} from "../../pages/api/google-places";
+import {useDispatch} from "react-redux";
+import {initCart} from "../redux/cartSlice";
 
 type LayoutProps = {
     children: React.ReactNode,
     menus: Menus,
-    googlePlaces: GooglePlaces
+    googlePlaces: GooglePlaces,
+    breadcrumbs?: BreadCrumb[]
 }
-export default function Layout({children, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}}: LayoutProps) {
+export default function Layout({children, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}}: LayoutProps) {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const dispatch = useDispatch()
+    useEffect(() => {
+        dispatch(initCart())
+    })
     return (
         <>
             {isMobile ?
                 <NavBarMobile mobileMenu={mobileMenu} />  :
-                <NavBar leftMenu={leftMenu} rightMenu={rightMenu} />
+                <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />
             }
             {children}
             <Footer googlePlaces={googlePlaces} />

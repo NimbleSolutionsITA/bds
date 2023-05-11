@@ -5,8 +5,6 @@ import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
 import {Menus} from "../src/types/settings";
 import {AcfAdvancedLink, AcfImage, AcfProduct, AcfProductCategory} from "../src/types/woocommerce";
 import {GooglePlaces} from "./api/google-places";
-import BannerTestimonials from "../src/pages/home/BannerTestimonials";
-import BannerContact from "../src/pages/home/BannerContact";
 
 const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
 const OurSelection = dynamic(() => import("../src/pages/home/OurSelection"));
@@ -16,6 +14,8 @@ const BannerDesigners = dynamic(() => import("../src/pages/home/BannerDesigners"
 const BannerTop = dynamic(() => import("../src/pages/home/BannerTop"));
 const BannerBottom = dynamic(() => import("../src/pages/home/BannerBottom"));
 const BannerBottom2 = dynamic(() => import("../src/pages/home/BannerBottom2"));
+const BannerTestimonials = dynamic(() => import("../src/pages/home/BannerTestimonials"));
+const BannerContact = dynamic(() => import("../src/pages/home/BannerContact"));
 
 export type HomeProps = {
     page: {
@@ -122,7 +122,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: st
             },
             seo,
             menus,
-            googlePlaces: googlePlaces
+            googlePlaces
         },
         revalidate: 10
     }

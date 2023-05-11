@@ -10,7 +10,6 @@ type BannerTestimonialsProps = {
 }
 
 const BannerTestimonials = ({reviews}: BannerTestimonialsProps) => {
-	console.log(reviews)
 	return (
 		<div style={{
 			backgroundColor: '#F4F4F4',

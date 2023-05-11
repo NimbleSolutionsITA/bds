@@ -1,18 +1,19 @@
 import TopBar from "./TopBar";
 import AppBar from "./AppBar";
 import BottomBar from "./BottomBar";
-import {Menus} from "../../types/settings";
+import {BreadCrumb, Menus} from "../../types/settings";
 
 type NavBarProps = {
-    leftMenu: Menus['leftMenu'],
+    leftMenu: Menus['leftMenu']
     rightMenu: Menus['rightMenu']
+    breadcrumbs?: BreadCrumb[]
 }
-export default function NavBar({leftMenu, rightMenu}: NavBarProps) {
+export default function NavBar({leftMenu, rightMenu, breadcrumbs}: NavBarProps) {
     return (
         <>
             <TopBar />
             <AppBar leftMenu={leftMenu} rightMenu={rightMenu} />
-            <BottomBar />
+            <BottomBar breadcrumbs={breadcrumbs} />
         </>
     )
 }

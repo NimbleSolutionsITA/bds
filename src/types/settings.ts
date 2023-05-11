@@ -11,3 +11,8 @@ export type Menus = {
 	mobileMenu: MenuItem[],
 	privacy: MenuItem[],
 }
+
+export type BreadCrumb = {
+	name: string,
+	href: string
+}
