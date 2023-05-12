@@ -68,12 +68,16 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths() {
-	const {productCategories} = await (await fetch(`${ NEXT_API_ENDPOINT}/products/categories?parent=188`).then(response => response.json()));
-	const paths = productCategories.map(({slug}: WooProductCategory) => ({ params: { slug } }));
+	try {
+		const {productCategories} = await (await fetch(`${NEXT_API_ENDPOINT}/products/categories?parent=188`).then(response => response.json()));
+		const paths = productCategories.map(({slug}: WooProductCategory) => ({params: {slug}}));
 
-	console.log(paths)
-	return {
-		paths,
-		fallback: 'blocking',
-	};
+		console.log(paths)
+		return {
+			paths,
+			fallback: 'blocking',
+		};
+	} catch (e) {
+		console.log(e)
+	}
 }
