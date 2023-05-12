@@ -1,9 +1,9 @@
 import React from "react";
 import Layout from "../../src/layout/Layout";
-import {getDesignerPageProps, getDesignersPageProps, getPageProps, getProducts} from "../../src/utils/wordpress_api";
+import {getDesignerPageProps, getProducts} from "../../src/utils/wordpress_api";
 import {BreadCrumb, Menus} from "../../src/types/settings";
 import {GooglePlaces} from "../api/google-places";
-import {BaseProduct, Product, WooProductCategory} from "../../src/types/woocommerce";
+import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import {NEXT_API_ENDPOINT} from "../../src/utils/endpoints";
 import sanitize from "sanitize-html";
@@ -46,7 +46,9 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
+	console.log(slug)
 	const { products } = await getProducts(locale, productCategory.slug)
+	console.log({products: products.length})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
@@ -69,6 +71,7 @@ export async function getStaticPaths() {
 	const {productCategories} = await (await fetch(`${ NEXT_API_ENDPOINT}/products/categories?parent=188`).then(response => response.json()));
 	const paths = productCategories.map(({slug}: WooProductCategory) => ({ params: { slug } }));
 
+	console.log(paths)
 	return {
 		paths,
 		fallback: 'blocking',
