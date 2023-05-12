@@ -6,6 +6,7 @@ import {
 } from "./endpoints"
 import {AcfImage, Category, Image, Product, Variation, WooProductCategory} from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
+import {getProductCategories} from "../../pages/api/products/categories";
 function mapMenuItem(item: any) {
 	return {
 		id: item.ID,
@@ -15,7 +16,7 @@ function mapMenuItem(item: any) {
 	}
 }
 
-export const getLayoutProps = async<T> (locale: string) => {
+export const getLayoutProps = async (locale: string) => {
 	const menus = {
 		leftMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-left${locale !== 'it' ? '-'+locale : ''}`).then(response => response.json())).items.map(mapMenuItem),
 		rightMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-right${locale !== 'it' ? '-'+locale : ''}`).then(response => response.json())).items.map(mapMenuItem),
@@ -25,19 +26,19 @@ export const getLayoutProps = async<T> (locale: string) => {
 	const googlePlaces = await getGooglePlaces(locale)
 	return { menus, googlePlaces }
 }
-export const getPageProps = async<T> (slug: string, locale: string) => {
+export const getPageProps = async (slug: string, locale: string) => {
 	const page = (await fetch(`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}`).then(response => response.json()))[0]
 	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${page.link}`).then(response => response.json()))
 	const { menus, googlePlaces } = await getLayoutProps(locale)
 	return { page, seo, menus, googlePlaces }
 }
 
-export const getDesignersPageProps = async<T> (locale: string) => {
-	const { productCategories } = (await fetch(`${ NEXT_API_ENDPOINT}/products/categories?lang=${locale}&parent=188`).then(response => response.json()))
+export const getDesignersPageProps = async (locale: string) => {
+	const productCategories = await getProductCategories(locale, '188')
 	return { productCategories: productCategories.map(mapProductCategory) }
 }
 
-export const getDesignerPageProps = async<T> (locale: string, slug: string) => {
+export const getDesignerPageProps = async (locale: string, slug: string) => {
 	const { productCategory } = (await fetch(`${ NEXT_API_ENDPOINT}/products/categories/${slug}?lang=${locale}`).then(response => response.json()))
 	const { menus, googlePlaces } = await getLayoutProps(locale)
 	return { menus, googlePlaces, productCategory: productCategory ? mapProductCategory(productCategory) : null }
@@ -52,6 +53,7 @@ export const getProductVariations = async (id: number): Promise<{productVariatio
 	const { productVariations } = (await fetch(`${ NEXT_API_ENDPOINT}/products/${id}/variations`).then(response => response.json()))
 	return { productVariations: productVariations.map(mapVariation) }
 }
+
 
 export const mapProduct = ({
 		id,

@@ -1,4 +1,3 @@
-import React from "react";
 import Layout from "../src/layout/Layout";
 import {getDesignersPageProps, getPageProps} from "../src/utils/wordpress_api";
 import {BreadCrumb, Menus} from "../src/types/settings";

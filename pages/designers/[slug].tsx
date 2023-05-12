@@ -5,8 +5,8 @@ import {BreadCrumb, Menus} from "../../src/types/settings";
 import {GooglePlaces} from "../api/google-places";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
-import {NEXT_API_ENDPOINT} from "../../src/utils/endpoints";
 import sanitize from "sanitize-html";
+import {getProductCategories} from "../api/products/categories";
 
 const DesignerTop = dynamic(() => import("../../src/pages/designers/DesignerTop"))
 const DesignerProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -46,9 +46,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
-	console.log(slug)
 	const { products } = await getProducts(locale, productCategory.slug)
-	console.log({products: products.length})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
@@ -68,16 +66,10 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths() {
-	try {
-		const {productCategories} = await (await fetch(`${NEXT_API_ENDPOINT}/products/categories?parent=188`).then(response => response.json()));
-		const paths = productCategories.map(({slug}: WooProductCategory) => ({params: {slug}}));
-
-		console.log(paths)
-		return {
-			paths,
-			fallback: 'blocking',
-		};
-	} catch (e) {
-		console.log(e)
-	}
+	const productCategories = await getProductCategories(undefined, '188');
+	const paths = productCategories.map(({slug}: WooProductCategory) => ({ params: { slug } }));
+	return {
+		paths,
+		fallback: 'blocking',
+	};
 }

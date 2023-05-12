@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
+import {WooProductCategory} from "../../../src/types/woocommerce";
 
 type Data = {
 	success: boolean
@@ -39,7 +40,10 @@ export default async function handler(
 	}
 }
 
-export const getProductCategories = async<T> (lang?: string | string[] | undefined, parent?: string | string[] | undefined) => {
+export const getProductCategories = async (
+	lang?: string | string[] | undefined,
+	parent?: string | string[] | undefined
+): Promise<WooProductCategory[]> => {
 	let page = 1
 	let { data } = await api.get(
 		'products/categories',
