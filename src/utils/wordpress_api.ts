@@ -7,6 +7,7 @@ import {
 import {AcfImage, Category, Image, Product, Variation, WooProductCategory} from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
+import {getProductCategory} from "../../pages/api/products/categories/[slug]";
 function mapMenuItem(item: any) {
 	return {
 		id: item.ID,
@@ -39,14 +40,9 @@ export const getDesignersPageProps = async (locale: string) => {
 }
 
 export const getDesignerPageProps = async (locale: string, slug: string) => {
-	const { productCategory } = (await fetch(`${ NEXT_API_ENDPOINT}/products/categories/${slug}?lang=${locale}`).then(response => response.json()))
+	const productCategory = await getProductCategory(locale, slug)
 	const { menus, googlePlaces } = await getLayoutProps(locale)
 	return { menus, googlePlaces, productCategory: productCategory ? mapProductCategory(productCategory) : null }
-}
-
-export const getProducts = async (locale: string, categories?: string): Promise<{products: Product[]}> => {
-	const { products } = (await fetch(`${ NEXT_API_ENDPOINT}/products?lang=${locale}${categories ? '&categories='+categories : ''}`).then(response => response.json()))
-	return { products }
 }
 
 export const getProductVariations = async (id: number): Promise<{productVariations: Variation[]}> => {
@@ -150,7 +146,7 @@ export const mapProductCategory = (category: WooProductCategory) => ({
 	name: category.name,
 	slug: category.slug,
 	description: category.description,
-	image: mapImage(category.image),
+	image: category.image ? mapImage(category.image) : null,
 	menu_order: category.menu_order,
 	count: category.count,
 	acf: category.acf,

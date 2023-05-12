@@ -26,12 +26,12 @@ export default async function handler(
 	if (req.method === 'GET') {
 		try {
 			const data = await getProductCategory(lang as string, slug as string)
-			if (!data[0]) {
+			if (!data) {
 				responseData.error = "Product category not found"
 				res.status(404).json(responseData);
 			} else {
 				responseData.success = true
-				responseData.productCategory = data[0]
+				responseData.productCategory = data
 				res.json(responseData)
 			}
 		}
@@ -55,5 +55,5 @@ export const getProductCategory = async (lang: string, slug: string) => {
 			slug
 		}
 	)
-	return data
+	return data[0] ?? null
 }

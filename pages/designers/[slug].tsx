@@ -1,12 +1,13 @@
 import React from "react";
 import Layout from "../../src/layout/Layout";
-import {getDesignerPageProps, getProducts} from "../../src/utils/wordpress_api";
+import {getDesignerPageProps} from "../../src/utils/wordpress_api";
 import {BreadCrumb, Menus} from "../../src/types/settings";
 import {GooglePlaces} from "../api/google-places";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
+import {getProducts} from "../api/products";
 
 const DesignerTop = dynamic(() => import("../../src/pages/designers/DesignerTop"))
 const DesignerProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -46,7 +47,10 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
-	const { products } = await getProducts(locale, productCategory.slug)
+	const products = await getProducts({
+		categories: slug,
+		lang: locale
+	})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
