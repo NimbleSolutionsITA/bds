@@ -7,7 +7,7 @@ type Data = {
 	error?: string
 }
 
-type RequestQuery = {
+export type ProductsRequestQuery = {
 	per_page?: string | undefined,
 	page?: string | undefined,
 	categories?: string | string[] | undefined,
@@ -74,7 +74,7 @@ export const getProducts = async ({
       colors,
       price_range,
       tags
-}: RequestQuery): Promise<BaseProduct[]> => {
+}: ProductsRequestQuery): Promise<BaseProduct[]> => {
 	const params = new URLSearchParams({
 		...(per_page && { per_page: per_page.toString() }),
 		...(page && { page: page.toString() }),
