@@ -75,7 +75,7 @@ export default function Home({page, menus, googlePlaces}: HomeProps) {
           <OurSelection ourSelection={page.ourSelection} />
           <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
           <BannerShipping shipping={page.shipping} />
-          <BannerDesigners designers={page.designers} />
+          {Array.isArray(page.designers) && <BannerDesigners designers={page.designers}/>}
           <BannerTop bannerTop={page.bannerTop} />
           <BannerBottom bannerBottom={page.bannerBottom} />
           <BannerTestimonials reviews={googlePlaces.main.reviews} />
