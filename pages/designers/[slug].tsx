@@ -49,7 +49,8 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	}
 	const products = await getProducts({
 		categories: slug,
-		lang: locale
+		lang: locale,
+		per_page: '24'
 	})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [

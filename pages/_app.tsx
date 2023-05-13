@@ -9,6 +9,7 @@ import createEmotionCache from '../src/theme/createEmotionCache';
 import '../styles/globals.css';
 import {Provider} from "react-redux";
 import {store} from "../src/redux/store";
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -16,6 +17,8 @@ const clientSideEmotionCache = createEmotionCache();
 export interface BDGAppProps extends AppProps {
     emotionCache?: EmotionCache;
 }
+// Create a client
+const queryClient = new QueryClient()
 
 export default function MyApp(props: BDGAppProps) {
     const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
@@ -26,9 +29,11 @@ export default function MyApp(props: BDGAppProps) {
                     <meta name="viewport" content="initial-scale=1, width=device-width" />
                 </Head>
                 <ThemeProvider theme={theme}>
-                    {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                    <CssBaseline />
-                    <Component {...pageProps} />
+                    <QueryClientProvider client={queryClient}>
+                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                        <CssBaseline />
+                        <Component {...pageProps} />
+                    </QueryClientProvider>
                 </ThemeProvider>
             </CacheProvider>
         </Provider>

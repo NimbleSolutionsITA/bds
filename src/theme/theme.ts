@@ -2,6 +2,8 @@ import { createTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
 import localFont from 'next/font/local'
 
+export const CUSTOM_COLOR = '#708477';
+
 export const primaryFont = localFont({
     src: [
         {
@@ -39,6 +41,9 @@ const theme = createTheme({
         error: {
             main: red.A400,
         },
+        background: {
+
+        }
     },
     typography: {
         fontFamily: primaryFont.style.fontFamily,

@@ -8,6 +8,7 @@ import {AcfImage, Category, Image, Product, Variation, WooProductCategory} from 
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
 import {getProductCategory} from "../../pages/api/products/categories/[slug]";
+import {DESIGNERS_CATEGORY, sanitize} from "./utils";
 function mapMenuItem(item: any) {
 	return {
 		id: item.ID,
@@ -34,8 +35,8 @@ export const getPageProps = async (slug: string, locale: string) => {
 	return { page, seo, menus, googlePlaces }
 }
 
-export const getDesignersPageProps = async (locale: string) => {
-	const productCategories = await getProductCategories(locale, '188')
+export const getDesignersPageProps = async (locale: 'it' | 'en') => {
+	const productCategories = await getProductCategories(locale, DESIGNERS_CATEGORY[locale])
 	return { productCategories: productCategories.map(mapProductCategory) }
 }
 
@@ -137,8 +138,8 @@ export const mapVariation = ({
 	backorders
 })
 
-export const mapCategory = ({id, name, slug}: Category) => ({
-	id, name, slug
+export const mapCategory = ({id, name, slug, count}: Category) => ({
+	id, name: sanitize(name), slug, count
 })
 
 export const mapProductCategory = (category: WooProductCategory) => ({

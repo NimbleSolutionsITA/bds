@@ -13,3 +13,8 @@ export const sanitize = (html: string) => {
     }
   });
 }
+
+export const DESIGNERS_CATEGORY = {
+  it: '188',
+  en: '496'
+}

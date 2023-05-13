@@ -68,6 +68,7 @@ export interface Category {
 	id: number;
 	name: string;
 	slug: string;
+	count: number;
 }
 
 export interface Image {
@@ -162,4 +163,12 @@ export type BaseVariation = {
 	stock_status: 'instock' | 'outofstock' | 'onbackorder';
 	stock_quantity?: number | null;
 	attributes?: DefaultAttribute[];
+}
+
+export type ProductTag = {
+	id: number;
+	name: string;
+	count: number;
+	filter: 'none' | 'material' | 'gender' | 'style';
+	slug: string;
 }

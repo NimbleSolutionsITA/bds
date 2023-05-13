@@ -1,9 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
+import {Product} from "../../../src/types/woocommerce";
 
 type Data = {
 	success: boolean
-	product?: any
+	product?: Product
 	error?: string
 }
 
@@ -47,10 +48,7 @@ export default async function handler(
 
 export const getProduct = async (id: string) => {
 	const { data } = await api.get(
-		'products/' + id,
-		{
-			per_page: 99
-		}
+		'products/' + id
 	)
 	return data
 }

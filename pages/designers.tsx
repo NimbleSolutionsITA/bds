@@ -24,7 +24,7 @@ export default function Designers({
     );
 }
 
-export async function getStaticProps({ locale }: { locales: string[], locale: string}) {
+export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
         { page, seo, menus, googlePlaces },
         { productCategories }
