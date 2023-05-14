@@ -1,37 +1,43 @@
 import {Slider} from "@mui/material";
-import Box from "@mui/material/Box";
 
 type PriceRangeProps = {
 	onChange: (priceRange: number|number[]) => void
+	price: any
 }
-const PriceRange = ({onChange}: PriceRangeProps) => {
-	const spanStyle = {
-		fontSize: '10px',
-		color: 'rgba(255,255,255,0.42)',
-		fontWeight: 500,
-		position: 'absolute',
-		top: '32px'
-	}
+const PriceRange = ({onChange, price}: PriceRangeProps) => {
+	console.log(price)
 	return (
-		<Box sx={{position: 'relative', width: {xs: '100%', md: 'auto'}}}>
-			<Box sx={{...spanStyle, left: '-5px'}}>0€</Box>
-			<Box sx={{...spanStyle, right: '-10px'}}>3000€</Box>
+		<div style={{width: '100%', paddingRight: '10px'}}>
 			<Slider
+				value={price}
 				color="secondary"
 				name="price_range"
 				valueLabelFormat={(value) => value+'€'}
 				valueLabelDisplay="auto"
 				size={'small'}
 				defaultValue={[0, 3000]}
+				marks={[
+					{ value: 0, label: '0€' },
+					{ value: 500, label: null },
+					{ value: 1000, label: '1.000€' },
+					{ value: 1500, label: null },
+					{ value: 2000, label: '2.000€' },
+					{ value: 2500, label: null },
+					{ value: 3000, label: '3.000€' },
+
+				]}
 				step={10}
 				min={0}
 				max={3000}
 				onChange={(_, value) => onChange(value)}
 				sx={{
-					width: {
-						xs: '100%',
-						md: 190
+					'& .MuiSlider-markLabel': {
+						fontSize: '12px',
+						color: 'rgba(255,255,255,0.42)',
 					},
+					'& .MuiSlider-mark': {
+						height: 10,
+					}
 				}}
 				slotProps={{
 					thumb: {
@@ -49,7 +55,7 @@ const PriceRange = ({onChange}: PriceRangeProps) => {
 					}
 				}}
 			/>
-		</Box>
+		</div>
 	)
 }
 

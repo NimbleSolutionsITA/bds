@@ -2,6 +2,7 @@ import HtmlBlock from "./HtmlBlock";
 import {Button, Box, Collapse, TextField, Zoom, CircularProgress} from "@mui/material";
 import {useState} from "react";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import {CUSTOM_COLOR} from "../theme/theme";
 
 type BannerNewsletterProps = {
 	body: string
@@ -23,7 +24,7 @@ const BannerNewsletter = ({body, ctaText}: BannerNewsletterProps) => {
 	}
 	return (
 		<Box sx={{
-			backgroundColor: '#708477',
+			backgroundColor: CUSTOM_COLOR,
 			color: '#fff',
 			textAlign: 'center',
 			padding: '40px 20px'

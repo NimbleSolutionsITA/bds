@@ -93,7 +93,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
                             {currentProduct.stock_status !== 'instock' ? 'prodotto non in-stock' : 'Aggiungi al carrello'}
                         </Button>
                     </div>
-                    <Typography sx={{fontSize: '14px', opacity: hover ? 0 : 1, transition: 'opacity .5s ease'}}>{currentProduct.price},00€</Typography>
+                    {currentProduct.price && (
+                        <Typography sx={{
+                            fontSize: '14px',
+                            opacity: hover ? 0 : 1,
+                            transition: 'opacity .5s ease'
+                        }}>{currentProduct.price},00€</Typography>
+                    )}
                 </div>
             </CardContent>
         </Card>
