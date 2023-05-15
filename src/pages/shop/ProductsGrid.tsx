@@ -87,7 +87,7 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 						loader={(<Typography variant="h1">Loading...</Typography>)}
 						scrollableTarget="html"
 					>
-						{data?.pages[0].length > 0 ? (
+						{data?.pages[0]?.length > 0 ? (
 							<Grid container spacing={3}>
 								{data?.pages.map(products => products.map((product: BaseProduct) => (
 									<Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
