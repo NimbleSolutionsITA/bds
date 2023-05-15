@@ -1,7 +1,7 @@
 import {BaseProduct, Category, Color, ProductTag} from "../../types/woocommerce";
-import {Container, Grid, Typography} from "@mui/material";
+import {Backdrop, CircularProgress, Container, Grid, Typography} from "@mui/material";
 import ProductCard from "../../components/ProductCard";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -29,7 +29,7 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 	const [searchParams, setSearchParams] = useState<SearchParams>({})
 	const {locale} = useRouter()
 
-	const { data, status, fetchNextPage, hasNextPage } = useInfiniteQuery(
+	const { data, status, fetchNextPage, hasNextPage, isRefetching } = useInfiniteQuery(
 		["products", searchParams],
 		async ({ pageParam = 1}): Promise<BaseProduct[]> => {
 			const queryParams = Object.fromEntries(Object.entries({
@@ -59,6 +59,12 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 			initialData: {pages: [products], pageParams: []}
 		}
 	);
+
+	useEffect(() => {
+		if (isRefetching)
+			window.scrollTo({top: 0, behavior: 'smooth'})
+	} , [isRefetching])
+
 	return (
 		<div style={{height: '100%'}}>
 			<Filters
@@ -68,25 +74,36 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 				tags={tags.filter(tag => tag.count > 0)}
 				designers={designers.filter(designer => designer.count > 0)}
 			/>
-			<Container sx={{marginTop: '20px', marginBottom: '20px'}}>
+			<Container sx={{marginTop: '20px', marginBottom: '20px', minHeight: '500px'}}>
 				{status === "success" && (
 					<InfiniteScroll
-						style={{width: '100%', overflow: 'hidden'}}
+						style={{
+							width: '100%',
+							overflow: 'hidden'
+						}}
 						dataLength={data?.pages.length * 24}
 						next={fetchNextPage}
 						hasMore={hasNextPage || false}
 						loader={(<Typography variant="h1">Loading...</Typography>)}
 						scrollableTarget="html"
 					>
-						<Grid container spacing={3}>
-							{data?.pages.map(products => products.map((product: BaseProduct) => (
-								<Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
-									<ProductCard product={product} />
-								</Grid>
-							)))}
-						</Grid>
+						{data?.pages[0].length > 0 ? (
+							<Grid container spacing={3}>
+								{data?.pages.map(products => products.map((product: BaseProduct) => (
+									<Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
+										<ProductCard product={product} />
+									</Grid>
+								)))}
+							</Grid>
+						) : <Typography variant="subtitle2">Nessun prdodotto trovato</Typography>}
 					</InfiniteScroll>
 				)}
+				<Backdrop
+					sx={{ backgroundColor: 'rgba(255,255,255,0.75)', zIndex: (theme) => theme.zIndex.appBar - 2 }}
+					open={isRefetching}
+				>
+					<CircularProgress color="inherit" />
+				</Backdrop>
 			</Container>
 		</div>
 	)

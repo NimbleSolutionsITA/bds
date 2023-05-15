@@ -7,7 +7,13 @@ import LanguageButton from "../../components/LanguageButton";
 
 export default function TopBar() {
     return (
-        <Container sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <Container sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            zIndex: (theme) => theme.zIndex.appBar,
+            position: 'relative'
+        }}>
             <div>
                 <LanguageButton />
                 <IconButton size="small">

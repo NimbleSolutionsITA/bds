@@ -8,7 +8,13 @@ type BottomBarProps = {
 
 export default function BottomBar({breadcrumbs}: BottomBarProps) {
     return (
-        <Container sx={{display: 'flex', height: '30px', alignItems: 'center'}}>
+        <Container sx={{
+            display: 'flex',
+            height: '30px',
+            alignItems: 'center',
+            zIndex: (theme) => theme.zIndex.appBar,
+            position: 'relative'
+        }}>
             {breadcrumbs && <Breadcrumbs breadcrumbs={breadcrumbs} />}
         </Container>
     )

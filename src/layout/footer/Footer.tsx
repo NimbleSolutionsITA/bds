@@ -24,7 +24,7 @@ type FooterProps = {
 
 const Footer = ({googlePlaces}: FooterProps) => {
 	return (
-		<Container component="footer" sx={{padding: '24px 20px'}}>
+		<Container component="footer" sx={{padding: '24px 20px', position: 'relative', zIndex: (theme) => theme.zIndex.appBar - 2, backgroundColor: '#fff'}}>
 			<Grid container>
 				<Grid item xs={12} md={3} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
 					<LogoButton />

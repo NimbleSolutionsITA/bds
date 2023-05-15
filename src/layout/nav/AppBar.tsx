@@ -20,7 +20,6 @@ export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
             elevation={0}
             sx={{
                 height: '90px',
-                zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
             color="secondary"
         >
