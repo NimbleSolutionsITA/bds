@@ -5,11 +5,11 @@ type PriceRangeProps = {
 	price: any
 }
 const PriceRange = ({onChange, price}: PriceRangeProps) => {
-	console.log(price)
+	const value = price ?? [0, 3000]
 	return (
 		<div style={{width: '100%', paddingRight: '10px'}}>
 			<Slider
-				value={price}
+				value={value}
 				color="secondary"
 				name="price_range"
 				valueLabelFormat={(value) => value+'€'}
