@@ -60,7 +60,7 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 		}
 	);
 	return (
-		<>
+		<div style={{height: '100%'}}>
 			<Filters
 				searchParams={searchParams}
 				setSearchParams={setSearchParams}
@@ -68,10 +68,10 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 				tags={tags.filter(tag => tag.count > 0)}
 				designers={designers.filter(designer => designer.count > 0)}
 			/>
-			<Container sx={{paddingTop: '20px', paddingBottom: '20px'}}>
+			<Container sx={{marginTop: '20px', marginBottom: '20px'}}>
 				{status === "success" && (
 					<InfiniteScroll
-						style={{width: '100%'}}
+						style={{width: '100%', overflow: 'hidden'}}
 						dataLength={data?.pages.length * 24}
 						next={fetchNextPage}
 						hasMore={hasNextPage || false}
@@ -88,7 +88,7 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 					</InfiniteScroll>
 				)}
 			</Container>
-		</>
+		</div>
 	)
 }
 
