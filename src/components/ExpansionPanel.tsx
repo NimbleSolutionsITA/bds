@@ -35,6 +35,9 @@ const ExpansionPanel = ({children ,title, plusMinus}: ExpansionPanelProps) => {
 				'&.Mui-expanded': {
 					marginBottom: 0,
 					marginTop: {xs: '10px', md: 0},
+					'&:first-of-type': {
+						marginTop: {xs: '10px', md: 0},
+					}
 				},
 				'&::before': {
 					display: 'none',

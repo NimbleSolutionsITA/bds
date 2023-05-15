@@ -5,8 +5,9 @@ import {ChangeEvent} from "react"; // import the clear icon
 type NameFieldProps = {
 	onChange: (name?: string) => void
 	value: string
+	disabled?: boolean
 }
-const NameField = ({onChange, value}: NameFieldProps) => {
+const NameField = ({onChange, value, disabled}: NameFieldProps) => {
 
 	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		onChange(event.target.value);
@@ -23,6 +24,7 @@ const NameField = ({onChange, value}: NameFieldProps) => {
 		size="small"
 		variant="filled"
 		color="secondary"
+		disabled={disabled}
 		InputProps={{
 			endAdornment: value ? (
 				<InputAdornment position="end">
@@ -33,6 +35,8 @@ const NameField = ({onChange, value}: NameFieldProps) => {
 			) : null,
 		}}
 		sx={{
+			opacity: disabled ? 0.5 : 1,
+			transition: 'opacity 0.3s ease-in-out',
 			fontSize: '10px',
 			borderRadius: 0,
 			'& .MuiInputBase-root.Mui-focused': {
@@ -45,7 +49,11 @@ const NameField = ({onChange, value}: NameFieldProps) => {
 					textOverflow: 'ellipsis !important',
 					color: '#fff',
 					opacity: 1,
-				}
+				},
+			},
+			'& .MuiInputBase-input.Mui-disabled': {
+				color: 'rgba(255,255,255,.43)',
+				WebkitTextFillColor: 'rgba(255,255,255,.43)',
 			},
 			'& .MuiInputBase-colorSecondary::before': {
 				display: 'none !important',

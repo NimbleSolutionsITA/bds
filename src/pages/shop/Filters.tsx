@@ -28,7 +28,7 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 		<Box
 			ref={ref}
 			sx={{
-				zIndex: 1201,
+				zIndex: (theme) => theme.zIndex.appBar - 1,
 				height: '40px',
 				backgroundColor: CUSTOM_COLOR,
 				width: '100%',
@@ -50,6 +50,7 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 				<NameField
 					value={searchParams.name ?? ''}
 					onChange={(name?: string) => setSearchParams(params => ({...params, name}))}
+					disabled={open}
 				/>
 				<div>
 					{Object.keys(searchParams).length > 0 && (
@@ -68,13 +69,16 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 				onClose={() => setOpen(false)}
 				onOpen={() => setOpen(true)}
 				elevation={0}
+				sx={{
+					zIndex: (theme) => theme.zIndex.appBar - 2,
+				}}
 				PaperProps={{
 					sx: {
 						backgroundColor: CUSTOM_COLOR,
-						marginTop: '40px',
 						height: '100vh',
 						width: '400px',
-						top: ref.current?.getBoundingClientRect().top+'px',
+						maxWidth: '100%',
+						top: ((ref.current?.getBoundingClientRect().top ?? 0) + 40)+'px',
 					}
 				}}
 				BackdropProps={{
@@ -126,7 +130,7 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 						setSearchParams={setSearchParams}
 					/>
 					<Divider light sx={{margin: '5px 0'}} />
-					<Typography  sx={{color: 'rgba(255,255,255)', fontWeight: 500, textTransform: 'uppercase', marginBottom: '10px'}}>Prezzo</Typography>
+					<Typography  sx={{color: 'rgba(255,255,255)', fontWeight: 500, textTransform: 'uppercase', margin: '10px 0'}}>Prezzo</Typography>
 					<PriceRange
 						price={searchParams.price_range}
 						onChange={(priceRange) => setSearchParams(params => ({

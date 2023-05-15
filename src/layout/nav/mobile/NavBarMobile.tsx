@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Box, AppBar, Button, IconButton, SwipeableDrawer, Toolbar} from "@mui/material";
+import {AppBar, Button, IconButton, SwipeableDrawer, Toolbar, Container} from "@mui/material";
 import {MenuToggle} from "./MenuToggle";
 import Image from "next/image";
 import logo from "../../../images/bottega-di-sguardi-logo.png";
@@ -29,8 +29,8 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                 elevation={0}
                 position="sticky"
                 sx={{
-                    zIndex: 1201,
-                    height: '80px'
+                    height: '80px',
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
             }}
             >
                 <Toolbar sx={{position: 'relative', width: '100%', height: '100%', justifyContent: 'space-between'}}>
@@ -51,6 +51,7 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                 open={open}
                 anchor="top"
                 elevation={0}
+                hideBackdrop
                 swipeAreaWidth={drawerBleeding}
                 disableSwipeToOpen={false}
                 ModalProps={{
@@ -59,12 +60,18 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                 sx={{
                     position: 'relative',
                     '& .MuiPaper-root': {
-                        paddingTop: '80px',
-                        height: '100%'
+                        top: '80px',
+                        height: 'calc(100% - 80px)',
                     }
                 }}
             >
-                <Box display="flex" flexDirection="column" padding="20px">
+                <Container sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                    paddingTop: '20px',
+                    paddingBottom: '10px'
+                }}>
                     {mobileMenu.map(nav => (
                         <Button
                             key={nav.id}
@@ -76,16 +83,17 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                             {nav.title}
                         </Button>
                     ))}
-                </Box>
-                <Box sx={{position: 'absolute', bottom: '20px', width: '100%', textAlign: 'right', paddingRight: '20px'}}>
-                    <LanguageButton onClick={() => setOpen(false)} />
-                    <IconButton size="small">
-                        <Facebook fontSize="small" />
-                    </IconButton>
-                    <IconButton size="small">
-                        <Instagram fontSize="small" />
-                    </IconButton>
-                </Box>
+                    <div style={{flexGrow: 1}} />
+                    <div style={{width: '100%', textAlign: 'right'}}>
+                        <LanguageButton onClick={() => setOpen(false)} />
+                        <IconButton size="small">
+                            <Facebook fontSize="small" />
+                        </IconButton>
+                        <IconButton size="small">
+                            <Instagram fontSize="small" />
+                        </IconButton>
+                    </div>
+                </Container>
             </SwipeableDrawer>
         </>
     )

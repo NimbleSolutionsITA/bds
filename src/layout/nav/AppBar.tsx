@@ -18,7 +18,10 @@ export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
         <MuiAppBar
             position="sticky"
             elevation={0}
-            sx={{ height: '90px' }}
+            sx={{
+                height: '90px',
+                zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
             color="secondary"
         >
             <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
