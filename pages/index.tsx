@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
 import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
 import {Menus} from "../src/types/settings";
-import {AcfAdvancedLink, AcfImage, AcfProduct, AcfProductCategory} from "../src/types/woocommerce";
+import {AcfAdvancedLink, AcfImage, AcfProduct, AcfProductCategory, BaseProduct} from "../src/types/woocommerce";
 import {GooglePlaces} from "./api/google-places";
 
 const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
@@ -25,7 +25,7 @@ export type HomeProps = {
         }
         ourSelection: {
             title: string
-            products: AcfProduct[]
+            products: BaseProduct[]
         }
         newsletter: {
             body: string
