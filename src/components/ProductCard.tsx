@@ -41,7 +41,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
     const defaultCurrentAttributes: CurrentAttribute = defaultProduct.attributes ? defaultProduct.attributes.reduce((obj, item) => {
         const key = item.id.toString().replace("pa_", ""); // remove "pa_" prefix from id
-        obj[key] = item.option;
+        obj[key === 'montatura-lenti' ? 'montaturaLenti': key] = item.option;
         return obj;
     }, {} as {[key: string]: string}) : {};
 
@@ -61,7 +61,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         (!newAttributes.lente || variation.attributes?.find((attribute) => attribute.id === 'pa_lente')?.option === newAttributes.lente) &&
                         (!newAttributes.modello || variation.attributes?.find((attribute) => attribute.id === 'pa_modello')?.option === newAttributes.modello) &&
                         (!newAttributes.montatura || variation.attributes?.find((attribute) => attribute.id === 'pa_montatura')?.option === newAttributes.montatura) &&
-                        (!newAttributes.montaturaLenti || variation.attributes?.find((attribute) => attribute.id === 'pa_montaturaL-lenti')?.option === newAttributes.montaturaLenti) &&
+                        (!newAttributes.montaturaLenti || variation.attributes?.find((attribute) => attribute.id === 'pa_montatura-lenti')?.option === newAttributes.montaturaLenti) &&
                         (!newAttributes.calibro || variation.attributes?.find((attribute) => attribute.id === 'pa_calibro')?.option === newAttributes.calibro) &&
                         (!newAttributes.formato || variation.attributes?.find((attribute) => attribute.id === 'pa_formato')?.option === newAttributes.formato)
                     )
@@ -86,6 +86,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
     return (
         <Card
+            key={currentProduct.id}
             sx={{width: '100%', height: 'auto'}}
             elevation={0}
             onMouseEnter={() => setHover(true)}
