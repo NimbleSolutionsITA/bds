@@ -24,7 +24,7 @@ const BannerDesigners = ({designers}: BannerDesignersProps) => {
 					indicators={false}
 					onChange={(next) => setActiveSlide(next as number)}
 				>
-					{designers.slider.map((designer, index) => (
+					{designers.slider?.map((designer, index) => (
 						<div
 							key={designer.id}
 							style={{

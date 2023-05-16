@@ -17,7 +17,7 @@ const AcfProductCard = ({ product, width = '100%' }: ProductCardProps) => {
                 image={product.image}
             />
             <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
-                <Typography sx={{}}>{product.category.name}</Typography>
+                <Typography sx={{}}>{product.category?.name ?? ' '}</Typography>
                 <Typography variant="h3" sx={{
                     fontFamily: 'Ogg Roman',
                     fontSize: '24px',

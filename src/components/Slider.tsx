@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {motion, useAnimation, useDragControls, useScroll} from "framer-motion";
+import {motion, useAnimation} from "framer-motion";
 import Bullet from "./Bullet";
 
 type SliderProps = {
@@ -53,6 +53,7 @@ const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 				dragConstraints={{ right: 0, left: -constraint }}
 				dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
 				dragElastic={0}
+				dragMomentum={false}
 				key={constraint}
 				style={{display: 'flex', gap: gap}}
 				animate={animation}

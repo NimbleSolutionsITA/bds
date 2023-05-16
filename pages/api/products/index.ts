@@ -73,7 +73,7 @@ export const getProducts = async ({
       name,
       colors,
       price_range,
-      tags
+      tags,
 }: ProductsRequestQuery): Promise<BaseProduct[]> => {
 	const params = new URLSearchParams({
 		...(per_page && { per_page: per_page.toString() }),

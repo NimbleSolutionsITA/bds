@@ -21,7 +21,7 @@ const OurSelection = ({ourSelection}: OurSelectionProps) => {
 				<strong>{ourSelection.title}</strong>
 			</h3>
 			<Slider slides={getSlides()}>
-				{ourSelection.products.map((product) => <AcfProductCard product={product} key={product.id} />)}
+				{ourSelection.products?.map((product) => <AcfProductCard product={product} key={product.id} />)}
 			</Slider>
 		</Container>
 	);

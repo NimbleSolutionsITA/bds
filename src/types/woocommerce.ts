@@ -64,6 +64,17 @@ export interface Color {
 	code: string;
 }
 
+export interface ImageColor {
+	slug: string;
+	name: string;
+	image: string;
+}
+
+export interface TextAttribute {
+	name: string;
+	slug: string;
+}
+
 export interface Category {
 	id: number;
 	name: string;
@@ -149,7 +160,15 @@ export type BaseProduct = {
 		name: string;
 		slug: string;
 	}
-	colors: Color[];
+	attributes: {
+		colore?: Color[];
+		lente?: Color[];
+		modello?: Color[];
+		montatura?: Color[];
+		montaturaLenti?: ImageColor[];
+		calibro?: TextAttribute[];
+		formato?: TextAttribute[];
+	}
 	stock_status: 'instock' | 'outofstock' | 'onbackorder';
 	stock_quantity?: number;
 	manage_stock: boolean;
