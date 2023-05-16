@@ -131,7 +131,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        opacity: hover ? 1 : 1,
+                        opacity: hover ? 1 : 0,
                         transition: 'opacity .5s ease',
                         width: '100%',
                         zIndex: 1
