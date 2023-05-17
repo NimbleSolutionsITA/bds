@@ -7,6 +7,7 @@ import Footer from "./footer/Footer";
 import {GooglePlaces} from "../../pages/api/google-places";
 import {useDispatch} from "react-redux";
 import {initCart} from "../redux/cartSlice";
+import CartDrawer from "./cart/CartDrawer";
 
 type LayoutProps = {
     children: React.ReactNode,
@@ -27,6 +28,7 @@ export default function Layout({children, breadcrumbs, googlePlaces, menus: {lef
                 <NavBarMobile mobileMenu={mobileMenu} />  :
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />
             }
+            <CartDrawer />
             {children}
             <Footer googlePlaces={googlePlaces} />
         </>

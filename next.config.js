@@ -9,8 +9,13 @@ module.exports =  {
   reactStrictMode: true,
   swcMinify: true,
   images: {
-      domains: [
-          process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL.match(/(?!(w+)\.)\w*(?:\w+\.)+\w+/)[0],
+      remotePatterns: [
+          {
+              protocol: 'https',
+              hostname: 'wpbdg.nimble-lab.com',
+              port: '',
+              pathname: '/wp-content/uploads/**',
+          },
       ],
   },
   i18n: {

@@ -23,7 +23,7 @@ export default function TopBar() {
                     <Instagram fontSize="small" />
                 </IconButton>
             </div>
-            <CartIndicator amount={13} />
+            <CartIndicator />
         </Container>
     )
 }

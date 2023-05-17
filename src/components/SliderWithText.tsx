@@ -2,6 +2,7 @@ import {Box, Grid} from "@mui/material";
 import React from "react";
 import HtmlBlock from "./HtmlBlock";
 import Carousel from "react-material-ui-carousel";
+import Image from "next/image";
 
 type SliderWithTextProps = {
 	body: string
@@ -52,16 +53,23 @@ const SliderWithText = ({body, images}: SliderWithTextProps) => {
 					}}
 				>
 					{images.map((image) => (
+
 						<Box key={image} sx={{
 							width: '100%',
 							height: {
 								md: 'calc(100vh - 160px)',
 								xs: 'calc(100vh - 80px)',
 							},
-							backgroundImage: `url(${image})`,
-							backgroundSize: 'cover',
-							backgroundPosition: 'center center'
-						}} />
+							position: 'relative'
+						}}>
+							<Image
+								key={image}
+								src={image}
+								alt="Bottega di Sguardi home slider image"
+								fill
+								style={{objectFit: 'cover', objectPosition: 'center center'}}
+							/>
+						</Box>
 					))}
 				</Carousel>
 			</Grid>

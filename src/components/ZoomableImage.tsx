@@ -1,18 +1,20 @@
 import React, { useState, useRef } from 'react';
 import { Box } from '@mui/system';
 import { motion } from 'framer-motion';
+import Image from "next/image";
 
 interface ZoomProps {
 	img: string;
-	zoomScale: number;
-	height: number;
-	width: number;
+
+	ratio?: number;
+	zoomScale?: number;
 	transitionTime?: number;
 }
 
-const Zoom: React.FC<ZoomProps> = ({ img, zoomScale, height, width, transitionTime = 0.1 }) => {
+const Zoom: React.FC<ZoomProps> = ({ img, zoomScale = 3.0, transitionTime = 0.1, ratio = 16/9 }) => {
 	const [zoom, setZoom] = useState<boolean>(false);
 	const [mouseXY, setMouseXY] = useState<{ x: number; y: number }>({ x: 50, y: 50 });
+
 
 	const imageRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +23,7 @@ const Zoom: React.FC<ZoomProps> = ({ img, zoomScale, height, width, transitionTi
 	const handleMouseOut = () => setZoom(false);
 
 	const handleMouseMovement = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-		const { left: offsetLeft, top: offsetTop } = e.currentTarget.getBoundingClientRect();
+		const { left: offsetLeft, top: offsetTop, width, height } = e.currentTarget.getBoundingClientRect();
 		const x = ((e.pageX - offsetLeft) / width) * 100;
 		const y = ((e.pageY - offsetTop) / height) * 100;
 		setMouseXY({ x, y });
@@ -34,18 +36,24 @@ const Zoom: React.FC<ZoomProps> = ({ img, zoomScale, height, width, transitionTi
 
 	return (
 		<Box
-			sx={{ width: `${width}px`, height: `${height}px`, overflow: 'hidden', position: 'relative' }}
+			sx={{
+				width: '100%',
+				height: '100%',
+				overflow: 'hidden',
+				position: 'relative',
+				paddingTop: {
+					xs: `calc(100% / ${ratio})`,
+					md: `calc(100% / ${ratio})`,
+				}
+		}}
 			onMouseEnter={handleMouseOver}
 			onMouseLeave={handleMouseOut}
 			onMouseMove={handleMouseMovement}
 			ref={imageRef}
 		>
+
 			<motion.div
 				style={{
-					backgroundRepeat: 'no-repeat',
-					backgroundPosition: 'center',
-					backgroundSize: 'auto 100%',
-					backgroundImage: `url('${img}')`,
 					width: '100%',
 					height: '100%',
 					position: 'absolute',
@@ -54,7 +62,15 @@ const Zoom: React.FC<ZoomProps> = ({ img, zoomScale, height, width, transitionTi
 				}}
 				animate={transform}
 				transition={{ duration: transitionTime, ease: 'easeOut' }}
-			/>
+			>
+				<Image
+					src={img}
+					unoptimized
+					fill
+					alt="product gallery image"
+					style={{objectFit: 'cover', objectPosition: 'center center'}}
+				/>
+			</motion.div>
 		</Box>
 	);
 };

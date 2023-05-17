@@ -19,6 +19,7 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
     const [open, setOpen] = useState(false)
     const router = useRouter()
     function handleClick(nav: MenuItem) {
+        console.log(nav)
         setOpen(false)
     }
 
@@ -42,7 +43,7 @@ export default function NavBarMobile({mobileMenu}: NavBarMobileProps) {
                     <IconButton onClick={() => setOpen(open => !open)}>
                         <MenuToggle isOpen={open} />
                     </IconButton>
-                    <CartIndicator iconProps={{fontSize: 'large'}} amount={10} />
+                    <CartIndicator iconProps={{fontSize: 'large'}} />
                 </Toolbar>
             </AppBar>
             <SwipeableDrawer

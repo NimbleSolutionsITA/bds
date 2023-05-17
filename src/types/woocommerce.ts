@@ -3,30 +3,25 @@ export type Product = {
 	name: string;
 	slug: string;
 	type: "simple" | "variable" | "grouped";
-	description: string;
 	short_description: string;
 	price: string;
-	regular_price: string;
-	sale_price: string;
-	categories: Category[];
-	tags: Category[];
-	attributes: Attribute[];
-	default_attributes: DefaultAttribute[];
-	variations: number[];
-	related_ids: number[];
+	category: {
+		id: number;
+		name: string;
+		slug: string;
+		bottomText: string;
+	};
+	attributes: {
+
+	};
+	variations: BaseVariation[];
+	related: BaseProduct[];
+	stock_status: 'instock' | 'outofstock' | 'onbackorder';
 	manage_stock: boolean;
 	stock_quantity: number;
 	backorders: 'no' | 'notify' | 'yes';
-	backorders_allowed: boolean;
-	backordered: boolean;
-	images: Image[];
-
-	colors: Color[];
-	stock_status: 'instock' | 'outofstock' | 'onbackorder';
-	translations: {
-		[lang: string]: string
-	}
-	lang: string
+	image: string
+	gallery: string[];
 }
 
 export interface Variation {

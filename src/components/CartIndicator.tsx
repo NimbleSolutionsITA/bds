@@ -2,18 +2,19 @@ import {Badge, IconButton} from "@mui/material";
 import CartIcon from "../icons/CartIcon";
 import {IconButtonProps} from "@mui/material/IconButton/IconButton";
 import {SvgIconProps} from "@mui/material/SvgIcon/SvgIcon";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store";
+import {toggleCartDrawer} from "../redux/cartSlice";
 
 type CartIndicatorProps = {
-	amount: number,
 	buttonProps?: IconButtonProps
 	iconProps?: SvgIconProps
 }
-const CartIndicator = ({amount, buttonProps, iconProps}: CartIndicatorProps) => {
+const CartIndicator = ({buttonProps, iconProps}: CartIndicatorProps) => {
 	const { items } = useSelector((state: RootState) => state.cart);
+	const dispatch = useDispatch()
 	return (
-		<IconButton {...buttonProps}>
+		<IconButton {...buttonProps} onClick={() => dispatch(toggleCartDrawer())}>
 			<Badge
 				badgeContent={items.length}
 				overlap="circular"
@@ -23,7 +24,7 @@ const CartIndicator = ({amount, buttonProps, iconProps}: CartIndicatorProps) => 
 						fontSize: '.7rem',
 						minWidth: '15px',
 						height: '15px',
-						backgroundColor: 'rgba(0,0,0,0.6)',
+						backgroundColor: 'rgba(102,130,113,0.6)',
 					}
 				}}
 			>

@@ -2,59 +2,60 @@ import React from "react";
 import Layout from "../../src/layout/Layout";
 import {BreadCrumb, Menus} from "../../src/types/settings";
 import {GooglePlaces} from "../api/google-places";
-import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
+import {Product as ProductType} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
+import {getLayoutProps} from "../../src/utils/wordpress_api";
+import {getProduct} from "../api/products/[slug]";
+
+const ProductView = dynamic(() => import('../../src/pages/product/ProductView'), { ssr: false });
+const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
 
 export type DesignerProps = {
 	menus: Menus,
 	googlePlaces: GooglePlaces,
-	productCategory: WooProductCategory,
-	product: BaseProduct[],
+	product: ProductType,
 	breadcrumbs?: BreadCrumb[]
 }
 export default function Product({
-	menus, googlePlaces, productCategory, product, breadcrumbs
+	menus, googlePlaces, product, breadcrumbs
 }: DesignerProps) {
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<div>PD</div>
+			<ProductView product={product} />
+			<ProductsSlider products={product.related ?? []} title="Prodotti correlati" />
 		</Layout>
 	);
 }
 
 export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: string, params: { slug: string }}) {
-	/*const [
-		{ productCategory, menus, googlePlaces }
+	const [
+		{ menus, googlePlaces },
+		product
 	] = await Promise.all([
-		getDesignerPageProps(locale, slug)
+		getLayoutProps(locale),
+		getProduct(slug, locale)
 	]);
-	if (!productCategory) {
+	if (typeof product === 'string') {
 		return {
 			notFound: true
 		}
 	}
-	const products = await getProducts({
-		categories: slug,
-		lang: locale,
-		per_page: '24'
-	})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
-		{ name: 'Designers', href: urlPrefix + '/designers' },
-		{ name: sanitize(productCategory.name), href: urlPrefix +  '/designers/' + productCategory.slug },
+		{ name: 'Shop', href: urlPrefix + '/shop' },
+		{ name: sanitize(product.name), href: urlPrefix +  '/designers/' + slug },
 	]
 	return {
 		props: {
 			menus,
 			googlePlaces,
-			productCategory,
-			breadcrumbs,
-			products
+			product,
+			breadcrumbs
 		},
 		revalidate: 10
-	}*/
+	}
 }
 
 export async function getStaticPaths() {

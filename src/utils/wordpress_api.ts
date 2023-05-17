@@ -1,10 +1,9 @@
 import {
-	NEXT_API_ENDPOINT,
 	WORDPRESS_API_ENDPOINT,
 	WORDPRESS_MENUS_ENDPOINT,
 	WORDPRESS_RANK_MATH_SEO_ENDPOINT
 } from "./endpoints"
-import {AcfImage, Category, Image, Product, Variation, WooProductCategory} from "../types/woocommerce";
+import {AcfImage, Category, Image, WooProductCategory} from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
 import {getProductCategory} from "../../pages/api/products/categories/[slug]";
@@ -45,98 +44,6 @@ export const getDesignerPageProps = async (locale: string, slug: string) => {
 	const { menus, googlePlaces } = await getLayoutProps(locale)
 	return { menus, googlePlaces, productCategory: productCategory ? mapProductCategory(productCategory) : null }
 }
-
-export const getProductVariations = async (id: number): Promise<{productVariations: Variation[]}> => {
-	const { productVariations } = (await fetch(`${ NEXT_API_ENDPOINT}/products/${id}/variations`).then(response => response.json()))
-	return { productVariations: productVariations.map(mapVariation) }
-}
-
-
-export const mapProduct = ({
-		id,
-		slug,
-		name,
-		description,
-		price,
-		type,
-		categories,
-		attributes,
-		related_ids,
-		short_description,
-		regular_price,
-		sale_price,
-		tags,
-		default_attributes,
-		variations,
-		images,
-		colors,
-		stock_status,
-		lang,
-		translations,
-		stock_quantity,
-		manage_stock,
-		backordered,
-		backorders_allowed,
-		backorders
-}: Product) => ({
-		id,
-		slug,
-		name,
-		description,
-		price,
-		type,
-		categories: categories.map(mapCategory),
-		attributes,
-		related_ids,
-		short_description,
-		regular_price,
-		sale_price,
-		tags,
-		default_attributes,
-		variations,
-		images: images.map(mapImage),
-		colors,
-		stock_status,
-		lang,
-		translations,
-		stock_quantity,
-		manage_stock,
-		backordered,
-		backorders_allowed,
-		backorders
-})
-
-export const mapVariation = ({
-	id,
-	price,
-	attributes,
-	regular_price,
-	sale_price,
-	image,
-	stock_status,
-	lang,
-	translations,
-	stock_quantity,
-	manage_stock,
-	backordered,
-	backorders_allowed,
-	backorders
-}: Variation) => ({
-	id,
-	price,
-	attributes,
-	regular_price,
-	sale_price,
-	image: mapImage(image),
-	stock_status,
-	lang,
-	translations,
-	stock_quantity,
-	manage_stock,
-	backordered,
-	backorders_allowed,
-	backorders
-})
 
 export const mapCategory = ({id, name, slug, count}: Category) => ({
 	id, name: sanitize(name), slug, count

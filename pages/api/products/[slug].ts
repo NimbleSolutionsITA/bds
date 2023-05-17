@@ -1,5 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {Product} from "../../../src/types/woocommerce";
 
 type Data = {
@@ -7,14 +6,6 @@ type Data = {
 	product?: Product
 	error?: string
 }
-
-const api = new WooCommerceRestApi({
-	url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? '',
-	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
-	version: "wc/v3"
-});
-
 export default async function handler(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
@@ -22,11 +13,12 @@ export default async function handler(
 	const responseData: Data = {
 		success: false,
 	}
-	const id = req.query.id;
+	const slug = req.query.slug as string;
+	const lang = req.query.lang as string;
 	if (req.method === 'GET') {
 		try {
-			const data = await getProduct(id as string)
-			if (!data) {
+			const data = await getProduct(slug, lang)
+			if (!data || typeof  data === "string") {
 				responseData.error = "Product not found"
 				res.status(404).json(responseData);
 			} else {
@@ -46,9 +38,8 @@ export default async function handler(
 	}
 }
 
-export const getProduct = async (id: string) => {
-	const { data } = await api.get(
-		'products/' + id
-	)
-	return data
+export const getProduct = async (slug: string, lang: string): Promise<Product | string> => {
+	const params = new URLSearchParams({slug, lang})
+	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/product?${params.toString()}`)
+		.then(res => res.json())
 }

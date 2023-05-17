@@ -1,11 +1,13 @@
 import {useState} from "react";
 import {BaseProduct, BaseVariation, Color, ImageColor, TextAttribute} from "../types/woocommerce";
-import {Box, Card, CardContent, CardMedia, Checkbox, IconButton, Typography} from "@mui/material";
+import {Box, Card, CardContent, Checkbox, IconButton, Typography} from "@mui/material";
 import {CheckboxProps} from "@mui/material/Checkbox/Checkbox";
 import {sanitize} from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
 import {useDispatch} from "react-redux";
 import {addCartItem} from "../redux/cartSlice";
+import Image from "next/image";
+import Link from "./Link";
 
 type ColorAttribute = 'colore'|'lente'|'modello'|'montatura'
 type ImageAttribute = 'montaturaLenti'
@@ -19,9 +21,10 @@ type CurrentAttribute = {
 
 type ProductCardProps = {
     product: BaseProduct;
+    imageRatio?: number;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
     const [hover, setHover] = useState(false);
     const defaultProduct = product.variations[0] ?? {
         id: product.id,
@@ -79,7 +82,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 price: Number(currentProduct.price),
                 qty: 1,
                 stock_quantity: Number(currentProduct.stock_quantity),
-                attributes: currentProduct.attributes ?? []
+                attributes: currentProduct.attributes ?? [],
+                category: product.category.name
             }));
         }
     }
@@ -92,12 +96,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
         >
-            <CardMedia
-                sx={{ width: '100%', height: '100%', minHeight: 250 }}
-                image={currentProduct.image}
-            />
+            <Link href={`/products/${product.slug}`}>
+                <Box sx={{width: '100%', paddingBottom: imageRatio+'%', position: 'relative'}}>
+                    <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        style={{objectFit: 'cover', objectPosition: 'center center'}}
+                    />
+                </Box>
+            </Link>
             <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
-                <Typography sx={{}} dangerouslySetInnerHTML={{ __html: sanitize(product.category.name)}} />
+                <Link href={`/designers/${product.category.name}`} style={{textDecoration: 'none'}}>
+                    <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(product.category.name)}} />
+                </Link>
                 <div style={{
                     margin: '10px 0',
                     padding: '10px 0',
@@ -107,26 +119,28 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     borderTop: '1px solid',
                     borderBottom: '1px solid'
                 }}>
-                    <Typography
-                        variant="h3"
-                        sx={{
-                            fontFamily: 'Ogg Roman',
-                            fontSize: '24px',
-                            width: '100%',
-                            fontWeight: '300 !important'
-                        }}
-                        dangerouslySetInnerHTML={{ __html: sanitize(product.name)}}
-                    />
+                    <Link href={`/designers/${product.category.name}`} style={{textDecoration: 'none', width: '100%'}}>
+                        <Typography
+                            variant="h3"
+                            sx={{
+                                fontFamily: 'Ogg Roman',
+                                fontSize: '24px',
+                                width: '100%',
+                                fontWeight: '300 !important'
+                            }}
+                            dangerouslySetInnerHTML={{ __html: sanitize(product.name)}}
+                        />
+                    </Link>
                 </div>
                 <div style={{position: 'relative'}}>
                     {currentProduct.price && (
                         <Typography sx={{
-                            fontSize: '14px',
+                            fontSize: '16px',
                             opacity: hover ? 0 : 1,
                             transition: 'opacity .5s ease',
                             position: 'absolute',
-                            width: '100%',
-                        }}>{Number(currentProduct.price)},00€</Typography>
+                            width: '100%'
+                        }}>{Number(currentProduct.price)} €</Typography>
                     )}
                     <div style={{
                         display: 'flex',
@@ -217,9 +231,9 @@ const ColorBox = ({ productColor, ...checkBoxProps }: { productColor: Color } & 
 const ImageBox = ({ productColor, ...checkBoxProps }: { productColor: ImageColor } & CheckboxProps) => {
     return (
         <Checkbox
-            icon={<img src={productColor.image} alt={productColor.name} width="30" height="10" />}
+            icon={<Image src={productColor.image} alt={productColor.name} width="30" height="10" />}
             checkedIcon={<div style={{ border: '1px solid #000', padding: '2px', height: '16px', width: '36px'}}>
-                <img src={productColor.image} width="30" height="10" style={{display: 'block'}} alt={productColor.name} />
+                <Image src={productColor.image} width="30" height="10" style={{display: 'block'}} alt={productColor.name} />
             </div>}
             sx={{
                 padding: 0,

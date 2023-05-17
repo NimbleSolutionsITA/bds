@@ -1,6 +1,7 @@
 import {HomeProps} from "../../../pages";
 import {Box, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
+import Image from "next/image";
 
 type BannerTopProps = {
 	bannerTop: HomeProps['page']['bannerTop']
@@ -49,12 +50,16 @@ const BannerTop = ({bannerTop}: BannerTopProps) => {
 							xs: '70vw',
 							lg: '100%'
 						},
-						backgroundImage: `url(${bannerTop.imageRight.url})`,
-						backgroundRepeat: 'no-repeat',
-						backgroundSize: 'cover',
-						backgroundPosition: 'bottom center',
+						position: 'relative'
 					}}
-				/>
+				>
+					<Image
+						src={bannerTop.imageRight.url}
+						alt="image banner"
+						fill
+						style={{objectFit: 'cover', objectPosition: 'center center'}}
+					/>
+				</Box>
 			</Grid>
 		</Grid>
 	)

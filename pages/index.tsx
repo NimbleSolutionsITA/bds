@@ -3,11 +3,11 @@ import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
 import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
 import {Menus} from "../src/types/settings";
-import {AcfAdvancedLink, AcfImage, AcfProduct, AcfProductCategory, BaseProduct} from "../src/types/woocommerce";
+import {AcfAdvancedLink, AcfImage, AcfProductCategory, BaseProduct} from "../src/types/woocommerce";
 import {GooglePlaces} from "./api/google-places";
 
 const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
-const OurSelection = dynamic(() => import("../src/pages/home/OurSelection"));
+const ProductsSlider = dynamic(() => import("../src/components/ProductsSlider"));
 const BannerNewsletter = dynamic(() => import("../src/components/BannerNewsletter"));
 const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
 const BannerDesigners = dynamic(() => import("../src/pages/home/BannerDesigners"));
@@ -72,7 +72,7 @@ export default function Home({page, menus, googlePlaces}: HomeProps) {
     return (
       <Layout menus={menus} googlePlaces={googlePlaces}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
-          <OurSelection ourSelection={page.ourSelection} />
+          <ProductsSlider products={page.ourSelection.products ?? []} title={page.ourSelection.title} />
           <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
           <BannerShipping shipping={page.shipping} />
           <BannerDesigners designers={page.designers}/>
