@@ -7,7 +7,7 @@ import {AcfImage, Category, Image, WooProductCategory} from "../types/woocommerc
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
 import {getProductCategory} from "../../pages/api/products/categories/[slug]";
-import {DESIGNERS_CATEGORY, sanitize} from "./utils";
+import {EYEWEAR_CATEGORY, sanitize} from "./utils";
 function mapMenuItem(item: any) {
 	return {
 		id: item.ID,
@@ -35,7 +35,7 @@ export const getPageProps = async (slug: string, locale: string) => {
 }
 
 export const getDesignersPageProps = async (locale: 'it' | 'en') => {
-	const productCategories = await getProductCategories(locale, DESIGNERS_CATEGORY[locale])
+	const productCategories = await getProductCategories(locale, EYEWEAR_CATEGORY[locale].toString())
 	return { productCategories: productCategories.map(mapProductCategory) }
 }
 

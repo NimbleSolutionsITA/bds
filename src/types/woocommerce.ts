@@ -1,47 +1,24 @@
-export type Product = {
-	id: number;
-	name: string;
-	slug: string;
+export type Product = Omit<BaseProduct, 'image' | 'variations'> & {
 	type: "simple" | "variable" | "grouped";
 	short_description: string;
-	price: string;
-	category: {
-		id: number;
-		name: string;
-		slug: string;
-		bottomText: string;
-	};
-	attributes: {
-
-	};
-	variations: BaseVariation[];
+	categories: (BaseCategory & { bottomText: string | null })[];
 	related: BaseProduct[];
 	stock_status: 'instock' | 'outofstock' | 'onbackorder';
 	manage_stock: boolean;
 	stock_quantity: number;
 	backorders: 'no' | 'notify' | 'yes';
-	image: string
-	gallery: string[];
+	gallery: ImageDetailed[];
+	image: ImageDetailed;
+	variations: Variation[];
 }
 
-export interface Variation {
-	id: number;
-	price: string;
-	regular_price: string;
-	sale_price: string;
-	stock_status: 'instock' | 'outofstock' | 'onbackorder';
-	translations: {
-		[lang: string]: string
-	}
-	lang: string
-	manage_stock: boolean;
-	stock_quantity: number;
-	backorders: 'no' | 'notify' | 'yes';
-	backorders_allowed: boolean;
-	backordered: boolean;
-	attributes: DefaultAttribute[];
-	image: Image;
+export type Variation = Omit<BaseVariation, 'image'> & { image: ImageDetailed }
 
+export interface ImageDetailed {
+	url: string;
+	alt: string;
+	width: number;
+	height: number;
 }
 
 export interface AcfAdvancedLink {
@@ -93,15 +70,6 @@ export interface AcfImage {
 	height: string;
 }
 
-export interface Attribute {
-	id: number;
-	name: string;
-	position: number;
-	visible: boolean;
-	variation: boolean;
-	options: string[];
-}
-
 export interface DefaultAttribute {
 	id: number | string
 	name: string;
@@ -114,19 +82,6 @@ export interface AcfProductCategory {
 	slug: string;
 	description: string;
 	image: string;
-}
-
-export interface AcfProduct {
-	id: number;
-	name: string;
-	slug: string;
-	price: string;
-	image: string;
-	category: {
-		id: number;
-		name: string;
-		slug: string;
-	}
 }
 
 export interface WooProductCategory {
@@ -144,26 +99,31 @@ export interface WooProductCategory {
 	parent?: number;
 }
 
+export type BaseAttributes = {
+	colore?: Color[];
+	lente?: Color[];
+	modello?: Color[];
+	montatura?: Color[];
+	montaturaLenti?: ImageColor[];
+	calibro?: TextAttribute[];
+	formato?: TextAttribute[];
+}
+
+export type BaseCategory = {
+	id: number;
+	name: string;
+	slug: string;
+	parent: number;
+}
+
 export type BaseProduct = {
 	id: number;
 	name: string;
 	slug: string;
 	image: string;
 	price: string;
-	category: {
-		id: number;
-		name: string;
-		slug: string;
-	}
-	attributes: {
-		colore?: Color[];
-		lente?: Color[];
-		modello?: Color[];
-		montatura?: Color[];
-		montaturaLenti?: ImageColor[];
-		calibro?: TextAttribute[];
-		formato?: TextAttribute[];
-	}
+	categories: BaseCategory[];
+	attributes: BaseAttributes
 	stock_status: 'instock' | 'outofstock' | 'onbackorder';
 	stock_quantity?: number;
 	manage_stock: boolean;

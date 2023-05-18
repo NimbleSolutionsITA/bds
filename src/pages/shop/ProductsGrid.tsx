@@ -13,6 +13,8 @@ type ProductsGridProps = {
 	colors: Color[]
 	tags: ProductTag[],
 	designers: Category[]
+	isSunglasses?: boolean
+	isOptical?: boolean
 }
 
 export type SearchParams = {
@@ -25,7 +27,7 @@ export type SearchParams = {
 	genders?: string | string[] | undefined,
 }
 
-const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) => {
+const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptical }: ProductsGridProps) => {
 	const [searchParams, setSearchParams] = useState<SearchParams>({})
 	const {locale} = useRouter()
 
@@ -37,7 +39,9 @@ const ProductsGrid = ({ products, colors, tags, designers }: ProductsGridProps) 
 				name: searchParams.name,
 				colors: searchParams.colors,
 				price_range: searchParams.price_range,
-				tags: [searchParams.styles, searchParams.materials, searchParams.genders].filter(v=>v).join(',')
+				tags: [searchParams.styles, searchParams.materials, searchParams.genders].filter(v=>v).join(','),
+				sunglasses: isSunglasses ? true : undefined,
+				optical: isOptical ? true : undefined
 			}).filter(([_, value]) => value !== undefined))
 
 			const {products: data} = await fetch(NEXT_API_ENDPOINT + '/products?' + new URLSearchParams({

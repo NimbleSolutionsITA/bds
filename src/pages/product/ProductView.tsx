@@ -2,7 +2,7 @@ import {Product} from "../../types/woocommerce";
 import {Container, Grid, Typography} from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
-import {sanitize} from "../../utils/utils";
+import {MAIN_CATEGORIES, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
 
@@ -12,6 +12,7 @@ type ProductViewProps = {
 
 const ProductView = ({product}: ProductViewProps) => {
 	console.log(product)
+	const category = product.categories.find((category) => MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
 
 	const galleryImages = [
 		...(product.gallery.length > 0 ? product.gallery : [product.image] ),
@@ -27,7 +28,7 @@ const ProductView = ({product}: ProductViewProps) => {
 						indicators={false}
 					>
 						{galleryImages.map((image) => (
-							<ZoomableImage key={image} img={image} ratio={4/3} />
+							<ZoomableImage key={image.url} img={image.url} ratio={image.width/image.height} />
 						))}
 					</Carousel>
 				</Grid>
@@ -52,9 +53,9 @@ const ProductView = ({product}: ProductViewProps) => {
 							fontWeight: 500,
 							textDecoration: 'none',
 						}}
-						dangerouslySetInnerHTML={{__html: sanitize(product.category.name)}}
+						dangerouslySetInnerHTML={{__html: sanitize(category.name)}}
 						component={Link}
-						href={`/designers/${product.category.slug}`}
+						href={`/designers/${category.slug}`}
 					/>
 					<HtmlBlock
 						sx={{margin: '20px 0'}}

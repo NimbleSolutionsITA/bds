@@ -8,7 +8,7 @@ import {getProducts} from "./api/products";
 import {getColors} from "./api/products/colors";
 import {getProductTags} from "./api/products/tags";
 import {getProductCategories} from "./api/products/categories";
-import {DESIGNERS_CATEGORY} from "../src/utils/utils";
+import {EYEWEAR_CATEGORY} from "../src/utils/utils";
 
 const ProductsGrid = dynamic(() => import("../src/pages/shop/ProductsGrid"));
 
@@ -47,7 +47,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 		}),
 		getColors(locale),
 		getProductTags(locale),
-		getProductCategories(locale, DESIGNERS_CATEGORY[locale])
+		getProductCategories(locale, EYEWEAR_CATEGORY[locale].toString())
 
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;

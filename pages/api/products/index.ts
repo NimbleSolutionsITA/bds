@@ -17,6 +17,8 @@ export type ProductsRequestQuery = {
 	colors?: string | string[] | undefined,
 	price_range?: string | string[] | undefined,
 	tags?: string | string[] | undefined,
+	sunglasses?: boolean | undefined,
+	optical?: boolean | undefined
 }
 
 export default async function handler(
@@ -37,6 +39,8 @@ export default async function handler(
 			colors,
 			price_range,
 			tags,
+			sunglasses,
+			optical
 		} = req.query;
 		try {
 			responseData.products = await getProducts({
@@ -49,6 +53,8 @@ export default async function handler(
 				colors,
 				price_range,
 				tags,
+				sunglasses: sunglasses === "true",
+				optical: optical === "true"
 			})
 			responseData.success = true
 			res.json(responseData)
@@ -74,6 +80,8 @@ export const getProducts = async ({
       colors,
       price_range,
       tags,
+	  sunglasses,
+	  optical
 }: ProductsRequestQuery): Promise<BaseProduct[]> => {
 	const params = new URLSearchParams({
 		...(per_page && { per_page: per_page.toString() }),
@@ -85,6 +93,8 @@ export const getProducts = async ({
 		...(colors && { colors: colors.toString() }),
 		...(price_range && { price_range: price_range.toString() }),
 		...(tags && { tags: tags.toString() }),
+		...(sunglasses && { sunglasses: 'true' }),
+		...(optical && { optical: 'true' }),
 	});
 	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
 		.then(res => res.json())

@@ -2,7 +2,7 @@ import {useState} from "react";
 import {BaseProduct, BaseVariation, Color, ImageColor, TextAttribute} from "../types/woocommerce";
 import {Box, Card, CardContent, Checkbox, IconButton, Typography} from "@mui/material";
 import {CheckboxProps} from "@mui/material/Checkbox/Checkbox";
-import {sanitize} from "../utils/utils";
+import {MAIN_CATEGORIES, sanitize} from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
 import {useDispatch} from "react-redux";
 import {addCartItem} from "../redux/cartSlice";
@@ -52,6 +52,7 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
 
     const [currentProduct, setCurrentProduct] = useState<BaseVariation>(defaultProduct);
     const dispatch = useDispatch();
+    const category = product.categories.find((cat) => MAIN_CATEGORIES.includes(cat.parent)) ?? product.categories[0];
 
     const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
         const newAttributes = {...currentAttributes, [attribute]: slug};
@@ -83,7 +84,7 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                 qty: 1,
                 stock_quantity: Number(currentProduct.stock_quantity),
                 attributes: currentProduct.attributes ?? [],
-                category: product.category.name
+                category: category.name
             }));
         }
     }
@@ -99,7 +100,7 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
             <Link href={`/products/${product.slug}`}>
                 <Box sx={{width: '100%', paddingBottom: imageRatio+'%', position: 'relative'}}>
                     <Image
-                        src={product.image}
+                        src={currentProduct.image}
                         alt={product.name}
                         fill
                         style={{objectFit: 'cover', objectPosition: 'center center'}}
@@ -107,8 +108,8 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                 </Box>
             </Link>
             <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
-                <Link href={`/designers/${product.category.name}`} style={{textDecoration: 'none'}}>
-                    <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(product.category.name)}} />
+                <Link href={`/designers/${category.name}`} style={{textDecoration: 'none'}}>
+                    <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(category.name)}} />
                 </Link>
                 <div style={{
                     margin: '10px 0',
@@ -119,7 +120,7 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                     borderTop: '1px solid',
                     borderBottom: '1px solid'
                 }}>
-                    <Link href={`/designers/${product.category.name}`} style={{textDecoration: 'none', width: '100%'}}>
+                    <Link href={`/products/${product.slug}`} style={{textDecoration: 'none', width: '100%'}}>
                         <Typography
                             variant="h3"
                             sx={{

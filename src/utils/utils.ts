@@ -14,11 +14,16 @@ export const sanitize = (html: string) => {
     }
   });
 }
-
-export const DESIGNERS_CATEGORY = {
-  it: '188',
-  en: '496'
+export const EYEWEAR_CATEGORY = {
+  it: 188,
+  en: 496
 }
+
+export const MAIN_CATEGORIES = [
+    EYEWEAR_CATEGORY.it,
+    EYEWEAR_CATEGORY.en,
+]
+
 
 type RGB = [number, number, number];
 type Palette = { [color: string]: { label: string, color: string } };
