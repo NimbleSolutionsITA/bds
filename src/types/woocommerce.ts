@@ -1,7 +1,7 @@
-export type Product = Omit<BaseProduct, 'image' | 'variations'> & {
+export type Product = Omit<BaseProduct, 'image' | 'variations' | 'categories'> & {
 	type: "simple" | "variable" | "grouped";
 	short_description: string;
-	categories: (BaseCategory & { bottomText: string | null })[];
+	categories: ProductCategory[];
 	related: BaseProduct[];
 	stock_status: 'instock' | 'outofstock' | 'onbackorder';
 	manage_stock: boolean;
@@ -12,13 +12,24 @@ export type Product = Omit<BaseProduct, 'image' | 'variations'> & {
 	variations: Variation[];
 }
 
+export type ProductCategory = BaseCategory & { bottomText: string | null }
+
 export type Variation = Omit<BaseVariation, 'image'> & { image: ImageDetailed }
+
+export type ColorAttribute = 'colore'|'lente'|'modello'|'montatura'
+
+export type ImageAttribute = 'montaturaLenti'
+
+export type BaseAttribute = 'calibro'|'formato'
+
+export type AttributeType = BaseAttribute|ImageAttribute|ColorAttribute
 
 export interface ImageDetailed {
 	url: string;
 	alt: string;
 	width: number;
 	height: number;
+	variation?: number;
 }
 
 export interface AcfAdvancedLink {

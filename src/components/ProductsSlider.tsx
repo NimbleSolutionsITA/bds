@@ -1,5 +1,5 @@
 import Slider from "./Slider";
-import {Container, Theme, useMediaQuery} from "@mui/material";
+import {Container, Theme, Typography, useMediaQuery} from "@mui/material";
 import React from "react";
 import ProductCard from "./ProductCard";
 import {BaseProduct} from "../types/woocommerce";
@@ -19,9 +19,9 @@ const ProductsSlider = ({products, title}: ProductsSliderProps) => {
 	return (
 		<Container maxWidth="md" sx={{margin: '40px auto', textAlign: 'center'}}>
 			{title && (
-				<h3>
-					<strong>{title}</strong>
-				</h3>
+				<Typography variant="h3" component="div" sx={{margin: '20px 0 30px'}}>
+					{title}
+				</Typography>
 			)}
 			<Slider slides={getSlides()}>
 				{products.map((product) => <ProductCard product={product} key={product.id} />)}

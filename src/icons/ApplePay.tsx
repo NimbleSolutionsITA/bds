@@ -1,6 +1,5 @@
 import {SvgIcon} from "@mui/material";
 import {SvgIconProps} from "@mui/material/SvgIcon/SvgIcon";
-import React from "react";
 
 export default function ApplePay(props: SvgIconProps) {
 	return (
@@ -24,6 +23,6 @@ export default function ApplePay(props: SvgIconProps) {
 					      d="M120.975 79.652v-4.496c.364.051 1.247.103 1.715.103 2.573 0 4.029-1.09 4.913-3.899l.52-1.663-9.852-27.293h6.082l6.863 22.146h.13l6.862-22.146h5.927l-10.216 28.67c-2.34 6.577-5.017 8.735-10.683 8.735-.442 0-1.872-.052-2.261-.157z" />
 				</g>
 			</g>
-</SvgIcon>
+		</SvgIcon>
 	);
 }

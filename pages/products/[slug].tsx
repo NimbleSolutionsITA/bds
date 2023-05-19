@@ -7,9 +7,11 @@ import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getLayoutProps} from "../../src/utils/wordpress_api";
 import {getProduct} from "../api/products/[slug]";
+import {MAIN_CATEGORIES} from "../../src/utils/utils";
 
 const ProductView = dynamic(() => import('../../src/pages/product/ProductView'), { ssr: false });
 const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
+const SeoFooter = dynamic(() => import('../../src/pages/product/SeoFooter'), { ssr: false });
 
 export type DesignerProps = {
 	menus: Menus,
@@ -20,10 +22,12 @@ export type DesignerProps = {
 export default function Product({
 	menus, googlePlaces, product, breadcrumbs
 }: DesignerProps) {
+	const category = product.categories.find((category) => MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<ProductView product={product} />
+			<ProductView product={product} category={category} />
 			<ProductsSlider products={product.related ?? []} title="Prodotti correlati" />
+			<SeoFooter category={category} />
 		</Layout>
 	);
 }

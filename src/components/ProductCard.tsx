@@ -1,23 +1,19 @@
 import {useState} from "react";
-import {BaseProduct, BaseVariation, Color, ImageColor, TextAttribute} from "../types/woocommerce";
-import {Box, Card, CardContent, Checkbox, IconButton, Typography} from "@mui/material";
-import {CheckboxProps} from "@mui/material/Checkbox/Checkbox";
-import {MAIN_CATEGORIES, sanitize} from "../utils/utils";
+import {
+    AttributeType,
+    BaseProduct,
+    BaseVariation,
+} from "../types/woocommerce";
+import {Box, Card, CardContent, IconButton, Typography} from "@mui/material";
+import {findVariationFromAttributes, getDefaultProduct, MAIN_CATEGORIES, sanitize} from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
 import {useDispatch} from "react-redux";
 import {addCartItem} from "../redux/cartSlice";
 import Image from "next/image";
 import Link from "./Link";
-
-type ColorAttribute = 'colore'|'lente'|'modello'|'montatura'
-type ImageAttribute = 'montaturaLenti'
-type BaseAttribute = 'calibro'|'formato'
-
-type AttributeType = BaseAttribute|ImageAttribute|ColorAttribute
-
-type CurrentAttribute = {
-    [key in AttributeType]?: string
-}
+import placeholder from "../images/placeholder.jpg";
+import blur from "../images/blur.jpg";
+import {AttributeCheckboxes} from "./AttributeCheckboxes";
 
 type ProductCardProps = {
     product: BaseProduct;
@@ -26,52 +22,23 @@ type ProductCardProps = {
 
 const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
     const [hover, setHover] = useState(false);
-    const defaultProduct = product.variations[0] ?? {
-        id: product.id,
-        stock_status: product.stock_status,
-        stock_quantity: product.stock_quantity,
-        image: product.image,
-        price: product.price,
-        attributes: Object.keys(product.attributes).map((key) => {
-            const attributes = product.attributes[key as AttributeType];
-            return ({
-                id: 'pa_' + (key === 'montaturaLenti' ? 'montatura-lenti' : key),
-                name: attributes && attributes[0].name,
-                option: attributes && attributes[0].slug
-            })
-        })
-    }
+    const init = getDefaultProduct(product);
+    const defaultProduct = init.defaultProduct as BaseVariation;
+    const {defaultAttributes} = init;
 
-    const defaultCurrentAttributes: CurrentAttribute = defaultProduct.attributes ? defaultProduct.attributes.reduce((obj, item) => {
-        const key = item.id.toString().replace("pa_", ""); // remove "pa_" prefix from id
-        obj[key === 'montatura-lenti' ? 'montaturaLenti': key] = item.option;
-        return obj;
-    }, {} as {[key: string]: string}) : {};
+    const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
+    const [currentProduct, setCurrentProduct] = useState(defaultProduct);
+    const [currentImage, setCurrentImage] = useState<string>(currentProduct.image);
 
-    const [currentAttributes, setCurrentAttributes] = useState<CurrentAttribute>(defaultCurrentAttributes);
-
-    const [currentProduct, setCurrentProduct] = useState<BaseVariation>(defaultProduct);
     const dispatch = useDispatch();
     const category = product.categories.find((cat) => MAIN_CATEGORIES.includes(cat.parent)) ?? product.categories[0];
 
     const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
         const newAttributes = {...currentAttributes, [attribute]: slug};
         await setCurrentAttributes(newAttributes)
-        setCurrentProduct(
-            product.variations.find(
-                (variation) => {
-                    return (
-                        (!newAttributes.colore || variation.attributes?.find((attribute) => attribute.id === 'pa_colore')?.option === newAttributes.colore) &&
-                        (!newAttributes.lente || variation.attributes?.find((attribute) => attribute.id === 'pa_lente')?.option === newAttributes.lente) &&
-                        (!newAttributes.modello || variation.attributes?.find((attribute) => attribute.id === 'pa_modello')?.option === newAttributes.modello) &&
-                        (!newAttributes.montatura || variation.attributes?.find((attribute) => attribute.id === 'pa_montatura')?.option === newAttributes.montatura) &&
-                        (!newAttributes.montaturaLenti || variation.attributes?.find((attribute) => attribute.id === 'pa_montatura-lenti')?.option === newAttributes.montaturaLenti) &&
-                        (!newAttributes.calibro || variation.attributes?.find((attribute) => attribute.id === 'pa_calibro')?.option === newAttributes.calibro) &&
-                        (!newAttributes.formato || variation.attributes?.find((attribute) => attribute.id === 'pa_formato')?.option === newAttributes.formato)
-                    )
-                }
-            ) ?? defaultProduct
-        )
+        const newProduct = findVariationFromAttributes(product, newAttributes) as BaseVariation ?? defaultProduct
+        setCurrentProduct(newProduct)
+        setCurrentImage(newProduct.image ?? product.image ?? placeholder)
     }
 
     const handleAddToCart = () => {
@@ -100,17 +67,22 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
             <Link href={`/products/${product.slug}`}>
                 <Box sx={{width: '100%', paddingBottom: imageRatio+'%', position: 'relative'}}>
                     <Image
-                        src={currentProduct.image}
+                        src={currentImage}
                         alt={product.name}
                         fill
                         style={{objectFit: 'cover', objectPosition: 'center center'}}
+                        onError={() => setCurrentImage(placeholder.src)}
+                        placeholder="blur"
+                        blurDataURL={blur.blurDataURL}
                     />
                 </Box>
             </Link>
             <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
-                <Link href={`/designers/${category.name}`} style={{textDecoration: 'none'}}>
-                    <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(category.name)}} />
-                </Link>
+                {category &&(
+                    <Link href={`/designers/${category.name}`} style={{textDecoration: 'none'}}>
+                        <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(category.name)}} />
+                    </Link>
+                )}
                 <div style={{
                     margin: '10px 0',
                     padding: '10px 0',
@@ -136,7 +108,7 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                 <div style={{position: 'relative'}}>
                     {currentProduct.price && (
                         <Typography sx={{
-                            fontSize: '16px',
+                            fontSize: '20px',
                             opacity: hover ? 0 : 1,
                             transition: 'opacity .5s ease',
                             position: 'absolute',
@@ -152,53 +124,11 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                         width: '100%',
                         zIndex: 1
                     }}>
-                        <div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 40px)'}}>
-                            {['colore', 'lente', 'modello', 'montatura'].map((attribute) => {
-                                const attributes = product.attributes[attribute as ColorAttribute];
-                                return Array.isArray(attributes) ? (
-                                    <div key={attribute} style={{display: 'flex', gap: '5px', flexWrap: 'wrap'}}>
-                                        {attributes.map((color) => (
-                                            <ColorBox
-                                                title={attribute + ' - ' + color.name }
-                                                productColor={color}
-                                                key={color.slug}
-                                                checked={currentAttributes[attribute as ColorAttribute] === color.slug}
-                                                onChange={() => handleClickAttribute(attribute as ColorAttribute, color.slug)}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : null
-                            })}
-                            {Array.isArray(product.attributes.montaturaLenti) ? (
-                                <div key="montaturaLenti" style={{display: 'flex', gap: '5px', flexWrap: 'wrap'}}>
-                                    {product.attributes.montaturaLenti.map((color) => (
-                                        <ImageBox
-                                            title={'montatura lenti' + ' - ' + color.name }
-                                            productColor={color}
-                                            key={color.slug}
-                                            checked={currentAttributes.montaturaLenti === color.slug}
-                                            onChange={() => handleClickAttribute('montaturaLenti', color.slug)}
-                                        />
-                                    ))}
-                                </div>
-                            ) : null}
-                            {['calibro', 'formato'].map((attributeName) => {
-                                const attributes = product.attributes[attributeName as BaseAttribute];
-                                return Array.isArray(attributes) ? (
-                                    <div key={attributeName} style={{display: 'flex', gap: '5px', flexWrap: 'wrap'}}>
-                                        {attributes.map((attribute) => (
-                                            <TextBox
-                                                title={attributeName + ' - ' + attribute.name }
-                                                attribute={attribute}
-                                                key={attribute.slug}
-                                                checked={currentAttributes[attributeName as BaseAttribute] === attribute.slug}
-                                                onChange={() => handleClickAttribute(attributeName as BaseAttribute, attribute.slug)}
-                                            />
-                                        ))}
-                                    </div>
-                                ) : null
-                            })}
-                        </div>
+                        <AttributeCheckboxes
+                            product={product}
+                            currentAttributes={currentAttributes}
+                            handleClickAttribute={handleClickAttribute}
+                        />
                         <IconButton
                             size="small"
                             onClick={handleAddToCart}
@@ -212,68 +142,5 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
         </Card>
     );
 };
-
-const ColorBox = ({ productColor, ...checkBoxProps }: { productColor: Color } & CheckboxProps) => {
-    return (
-        <Checkbox
-            icon={<Box sx={{ height: '10px', width: '30px', backgroundColor: productColor.code }} />}
-            checkedIcon={<div style={{ border: '1px solid', borderColor: productColor.code}}>
-                <Box sx={{ height: '10px', width: '30px', backgroundColor: productColor.code, margin: '2px' }} />
-            </div>}
-            sx={{
-                padding: 0,
-                margin: 0
-            }}
-            {...checkBoxProps}
-        />
-    )
-}
-
-const ImageBox = ({ productColor, ...checkBoxProps }: { productColor: ImageColor } & CheckboxProps) => {
-    return (
-        <Checkbox
-            icon={<Image src={productColor.image} alt={productColor.name} width="30" height="10" />}
-            checkedIcon={<div style={{ border: '1px solid #000', padding: '2px', height: '16px', width: '36px'}}>
-                <Image src={productColor.image} width="30" height="10" style={{display: 'block'}} alt={productColor.name} />
-            </div>}
-            sx={{
-                padding: 0,
-                margin: 0
-            }}
-            {...checkBoxProps}
-        />
-    )
-}
-
-const TextBox = ({ attribute, ...checkBoxProps }: { attribute: TextAttribute } & CheckboxProps) => {
-    const AttributeBox = ({isChecked}: {isChecked?: boolean}) => (
-        <Box sx={{
-            height: isChecked ? '16px' : '14px',
-            minWidth: isChecked ? '36px' : '30px',
-            border: '1px solid #000',
-            padding: '2px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: isChecked ? '#fff' : '#000',
-            backgroundColor: isChecked ? '#000' : '#fff',
-            fontSize: '10px',
-            fontWeight: isChecked ? 700 : 300,
-        }}>
-            {attribute.name}
-        </Box>
-    )
-    return (
-        <Checkbox
-            icon={<AttributeBox />}
-            checkedIcon={<AttributeBox isChecked />}
-            sx={{
-                padding: 0,
-                margin: 0
-            }}
-            {...checkBoxProps}
-        />
-    )
-}
 
 export default ProductCard;

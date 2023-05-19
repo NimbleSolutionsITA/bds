@@ -9,7 +9,7 @@ import Document, {
 } from 'next/document';
 import createEmotionServer from '@emotion/server/create-instance';
 import { AppType } from 'next/app';
-import theme, { primaryFont, secondaryFont }  from '../src/theme/theme';
+import theme  from '../src/theme/theme';
 import createEmotionCache from '../src/theme/createEmotionCache';
 import { BDGAppProps } from './_app';
 
@@ -19,7 +19,7 @@ interface MyDocumentProps extends DocumentProps {
 
 export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
     return (
-        <Html lang="en" className={`${primaryFont.className} ${secondaryFont.className}`}>
+        <Html lang="en">
             <Head>
                 {/* PWA primary color */}
                 <meta name="theme-color" content={theme.palette.primary.main} />

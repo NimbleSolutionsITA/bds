@@ -7,6 +7,7 @@ import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {useRouter} from "next/router";
 import Filters from "./Filters";
+import Loading from "../../components/Loading";
 
 type ProductsGridProps = {
 	products: BaseProduct[]
@@ -88,7 +89,7 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 						dataLength={data?.pages.length * 24}
 						next={fetchNextPage}
 						hasMore={hasNextPage || false}
-						loader={(<Typography variant="h1">Loading...</Typography>)}
+						loader={(<Loading />)}
 						scrollableTarget="html"
 					>
 						{data?.pages[0]?.length > 0 ? (

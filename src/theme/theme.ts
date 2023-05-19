@@ -1,33 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
-import localFont from 'next/font/local'
 
 export const CUSTOM_COLOR = 'rgba(102,130,113)';
-
-export const primaryFont = localFont({
-    src: [
-        {
-            path: '../../public/fonts/Apercu-Light.woff2',
-            weight: '300',
-            style: 'normal'
-        },
-        {
-            path: '../../public/fonts/Apercu-Medium.woff2',
-            weight: '500',
-            style: 'normal'
-        }
-    ]
-});
-
-export const secondaryFont = localFont({
-    src: [
-        {
-            path: '../../public/fonts/OggRoman-Regular.woff2',
-            weight: '300',
-            style: 'normal'
-        }
-    ]
-});
 
 // Create a theme instance.
 const theme = createTheme({
@@ -46,35 +20,32 @@ const theme = createTheme({
         }
     },
     typography: {
-        fontFamily: primaryFont.style.fontFamily,
+        fontFamily: 'Apercu, sans-serif',
         body1: {
             fontSize: '14px',
             fontWeight: 300,
         },
         h1: {
-            fontFamily: secondaryFont.style.fontFamily,
-            fontWeight: 500,
+            fontFamily: 'Ogg Roman, serif',
             fontSize: '2.5rem',
             lineHeight: 1.2,
+            fontWeight: 300,
         },
         h2: {
             fontSize: '2rem',
-            fontFamily: primaryFont.style.fontFamily,
-            fontWeight: 500,
         },
         h3: {
             fontSize: '1.75rem',
-            fontWeight: 500,
             lineHeight: 1.2,
+            fontWeight: 300,
         },
         h4: {
             fontSize: '1.5rem',
-            fontWeight: 500,
             lineHeight: 1.2,
+            fontWeight: 300,
         },
         h6: {
             fontSize: '1rem',
-            fontWeight: 500,
             lineHeight: 1.2,
         }
     },

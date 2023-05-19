@@ -2,6 +2,7 @@ import {useDispatch} from "react-redux";
 import {Box, IconButton, Typography} from "@mui/material";
 import {DeleteOutlineSharp} from "@mui/icons-material";
 import {CartItem as CartItemType, deleteCartItem} from "../../redux/cartSlice";
+import Image from "next/image";
 
 type CartItemProps = {
 	item: CartItemType
@@ -14,16 +15,23 @@ const CartItem = ({item}: CartItemProps) => {
 			display: 'flex',
 			minHeight: '94px',
 		}}>
-
 			<div style={{
 				width: '25%',
-				paddingBottom: '15%',
-				backgroundImage: `url(${item.image})`,
-				backgroundSize: 'contain',
-				backgroundRepeat: 'no-repeat',
-				backgroundPosition: 'center center',
-				backgroundColor: '#fff'
-			}} />
+				height: '100%',
+				backgroundColor: '#fff',
+				display: 'flex',
+				alignItems: 'center',
+				position: 'relative',
+				borderRight: '1px solid #fff'
+			}}>
+				<Image
+					src={item.image}
+					alt={item.name}
+					fill
+					style={{objectFit: 'contain'}}
+
+				/>
+			</div>
 			<div style={{width: '75%', padding: '10px', position: 'relative'}}>
 				<Typography sx={{fontFamily: 'Apercu', fontWeight: 500, lineHeight: '16px', marginBottom: '8px'}}>
 					{item.category} - {item.name}<br />

@@ -87,7 +87,12 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 					}
 				}}
 			>
-				<Container>
+				<Box sx={{
+					padding: '20px',
+					margin: '20px',
+					width: 'calc(100% - 40px)',
+					border: '1px solid rgba(255,255,255,0.2)',
+				}}>
 					<ExpansionPanel title="Designers">
 						<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
 							{designers.map(designer => (
@@ -138,7 +143,7 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 							price_range: (Array.isArray(priceRange) ? priceRange : [priceRange].filter(v => v)).map(v => v.toString())
 						}))}
 					/>
-				</Container>
+				</Box>
 			</SwipeableDrawer>
 		</Box>
 	)

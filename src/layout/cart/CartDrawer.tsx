@@ -16,6 +16,9 @@ const CartDrawer = () => {
 			onClose={() => dispatch(closeCartDrawer())}
 			elevation={0}
 			anchor="right"
+			sx={{
+				zIndex: (theme) => theme.zIndex.drawer + 1,
+			}}
 			PaperProps={{
 				sx: {
 					width: '400px',

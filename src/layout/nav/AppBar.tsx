@@ -7,6 +7,7 @@ import Image from "next/image";
 import {motion, Variants} from "framer-motion";
 import {KeyboardArrowDown} from "@mui/icons-material";
 import {MenuItem, Menus} from "../../types/settings";
+import Link from "next/link";
 
 type AppBarProps = {
     leftMenu: Menus['leftMenu'],
@@ -32,12 +33,16 @@ export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
                 >
                     {leftMenu.map(item => <NavButton key={item.id} item={item} />)}
                 </Box>
-                <IconButton sx={{
-                    marginX: '20px',
-                    '&:hover': {
-                        backgroundColor: 'inherit'
-                    }
-                }}>
+                <IconButton
+                    component={Link}
+                    href="/"
+                    sx={{
+                        marginX: '20px',
+                        '&:hover': {
+                            backgroundColor: 'inherit'
+                        }
+                    }}
+                >
                     <Image
                         src={logo}
                         alt="Logo Bottega di Sguardi"

@@ -29,6 +29,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-material-ui-carousel": "^3.4.2",
     "react-redux": "^8.0.5",
+    "react-share": "^4.4.1",
     "sanitize-html": "^2.10.0"
   },
   "devDependencies": {

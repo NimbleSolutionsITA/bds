@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Box } from '@mui/system';
 import { motion } from 'framer-motion';
 import Image from "next/image";
+import placeholder from "../images/placeholder.jpg";
 
 interface ZoomProps {
 	img: string;
@@ -14,7 +15,7 @@ interface ZoomProps {
 const Zoom: React.FC<ZoomProps> = ({ img, zoomScale = 3.0, transitionTime = 0.1, ratio = 16/9 }) => {
 	const [zoom, setZoom] = useState<boolean>(false);
 	const [mouseXY, setMouseXY] = useState<{ x: number; y: number }>({ x: 50, y: 50 });
-
+	const [image, setImage] = useState<string>(img);
 
 	const imageRef = useRef<HTMLDivElement>(null);
 
@@ -64,11 +65,12 @@ const Zoom: React.FC<ZoomProps> = ({ img, zoomScale = 3.0, transitionTime = 0.1,
 				transition={{ duration: transitionTime, ease: 'easeOut' }}
 			>
 				<Image
-					src={img}
+					src={image}
 					unoptimized
 					fill
 					alt="product gallery image"
 					style={{objectFit: 'cover', objectPosition: 'center center'}}
+					onError={() => setImage(placeholder.src)}
 				/>
 			</motion.div>
 		</Box>
