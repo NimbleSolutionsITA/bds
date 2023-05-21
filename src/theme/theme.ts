@@ -95,6 +95,14 @@ const theme = createTheme({
                     color: 'rgba(255,255,255,0.5)',
                 }
             }
+        },
+        MuiIcon: {
+            defaultProps: {
+                sx: {
+                    fontFamily: `"Material Icons Sharp"`,
+                    fontDisplay: "block",
+                },
+            },
         }
     }
 });

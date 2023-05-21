@@ -1,6 +1,6 @@
 import {Box, Container, Divider, IconButton, SwipeableDrawer, Typography} from "@mui/material";
 import {CUSTOM_COLOR} from "../../theme/theme";
-import {RestartAltSharp, TuneSharp} from '@mui/icons-material';
+import {Close, RestartAltSharp, TuneSharp} from '@mui/icons-material';
 import React, {Dispatch, SetStateAction, useRef, useState} from "react";
 import {Category, Color, ProductTag} from "../../types/woocommerce";
 import {SearchParams} from "./ProductsGrid";
@@ -59,7 +59,10 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 						</IconButton>
 					)}
 					<IconButton size="small" onClick={() => setOpen(!open)}>
-						<TuneSharp fontSize="small" sx={{color: 'rgba(255,255,255,0.8)'}} />
+						{open ?
+							<Close fontSize="small" sx={{color: 'rgba(255,255,255,0.8)'}}/> :
+							<TuneSharp fontSize="small" sx={{color: 'rgba(255,255,255,0.8)'}}/>
+						}
 					</IconButton>
 				</div>
 			</Container>
@@ -75,10 +78,14 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 				PaperProps={{
 					sx: {
 						backgroundColor: CUSTOM_COLOR,
-						height: '100vh',
 						width: '400px',
 						maxWidth: '100%',
+						height: 'auto',
 						top: ((ref.current?.getBoundingClientRect().top ?? 0) + 40)+'px',
+						right: {
+							xs: 0,
+							md: '24px'
+						}
 					}
 				}}
 				BackdropProps={{

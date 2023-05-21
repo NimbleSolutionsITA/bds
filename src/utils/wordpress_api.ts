@@ -45,6 +45,8 @@ export const getDesignerPageProps = async (locale: string, slug: string) => {
 	return { menus, googlePlaces, productCategory: productCategory ? mapProductCategory(productCategory) : null }
 }
 
+
+
 export const mapCategory = ({id, name, slug, count}: Category) => ({
 	id, name: sanitize(name), slug, count
 })

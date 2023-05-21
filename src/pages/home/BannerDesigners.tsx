@@ -1,9 +1,10 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import {HomeProps} from "../../../pages";
 import {Button, Grid, Typography} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
 import Carousel from 'react-material-ui-carousel';
 import {motion} from "framer-motion";
+import {ArrowBackIosSharp, ArrowForwardIosSharp} from "@mui/icons-material";
 
 type BannerDesignersProps = {
 	designers: HomeProps['page']['designers']
@@ -22,6 +23,14 @@ const BannerDesigners = ({designers}: BannerDesignersProps) => {
 					animation="slide"
 					autoPlay={false}
 					indicators={false}
+					navButtonsProps={{
+						style: {
+							background: 'none',
+							color: '#000',
+						}
+					}}
+					NextIcon={<ArrowForwardIosSharp sx={{fontSize: '40px'}} />}
+					PrevIcon={<ArrowBackIosSharp sx={{fontSize: '40px'}} />}
 					onChange={(next) => setActiveSlide(next as number)}
 				>
 					{designers.slider?.map((designer, index) => (

@@ -1,22 +1,20 @@
-import {AttributeType, Product, ProductCategory, Variation} from "../../types/woocommerce";
-import {Button, Container, Grid, Typography} from "@mui/material";
+import {AttributeType, ImageDetailed, Product, ProductCategory, Variation} from "../../types/woocommerce";
+import {Button, Container, Grid, Tooltip, Typography} from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
 import {findVariationFromAttributes, getDefaultProduct, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
-import {useState} from "react";
+import React, {useState} from "react";
 import {addCartItem} from "../../redux/cartSlice";
 import {useDispatch} from "react-redux";
 import {AttributeCheckboxes} from "../../components/AttributeCheckboxes";
 import InStock from "../../icons/InStock";
-import {
-	FacebookShareButton, FacebookIcon, FacebookMessengerIcon, FacebookMessengerShareButton,
-	WhatsappShareButton, WhatsappIcon,
-	TelegramShareButton, TelegramIcon,
-	EmailShareButton, EmailIcon,
-	TwitterShareButton, TwitterIcon
-} from "react-share";
+import SocialShare from "./SocialShare";
+import InStockNotifier from "./InStockNotifier";
+import Image from "next/image";
+import {ArrowForwardIosSharp, ArrowBackIosSharp} from "@mui/icons-material";
+import placeholder from "../../images/placeholder.jpg";
 
 type ProductViewProps = {
 	product: Product
@@ -69,13 +67,60 @@ const ProductView = ({product, category}: ProductViewProps) => {
 					<Carousel
 						animation="slide"
 						autoPlay={false}
-						indicators={false}
 						index={galleryIndex}
 						sx={{
 							minHeight: '100%',
 							display: 'flex',
-							alignItems: 'center'
+							alignItems: 'center',
 						}}
+						NextIcon={<ArrowForwardIosSharp sx={{fontSize: '40px'}} />}
+						PrevIcon={<ArrowBackIosSharp sx={{fontSize: '40px'}} />}
+						navButtonsProps={{
+							style: {
+								background: 'none',
+								color: '#000',
+							}
+						}}
+						indicatorContainerProps={{
+							style: {
+								position: 'absolute',
+								bottom: 0,
+								zIndex: 1,
+								height: '30px',
+								background: '#fff',
+								display: 'flex',
+								justifyContent: 'center',
+								alignItems: 'flex-end'
+							}
+						}}
+						indicatorIconButtonProps={{
+							style: {
+								backgroundColor: 'rgba(0,0,0,0.1)',
+								margin: '0',
+								width: '50px',
+								height: '7px',
+								borderRadius: '0',
+							}
+						}}
+						activeIndicatorIconButtonProps={{
+							style: {
+								backgroundColor: '#000',
+								margin: '0',
+								width: '50px',
+								height: '7px',
+								borderRadius: '0',
+							}
+						}}
+						IndicatorIcon={galleryImages.map((image) => (
+							<Tooltip
+								key={image.url}
+								arrow
+								placement="top"
+								title={<TooltipImage image={image} />}
+							>
+								<div style={{width: '100%', height: '100%'}} />
+							</Tooltip>
+						))}
 					>
 						{galleryImages.map((image) => (
 							<ZoomableImage key={image.url} img={image.url} ratio={image.width/image.height} />
@@ -125,72 +170,35 @@ const ProductView = ({product, category}: ProductViewProps) => {
 						extended
 					/>
 					{currentProduct.stock_status !== 'instock' ? (
-						<div>CONTACT FORM</div>
+						<InStockNotifier
+							productId={product.id}
+							variationId={currentProduct.id}
+						/>
 					) : (
 						<Typography sx={{fontSize: '18px', display: 'flex', fontStyle: 'italic', margin: '10px 0'}}>
 							<InStock sx={{fontSize: '30px', marginRight: '10px'}}/> disponibile
 						</Typography>
 					)}
-					<Button
-						disabled={currentProduct.stock_status !== 'instock'}
-						onClick={handleAddToCart}
-						fullWidth
-						sx={{
-							marginTop: '20px',
-						}}
-					>
-						Aggiungi alla shopping bag
-					</Button>
-					<div style={{display: 'flex', marginTop: '30px', gap: '4px' }}>
-						<FacebookShareButton url="">
-							<FacebookIcon
-								size={32}
-								round={false}
-								iconFillColor="#000"
-								bgStyle={{fill: 'transparent'}}
-							/>
-						</FacebookShareButton>
-						<FacebookMessengerShareButton appId="" url="">
-							<FacebookMessengerIcon
-								size={32}
-								round={false}
-								iconFillColor="#000"
-								bgStyle={{fill: 'transparent'}}
-							/>
-						</FacebookMessengerShareButton>
-						<WhatsappShareButton url={'/'}>
-							<WhatsappIcon
-								size={32}
-								round={false}
-								iconFillColor="#000"
-								bgStyle={{fill: 'transparent'}}
-							/>
-						</WhatsappShareButton>
-						<TelegramShareButton url={'/'}>
-							<TelegramIcon
-								size={32}
-								round={false}
-								iconFillColor="#000"
-								bgStyle={{fill: 'transparent'}}
-							/>
-						</TelegramShareButton>
-						<TwitterShareButton url={'/'}>
-							<TwitterIcon
-								size={32}
-								round={false}
-								iconFillColor="#000"
-								bgStyle={{fill: 'transparent'}}
-							/>
-						</TwitterShareButton>
-						<EmailShareButton url={'/'}>
-							<EmailIcon
-								size={32}
-								round={false}
-								iconFillColor="#000"
-								bgStyle={{fill: 'transparent'}}
-							/>
-						</EmailShareButton>
-					</div>
+					{currentProduct.stock_status === 'instock'  && (
+						<Button
+							onClick={handleAddToCart}
+							fullWidth
+							sx={{
+								marginTop: '20px',
+							}}
+						>
+							Aggiungi alla shopping bag
+						</Button>
+					)}
+					<SocialShare
+						facebookUrl={'/'}
+						facebookMessengerAppId={'/'}
+						facebookMessengerUrl={'/'}
+						whatsappUrl={'/'}
+						telegramUrl={'/'}
+						twitterUrl={'/'}
+						emailUrl={'/'}
+					/>
 					<Typography sx={{marginTop: '20px'}}>
 						<b>Costi di spedizione</b> gratuiti per ordini superiori a 150€.
 						<br/>
@@ -201,6 +209,21 @@ const ProductView = ({product, category}: ProductViewProps) => {
 				</Grid>
 			</Grid>
 		</Container>
+	)
+}
+
+const TooltipImage = ({image}: {image: ImageDetailed}) => {
+	const [img, setImg] = useState(image.url);
+	return (
+		<div style={{width: '250px', height: 250 * image.height / image.width, position: 'relative', margin: '5px 0'}}>
+			<Image
+				src={img}
+				fill
+				alt={image.alt}
+				style={{objectFit: 'contain'}}
+				onError={() => setImg(placeholder.src)}
+			/>
+		</div>
 	)
 }
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {motion, useAnimation} from "framer-motion";
-import Bullet from "./Bullet";
+import {Button} from "@mui/material";
 
 type SliderProps = {
 	children: React.ReactNode[]
@@ -26,6 +26,7 @@ const translateXForElement = (element) => {
 const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 	const ref = useRef(null);
 	const [constraint, setConstraint] = useState(0);
+	const [activeSlide, setActiveSlide] = useState(0);
 	const animation = useAnimation()
 
 	useEffect(() => {
@@ -40,9 +41,10 @@ const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 	}, []);
 
 	const goToSlide = (index: number) => {
+		setActiveSlide(index)
 		// @ts-ignore
 		const slideWidth = (ref?.current?.offsetWidth - gap * (slides - 1)) / slides
-		animation.start({ x: -(index * (slideWidth+gap)) })
+		return animation.start({ x: -(index * (slideWidth+gap)) })
 	}
 
 	return (
@@ -62,7 +64,8 @@ const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 					// @ts-ignore
 					const slideWidth = (ref.current.offsetWidth - gap * (slides - 1)) / slides + gap
 					const targetX = -Math.abs(Math.round(xPos / (slideWidth)) * slideWidth)
-					animation.start({ x: targetX, transition: { type: "spring" } });
+					setActiveSlide(Math.abs(Math.round(xPos / (slideWidth))))
+					return animation.start({ x: targetX, transition: { type: "spring" } });
 				}}
 			>
 				{[...children, ...children.slice(0,slides)].map((slide, index) => (
@@ -76,7 +79,18 @@ const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 			</motion.div>
 			<div style={{display: 'flex', width: '100%', justifyContent: 'center', padding: '20px 0'}}>
 				{children.map((slide, index) => (
-					<Bullet isGrey key={index} onClick={() => goToSlide(index)} width="10px" />
+					<Button
+						key={index}
+						onClick={() => goToSlide(index)}
+						sx={{
+							backgroundColor: activeSlide === index ? '#000' : 'rgba(0,0,0,0.1)',
+							margin: '0',
+							padding: '0',
+							width: '50px',
+							height: '7px',
+							borderRadius: '0',
+						}}
+					/>
 				))}
 			</div>
 		</motion.div>

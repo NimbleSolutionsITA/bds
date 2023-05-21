@@ -33,24 +33,33 @@ const SliderWithText = ({body, images}: SliderWithTextProps) => {
 					indicatorContainerProps={{
 						style: {
 							position: 'absolute',
-							bottom: '10px',
+							bottom: 0,
 							zIndex: 1,
+							display: 'flex',
+							justifyContent: 'center',
+							alignItems: 'flex-end',
+							height: '30px',
 						}
 					}}
 					indicatorIconButtonProps={{
 						style: {
-							color: 'transparent',
-							border: '2px solid white',
-							margin: '0 5px',
-							width: '15px',
-							height: '15px',
+							backgroundColor: 'rgba(0,0,0,0.2)',
+							margin: '0',
+							width: '50px',
+							height: '7px',
+							borderRadius: '0',
 						}
 					}}
 					activeIndicatorIconButtonProps={{
 						style: {
-							color: 'rgba(255, 255, 255, 0.5)',
+							backgroundColor: '#000',
+							margin: '0',
+							width: '50px',
+							height: '7px',
+							borderRadius: '0',
 						}
 					}}
+					IndicatorIcon={<div />}
 				>
 					{images.map((image) => (
 
