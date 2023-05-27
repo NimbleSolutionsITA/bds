@@ -13,7 +13,7 @@ module.exports =  {
           {
               protocol: 'https',
               hostname: 'wpbdg.nimble-lab.com',
-              port: '',
+              port: '443',
               pathname: '/wp-content/uploads/**',
           },
       ],

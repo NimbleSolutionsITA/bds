@@ -12,7 +12,7 @@ const GoogleAddress = ({address, name, whatsApp}: {whatsApp: string, name: strin
 				{street} {streetNumber}<br />
 				{cityCap} - {country}<br />
 				<a href={`tel:${address.formatted_phone_number.replaceAll(' ', '')}`}>{address.formatted_phone_number}</a><br />
-				<a href={`https://api.whatsapp.com/send?phone=39${whatsApp.replaceAll(' ', '')}&amp;text=Ciao!`} target="_blank" rel="noopener">{whatsApp}</a><br />
+				<a href={`https://api.whatsapp.com/send?phone=39${whatsApp.replaceAll(' ', '')}&amp;text=Ciao!`} target="_blank" rel="noopener noreferrer">{whatsApp}</a><br />
 				<a href="mailto:info@bottegadisguardi.com">info@bottegadisguardi.com</a>
 			</Typography>
 			<Typography sx={pStyle}>

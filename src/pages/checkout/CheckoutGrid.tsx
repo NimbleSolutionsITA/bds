@@ -1,6 +1,6 @@
 import {Backdrop, CircularProgress} from "@mui/material";
 import {useEffect, useState} from "react";
-import { useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {shippingMethodApplies} from "../../utils/utils";
 import {useForm} from "react-hook-form";
@@ -8,7 +8,7 @@ import {useMutation} from "@tanstack/react-query";
 import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
 import {Country, ShippingClass, WooOrder} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
-import {CartItem,} from "../../redux/cartSlice";
+import {CartItem, destroyCart,} from "../../redux/cartSlice";
 import CheckoutDesktop from "./CheckoutDesktop";
 import {Stripe} from "@stripe/stripe-js";
 import PaymentResult from "./PaymentResult";
@@ -71,6 +71,7 @@ const CheckoutGrid = ({
 	const [checkoutStep, setCheckoutStep] = useState(1);
 	const [tab, setTab] = useState(0);
 	const { items } = useSelector((state: RootState) => state.cart);
+	const dispatch = useDispatch()
 	const subtotalCart = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
 	const defaultShippingMethod = shipping.classes.find(sc => sc.locations.includes('IT'))
 		?.methods.find(method => shippingMethodApplies(method, subtotalCart, 0));
@@ -170,7 +171,6 @@ const CheckoutGrid = ({
 	}
 
 	const setPaid = (transaction_id: string|number) => {
-		console.log('setPaid', transaction_id, order?.id)
 		if (order?.id && checkoutStep === 5) {
 			mutate({
 				orderId: order.id,
@@ -178,44 +178,44 @@ const CheckoutGrid = ({
 				transaction_id
 			})
 			setCheckoutStep(6)
+			dispatch(destroyCart());
 		}
 	}
 
-	const initOrder = async () => {
-		await mutate({
-			line_items: items.map(item => ({
-				product_id: item.product_id,
-				variation_id: item.variation_id === item.product_id ?
-					undefined : item.variation_id,
-				quantity: item.qty,
-			})),
-			shipping_lines: [{
-				method_id: shippingMethod?.methodId,
-				total: shippingMethod?.cost
-			}]
-		})
-	}
-
-	const deleteOrder = () => {
-		return fetch(NEXT_API_ENDPOINT + '/orders/' + order.id, { method: 'DELETE' })
-			.then(response => response.json())
-	}
 
 	useEffect(() => {
 		return () => {
+			const deleteOrder = () => {
+				return fetch(NEXT_API_ENDPOINT + '/orders/' + order.id, { method: 'DELETE' })
+					.then(response => response.json())
+			}
 			// Delete order when component unmounts
 			if (order?.id && order?.billing?.email) {
 				deleteOrder().then(r => r);
 			}
 		}
-	}, []);
+	}, [order?.id, order?.billing?.email]);
 
 	useEffect(() => {
+		const initOrder = async () => {
+			await mutate({
+				line_items: items.map(item => ({
+					product_id: item.product_id,
+					variation_id: item.variation_id === item.product_id ?
+						undefined : item.variation_id,
+					quantity: item.qty,
+				})),
+				shipping_lines: [{
+					method_id: shippingMethod?.methodId,
+					total: shippingMethod?.cost
+				}]
+			})
+		}
 		// Initialize order once items are loaded
 		if (items.length > 0 && checkoutStep === 1) {
 			initOrder().then(() => setCheckoutStep(2));
 		}
-	}, [items, checkoutStep]);
+	}, [items, checkoutStep, mutate, shippingMethod?.methodId, shippingMethod?.cost]);
 
 	useEffect(() => {
 		// Update order when cart items quantity changes
@@ -242,7 +242,7 @@ const CheckoutGrid = ({
 				})
 			}
 		}
-	}, [lineItems, checkoutStep]);
+	}, [lineItems, checkoutStep, order?.id, order?.line_items, mutate]);
 
 	useEffect(() => {
 		if(order && order.shipping_lines && order.shipping_lines[0].method_id !== shippingMethodId) {
@@ -256,7 +256,7 @@ const CheckoutGrid = ({
 				}]
 			})
 		}
-	}, [shippingMethodId])
+	}, [mutate, order, shippingMethodId, shippingMethods])
 
 	const finalSippingMethods = shippingMethods?.filter(sm => !hasFreeShipping || sm.methodId !== 'flat_rate')
 
@@ -264,7 +264,7 @@ const CheckoutGrid = ({
 		if(!shippingMethodId || !finalSippingMethods?.find(sm => sm.id === Number(shippingMethodId))) {
 			setValue('shipping_method', finalSippingMethods?.[0]?.id.toString() ?? null)
 		}
-	}, [country, shippingMethodId]);
+	}, [country, finalSippingMethods, setValue, shippingMethodId]);
 
 	switch (checkoutStep) {
 		case 1:

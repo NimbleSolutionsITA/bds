@@ -33,7 +33,7 @@ const StripeWrapper = ({order, isReadyToPay, stripePromise, setCheckoutStep}: St
 					setPaymentIntentId(data.payment_intent_id)
 				});
 		}
-	}, [orderTotal, order]);
+	}, [orderTotal, order, paymentIntentId]);
 
 	return clientSecret && stripePromise ? (
 		<Elements

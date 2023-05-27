@@ -55,7 +55,7 @@ export const cartSlice = createSlice({
 			}
 			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
 		},
-		deleteCartItem: (state, { payload }: PayloadAction<{ product_id: number, variation_id: number }>) => {
+		deleteCartItem: (state, { payload }: PayloadAction<{ product_id: number, variation_id?: number }>) => {
 			state.items = state.items.filter((item: CartItem) => item.product_id !== payload.product_id && item.variation_id !== payload.variation_id)
 			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
 		},

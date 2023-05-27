@@ -37,7 +37,7 @@ export default function Checkout({
 	useEffect(() => {
 		// Dispatch initCart to load cart from localStorage
 		dispatch(initCart());
-	}, []);
+	}, [dispatch]);
 
 	const isReady = items.length > 0 && !!CLIENT_ID
 

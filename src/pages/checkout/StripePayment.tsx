@@ -1,5 +1,5 @@
 import {PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
-import {Dispatch, SetStateAction, useEffect, useState} from "react";
+import {Dispatch, SetStateAction, useEffect} from "react";
 import {WooOrder} from "../../types/woocommerce";
 
 type StripePaymentProps = {
@@ -23,7 +23,7 @@ const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProp
 
 			setCheckoutStep(4.5);
 
-			const { error } = await stripe.confirmPayment({
+			await stripe.confirmPayment({
 				elements,
 				confirmParams: {
 					// Make sure to change this to your payment completion page
@@ -40,7 +40,7 @@ const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProp
 			setCheckoutStep(7);
 		}
 		handlePay();
-	}, [isReadyToPay, stripe, elements]);
+	}, [isReadyToPay, stripe, elements, order, setCheckoutStep]);
 
 
 	return (

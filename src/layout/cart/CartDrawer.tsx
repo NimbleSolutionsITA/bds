@@ -43,7 +43,7 @@ const CartDrawer = () => {
 					</IconButton>
 				</div>
 				{items.map((item) => (
-					<CartItem key={item.id} item={item} />
+					<CartItem key={item.variation_id??''+item.product_id} item={item} />
 				))}
 				{items.length > 0 && (
 					<>

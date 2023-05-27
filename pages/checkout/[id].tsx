@@ -3,6 +3,8 @@ import PaymentResult from "../../src/pages/checkout/PaymentResult";
 import {loadStripe} from "@stripe/stripe-js";
 import {useEffect, useState} from "react";
 import {NEXT_API_ENDPOINT} from "../../src/utils/endpoints";
+import {useDispatch} from "react-redux";
+import {destroyCart} from "../../src/redux/cartSlice";
 
 
 export type CheckoutResultProps = {
@@ -18,7 +20,7 @@ const stripePromise = loadStripe(stripePublicKey ?? '');
 export default function CheckoutResult({ orderId }: CheckoutResultProps) {
     const [result, setResult] = useState<string>('pending')
 	const router = useRouter()
-
+	const dispatch = useDispatch()
 	const {
 		payment_intent,
 		payment_intent_client_secret,
@@ -47,18 +49,21 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 				stripe.retrievePaymentIntent(payment_intent_client_secret as string).then(({ paymentIntent }) => {
 					console.log('paymentIntent', paymentIntent)
 					if (paymentIntent?.status === 'succeeded') {
-						updateOrder().then(() => setResult('succeeded'))
+						updateOrder().then(() => {
+							setResult('succeeded')
+							dispatch(destroyCart())
+						})
 					}
 					else
 						setResult(paymentIntent?.status ?? 'error')
 				});
 			}
 		});
-	}, [stripePromise]);
+	}, [payment_intent, payment_intent_client_secret, redirect_status, orderId, dispatch]);
 
 	return <PaymentResult isLoading={result === 'pending'} isSuccess={result === 'succeeded'} />
 }
-export async function getStaticProps({ locale, params: {id} }: { locales: string[], locale: 'it' | 'en', params: {id: string}}) {
+export async function getStaticProps({ params: {id} }: { locales: string[], locale: 'it' | 'en', params: {id: string}}) {
 	const [
 	] = await Promise.all([
 	]);

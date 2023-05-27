@@ -19,7 +19,7 @@ const BottomLinks = () => {
 				Bottega di Sguardi © 2023
 			</Typography>
 			<Typography sx={{fontSize: '11px', fontWeight: 300, marginTop: '4px', textAlign: 'center', opacity: .75}}>
-				Made with <FavoriteIcon sx={{fontSize: '15px', marginBottom: '-4px'}} color="error" /> by <a href="https://www.nimble-solutions.com" target="_blank" rel="noopener">Nimble Solutions</a>
+				Made with <FavoriteIcon sx={{fontSize: '15px', marginBottom: '-4px'}} color="error" /> by <a href="https://www.nimble-solutions.com" target="_blank" rel="noopener noreferrer">Nimble Solutions</a>
 			</Typography>
 		</>
 	)
