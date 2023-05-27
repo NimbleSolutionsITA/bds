@@ -157,3 +157,109 @@ export type ProductTag = {
 	filter: 'none' | 'material' | 'gender' | 'style';
 	slug: string;
 }
+
+export type ShippingClass = ShippingZone & {
+	methods: ShippingMethod[];
+	locations: string[];
+}
+
+export type ShippingZone = {
+	id: number;
+	name: string;
+	order: number;
+}
+
+export type SippingZoneLocation = {
+	code: string;
+	type: 'country' | 'state' | 'postcode' | 'continent';
+}
+
+export type ShippingMethod = {
+	id: number;
+	order: number;
+	enabled: boolean;
+	methodId: string;
+	title: string
+	cost: string;
+	requires: 'min_amount';
+	minAmount: string;
+	ignoreDiscounts: 'no' | 'yes';
+}
+
+export type Country = {
+	code: string,
+	name: string,
+	states: {
+		code: string,
+		name: string
+	}[]
+}
+
+export type WooOrder = {
+	id: number;
+	discount_total: string;
+	shipping_total: string;
+	total: string;
+	currency: string;
+	discount_tax: string;
+	shipping_tax: string;
+	cart_tax: string;
+	total_tax: string;
+	billing: {
+		first_name: string;
+		last_name: string;
+		address_1: string;
+		address_2: string;
+		company: string;
+		city: string;
+		state: string;
+		postcode: string;
+		country: string;
+		email: string;
+		phone: string;
+	}
+	shipping: {
+		first_name: string;
+		last_name: string;
+		company: string;
+		address_1: string;
+		address_2: string;
+		city: string;
+		state: string;
+		postcode: string;
+		country: string;
+	}
+	payment_method: string;
+	payment_method_title: string;
+	status: string;
+	line_items: WooLineItem[]
+	coupon_lines: {
+		id: number;
+		code: string;
+	}[]
+	shipping_lines: WooSippingLine[]
+}
+
+export type WooSippingLine = {
+	id: number;
+	method_title: string;
+	method_id: string;
+}
+
+export type WooLineItem = {
+	id: number;
+	name: string;
+	product_id: number;
+	variation_id: number;
+	quantity: number;
+	subtotal: string;
+	subtotal_tax: string;
+	total: string;
+	total_tax: string;
+	meta_data: {
+		id: number;
+		key: string;
+		value: string;
+	}[]
+
+}

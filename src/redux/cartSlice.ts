@@ -2,7 +2,8 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import { DefaultAttribute} from "../types/woocommerce";
 
 export type CartItem = {
-	id: number
+	product_id: number
+	variation_id?: number
 	name: string
 	image: string
 	price: number
@@ -10,6 +11,7 @@ export type CartItem = {
 	attributes: DefaultAttribute[]
 	stock_quantity: number
 	category: string
+	slug: string
 }
 
 type CartState = {
@@ -36,19 +38,25 @@ export const cartSlice = createSlice({
 			return state
 		},
 		addCartItem: (state, { payload }: PayloadAction<CartItem>) => {
-			const i = state.items.findIndex((_element: CartItem) => _element.id === payload.id)
+			const i = state.items.findIndex((_element: CartItem) => _element.product_id === payload.product_id && _element.variation_id === payload.variation_id)
 			if (i > -1) state.items[i].qty = state.items[i].qty + 1
 			else state.items.push(payload)
 			state.cartDrawerOpen = true
 			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
 		},
-		updateCartItem: (state, { payload }: PayloadAction<{ id: number, qty: number }>) => {
-			const i = state.items.findIndex((_element: CartItem) => _element.id === payload.id)
-			if (i > -1) state.items[i].qty = payload.qty
+		updateCartItem: (state, { payload }: PayloadAction<{ product_id: number, variation_id?: number, qty: number }>) => {
+			const i = state.items.findIndex((_element: CartItem) => _element.product_id === payload.product_id && _element.variation_id === payload.variation_id)
+			if (i > -1) {
+				if (payload.qty === 0) {
+					state.items = state.items.filter((item: CartItem) => item.product_id !== payload.product_id && item.variation_id !== payload.variation_id)
+				} else {
+					state.items[i].qty = payload.qty
+				}
+			}
 			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
 		},
-		deleteCartItem: (state, { payload }: PayloadAction<number>) => {
-			state.items = state.items.filter((item: CartItem) => item.id !== payload)
+		deleteCartItem: (state, { payload }: PayloadAction<{ product_id: number, variation_id: number }>) => {
+			state.items = state.items.filter((item: CartItem) => item.product_id !== payload.product_id && item.variation_id !== payload.variation_id)
 			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
 		},
 		destroyCart: () => {

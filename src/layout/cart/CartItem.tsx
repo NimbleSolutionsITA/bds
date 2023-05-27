@@ -45,13 +45,12 @@ const CartItem = ({item}: CartItemProps) => {
 				<Typography sx={{fontFamily: 'Apercu', fontSize: '12px', lineHeight: '16px'}}>QUANTITÀ: {item.qty}</Typography>
 				<IconButton
 					size="small"
-					onClick={() => dispatch(deleteCartItem(item.id))}
+					onClick={() => dispatch(deleteCartItem({ product_id: item.product_id, variation_id: item.variation_id}))}
 					sx={{position: 'absolute', bottom: '5px', right: '5px'}}
 				>
 					<DeleteOutlineSharp fontSize="small" />
 				</IconButton>
 			</div>
-
 		</Box>
 	)
 }

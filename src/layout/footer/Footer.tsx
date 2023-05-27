@@ -4,7 +4,7 @@ import LogoButton from "./LogoButton";
 import GoogleAddress from "./GoogleAddress";
 import GoogleReviews from "./GoogleReviews";
 import BottomLinks from "./BottomLinks";
-import Payments from "./Payments";
+import Payments from "../../components/Payments";
 
 
 type FooterProps = {

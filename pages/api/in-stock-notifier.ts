@@ -25,8 +25,6 @@ export default async function handler(
 	}).then(response => response.json())
 		.then(result =>result);
 
-	console.log(response)
-
 	const status = response.data?.status ? Number(response.data.status) : 200
 
 	res.status(status).json(response);

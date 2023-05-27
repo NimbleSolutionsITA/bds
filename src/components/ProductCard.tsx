@@ -44,14 +44,16 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
     const handleAddToCart = () => {
         if (currentProduct.stock_status === 'instock') {
             dispatch(addCartItem({
-                id: currentProduct.id,
+                product_id: product.id,
+                variation_id: product.id !== currentProduct.id ? currentProduct.id : undefined,
                 name: product.name,
                 image: currentProduct.image ?? product.image,
                 price: Number(currentProduct.price),
                 qty: 1,
                 stock_quantity: Number(currentProduct.stock_quantity),
                 attributes: currentProduct.attributes ?? [],
-                category: category.name
+                category: category.name,
+                slug: product.slug,
             }));
         }
     }

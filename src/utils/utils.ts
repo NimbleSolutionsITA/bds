@@ -1,5 +1,13 @@
 import sanitizeHtml from 'sanitize-html';
-import {AttributeType, BaseProduct, BaseVariation, Color, Product, Variation} from "../types/woocommerce";
+import {
+    AttributeType,
+    BaseProduct,
+    BaseVariation,
+    Color,
+    Product,
+    ShippingMethod,
+    Variation
+} from "../types/woocommerce";
 
 export const sanitize = (html: string) => {
   return sanitizeHtml(html, {
@@ -119,4 +127,27 @@ export function findVariationFromAttributes(product: BaseProduct | Product, attr
             )
         }
     )
+}
+
+export function shippingMethodApplies(method: ShippingMethod, totalOrderAmount: number, totalDiscounts: number) {
+    if(!method.enabled) {
+        return false;
+    }
+    if (method.methodId === 'free_shipping') {
+        if (method.requires === 'min_amount') {
+            const minAmount = parseFloat(method.minAmount);
+            let effectiveOrderAmount = totalOrderAmount;
+            // Check if discounts should be ignored
+            if (method.ignoreDiscounts === 'yes') {
+                effectiveOrderAmount += totalDiscounts;
+            }
+            if (effectiveOrderAmount < minAmount) {
+                // The order amount is less than the required minimum for free shipping
+                return false;
+            }
+        }
+        // Add more conditions here if needed...
+    }
+    // If none of the conditions above matched, the method applies
+    return true;
 }

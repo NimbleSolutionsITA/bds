@@ -4,6 +4,7 @@ import {RootState} from "../../redux/store";
 import {closeCartDrawer, openCartDrawer} from "../../redux/cartSlice";
 import {CloseOutlined} from "@mui/icons-material";
 import CartItem from "./CartItem";
+import Link from "next/link";
 
 const CartDrawer = () => {
 	const { cartDrawerOpen, items } = useSelector((state: RootState) => state.cart);
@@ -50,7 +51,7 @@ const CartDrawer = () => {
 							<Typography variant="h6">Subtotale</Typography>
 							<Typography variant="h6">{items.reduce((previousValue, currentValue) => previousValue + (currentValue.price * currentValue.qty), 0)} €</Typography>
 						</div>
-						<Button>VAI AL CHECKOUT</Button>
+						<Button component={Link} href="/checkout">VAI AL CHECKOUT</Button>
 					</>
 				)}
 			</Container>

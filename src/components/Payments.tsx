@@ -1,10 +1,10 @@
-import AmericanExpress from "../../icons/AmericanExpress";
-import ApplePay from "../../icons/ApplePay";
-import GooglePay from "../../icons/GooglePay";
-import Maestro from "../../icons/Maestro";
-import Mastercard from "../../icons/Mastercard";
-import PayPal from "../../icons/PayPal";
-import Visa from "../../icons/Visa";
+import AmericanExpress from "../icons/AmericanExpress";
+import ApplePay from "../icons/ApplePay";
+import GooglePay from "../icons/GooglePay";
+import Maestro from "../icons/Maestro";
+import Mastercard from "../icons/Mastercard";
+import PayPal from "../icons/PayPal";
+import Visa from "../icons/Visa";
 import React from "react";
 
 const Payments = () => {

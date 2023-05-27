@@ -8,6 +8,7 @@ import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
 import {getProductCategory} from "../../pages/api/products/categories/[slug]";
 import {EYEWEAR_CATEGORY, sanitize} from "./utils";
+import {getShippingInfo} from "../../pages/api/shipping";
 function mapMenuItem(item: any) {
 	return {
 		id: item.ID,
@@ -45,7 +46,10 @@ export const getDesignerPageProps = async (locale: string, slug: string) => {
 	return { menus, googlePlaces, productCategory: productCategory ? mapProductCategory(productCategory) : null }
 }
 
-
+export const getCheckoutPageProps = async (locale: string) => {
+	const shipping = await getShippingInfo(locale)
+	return { shipping }
+}
 
 export const mapCategory = ({id, name, slug, count}: Category) => ({
 	id, name: sanitize(name), slug, count

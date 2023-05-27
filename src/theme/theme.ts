@@ -103,6 +103,18 @@ const theme = createTheme({
                     fontDisplay: "block",
                 },
             },
+        },
+        MuiSwitch: {
+            styleOverrides: {
+                track: {
+                    borderRadius: 0,
+                    backgroundColor: 'rgba(0,0,0,0.1)'
+                },
+                thumb: {
+                    borderRadius: 0,
+                    border: '1px solid rgba(0,0,0,0.1)'
+                }
+            }
         }
     }
 });
