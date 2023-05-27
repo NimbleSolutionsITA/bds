@@ -178,7 +178,7 @@ const CheckoutGrid = ({
 				transaction_id
 			})
 			setCheckoutStep(6)
-			dispatch(destroyCart());
+			dispatch(destroyCart())
 		}
 	}
 

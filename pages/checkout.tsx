@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {getCheckoutPageProps} from "../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {Country, ShippingClass} from "../src/types/woocommerce";
@@ -33,13 +33,18 @@ export default function Checkout({
 }: CheckoutProps) {
 	const { items } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch()
+	const [cartReady, setCartReady] = useState<boolean>(false)
 
 	useEffect(() => {
 		// Dispatch initCart to load cart from localStorage
 		dispatch(initCart());
 	}, [dispatch]);
 
-	const isReady = items.length > 0 && !!CLIENT_ID
+	if (items.length > 0 && !cartReady) {
+		setCartReady(true)
+	}
+
+	const isReady = cartReady && !!CLIENT_ID
 
 	return isReady ? (
 		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons' }}>
