@@ -94,6 +94,13 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 					stripePromise={stripePromise}
 					setCheckoutStep={setCheckoutStep}
 				/>
+				<Button
+					fullWidth
+					sx={{display: {xs: 'block', md: 'none'}, marginTop: '20px'}}
+					onClick={() => setCheckoutStep(4)}
+				>
+					Pay now
+				</Button>
 			</motion.div>
 			<motion.div
 				key="paypal"

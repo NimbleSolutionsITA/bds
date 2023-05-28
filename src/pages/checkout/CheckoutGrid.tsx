@@ -1,17 +1,18 @@
-import {Backdrop, CircularProgress} from "@mui/material";
-import {useEffect, useState} from "react";
+import {Backdrop, CircularProgress, useMediaQuery, useTheme} from "@mui/material";
+import {BaseSyntheticEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {shippingMethodApplies} from "../../utils/utils";
-import {useForm} from "react-hook-form";
+import {Control, ErrorOption, FieldErrors, FieldPath, useForm} from "react-hook-form";
 import {useMutation} from "@tanstack/react-query";
 import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
-import {Country, ShippingClass, WooOrder} from "../../types/woocommerce";
+import {Country, ShippingClass, ShippingMethod, WooOrder} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
 import {CartItem, destroyCart,} from "../../redux/cartSlice";
 import CheckoutDesktop from "./CheckoutDesktop";
 import {Stripe} from "@stripe/stripe-js";
 import PaymentResult from "./PaymentResult";
+import CheckoutMobile from "./CheckoutMobile";
 
 export type CheckoutGridProps = {
 	shipping: {
@@ -53,6 +54,39 @@ export type Inputs = {
 	}
 };
 
+export type CheckoutComponentProps = {
+	control: Control<Inputs>
+	errors: FieldErrors<Inputs>
+	countries: Country[]
+	shippingCountry: string
+	billingCountry: string
+	hasShipping: boolean
+	setAddress: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+	isLoading: boolean
+	setCoupon: () => void
+	shippingMethods?: ShippingMethod[]
+	shippingMethod?: ShippingMethod
+	prices: {
+		total: number
+		totalTax: number
+		shipping: number
+		shippingTax: number
+		discount: number
+		discountTax: number
+		cartTax: number
+	}
+	cartTotal: number
+	items: (CheckoutCartItem | CartItem)[]
+	setError: (name: (FieldPath<Inputs> | `root.${string}` | "root"), error: ErrorOption, options?: {shouldFocus: boolean}) => void
+	tab: number
+	setTab: Dispatch<SetStateAction<number>>
+	checkoutStep: number
+	setCheckoutStep: Dispatch<SetStateAction<number>>
+	order?: WooOrder
+	setPaid: (transaction_id: number) => void
+	stripePromise:  Promise<Stripe | null>
+}
+
 const defaultAddressValues = {
 	first_name: '',
 	last_name: '',
@@ -75,6 +109,12 @@ const CheckoutGrid = ({
 	const subtotalCart = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
 	const defaultShippingMethod = shipping.classes.find(sc => sc.locations.includes('IT'))
 		?.methods.find(method => shippingMethodApplies(method, subtotalCart, 0));
+
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+	const CheckoutComponent = isMobile ? CheckoutMobile : CheckoutDesktop
+
 	const { control, formState: { errors }, watch, handleSubmit, setValue, setError } = useForm<Inputs>({
 		defaultValues: {
 			has_shipping: false,
@@ -147,7 +187,9 @@ const CheckoutGrid = ({
 				billing: data.billing,
 				shipping: data.has_shipping ? data.shipping : {...defaultAddressValues, country: ''},
 			});
-			setCheckoutStep(3)
+			if (!isMobile) {
+				setCheckoutStep(3)
+			}
 		}
 	}
 
@@ -287,7 +329,7 @@ const CheckoutGrid = ({
 			return <PaymentResult isLoading={false} isSuccess={false} />
 		default:
 			return (
-				<CheckoutDesktop
+				<CheckoutComponent
 					control={control}
 					errors={errors}
 					countries={shipping.countries}
@@ -311,7 +353,7 @@ const CheckoutGrid = ({
 					setPaid={setPaid}
 					stripePromise={stripePromise}
 				/>
-			);
+			)
 	}
 }
 

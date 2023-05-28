@@ -2,46 +2,9 @@ import {Grid} from "@mui/material";
 import Logo from "./Logo";
 import AddressForm from "./AddressForm";
 import Recap from "./Recap";
-import {Country, ShippingMethod, WooOrder} from "../../types/woocommerce";
-import {Control, ErrorOption, FieldErrors, FieldPath} from "react-hook-form";
-import {BaseSyntheticEvent, Dispatch, SetStateAction} from "react";
-import {CheckoutCartItem, Inputs} from "./CheckoutGrid";
-import {CartItem} from "../../redux/cartSlice";
 import Payment from "./Payment";
-import {Stripe} from "@stripe/stripe-js";
+import {CheckoutComponentProps} from "./CheckoutGrid";
 
-type CheckoutDesktopProps = {
-	control: Control<Inputs>
-	errors: FieldErrors<Inputs>
-	countries: Country[]
-	shippingCountry: string
-	billingCountry: string
-	hasShipping: boolean
-	setAddress: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
-	isLoading: boolean
-	setCoupon: () => void
-	shippingMethods?: ShippingMethod[]
-	shippingMethod?: ShippingMethod
-	prices: {
-		total: number
-		totalTax: number
-		shipping: number
-		shippingTax: number
-		discount: number
-		discountTax: number
-		cartTax: number
-	}
-	cartTotal: number
-	items: (CheckoutCartItem | CartItem)[]
-	setError: (name: (FieldPath<Inputs> | `root.${string}` | "root"), error: ErrorOption, options?: {shouldFocus: boolean}) => void
-	tab: number
-	setTab: Dispatch<SetStateAction<number>>
-	checkoutStep: number
-	setCheckoutStep: Dispatch<SetStateAction<number>>
-	order?: WooOrder
-	setPaid: (transaction_id: number) => void
-	stripePromise:  Promise<Stripe | null>
-}
 const CheckoutDesktop = ({
 	control,
 	errors,
@@ -65,7 +28,7 @@ const CheckoutDesktop = ({
     order,
 	setPaid,
 	stripePromise
-}: CheckoutDesktopProps) => {
+}: CheckoutComponentProps) => {
 	const editAddress = (tab: number) => {
 		setCheckoutStep(2)
 		setTab(tab)
