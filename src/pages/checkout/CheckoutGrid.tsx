@@ -245,7 +245,12 @@ const CheckoutGrid = ({
 	}, [lineItems, checkoutStep, order?.id, order?.line_items, mutate]);
 
 	useEffect(() => {
-		if(order && order.shipping_lines && order.shipping_lines[0].method_id !== shippingMethodId) {
+		if(
+			checkoutStep === 2 &&
+			order &&
+			order.shipping_lines &&
+			order.shipping_lines[0].method_id !== shippingMethodId
+		) {
 			console.log('shipping method changed')
 			mutate({
 				orderId: order?.id,
@@ -256,7 +261,7 @@ const CheckoutGrid = ({
 				}]
 			})
 		}
-	}, [mutate, order, shippingMethodId, shippingMethods])
+	}, [checkoutStep, mutate, order, shippingMethodId, shippingMethods])
 
 	const finalSippingMethods = shippingMethods?.filter(sm => !hasFreeShipping || sm.methodId !== 'flat_rate')
 
