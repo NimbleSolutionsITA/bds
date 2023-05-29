@@ -1,7 +1,6 @@
 import {Backdrop, CircularProgress, useMediaQuery, useTheme} from "@mui/material";
 import {BaseSyntheticEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "../../redux/store";
+import {useDispatch} from "react-redux";
 import {shippingMethodApplies} from "../../utils/utils";
 import {Control, ErrorOption, FieldErrors, FieldPath, useForm} from "react-hook-form";
 import {useMutation} from "@tanstack/react-query";
@@ -20,6 +19,7 @@ export type CheckoutGridProps = {
 		countries: Country[]
 	}
 	stripePromise:  Promise<Stripe | null>
+	items: CartItem[]
 }
 
 export type CheckoutCartItem = CartItem & {id: number};
@@ -100,15 +100,15 @@ const defaultAddressValues = {
 
 const CheckoutGrid = ({
     shipping,
-	stripePromise
+	stripePromise,
+	items
 }: CheckoutGridProps) => {
 	const [checkoutStep, setCheckoutStep] = useState(1);
-	const [tab, setTab] = useState(0);
-	const { items } = useSelector((state: RootState) => state.cart);
+	const [addressTab, setAddressTab] = useState(0);
 	const dispatch = useDispatch()
-	const subtotalCart = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
+	const cartItemsTotal = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
 	const defaultShippingMethod = shipping.classes.find(sc => sc.locations.includes('IT'))
-		?.methods.find(method => shippingMethodApplies(method, subtotalCart, 0));
+		?.methods.find(method => shippingMethodApplies(method, cartItemsTotal, 0));
 
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -169,7 +169,6 @@ const CheckoutGrid = ({
 		discountTax: parseFloat(order?.discount_tax ?? '0')
 	}
 	const cartTotal = prices.total - prices.shipping + prices.discount;
-	const cartItemsTotal = items.reduce((acc, item) => acc + (item.qty * item.price), 0);
 
 	const country = hasShipping ? shippingCountry : billingCountry;
 
@@ -195,7 +194,7 @@ const CheckoutGrid = ({
 
 	const onInvalid: SubmitErrorHandler<Inputs> = (data) => {
 		if(hasShipping &&  data.shipping && !data.billing) {
-			setTab(1);
+			setAddressTab(1);
 		}
 	}
 
@@ -291,9 +290,8 @@ const CheckoutGrid = ({
 			checkoutStep === 2 &&
 			order &&
 			order.shipping_lines &&
-			order.shipping_lines[0].method_id !== shippingMethodId
+			order.shipping_lines[0].method_id !== shippingMethodId?.toString()
 		) {
-			console.log('shipping method changed')
 			mutate({
 				orderId: order?.id,
 				shipping_lines: [{
@@ -345,8 +343,8 @@ const CheckoutGrid = ({
 					cartTotal={cartTotal}
 					items={lineItems ?? items}
 					setError={setError}
-					tab={tab}
-					setTab={setTab}
+					tab={addressTab}
+					setTab={setAddressTab}
 					checkoutStep={checkoutStep}
 					setCheckoutStep={setCheckoutStep}
 					order={order}

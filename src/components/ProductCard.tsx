@@ -107,16 +107,7 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                         />
                     </Link>
                 </div>
-                <div style={{position: 'relative'}}>
-                    {currentProduct.price && (
-                        <Typography sx={{
-                            fontSize: '20px',
-                            opacity: hover ? 0 : 1,
-                            transition: 'opacity .5s ease',
-                            position: 'absolute',
-                            width: '100%'
-                        }}>{Number(currentProduct.price)} €</Typography>
-                    )}
+                <div style={{position: 'relative', paddingBottom: hover ? 0 : '27px'}}>
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',
@@ -139,6 +130,12 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                             <CartIcon />
                         </IconButton>
                     </div>
+                    <Typography sx={{
+                        fontSize: currentProduct.price ?  '20px' : '16px',
+                        top: 0,
+                        position:  hover ?  'relative' : 'absolute',
+                        width: '100%'
+                    }}>{currentProduct.price ? `${Number(currentProduct.price)} €` : 'upon request'}</Typography>
                 </div>
             </CardContent>
         </Card>

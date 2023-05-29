@@ -48,7 +48,7 @@ export default function Checkout({
 
 	return isReady ? (
 		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons' }}>
-			<CheckoutGrid shipping={shipping} stripePromise={stripePromise} />
+			<CheckoutGrid shipping={shipping} stripePromise={stripePromise} items={items} />
 		</PayPalScriptProvider>
 	) : (
 		<Backdrop

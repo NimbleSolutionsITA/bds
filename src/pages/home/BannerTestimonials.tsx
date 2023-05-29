@@ -1,9 +1,8 @@
 import {Review} from "../../../pages/api/google-places";
-import {Container, Divider, IconButton, Typography} from "@mui/material";
+import {Box, Container, Divider, Typography} from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import _ from "lodash";
-import ThinArrowRight from "../../icons/ThinArrowRight";
-import ThinArrowLeft from "../../icons/ThinArrowLeft";
+import {ArrowBackIosSharp, ArrowForwardIosSharp} from "@mui/icons-material";
 
 type BannerTestimonialsProps = {
 	reviews: Array<Review>
@@ -22,37 +21,44 @@ const BannerTestimonials = ({reviews}: BannerTestimonialsProps) => {
 				Testimonials
 			</Typography>
 			<Divider />
-			<Carousel
-				animation="slide"
-				navButtonsAlwaysVisible={true}
-				indicators={false}
-				NextIcon={<ThinArrowRight sx={{fontSize: '60px'}} />}
-				PrevIcon={<ThinArrowLeft sx={{fontSize: '60px'}} />}
-				navButtonsProps={{
-					style: {
-						backgroundColor: 'transparent',
+			<Container
+				maxWidth="md"
+				sx={{
+					padding: '24px',
+					display: 'flex',
+					alignItems: 'center',
+					height: {
+						xs: '350px',
+						md: '250px'
 					}
 				}}
-				sx={{
-					maxWidth: '1024px',
-					margin: '0 auto'
-				}}
 			>
-				{reviews.map((review, index) => (
-					<Container
-						key={index}
-						maxWidth="sm"
-						sx={{
-							padding: '24px'
-						}}
-					>
-						<Typography sx={{fontSize: '18px', fontWeight: 500, paddingBottom: '10px'}}>
-							{_.startCase(_.toLower(review.author_name))}
-						</Typography>
-						<Typography>{review.text}</Typography>
-					</Container>
-				))}
-			</Carousel>
+				<Carousel
+					animation="slide"
+					navButtonsAlwaysVisible={true}
+					indicators={false}
+					NextIcon={<ArrowForwardIosSharp color="disabled" sx={{fontSize: '60px', display: {xs:'none', md: 'block'}}} />}
+					PrevIcon={<ArrowBackIosSharp color="disabled" sx={{fontSize: '60px', display: {xs:'none', md: 'block'}}} />}
+					navButtonsProps={{
+						style: {
+							backgroundColor: 'transparent',
+						}
+					}}
+					sx={{
+						width: '100%',
+						margin: '0 auto'
+					}}
+				>
+					{reviews.map((review) => (
+						<Box sx={{width: '100%', height: '100%', padding: {xs: 0, md: '20px 120px'}}} key={review.text}>
+							<Typography sx={{fontSize: '18px', fontWeight: 500, paddingBottom: '10px'}}>
+								{_.startCase(_.toLower(review.author_name))}
+							</Typography>
+							<Typography>{review.text}</Typography>
+						</Box>
+					))}
+				</Carousel>
+			</Container>
 		</div>
 	)
 }

@@ -9,7 +9,9 @@ import {
 	FormControl,
 	FormHelperText,
 	Grid,
-	IconButton, InputLabel,
+	Hidden,
+	IconButton,
+	InputLabel,
 	MenuItem,
 	Select,
 	TextField,
@@ -20,11 +22,12 @@ import {Control, Controller, FieldErrors} from "react-hook-form";
 import {ShippingMethod} from "../../types/woocommerce";
 import {CheckoutCartItem, Inputs} from "./CheckoutGrid";
 import Link from "next/link";
-import {BaseSyntheticEvent, ReactNode} from "react";
-import {NumericFormat} from "react-number-format";
+import {ReactNode} from "react";
+import PriceFormat from "../../components/PriceFormat";
 import {LocalShippingSharp, StorefrontSharp} from "@mui/icons-material";
 import Payments from "../../components/Payments";
 import Loading from "../../components/Loading";
+import PriceRecap from "./PriceRecap";
 
 type RecapProps = {
 	control: Control<Inputs>
@@ -159,20 +162,27 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 					</FormControl>
 				)}
 			/>
-			<Divider sx={{margin: '5px 0'}} />
-			<SplitField label="Subtotale" value={subtotal} isLoading={isLoading} />
-			<SplitField label="Spedizione" value={prices.shipping} isLoading={isLoading} />
-			{prices.discount > 0 && (
-				<SplitField label="Sconto" value={prices.discount} isLoading={isLoading} />
-			)}
-			<Divider sx={{margin: '5px 0'}} />
-			<SplitField label="Totale" value={prices.total} labelWight={500} isLoading={isLoading} large />
-			<span style={{fontWeight: 300, color: '#333333', fontSize: '11px', marginTop: '-8px'}}>(inclusi <PriceFormat value={prices.totalTax} /> IVA)</span>
-			<Divider sx={{margin: '10px 0 20px'}} />
-			<Button fullWidth onClick={recapAction} disabled={isLoading || checkoutStep > 4} startIcon={(isLoading || checkoutStep === 4.5) && <CircularProgress size={16} />}>
-				{(checkoutStep === 3 || checkoutStep === 4.5) ? 'PAGA ORA' : 'VAI AL PAGAMENTO'}
-			</Button>
-			<Payments />
+			<Hidden smDown>
+				<Divider sx={{margin: '5px 0'}} />
+				<PriceRecap
+					subtotal={subtotal}
+					shipping={prices.shipping}
+					discount={prices.discount}
+					total={prices.total}
+					totalTax={prices.totalTax}
+					isLoading={isLoading}
+				/>
+				<Divider sx={{margin: '10px 0 20px'}} />
+				<Button
+					fullWidth
+					onClick={recapAction}
+					disabled={isLoading || checkoutStep > 4}
+					startIcon={(isLoading || checkoutStep === 4.5) && <CircularProgress size={16} />}
+				>
+					{(checkoutStep === 3 || checkoutStep === 4.5) ? 'PAGA ORA' : 'VAI AL PAGAMENTO'}
+				</Button>
+				<Payments />
+			</Hidden>
 		</div>
 	)
 }
@@ -225,19 +235,6 @@ const Minus = ({item, disabled}: CartButtonProps) => {
 		</IconButton>
 	)
 }
-
-const PriceFormat = ({value, prefix}: {value: number | string, prefix?: string}) => (
-	<NumericFormat
-		value={value}
-		displayType={'text'}
-		thousandSeparator={'.'}
-		decimalSeparator={','}
-		fixedDecimalScale
-		prefix={prefix}
-		suffix={' €'}
-		decimalScale={2}
-	/>
-)
 
 const SelectStartAdornment = ({methodId}: {methodId?: string}) => methodId === 'local_pickup' ?
 	<StorefrontSharp /> : <LocalShippingSharp />

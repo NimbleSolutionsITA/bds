@@ -28,8 +28,6 @@ type PaymentProps = {
 	stripePromise:  Promise<Stripe | null>
 }
 
-export type PaymentMethod = 'stripe' | 'paypal';
-
 const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheckoutStep, stripePromise}: PaymentProps) => {
 	const shippingAddress = order?.shipping.first_name ? `${order.shipping.address_1}, ${order.shipping.postcode}, ${order.shipping.city} ${order.shipping.state}, ${order.shipping.country}` : null;
 	const billingAddress = `${order?.billing.address_1}, ${order?.billing.postcode}, ${order?.billing.city} ${order?.billing.state}, ${order?.billing.country}`;
@@ -94,13 +92,6 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 					stripePromise={stripePromise}
 					setCheckoutStep={setCheckoutStep}
 				/>
-				<Button
-					fullWidth
-					sx={{display: {xs: 'block', md: 'none'}, marginTop: '20px'}}
-					onClick={() => setCheckoutStep(4)}
-				>
-					Pay now
-				</Button>
 			</motion.div>
 			<motion.div
 				key="paypal"
@@ -112,13 +103,11 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 				}}
 				transition={{ duration: 0.5 }}
 			>
-				{order?.total && (
-					<PaypalButton
-						orderTotal={order.total}
-						setPaid={setPaid}
-						setError={() => setCheckoutStep(7)}
-					/>
-				)}
+				<PaypalButton
+					orderTotal={order?.total}
+					setPaid={setPaid}
+					setError={() => setCheckoutStep(7)}
+				/>
 			</motion.div>
 
 		</div>

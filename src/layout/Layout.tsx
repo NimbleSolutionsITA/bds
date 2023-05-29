@@ -1,6 +1,5 @@
 import React, {useEffect} from "react";
 import NavBar from "./nav/NavBar";
-import {useMediaQuery, useTheme} from "@mui/material";
 import NavBarMobile from "./nav/mobile/NavBarMobile";
 import {BreadCrumb, Menus} from "../types/settings";
 import Footer from "./footer/Footer";
@@ -9,6 +8,7 @@ import {useDispatch} from "react-redux";
 import {initCart} from "../redux/cartSlice";
 import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
+import {Hidden} from "@mui/material";
 
 type LayoutProps = {
     children: React.ReactNode,
@@ -17,18 +17,18 @@ type LayoutProps = {
     breadcrumbs?: BreadCrumb[]
 }
 export default function Layout({children, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}}: LayoutProps) {
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch()
     useEffect(() => {
         dispatch(initCart())
     })
     return (
         <>
-            {isMobile ?
-                <NavBarMobile mobileMenu={mobileMenu} />  :
+            <Hidden mdUp>
+                <NavBarMobile mobileMenu={mobileMenu} />
+            </Hidden>
+            <Hidden smDown>
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />
-            }
+            </Hidden>
             <CartDrawer />
             <NewsletterDrawer />
             {children}

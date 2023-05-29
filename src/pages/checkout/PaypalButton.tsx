@@ -1,12 +1,13 @@
 import { PayPalButtons } from "@paypal/react-paypal-js";
+import Loading from "../../components/Loading";
 
 type PaypalButtonProps = {
 	setPaid: (transaction_id: number) => void
 	setError: () => void
-	orderTotal: string
+	orderTotal?: string
 }
 
-const PaypalButton = ({ setPaid, orderTotal, setError }: PaypalButtonProps) => (
+const PaypalButton = ({ setPaid, orderTotal, setError }: PaypalButtonProps) => orderTotal ? (
 	<div style={{padding: '20px', border: '1px solid rgba(0,0,0,0.1)'}}>
 		<PayPalButtons
 			createOrder={(data, actions) => {
@@ -23,8 +24,8 @@ const PaypalButton = ({ setPaid, orderTotal, setError }: PaypalButtonProps) => (
 				// @ts-ignore
 				return actions.order.capture().then((payPal) => setPaid(payPal.id));
 			}}
-			onError={(err) => setError()}
+			onError={() => setError()}
 		/>
 	</div>
-)
+) : <Loading />
 export default PaypalButton;
