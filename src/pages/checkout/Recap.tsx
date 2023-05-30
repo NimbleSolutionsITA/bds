@@ -52,7 +52,7 @@ type RecapProps = {
 }
 const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, items, prices, isLoading, errors, recapAction, checkoutStep}: RecapProps) => {
 	return (
-		<div style={{padding: '30px 0 20px', width: '100%', display: 'flex', flexDirection: 'column'}}>
+		<Box sx={{padding: {xs: '0 0 20px', md: '30px 0 20px'}, width: '100%', display: 'flex', flexDirection: 'column'}}>
 			<div style={{padding: '30px 0 20px', width: '100%', display: 'flex', flexDirection: 'column', gap: '15px'}}>
 				{items.map((item) => (
 					<Box key={(item.variation_id ?? 0) + item.product_id} sx={{
@@ -63,6 +63,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 						<div style={{
 							width: '30%',
 							height: '100%',
+							minHeight: '90px',
 							display: 'flex',
 							alignItems: 'center',
 							position: 'relative',
@@ -148,7 +149,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 
 						>
 							{shippingMethods?.map((method) => (
-								<MenuItem key={method.id} value={method.id}>
+								<MenuItem key={method.methodId} value={method.methodId}>
 									{method.title}
 									{parseFloat(method.cost) > 0 && (
 										<> (<PriceFormat value={parseFloat(method.cost)} />)</>
@@ -183,7 +184,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 				</Button>
 				<Payments />
 			</Hidden>
-		</div>
+		</Box>
 	)
 }
 

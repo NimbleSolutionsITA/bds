@@ -27,7 +27,6 @@ const CheckoutDesktop = ({
     setCheckoutStep,
     order,
 	setPaid,
-	stripePromise
 }: CheckoutComponentProps) => {
 	const editAddress = (tab: number) => {
 		setCheckoutStep(2)
@@ -69,7 +68,6 @@ const CheckoutDesktop = ({
 							setPaid={setPaid}
 							checkoutStep={checkoutStep}
 							setCheckoutStep={setCheckoutStep}
-							stripePromise={stripePromise}
 						/>
 					)}
 				</div>

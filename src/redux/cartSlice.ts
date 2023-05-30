@@ -30,7 +30,8 @@ export const cartSlice = createSlice({
 	reducers: {
 		initCart: (state) => {
 			try {
-				state.items = JSON.parse(localStorage.getItem( 'bdg-cart' ) ?? '[]' )
+				if(state.items.length === 0)
+					state.items = JSON.parse(localStorage.getItem( 'bdg-cart' ) ?? '[]' )
 			}
 			catch {
 				state.items = []

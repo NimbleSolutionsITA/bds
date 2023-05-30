@@ -12,11 +12,10 @@ import {
 } from "@mui/material";
 import {Dispatch, SetStateAction} from "react";
 import PaypalButton from "./PaypalButton";
-import StripeWrapper from "./StripeWrapper";
 import Loading from "../../components/Loading";
-import {motion} from "framer-motion";
 import PayPal from "../../icons/PayPal2";
-import {Stripe} from "@stripe/stripe-js";
+import MotionPanel from "../../components/MotionPanel";
+import StripePayment from "./StripePayment";
 
 type PaymentProps = {
 	order?: WooOrder
@@ -25,10 +24,9 @@ type PaymentProps = {
 	setPaid: (transaction_id: number) => void
 	checkoutStep: number
 	setCheckoutStep: Dispatch<SetStateAction<number>>
-	stripePromise:  Promise<Stripe | null>
 }
 
-const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheckoutStep, stripePromise}: PaymentProps) => {
+const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheckoutStep}: PaymentProps) => {
 	const shippingAddress = order?.shipping.first_name ? `${order.shipping.address_1}, ${order.shipping.postcode}, ${order.shipping.city} ${order.shipping.state}, ${order.shipping.country}` : null;
 	const billingAddress = `${order?.billing.address_1}, ${order?.billing.postcode}, ${order?.billing.city} ${order?.billing.state}, ${order?.billing.country}`;
 
@@ -76,40 +74,20 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 					{'Voglio pagare con'}&nbsp;&nbsp;&nbsp;&nbsp;<PayPal sx={{fontSize: '80px'}} />&nbsp;&nbsp;
 				</div>
 			)} />
-			<motion.div
-				key="stripe"
-				style={{ position: 'absolute', width: '100%', marginTop: '20px' }}
-				initial={{ opacity: 0 }}
-				animate={{
-					opacity: checkoutStep !== 5 ? 1 : 0,
-					pointerEvents: checkoutStep !== 5 ? 'auto' : 'none'
-				}}
-				transition={{ duration: 0.5 }}
-			>
-				<StripeWrapper
+			<MotionPanel key="stripe" active={checkoutStep !== 5}>
+				<StripePayment
 					order={order}
 					isReadyToPay={checkoutStep === 4}
-					stripePromise={stripePromise}
 					setCheckoutStep={setCheckoutStep}
 				/>
-			</motion.div>
-			<motion.div
-				key="paypal"
-				style={{ position: 'absolute', width: '100%', marginTop: '20px' }}
-				initial={{ opacity: 0, height: 0 }}
-				animate={{
-					opacity: checkoutStep === 5 ? 1 : 0,
-					pointerEvents: checkoutStep === 5 ? 'auto' : 'none'
-				}}
-				transition={{ duration: 0.5 }}
-			>
+			</MotionPanel>
+			<MotionPanel key="paypal" active={checkoutStep === 5}>
 				<PaypalButton
 					orderTotal={order?.total}
 					setPaid={setPaid}
 					setError={() => setCheckoutStep(7)}
 				/>
-			</motion.div>
-
+			</MotionPanel>
 		</div>
 	)
 }

@@ -1,41 +1,50 @@
-import {useState, useEffect, Dispatch, SetStateAction} from "react";
+import {useState, useEffect, ReactNode} from "react";
 import {Elements} from "@stripe/react-stripe-js";
-import StripePayment from "./StripePayment";
-import {Stripe} from "@stripe/stripe-js";
+import {loadStripe} from "@stripe/stripe-js";
 import {WooOrder} from "../../types/woocommerce";
 
 type StripeCheckoutProps = {
 	order?: WooOrder
-	isReadyToPay: boolean
-	stripePromise:  Promise<Stripe | null>
-	setCheckoutStep: Dispatch<SetStateAction<number>>
+	children: ReactNode
 }
 
-const StripeWrapper = ({order, isReadyToPay, stripePromise, setCheckoutStep}: StripeCheckoutProps) => {
+
+const stripePublicKey = process.env.NODE_ENV === 'production' ?
+	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_PRODUCTION :
+	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_SANDBOX;
+
+const stripePromise = loadStripe(stripePublicKey ?? '');
+
+const StripeWrapper = ({order, children}: StripeCheckoutProps) => {
 	const [clientSecret, setClientSecret] = useState('');
 	const [paymentIntentId, setPaymentIntentId] = useState('');
+	const [total, setTotal] = useState(0);
 	const orderTotal = parseFloat(order?.total || '0');
 	useEffect(() => {
 		// Create PaymentIntent as soon as the page loads using our local API
-		if(order && orderTotal > 0) {
-			fetch('api/orders/stripe-intent', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					amount: orderTotal,
-					payment_intent_id: paymentIntentId,
-					order_id: order.id,
-				}),
-			})
-				.then((res) => res.json())
-				.then((data) => {
-					setClientSecret(data.client_secret)
-					setPaymentIntentId(data.payment_intent_id)
-				});
+		if(order?.id && orderTotal > 0) {
+			if (orderTotal !== total) {
+				console.log('total stripe intent updated', orderTotal, total)
+				fetch('api/orders/stripe-intent', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({
+						amount: orderTotal,
+						payment_intent_id: paymentIntentId,
+						order_id: order.id,
+					}),
+				})
+					.then((res) => res.json())
+					.then((data) => {
+						setClientSecret(data.client_secret)
+						setPaymentIntentId(data.payment_intent_id)
+						setTotal(orderTotal)
+					});
+			}
 		}
-	}, [orderTotal, order, paymentIntentId]);
+	}, [orderTotal, order?.id, paymentIntentId, total]);
 
-	return clientSecret && stripePromise ? (
+	return clientSecret ? (
 		<Elements
 			options={{
 				clientSecret,
@@ -58,9 +67,9 @@ const StripeWrapper = ({order, isReadyToPay, stripePromise, setCheckoutStep}: St
 			}}
 			stripe={stripePromise}
 		>
-			<StripePayment order={order} isReadyToPay={isReadyToPay} setCheckoutStep={setCheckoutStep} />
+			{children}
 		</Elements>
-    ) : <span />;
+	) : null;
 }
 
 export default StripeWrapper;

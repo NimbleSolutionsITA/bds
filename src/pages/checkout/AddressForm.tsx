@@ -1,11 +1,11 @@
 import {SyntheticEvent, Dispatch, SetStateAction} from "react";
 import {Control, Controller, ErrorOption, FieldErrors, FieldPath} from "react-hook-form";
 import {Tabs, Tab, TextField, Switch, FormControlLabel} from "@mui/material";
-import Carousel from "react-material-ui-carousel";
 import Form from "./Form";
 import {Country} from "../../types/woocommerce";
 import {Inputs} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
+import MotionPanel from "../../components/MotionPanel";
 
 type AddressFormProps = {
 	control: Control<Inputs>
@@ -66,31 +66,29 @@ const AddressForm = ({isLoading, control, errors, countries, shippingCountry, bi
 				<Tab label={hasShipping ? 'Fatturazione' : 'Fatturazione e spedizione'} />
 				{hasShipping && <Tab label="Spedizione" />}
 			</Tabs>
-			<Carousel
-				autoPlay={false}
-				indicators={false}
-				index={hasShipping ? tab : 0}
-				navButtonsAlwaysInvisible
-				sx={{paddingBottom: '80px'}}
-			>
-				<Form
-					control={control}
-					errors={errors}
-					countries={countries}
-					country={billingCountry}
-					setError={setError}
-				/>
-				{hasShipping && (
+			<div style={{position: 'relative'}}>
+				<MotionPanel active={!hasShipping || tab === 0}>
 					<Form
-						isShipping
 						control={control}
 						errors={errors}
 						countries={countries}
-						country={shippingCountry}
+						country={billingCountry}
 						setError={setError}
 					/>
+				</MotionPanel>
+				{hasShipping && (
+					<MotionPanel active={tab === 1}>
+						<Form
+							isShipping
+							control={control}
+							errors={errors}
+							countries={countries}
+							country={shippingCountry}
+							setError={setError}
+						/>
+					</MotionPanel>
 				)}
-			</Carousel>
+			</div>
 		</div>
 	)
 }

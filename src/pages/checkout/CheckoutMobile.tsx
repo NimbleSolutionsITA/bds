@@ -31,7 +31,6 @@ const CheckoutMobile = ({
     setCheckoutStep,
     order,
 	setPaid,
-	stripePromise
 }: CheckoutComponentProps) => {
 	const [mobileCheckoutStep, setMobileCheckoutStep] = useState(1)
 	const editAddress = (tab: number) => {
@@ -65,6 +64,7 @@ const CheckoutMobile = ({
 
 		}
 	}
+
 	const StepContent = [
 		<AddressForm
 			key="address"
@@ -101,7 +101,6 @@ const CheckoutMobile = ({
 			setPaid={setPaid}
 			checkoutStep={checkoutStep}
 			setCheckoutStep={setCheckoutStep}
-			stripePromise={stripePromise}
 		/>
 	]
 	const variants = {
@@ -123,10 +122,11 @@ const CheckoutMobile = ({
 		}
 	};
 
+	const bottomBarHeight = prices.discount > 0 ? '225px' : '200px'
 
 	return (
 		<>
-			<Container sx={{width: '100%', height: 'calc(100vh - 200px)', overflow: 'hidden scroll', paddingY: '20px'}}>
+			<Container sx={{width: '100%', height: `calc(100vh - ${bottomBarHeight})`, overflow: 'hidden scroll', paddingY: '20px'}}>
 				<AnimatePresence custom={mobileCheckoutStep}>
 					<motion.div
 						key={mobileCheckoutStep}
@@ -144,7 +144,7 @@ const CheckoutMobile = ({
 					</motion.div>
 				</AnimatePresence>
 			</Container>
-			<Container sx={{width: '100%', height: '200px', paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.1)'}}>
+			<Container sx={{width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.1)'}}>
 				<PriceRecap
 					subtotal={cartTotal}
 					shipping={prices.shipping}

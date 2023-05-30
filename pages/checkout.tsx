@@ -6,7 +6,6 @@ import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import { initCart} from "../src/redux/cartSlice";
 import {RootState} from "../src/redux/store";
-import {loadStripe} from "@stripe/stripe-js";
 import {PayPalScriptProvider} from "@paypal/react-paypal-js";
 
 const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
@@ -18,15 +17,9 @@ export type CheckoutProps = {
 	}
 }
 
-const stripePublicKey = process.env.NODE_ENV === 'production' ?
-	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_PRODUCTION :
-	process.env.NEXT_PUBLIC_STRIPE_PUBLIC_SANDBOX;
-
 const CLIENT_ID = process.env.NODE_ENV === "production" ?
 	process.env.NEXT_PUBLIC_PAYPAL_PRODUCTION :
 	process.env.NEXT_PUBLIC_PAYPAL_SANDBOX;
-
-const stripePromise = loadStripe(stripePublicKey ?? '');
 
 export default function Checkout({
      shipping
@@ -44,11 +37,11 @@ export default function Checkout({
 		setCartReady(true)
 	}
 
-	const isReady = cartReady && !!CLIENT_ID
+	const isReady = items.length > 0 && !!CLIENT_ID
 
 	return isReady ? (
 		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons' }}>
-			<CheckoutGrid shipping={shipping} stripePromise={stripePromise} items={items} />
+			<CheckoutGrid shipping={shipping} items={items} />
 		</PayPalScriptProvider>
 	) : (
 		<Backdrop

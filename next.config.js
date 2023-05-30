@@ -6,7 +6,7 @@ if (!process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL) {
 }
 
 module.exports =  {
-  reactStrictMode: true,
+  reactStrictMode: false,
   swcMinify: true,
   images: {
       remotePatterns: [

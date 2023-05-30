@@ -9,16 +9,15 @@ import {Country, ShippingClass, ShippingMethod, WooOrder} from "../../types/wooc
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
 import {CartItem, destroyCart,} from "../../redux/cartSlice";
 import CheckoutDesktop from "./CheckoutDesktop";
-import {Stripe} from "@stripe/stripe-js";
 import PaymentResult from "./PaymentResult";
 import CheckoutMobile from "./CheckoutMobile";
+import StripeWrapper from "./StripeWrapper";
 
 export type CheckoutGridProps = {
 	shipping: {
 		classes: ShippingClass[],
 		countries: Country[]
 	}
-	stripePromise:  Promise<Stripe | null>
 	items: CartItem[]
 }
 
@@ -84,7 +83,6 @@ export type CheckoutComponentProps = {
 	setCheckoutStep: Dispatch<SetStateAction<number>>
 	order?: WooOrder
 	setPaid: (transaction_id: number) => void
-	stripePromise:  Promise<Stripe | null>
 }
 
 const defaultAddressValues = {
@@ -100,10 +98,9 @@ const defaultAddressValues = {
 
 const CheckoutGrid = ({
     shipping,
-	stripePromise,
 	items
 }: CheckoutGridProps) => {
-	const [checkoutStep, setCheckoutStep] = useState(1);
+	const [checkoutStep, setCheckoutStep] = useState(0);
 	const [addressTab, setAddressTab] = useState(0);
 	const dispatch = useDispatch()
 	const cartItemsTotal = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
@@ -119,7 +116,7 @@ const CheckoutGrid = ({
 		defaultValues: {
 			has_shipping: false,
 			coupon_code: '',
-			shipping_method: defaultShippingMethod?.id.toString(),
+			shipping_method: defaultShippingMethod?.methodId.toString(),
 			billing: {
 				email: '',
 				phone: '',
@@ -137,7 +134,7 @@ const CheckoutGrid = ({
 	const billingCountry = watch('billing.country');
 	const hasShipping = watch('has_shipping');
 	const shippingMethodId = watch('shipping_method');
-
+	console.log({shippingMethodId})
 	const {data: orderData, isLoading, mutate} = useMutation(
 		async ({orderId, ...validatedData}: any) => {
 			const response = await fetch(NEXT_API_ENDPOINT + '/orders' + (orderId ? '/' + orderId : ''), {
@@ -178,9 +175,10 @@ const CheckoutGrid = ({
 	const shippingMethods = shippingClass?.methods?.filter((method
 	) => shippingMethodApplies(method, cartTotal || cartItemsTotal, prices.discount))
 	const hasFreeShipping = shippingMethods?.some(method => method.methodId === 'free_shipping');
-	const shippingMethod = shippingClass?.methods.find(sm => sm.id === Number(shippingMethodId)) ?? shippingClass?.methods[0];
+	const shippingMethod = shippingClass?.methods.find(sm => sm.methodId === shippingMethodId) ?? shippingClass?.methods[0];
 	const onValid: SubmitHandler<Inputs> = (data) => {
 		if (shippingMethod && order?.id) {
+			console.log('address updated')
 			mutate({
 				orderId: order.id,
 				billing: data.billing,
@@ -201,7 +199,8 @@ const CheckoutGrid = ({
 	const setAddress = handleSubmit(onValid, onInvalid)
 
 	const setCoupon = () => {
-		if (order?.id && watch('coupon_code')) {
+		if (order?.id) {
+			console.log('coupon updated')
 			mutate({
 				orderId: order.id,
 				coupon_lines: [{
@@ -213,6 +212,7 @@ const CheckoutGrid = ({
 
 	const setPaid = (transaction_id: string|number) => {
 		if (order?.id && checkoutStep === 5) {
+			console.log('set paypal paid')
 			mutate({
 				orderId: order.id,
 				set_paid: true,
@@ -223,22 +223,9 @@ const CheckoutGrid = ({
 		}
 	}
 
-
-	useEffect(() => {
-		return () => {
-			const deleteOrder = () => {
-				return fetch(NEXT_API_ENDPOINT + '/orders/' + order.id, { method: 'DELETE' })
-					.then(response => response.json())
-			}
-			// Delete order when component unmounts
-			if (order?.id && order?.billing?.email) {
-				deleteOrder().then(r => r);
-			}
-		}
-	}, [order?.id, order?.billing?.email]);
-
 	useEffect(() => {
 		const initOrder = async () => {
+			console.log('init order', shippingMethod)
 			await mutate({
 				line_items: items.map(item => ({
 					product_id: item.product_id,
@@ -252,11 +239,25 @@ const CheckoutGrid = ({
 				}]
 			})
 		}
-		// Initialize order once items are loaded
-		if (items.length > 0 && checkoutStep === 1) {
-			initOrder().then(() => setCheckoutStep(2));
+		const deleteOrder = () => {
+			console.log('oder deleted')
+			return fetch(NEXT_API_ENDPOINT + '/orders/' + order.id, { method: 'DELETE' })
+				.then(response => response.json())
 		}
-	}, [items, checkoutStep, mutate, shippingMethod?.methodId, shippingMethod?.cost]);
+
+		if (checkoutStep === 0) {
+			initOrder()
+			setCheckoutStep(2)
+		}
+
+		return () => {
+			// Delete order when component unmounts
+			if (order?.id && !order?.billing?.email) {
+				deleteOrder().then(r => r);
+			}
+		}
+	}, []);
+
 
 	useEffect(() => {
 		// Update order when cart items quantity changes
@@ -277,6 +278,7 @@ const CheckoutGrid = ({
 				}
 			})
 			if (newItems.length > 0 && order?.id) {
+				console.log('line items updated')
 				mutate({
 					orderId: order.id,
 					line_items: newItems
@@ -292,6 +294,7 @@ const CheckoutGrid = ({
 			order.shipping_lines &&
 			order.shipping_lines[0].method_id !== shippingMethodId?.toString()
 		) {
+			console.log('shipping lines updated', order.shipping_lines[0].method_id, shippingMethodId?.toString(), order.shipping_lines[0])
 			mutate({
 				orderId: order?.id,
 				shipping_lines: [{
@@ -306,12 +309,15 @@ const CheckoutGrid = ({
 	const finalSippingMethods = shippingMethods?.filter(sm => !hasFreeShipping || sm.methodId !== 'flat_rate')
 
 	useEffect(() => {
-		if(!shippingMethodId || !finalSippingMethods?.find(sm => sm.id === Number(shippingMethodId))) {
-			setValue('shipping_method', finalSippingMethods?.[0]?.id.toString() ?? null)
+		if(checkoutStep === 2 && (
+			!shippingMethodId || !finalSippingMethods?.find(sm => sm.methodId === shippingMethodId)
+		)) {
+			setValue('shipping_method', finalSippingMethods?.[0]?.methodId.toString() ?? null)
 		}
-	}, [country, finalSippingMethods, setValue, shippingMethodId]);
+	}, [checkoutStep, country, finalSippingMethods, setValue, shippingMethodId]);
 
 	switch (checkoutStep) {
+		case 0:
 		case 1:
 			return (
 				<Backdrop
@@ -327,30 +333,31 @@ const CheckoutGrid = ({
 			return <PaymentResult isLoading={false} isSuccess={false} />
 		default:
 			return (
-				<CheckoutComponent
-					control={control}
-					errors={errors}
-					countries={shipping.countries}
-					shippingCountry={shippingCountry}
-					billingCountry={billingCountry}
-					hasShipping={hasShipping}
-					setAddress={setAddress}
-					isLoading={isLoading}
-					setCoupon={setCoupon}
-					shippingMethods={finalSippingMethods}
-					shippingMethod={shippingMethod}
-					prices={prices}
-					cartTotal={cartTotal}
-					items={lineItems ?? items}
-					setError={setError}
-					tab={addressTab}
-					setTab={setAddressTab}
-					checkoutStep={checkoutStep}
-					setCheckoutStep={setCheckoutStep}
-					order={order}
-					setPaid={setPaid}
-					stripePromise={stripePromise}
-				/>
+				<StripeWrapper order={order}>
+					<CheckoutComponent
+						control={control}
+						errors={errors}
+						countries={shipping.countries}
+						shippingCountry={shippingCountry}
+						billingCountry={billingCountry}
+						hasShipping={hasShipping}
+						setAddress={setAddress}
+						isLoading={isLoading}
+						setCoupon={setCoupon}
+						shippingMethods={finalSippingMethods}
+						shippingMethod={shippingMethod}
+						prices={prices}
+						cartTotal={cartTotal}
+						items={lineItems ?? items}
+						setError={setError}
+						tab={addressTab}
+						setTab={setAddressTab}
+						checkoutStep={checkoutStep}
+						setCheckoutStep={setCheckoutStep}
+						order={order}
+						setPaid={setPaid}
+					/>
+				</StripeWrapper>
 			)
 	}
 }
