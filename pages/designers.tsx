@@ -11,14 +11,15 @@ export type DesignersProps = {
     menus: Menus,
     googlePlaces: GooglePlaces,
     productCategories: WooProductCategory[],
-    breadcrumbs?: BreadCrumb[]
+    breadcrumbs?: BreadCrumb[],
+    seo: string
 }
 
 export default function Designers({
-    menus, googlePlaces, productCategories, breadcrumbs
+    menus, googlePlaces, productCategories, breadcrumbs, seo
 }: DesignersProps) {
     return (
-      <Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
+      <Layout seo={seo} menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
           <DesignersList designers={productCategories} />
       </Layout>
     );
@@ -41,7 +42,8 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
             breadcrumbs: [
                 { name: 'Home', href: urlPrefix + '/' },
                 { name: 'Designers', href: urlPrefix + '/designers' }
-            ]
+            ],
+            seo
         },
         revalidate: 10
     }

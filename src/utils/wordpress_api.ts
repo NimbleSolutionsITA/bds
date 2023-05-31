@@ -9,6 +9,9 @@ import {getProductCategories} from "../../pages/api/products/categories";
 import {getProductCategory} from "../../pages/api/products/categories/[slug]";
 import {EYEWEAR_CATEGORY, sanitize} from "./utils";
 import {getShippingInfo} from "../../pages/api/shipping";
+import {getProducts} from "../../pages/api/products";
+import {getColors} from "../../pages/api/products/colors";
+import {getProductTags} from "../../pages/api/products/tags";
 function mapMenuItem(item: any) {
 	return {
 		id: item.ID,
@@ -32,7 +35,7 @@ export const getPageProps = async (slug: string, locale: string) => {
 	const page = (await fetch(`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}`).then(response => response.json()))[0]
 	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${page.link}`).then(response => response.json()))
 	const { menus, googlePlaces } = await getLayoutProps(locale)
-	return { page, seo, menus, googlePlaces }
+	return { page, seo: seo.head, menus, googlePlaces }
 }
 
 export const getDesignersPageProps = async (locale: 'it' | 'en') => {
@@ -54,6 +57,41 @@ export const getCheckoutPageProps = async (locale: string) => {
 export const mapCategory = ({id, name, slug, count}: Category) => ({
 	id, name: sanitize(name), slug, count
 })
+
+export const getShopPageProps = async (locale: string, query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}) => {
+	const [
+		{ page, seo, menus, googlePlaces },
+		products,
+		colors,
+		tags,
+		designers
+	] = await Promise.all([
+		getPageProps("shop", locale),
+		getProducts({
+			lang: locale,
+			per_page: '12',
+			...query
+		}),
+		getColors(locale),
+		getProductTags(locale),
+		getProductCategories(locale, EYEWEAR_CATEGORY[locale as 'it' | 'en'].toString())
+
+	]);
+	const urlPrefix = locale === 'it' ? '' : '/' + locale;
+	return {
+		seo,
+		menus,
+		googlePlaces,
+		products,
+		colors,
+		breadcrumbs: [
+			{ name: 'Home', href: urlPrefix + '/' },
+			{ name: 'Shop', href: urlPrefix + '/shop' }
+		],
+		tags,
+		designers: designers.map(mapCategory)
+	}
+}
 
 export const mapProductCategory = (category: WooProductCategory) => ({
 	id: category.id,

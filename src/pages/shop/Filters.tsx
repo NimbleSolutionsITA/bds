@@ -18,9 +18,13 @@ type FiltersProps = {
 	tags: ProductTag[]
 	designers: Category[]
 	searchParams: SearchParams
+	isSunglasses?: boolean
+	isOptical?: boolean
+	isMan?: boolean
+	isWoman?: boolean
 }
 
-const Filters = ({setSearchParams, searchParams, colors, tags, designers}: FiltersProps) => {
+const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSunglasses, isOptical, isWoman, isMan}: FiltersProps) => {
 	const [open, setOpen] = useState(false);
 
 	const ref = useRef<HTMLDivElement | null>(null);
@@ -115,13 +119,48 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers}: Filte
 							))}
 						</div>
 					</ExpansionPanel>
-					<TagPanel
-						title="Genere"
-						name="genders"
-						params={searchParams.genders}
-						tags={tags.filter(tag => tag.filter === 'gender')}
-						setSearchParams={setSearchParams}
-					/>
+					{!isMan && !isWoman && (
+						<>
+							<Divider light sx={{margin: '5px 0'}} />
+							<ExpansionPanel title="Genere">
+								<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
+									{['man', 'woman'].map((type) => (
+										<FilterChip
+											key={type}
+											tag={{name: type}}
+											onClick={() => setSearchParams(params => ({
+												...params,
+												man: type === 'man' ? true : undefined,
+												woman: type === 'woman' ? true : undefined,
+											}))}
+											isActive={searchParams[type as 'man'|'woman'] ?? false}
+										/>
+									))}
+								</div>
+							</ExpansionPanel>
+						</>
+					)}
+					{!isSunglasses && !isOptical && (
+						<>
+							<Divider light sx={{margin: '5px 0'}} />
+							<ExpansionPanel title="Tipologia">
+								<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
+									{['optical', 'sunglasses'].map((type) => (
+										<FilterChip
+											key={type}
+											tag={{name: type}}
+											onClick={() => setSearchParams(params => ({
+												...params,
+												sunglasses: type === 'sunglasses' ? true : undefined,
+												optical: type === 'optical' ? true : undefined,
+											}))}
+											isActive={searchParams[type as 'optical'|'sunglasses'] ?? false}
+										/>
+									))}
+								</div>
+							</ExpansionPanel>
+						</>
+					)}
 					<TagPanel
 						title="Materiali"
 						name="materials"

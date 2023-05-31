@@ -19,6 +19,8 @@ export type ProductsRequestQuery = {
 	tags?: string | string[] | undefined,
 	sunglasses?: boolean | undefined,
 	optical?: boolean | undefined
+	man?: boolean | undefined
+	woman?: boolean | undefined
 }
 
 export default async function handler(
@@ -40,7 +42,9 @@ export default async function handler(
 			price_range,
 			tags,
 			sunglasses,
-			optical
+			optical,
+			man,
+			woman
 		} = req.query;
 		try {
 			responseData.products = await getProducts({
@@ -54,7 +58,9 @@ export default async function handler(
 				price_range,
 				tags,
 				sunglasses: sunglasses === "true",
-				optical: optical === "true"
+				optical: optical === "true",
+				man: man === "true",
+				woman: woman === "true"
 			})
 			responseData.success = true
 			res.json(responseData)
@@ -81,7 +87,9 @@ export const getProducts = async ({
       price_range,
       tags,
 	  sunglasses,
-	  optical
+	  optical,
+      man,
+      woman
 }: ProductsRequestQuery): Promise<BaseProduct[]> => {
 	const params = new URLSearchParams({
 		...(per_page && { per_page: per_page.toString() }),
@@ -95,6 +103,8 @@ export const getProducts = async ({
 		...(tags && { tags: tags.toString() }),
 		...(sunglasses && { sunglasses: 'true' }),
 		...(optical && { optical: 'true' }),
+		...(man && { man: 'true' }),
+		...(woman && { woman: 'true' }),
 	});
 	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
 		.then(res => res.json())

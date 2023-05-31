@@ -16,6 +16,8 @@ type ProductsGridProps = {
 	designers: Category[]
 	isSunglasses?: boolean
 	isOptical?: boolean
+	isMan?: boolean
+	isWoman?: boolean
 }
 
 export type SearchParams = {
@@ -25,10 +27,13 @@ export type SearchParams = {
 	price_range?: string | string[] | undefined,
 	styles?: string | string[] | undefined,
 	materials?: string | string[] | undefined,
-	genders?: string | string[] | undefined,
+	optical?: boolean | undefined,
+	sunglasses?: boolean | undefined,
+	man?: boolean | undefined,
+	woman?: boolean | undefined
 }
 
-const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptical }: ProductsGridProps) => {
+const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptical, isMan, isWoman }: ProductsGridProps) => {
 	const [searchParams, setSearchParams] = useState<SearchParams>({})
 	const {locale} = useRouter()
 
@@ -40,9 +45,11 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 				name: searchParams.name,
 				colors: searchParams.colors,
 				price_range: searchParams.price_range,
-				tags: [searchParams.styles, searchParams.materials, searchParams.genders].filter(v=>v).join(','),
-				sunglasses: isSunglasses ? true : undefined,
-				optical: isOptical ? true : undefined
+				tags: [searchParams.styles, searchParams.materials].filter(v=>v).join(','),
+				sunglasses: isSunglasses ? true : searchParams.sunglasses,
+				optical: isOptical ? true : searchParams.optical,
+				man: isMan ? true : searchParams.man,
+				woman: isWoman ? true : searchParams.woman
 			}).filter(([_, value]) => value !== undefined))
 
 			const {products: data} = await fetch(NEXT_API_ENDPOINT + '/products?' + new URLSearchParams({
@@ -78,6 +85,10 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 				colors={colors}
 				tags={tags.filter(tag => tag.count > 0)}
 				designers={designers.filter(designer => designer.count > 0)}
+				isSunglasses={isSunglasses}
+				isOptical={isOptical}
+				isMan={isMan}
+				isWoman={isWoman}
 			/>
 			<Container sx={{marginTop: '20px', marginBottom: '20px', minHeight: '500px'}}>
 				{status === "success" && (

@@ -29,6 +29,7 @@
     "framer-motion": "^10.10.0",
     "lodash": "^4.17.21",
     "next": "latest",
+    "node-html-parser": "^6.1.5",
     "react": "latest",
     "react-dom": "latest",
     "react-hook-form": "^7.43.9",

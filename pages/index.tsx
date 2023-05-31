@@ -66,11 +66,13 @@ export type HomeProps = {
     },
     menus: Menus,
     googlePlaces: GooglePlaces
+    seo: string
 }
 
-export default function Home({page, menus, googlePlaces}: HomeProps) {
+export default function Home({page, menus, googlePlaces, seo}: HomeProps) {
+    console.log({seo})
     return (
-      <Layout menus={menus} googlePlaces={googlePlaces}>
+      <Layout menus={menus} googlePlaces={googlePlaces} seo={seo}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
           <ProductsSlider products={page.ourSelection.products ?? []} title={page.ourSelection.title} />
           <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
