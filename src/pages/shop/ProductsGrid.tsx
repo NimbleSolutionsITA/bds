@@ -64,13 +64,15 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 		},
 		{
 			getNextPageParam: (lastPage, pages) => {
-				if (lastPage.length > 0) {
+				if (lastPage.length === 12) {
 					return pages.length + 1;
 				}
 			},
 			initialData: {pages: [products], pageParams: []}
 		}
 	);
+
+	console.log({status, isRefetching, hasNextPage})
 
 	useEffect(() => {
 		if (isRefetching)
@@ -100,7 +102,7 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 						dataLength={data?.pages.length * 24}
 						next={fetchNextPage}
 						hasMore={hasNextPage || false}
-						loader={(<Loading />)}
+						loader={<Loading />}
 						scrollableTarget="html"
 					>
 						{data?.pages[0]?.length > 0 ? (
