@@ -147,11 +147,14 @@ const CheckoutMobile = ({
 			<Container sx={{width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.1)'}}>
 				<PriceRecap
 					subtotal={cartTotal}
+					cartTax={prices.cartTax}
 					shipping={prices.shipping}
 					discount={prices.discount}
+					discountTax={prices.discountTax}
 					total={prices.total}
 					totalTax={prices.totalTax}
 					isLoading={isLoading}
+
 				/>
 				<Grid container sx={{marginTop: '5px'}} spacing={2}>
 					{mobileCheckoutStep === 2 && (
