@@ -130,8 +130,8 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSung
 											tag={{name: type}}
 											onClick={() => setSearchParams(params => ({
 												...params,
-												man: type === 'man' ? true : undefined,
-												woman: type === 'woman' ? true : undefined,
+												man: type === 'man' ? !params.man : undefined,
+												woman: type === 'woman' ? !params.woman : undefined,
 											}))}
 											isActive={searchParams[type as 'man'|'woman'] ?? false}
 										/>
@@ -151,8 +151,8 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSung
 											tag={{name: type}}
 											onClick={() => setSearchParams(params => ({
 												...params,
-												sunglasses: type === 'sunglasses' ? true : undefined,
-												optical: type === 'optical' ? true : undefined,
+												sunglasses: type === 'sunglasses' ? !params.sunglasses : undefined,
+												optical: type === 'optical' ? !params.optical : undefined,
 											}))}
 											isActive={searchParams[type as 'optical'|'sunglasses'] ?? false}
 										/>

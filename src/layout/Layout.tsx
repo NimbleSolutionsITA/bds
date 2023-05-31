@@ -51,10 +51,10 @@ export default function Layout({children, seo, breadcrumbs, googlePlaces, menus:
                     }
                 })}
             </Head>
-            <Hidden implementation="css" mdUp>
+            <Hidden mdUp>
                 <NavBarMobile mobileMenu={mobileMenu} />
             </Hidden>
-            <Hidden implementation="css" mdDown>
+            <Hidden mdDown>
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />
             </Hidden>
             <CartDrawer />
