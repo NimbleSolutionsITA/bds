@@ -102,6 +102,7 @@ const CheckoutGrid = ({
 }: CheckoutGridProps) => {
 	const [checkoutStep, setCheckoutStep] = useState(0);
 	const [addressTab, setAddressTab] = useState(0);
+	const [order, setOrder] = useState<WooOrder>();
 	const dispatch = useDispatch()
 	const cartItemsTotal = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
 	const defaultShippingMethod = shipping.classes.find(sc => sc.locations.includes('IT'))
@@ -134,8 +135,7 @@ const CheckoutGrid = ({
 	const billingCountry = watch('billing.country');
 	const hasShipping = watch('has_shipping');
 	const shippingMethodId = watch('shipping_method');
-	console.log({shippingMethodId})
-	const {data: orderData, isLoading, mutate} = useMutation(
+	const {isLoading, mutate} = useMutation(
 		async ({orderId, ...validatedData}: any) => {
 			const response = await fetch(NEXT_API_ENDPOINT + '/orders' + (orderId ? '/' + orderId : ''), {
 				method: orderId ? 'PUT' : 'POST',
@@ -143,13 +143,15 @@ const CheckoutGrid = ({
 				headers: [["Content-Type", 'application/json']],
 			})
 				.then(response => response.json());
-			if (response.data?.status) {
-				throw new Error(response.message ?? 'Server error');
+
+			if (!response.order) {
+				console.error('mutation error')
+				throw new Error(response.error ?? 'Server error');
 			}
-			return response;
+			setOrder(response.order)
+			return response.order;
 		}
 	);
-	const order: WooOrder = orderData?.order;
 
 	const lineItems = items.map(item => ({
 		...item,
@@ -165,7 +167,7 @@ const CheckoutGrid = ({
 		discount: parseFloat(order?.discount_total ?? '0'),
 		discountTax: parseFloat(order?.discount_tax ?? '0')
 	}
-	const cartTotal = prices.total - prices.shipping + prices.discount;
+	const cartTotal = prices.total - prices.shipping + prices.discount + prices.discountTax;
 
 	const country = hasShipping ? shippingCountry : billingCountry;
 
@@ -198,16 +200,67 @@ const CheckoutGrid = ({
 
 	const setAddress = handleSubmit(onValid, onInvalid)
 
-	const setCoupon = () => {
-		if (order?.id) {
-			console.log('coupon updated')
-			mutate({
-				orderId: order.id,
-				coupon_lines: [{
-					code: watch('coupon_code')
-				}]
+	const mutateOrder = () => {
+		const couponCode = watch('coupon_code')
+		const orderId = order?.id
+		const clearOrder = {
+			orderId,
+			line_items: lineItems.map(li => ({id: li.id, quantity: 0})),
+			coupon_lines: []
+		}
+		const restoreOrder = {
+			orderId,
+			line_items: lineItems.map(li => ({
+				product_id: li.product_id,
+				variation_id: li.variation_id === li.product_id ?
+					undefined : li.variation_id,
+				quantity: li.qty,
+			})),
+			coupon_lines: [{ code: couponCode }]
+		}
+
+		if (couponCode) {
+			return mutate(clearOrder, {
+				onSuccess: () => mutate(restoreOrder, {
+					onError: () => {
+						setError('coupon_code', {message: 'Coupon non valido'})
+						mutate({...restoreOrder, coupon_lines: []})
+					}
+				})
 			})
 		}
+		else {
+			let newItems: {id?: number, quantity: number, variation_id?: number, product_id?: number}[] = [];
+			lineItems.forEach(lineItem => {
+				const prevItem = order?.line_items.find(i => i.id === lineItem.id)
+				if (prevItem && lineItem.qty !== prevItem.quantity) {
+					newItems.push({
+						id: lineItem.id,
+						quantity: 0,
+					})
+					newItems.push({
+						quantity: lineItem.qty,
+						product_id: lineItem.product_id,
+						variation_id: lineItem.variation_id
+					})
+				}
+			})
+			if (newItems.length > 0 && order?.id) {
+				return mutate({orderId, line_items: newItems})
+			}
+		}
+	}
+
+	const mutateWithCoupon = (payload: any) => {
+		const couponCode = watch('coupon_code')
+		setError('coupon_code', {})
+		return couponCode ?
+			mutate({orderId: order?.id, coupon_lines: []}, {
+					onSuccess: () => mutate({orderId: order?.id, ...payload, coupon_lines: [{code: couponCode}]}, {
+						onError: () => setError('coupon_code', {message: 'Coupon non valido'})
+					})
+				}) :
+			mutate(payload)
 	}
 
 	const setPaid = (transaction_id: string|number) => {
@@ -225,7 +278,7 @@ const CheckoutGrid = ({
 
 	useEffect(() => {
 		const initOrder = async () => {
-			console.log('init order', shippingMethod)
+			console.log('init order')
 			await mutate({
 				line_items: items.map(item => ({
 					product_id: item.product_id,
@@ -239,9 +292,9 @@ const CheckoutGrid = ({
 				}]
 			})
 		}
-		const deleteOrder = () => {
+		const deleteOrder = (id: number) => {
 			console.log('oder deleted')
-			return fetch(NEXT_API_ENDPOINT + '/orders/' + order.id, { method: 'DELETE' })
+			return fetch(NEXT_API_ENDPOINT + '/orders/' + id, { method: 'DELETE' })
 				.then(response => response.json())
 		}
 
@@ -253,7 +306,7 @@ const CheckoutGrid = ({
 		return () => {
 			// Delete order when component unmounts
 			if (order?.id && !order?.billing?.email) {
-				deleteOrder().then(r => r);
+				deleteOrder(order.id).then(r => r);
 			}
 		}
 	}, []);
@@ -262,30 +315,9 @@ const CheckoutGrid = ({
 	useEffect(() => {
 		// Update order when cart items quantity changes
 		if (checkoutStep === 2 && lineItems) {
-			let newItems: {id?: number, quantity: number, variation_id?: number, product_id?: number}[] = [];
-			lineItems.forEach(lineItem => {
-				const prevItem = order?.line_items.find(i => i.id === lineItem.id)
-				if (prevItem && lineItem.qty !== prevItem.quantity) {
-					newItems.push({
-						id: lineItem.id,
-						quantity: 0
-					})
-					newItems.push({
-						quantity: lineItem.qty,
-						product_id: lineItem.product_id,
-						variation_id: lineItem.variation_id
-					})
-				}
-			})
-			if (newItems.length > 0 && order?.id) {
-				console.log('line items updated')
-				mutate({
-					orderId: order.id,
-					line_items: newItems
-				})
-			}
+			mutateOrder()
 		}
-	}, [lineItems, checkoutStep, order?.id, order?.line_items, mutate]);
+	}, [cartItemsTotal]);
 
 	useEffect(() => {
 		if(
@@ -343,7 +375,7 @@ const CheckoutGrid = ({
 						hasShipping={hasShipping}
 						setAddress={setAddress}
 						isLoading={isLoading}
-						setCoupon={setCoupon}
+						setCoupon={mutateOrder}
 						shippingMethods={finalSippingMethods}
 						shippingMethod={shippingMethod}
 						prices={prices}

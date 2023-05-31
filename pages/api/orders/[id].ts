@@ -42,12 +42,12 @@ export default async function handler(
     }
     responseData.order = resp.data
     responseData.success = true
-    res.json(responseData)
   } catch (error) {
     responseData.success = false
     // @ts-ignore
     responseData.error = error.response.data.message ?? error.message ?? 'bad request'
     // @ts-ignore
-    res.status(error.response.data.data.status ?? 500).json(responseData)
+    res.status(error.response.data.data.status ?? 500)
   }
+  return res.json(responseData)
 }

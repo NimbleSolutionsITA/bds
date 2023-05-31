@@ -28,6 +28,7 @@ import {LocalShippingSharp, StorefrontSharp} from "@mui/icons-material";
 import Payments from "../../components/Payments";
 import Loading from "../../components/Loading";
 import PriceRecap from "./PriceRecap";
+import HelperText from "../../components/HelperText";
 
 type RecapProps = {
 	control: Control<Inputs>
@@ -101,7 +102,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 				))}
 			</div>
 			<Divider sx={{margin: '5px 0'}} />
-			<Grid container spacing={1} sx={{padding: '20px 0', alignItems: 'center'}}>
+			<Grid container spacing={1} sx={{padding: '20px 0', alignItems: 'center', marginBottom: errors.coupon_code ? '7px' : 0}}>
 				<Grid item xs={7}>
 					<Controller
 						control={control}
@@ -113,6 +114,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 								fullWidth
 								variant="outlined"
 								label="Coupon code"
+								helperText={<HelperText message={errors.coupon_code?.message} absolute />}
 							/>
 						)}
 					/>
@@ -167,8 +169,10 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 				<Divider sx={{margin: '5px 0'}} />
 				<PriceRecap
 					subtotal={subtotal}
+					cartTax={prices.cartTax}
 					shipping={prices.shipping}
 					discount={prices.discount}
+					discountTax={prices.discountTax}
 					total={prices.total}
 					totalTax={prices.totalTax}
 					isLoading={isLoading}
@@ -187,17 +191,6 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 		</Box>
 	)
 }
-
-const SplitField = ({label, value, isLoading, labelWeight = 300, disabled = false, large = false}: {[key: string]: string|number|boolean|ReactNode, value: string | number}) => (
-	<Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
-		<Typography component="div" sx={{margin: '5px 0', fontWeight: labelWeight as number, fontSize: large ? '16px' : undefined}}>
-			{label}
-		</Typography>
-		<Typography component="div" sx={{fontWeight: 500, margin: '5px 0', color: disabled ? '#909090' : '#000', fontSize: large ? '18px' : undefined}}>
-			{isLoading ? <Loading fontSize="16px" /> : <PriceFormat value={value} />}
-		</Typography>
-	</Box>
-)
 
 type CartButtonProps = {
 	item: CartItemType

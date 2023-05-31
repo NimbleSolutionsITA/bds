@@ -27,7 +27,6 @@ export default async function handler(
 			const {data} = await api.post('orders', req.body)
 			responseData.success = true
 			responseData.order = data
-			res.json(responseData)
 		}
 		catch ( error ) {
 			if (typeof error === "string") {
@@ -35,8 +34,8 @@ export default async function handler(
 			} else if (error instanceof Error) {
 				responseData.error = error.message
 			}
-			res.status(500).json(responseData)
+			res.status(500)
 		}
-		return res
+		return res.json(responseData)
 	}
 }

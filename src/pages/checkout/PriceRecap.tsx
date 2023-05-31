@@ -6,18 +6,20 @@ import PriceFormat from "../../components/PriceFormat";
 type PriceRecapProps = {
 	shipping: number
 	discount: number
+	discountTax: number
 	subtotal: number
+	cartTax: number
 	total: number
 	totalTax: number
 	isLoading: boolean
 }
-const PriceRecap = ({shipping, discount, subtotal, total, totalTax, isLoading}: PriceRecapProps) => {
+const PriceRecap = ({shipping, discount, discountTax, cartTax, subtotal, total, totalTax, isLoading}: PriceRecapProps) => {
 	return (
 		<>
 			<SplitField label="Subtotale" value={subtotal} isLoading={isLoading} />
 			<SplitField label="Spedizione" value={shipping} isLoading={isLoading} />
 			{discount > 0 && (
-				<SplitField label="Sconto" value={discount} isLoading={isLoading} />
+				<SplitField label="Sconto" value={-(discount + discountTax)} isLoading={isLoading} />
 			)}
 			<Divider sx={{margin: {xs: '2px 0', md: '5px 0'}}} />
 			<SplitField label="Totale" value={total} labelWight={500} isLoading={isLoading} large />
