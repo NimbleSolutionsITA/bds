@@ -45,6 +45,7 @@ export interface Color {
 	slug: string;
 	name: string;
 	code: string;
+	type?: 'colore'|'lente'|'modello'|'montatura';
 }
 
 export interface ImageColor {

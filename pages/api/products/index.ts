@@ -21,6 +21,13 @@ export type ProductsRequestQuery = {
 	optical?: boolean | undefined
 	man?: boolean | undefined
 	woman?: boolean | undefined
+	calibro?: string | string[] | undefined,
+	calibro_ponte?: string | string[] | undefined,
+	formato?: string | string[] | undefined,
+	lente?: string | string[] | undefined,
+	modello?: string | string[] | undefined,
+	montatura?: string | string[] | undefined,
+	montatura_lenti?: string | string[] | undefined,
 }
 
 export default async function handler(
@@ -44,7 +51,14 @@ export default async function handler(
 			sunglasses,
 			optical,
 			man,
-			woman
+			woman,
+			calibro,
+			calibro_ponte,
+			formato,
+			lente,
+			modello,
+			montatura,
+			montatura_lenti,
 		} = req.query;
 		try {
 			responseData.products = await getProducts({
@@ -60,7 +74,14 @@ export default async function handler(
 				sunglasses: sunglasses === "true",
 				optical: optical === "true",
 				man: man === "true",
-				woman: woman === "true"
+				woman: woman === "true",
+				calibro,
+				calibro_ponte,
+				formato,
+				lente,
+				modello,
+				montatura,
+				montatura_lenti,
 			})
 			responseData.success = true
 			res.json(responseData)
@@ -89,7 +110,14 @@ export const getProducts = async ({
 	  sunglasses,
 	  optical,
       man,
-      woman
+      woman,
+	  calibro,
+	  calibro_ponte,
+	  formato,
+	  lente,
+	  modello,
+	  montatura,
+	  montatura_lenti
 }: ProductsRequestQuery): Promise<BaseProduct[]> => {
 	const params = new URLSearchParams({
 		...(per_page && { per_page: per_page.toString() }),
@@ -105,6 +133,13 @@ export const getProducts = async ({
 		...(optical && { optical: 'true' }),
 		...(man && { man: 'true' }),
 		...(woman && { woman: 'true' }),
+		...(calibro && { colors: calibro.toString() }),
+		...(calibro_ponte && { colors: calibro_ponte.toString() }),
+		...(formato && { colors: formato.toString() }),
+		...(lente && { colors: lente.toString() }),
+		...(modello && { colors: modello.toString() }),
+		...(montatura && { colors: montatura.toString() }),
+		...(montatura_lenti && { colors: montatura_lenti.toString() }),
 	});
 	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
 		.then(res => res.json())

@@ -26,7 +26,10 @@ type FiltersProps = {
 
 const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSunglasses, isOptical, isWoman, isMan}: FiltersProps) => {
 	const [open, setOpen] = useState(false);
-
+	const colori = colors.filter(color => color.type === 'colore')
+	const lenti = colors.filter(color => color.type === 'lente')
+	const montature = colors.filter(color => color.type === 'montatura')
+	const modelli = colors.filter(color => color.type === 'modello')
 	const ref = useRef<HTMLDivElement | null>(null);
 	return (
 		<Box
@@ -175,11 +178,38 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSung
 						tags={tags.filter(tag => tag.filter === 'style')}
 						setSearchParams={setSearchParams}
 					/>
-					<ColorPanel
-						params={searchParams.colors}
-						colors={colors}
-						setSearchParams={setSearchParams}
-					/>
+					{colori.length > 0 && (
+						<ColorPanel
+							params={searchParams.colors}
+							colors={colori}
+							setSearchParams={setSearchParams}
+							type="colore"
+						/>
+					)}
+					{lenti.length > 0 && (
+						<ColorPanel
+							params={searchParams.lente}
+							colors={lenti}
+							setSearchParams={setSearchParams}
+							type="lente"
+						/>
+					)}
+					{montature.length > 0 && (
+						<ColorPanel
+							params={searchParams.montatura}
+							colors={montature}
+							setSearchParams={setSearchParams}
+							type="montatura"
+						/>
+					)}
+					{modelli.length > 0 && (
+						<ColorPanel
+							params={searchParams.modello}
+							colors={modelli}
+							setSearchParams={setSearchParams}
+							type="modello"
+						/>
+					)}
 					<Divider light sx={{margin: '5px 0'}} />
 					<Typography  sx={{color: 'rgba(255,255,255)', fontWeight: 500, textTransform: 'uppercase', margin: '10px 0'}}>Prezzo</Typography>
 					<PriceRange

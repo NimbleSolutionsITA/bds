@@ -31,6 +31,13 @@ export type SearchParams = {
 	sunglasses?: boolean | undefined,
 	man?: boolean | undefined,
 	woman?: boolean | undefined
+	lente?: string | string[] | undefined,
+	modello?: string | string[] | undefined,
+	montatura?: string | string[] | undefined,
+	calibro?: string | string[] | undefined,
+	calibro_ponte?: string | string[] | undefined,
+	formato?: string | string[] | undefined,
+	montatura_lenti?: string | string[] | undefined,
 }
 
 const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptical, isMan, isWoman }: ProductsGridProps) => {
@@ -44,6 +51,13 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 				categories: searchParams.categories,
 				name: searchParams.name,
 				colors: searchParams.colors,
+				lente: searchParams.lente,
+				modello: searchParams.modello,
+				montatura: searchParams.montatura,
+				calibro: searchParams.calibro,
+				calibro_ponte: searchParams.calibro_ponte,
+				formato: searchParams.formato,
+				montatura_lenti: searchParams.montatura_lenti,
 				price_range: searchParams.price_range,
 				tags: [searchParams.styles, searchParams.materials].filter(v=>v).join(','),
 				sunglasses: isSunglasses ? true : searchParams.sunglasses,
@@ -71,8 +85,6 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 			initialData: {pages: [products], pageParams: []}
 		}
 	);
-
-	console.log({status, isRefetching, hasNextPage})
 
 	useEffect(() => {
 		if (isRefetching)

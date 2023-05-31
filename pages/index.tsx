@@ -70,7 +70,6 @@ export type HomeProps = {
 }
 
 export default function Home({page, menus, googlePlaces, seo}: HomeProps) {
-    console.log({seo})
     return (
       <Layout menus={menus} googlePlaces={googlePlaces} seo={seo}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />

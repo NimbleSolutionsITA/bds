@@ -10,8 +10,9 @@ type ColorPanelProps = {
 	colors: Color[]
 	params: string | string[] | undefined,
 	setSearchParams: Dispatch<SetStateAction<SearchParams>>,
+	type: 'colore' | 'lente' | 'montatura' | 'modello'
 }
-const ColorPanel = ({colors, params, setSearchParams}: ColorPanelProps) => {
+const ColorPanel = ({colors, params, setSearchParams, type}: ColorPanelProps) => {
 	const [selectedColors, setSelectedColors] = useState<string[]>([])
 	let groupedColors: { [color: string]: string[] } = {};
 
@@ -23,11 +24,13 @@ const ColorPanel = ({colors, params, setSearchParams}: ColorPanelProps) => {
 		groupedColors[closest].push(color.slug);
 	}
 
+	const availableColors = Object.keys(groupedColors)
+
 	const paletteColors = Object.keys(palette).map((key: string): Color => ({
 		name: palette[key].label,
 		slug: key,
 		code: palette[key].color
-	}));
+	})).filter(color => availableColors.includes(color.slug))
 
 	useEffect(() => {
 		if (!params || params.length === 0) {
@@ -39,7 +42,7 @@ const ColorPanel = ({colors, params, setSearchParams}: ColorPanelProps) => {
 	return (
 		<>
 			<Divider light sx={{margin: '5px 0'}} />
-			<ExpansionPanel title="Colori">
+			<ExpansionPanel title={type}>
 				<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
 					{paletteColors.map(color => (
 						<FilterChip
@@ -57,8 +60,9 @@ const ColorPanel = ({colors, params, setSearchParams}: ColorPanelProps) => {
 								}
 								setSearchParams(params => ({
 									...params,
-									colors: updatedColors.map(color => groupedColors[color])
+									[type === 'colore' ? 'colors' : type]: updatedColors.map(color => groupedColors[color])
 										.flat()
+										.filter(v => v)
 										.join(',')
 								}))
 
