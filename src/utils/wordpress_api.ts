@@ -10,7 +10,7 @@ import {getProductCategory} from "../../pages/api/products/categories/[slug]";
 import {EYEWEAR_CATEGORY, sanitize} from "./utils";
 import {getShippingInfo} from "../../pages/api/shipping";
 import {getProducts} from "../../pages/api/products";
-import {getColors} from "../../pages/api/products/colors";
+import {getAttributes} from "../../pages/api/products/colors";
 import {getProductTags} from "../../pages/api/products/tags";
 function mapMenuItem(item: any) {
 	return {
@@ -62,7 +62,7 @@ export const getShopPageProps = async (locale: string, query: {sunglasses?: bool
 	const [
 		{ page, seo, menus, googlePlaces },
 		products,
-		colors,
+		{colors, attributes},
 		tags,
 		designers
 	] = await Promise.all([
@@ -72,7 +72,7 @@ export const getShopPageProps = async (locale: string, query: {sunglasses?: bool
 			per_page: '12',
 			...query
 		}),
-		getColors(locale),
+		getAttributes(locale),
 		getProductTags(locale),
 		getProductCategories(locale, EYEWEAR_CATEGORY[locale as 'it' | 'en'].toString())
 
@@ -84,6 +84,7 @@ export const getShopPageProps = async (locale: string, query: {sunglasses?: bool
 		googlePlaces,
 		products,
 		colors,
+		attributes,
 		breadcrumbs: [
 			{ name: 'Home', href: urlPrefix + '/' },
 			{ name: 'Shop', href: urlPrefix + '/shop' }

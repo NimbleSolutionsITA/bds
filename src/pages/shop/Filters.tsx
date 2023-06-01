@@ -1,12 +1,11 @@
-import {Box, Container, Divider, IconButton, SwipeableDrawer, Typography} from "@mui/material";
+import {Box, Container, Divider, IconButton, Menu, MenuItem, SwipeableDrawer} from "@mui/material";
 import {CUSTOM_COLOR} from "../../theme/theme";
-import {Close, RestartAltSharp, TuneSharp} from '@mui/icons-material';
-import React, {Dispatch, SetStateAction, useRef, useState} from "react";
-import {Category, Color, ProductTag} from "../../types/woocommerce";
+import {Close, RestartAltSharp, TuneSharp, SortByAlphaSharp} from '@mui/icons-material';
+import {Dispatch, SetStateAction, useRef, useState, MouseEvent} from "react";
+import {Attribute, Category, Color, ProductTag} from "../../types/woocommerce";
 import {SearchParams} from "./ProductsGrid";
 import NameField from "./NameField";
 import ExpansionPanel from "../../components/ExpansionPanel";
-import PriceRange from "./PriceRange";
 import FilterChip from "./FilterChip";
 import TagPanel from "./TagPanel";
 import ColorPanel from "./ColorPanel";
@@ -15,6 +14,7 @@ import ColorPanel from "./ColorPanel";
 type FiltersProps = {
 	setSearchParams: Dispatch<SetStateAction<SearchParams>>
 	colors: Color[]
+	attributes: Attribute[]
 	tags: ProductTag[]
 	designers: Category[]
 	searchParams: SearchParams
@@ -24,13 +24,31 @@ type FiltersProps = {
 	isWoman?: boolean
 }
 
-const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSunglasses, isOptical, isWoman, isMan}: FiltersProps) => {
+const Filters = ({setSearchParams, searchParams, colors, attributes, tags, designers, isSunglasses, isOptical, isWoman, isMan}: FiltersProps) => {
+	const ref = useRef<HTMLDivElement | null>(null);
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	const selectOpen = Boolean(anchorEl);
+	const sortOptions: {slug: 'name_asc'|'name_desc'|'price_asc'|'price_desc'|'best_sells', name: string}[] = [
+		{slug: 'name_asc', name: 'Nome (A-Z)'},
+		{slug: 'name_desc', name: 'Nome (Z-A)'},
+		{slug: 'price_asc', name: 'Prezzo (crescente)'},
+		{slug: 'price_desc', name: 'Prezzo (decrescente)'},
+		{slug: 'best_sells', name: 'Più venduti'},
+	]
+	const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const handleClose = () => {
+		setAnchorEl(null);
+
+	};
 	const [open, setOpen] = useState(false);
 	const colori = colors.filter(color => color.type === 'colore')
 	const lenti = colors.filter(color => color.type === 'lente')
 	const montature = colors.filter(color => color.type === 'montatura')
 	const modelli = colors.filter(color => color.type === 'modello')
-	const ref = useRef<HTMLDivElement | null>(null);
+	const calibri = attributes.filter(attribute => attribute.type === 'calibro')
+	const calibriPonte = attributes.filter(attribute => attribute.type === 'calibro-ponte')
 	return (
 		<Box
 			ref={ref}
@@ -59,7 +77,32 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSung
 					onChange={(name?: string) => setSearchParams(params => ({...params, name}))}
 					disabled={open}
 				/>
-				<div>
+				<div style={{display: 'flex'}}>
+					<div>
+						<IconButton size="small" onClick={handleClick}>
+							<SortByAlphaSharp fontSize="small" sx={{color: 'rgba(255,255,255,0.8)'}} />
+						</IconButton>
+						<Menu
+							anchorEl={anchorEl}
+							open={selectOpen}
+							onClose={handleClose}
+							MenuListProps={{
+								'aria-labelledby': 'basic-button',
+							}}
+						>
+							{sortOptions.map(option => (
+								<MenuItem key={option.slug} selected={option.slug === searchParams.sort} onClick={() => {
+									setSearchParams(params => ({
+										...params,
+										sort: option.slug === params.sort ? undefined : option.slug,
+									}))
+									handleClose()
+								}}>
+									{option.name}
+								</MenuItem>
+							))}
+						</Menu>
+					</div>
 					{Object.keys(searchParams).length > 0 && (
 						<IconButton size="small" onClick={() => setSearchParams({})}>
 							<RestartAltSharp fontSize="small" sx={{color: 'rgba(255,255,255,0.8)'}} />
@@ -107,61 +150,43 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSung
 					width: 'calc(100% - 40px)',
 					border: '1px solid rgba(255,255,255,0.2)',
 				}}>
-					<ExpansionPanel title="Designers">
-						<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
-							{designers.map(designer => (
-								<FilterChip
-									key={designer.slug}
-									tag={designer}
-									onClick={() => setSearchParams(params => ({
-										...params,
-										categories: params.categories === designer.slug ? undefined : designer.slug
-									}))}
-									isActive={searchParams.categories?.includes(designer.slug) ?? false}
-								/>
-							))}
-						</div>
-					</ExpansionPanel>
+					<TextPanel
+						title="Designers"
+						list={designers}
+						isActive={(slug) => searchParams.categories?.includes(slug) ?? false}
+						onClick={(slug) => setSearchParams(params => ({
+							...params,
+							categories: params.categories === slug ? undefined : slug
+						}))}
+					/>
 					{!isMan && !isWoman && (
 						<>
 							<Divider light sx={{margin: '5px 0'}} />
-							<ExpansionPanel title="Genere">
-								<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
-									{['man', 'woman'].map((type) => (
-										<FilterChip
-											key={type}
-											tag={{name: type}}
-											onClick={() => setSearchParams(params => ({
-												...params,
-												man: type === 'man' ? !params.man : undefined,
-												woman: type === 'woman' ? !params.woman : undefined,
-											}))}
-											isActive={searchParams[type as 'man'|'woman'] ?? false}
-										/>
-									))}
-								</div>
-							</ExpansionPanel>
+							<TextPanel
+								title="Genere"
+								list={[{name: 'uomo', slug: 'man'}, {name: 'donna', slug: 'woman'}]}
+								isActive={(slug) => searchParams[slug as 'man'|'woman'] ?? false}
+								onClick={(slug) => setSearchParams(params => ({
+									...params,
+									man: slug === 'man' ? !params.man : undefined,
+									woman: slug === 'woman' ? !params.woman : undefined,
+								}))}
+							/>
 						</>
 					)}
 					{!isSunglasses && !isOptical && (
 						<>
 							<Divider light sx={{margin: '5px 0'}} />
-							<ExpansionPanel title="Tipologia">
-								<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
-									{['optical', 'sunglasses'].map((type) => (
-										<FilterChip
-											key={type}
-											tag={{name: type}}
-											onClick={() => setSearchParams(params => ({
-												...params,
-												sunglasses: type === 'sunglasses' ? !params.sunglasses : undefined,
-												optical: type === 'optical' ? !params.optical : undefined,
-											}))}
-											isActive={searchParams[type as 'optical'|'sunglasses'] ?? false}
-										/>
-									))}
-								</div>
-							</ExpansionPanel>
+							<TextPanel
+								title="Tipologia"
+								list={[{name: 'vista', slug: 'optical'}, {name: 'sole', slug: 'sunglasses'}]}
+								isActive={(slug) => searchParams[slug as 'optical'|'sunglasses'] ?? false}
+								onClick={(slug) => setSearchParams(params => ({
+									...params,
+									sunglasses: slug === 'sunglasses' ? !params.sunglasses : undefined,
+									optical: slug === 'optical' ? !params.optical : undefined,
+								}))}
+							/>
 						</>
 					)}
 					<TagPanel
@@ -210,13 +235,50 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSung
 							type="modello"
 						/>
 					)}
+					{!isSunglasses && calibri.length > 0 && (
+						<>
+							<Divider light sx={{margin: '5px 0'}} />
+							<TextPanel
+								title="Calibro"
+								list={calibri}
+								isActive={(slug) => searchParams.calibro?.toString() === slug}
+								onClick={(slug) => setSearchParams(params => ({
+									...params,
+									calibro: slug === searchParams.calibro?.toString() ? undefined : slug,
+								}))}
+							/>
+						</>
+					)}
+					{!isSunglasses && calibriPonte.length > 0 && (
+						<>
+							<Divider light sx={{margin: '5px 0'}} />
+							<TextPanel
+								title="Calibro Ponte"
+								list={calibriPonte}
+								isActive={(slug) => searchParams.calibro_ponte?.toString() === slug}
+								onClick={(slug) => setSearchParams(params => ({
+									...params,
+									calibro_ponte: slug === searchParams.calibro_ponte?.toString() ? undefined : slug,
+								}))}
+							/>
+						</>
+					)}
 					<Divider light sx={{margin: '5px 0'}} />
-					<Typography  sx={{color: 'rgba(255,255,255)', fontWeight: 500, textTransform: 'uppercase', margin: '10px 0'}}>Prezzo</Typography>
-					<PriceRange
-						price={searchParams.price_range}
-						onChange={(priceRange) => setSearchParams(params => ({
+					<TextPanel
+						title="Prezzo"
+						list={[
+							{name: 'fino a 200€', slug: '0,200'},
+							{name: '200€ - 300€', slug: '200,300'},
+							{name: '300€ - 400€', slug: '300,400'},
+							{name: '400€ - 500€', slug: '400,500'},
+							{name: '500€ - 750€', slug: '500,750'},
+							{name: '750€ - 1000€', slug: '750,1000'},
+							{name: 'oltre i 1000€', slug: '1000,5000'},
+						]}
+						isActive={(slug) => searchParams.price_range?.toString() === slug}
+						onClick={(slug) => setSearchParams(params => ({
 							...params,
-							price_range: (Array.isArray(priceRange) ? priceRange : [priceRange].filter(v => v)).map(v => v.toString())
+							price_range: slug === searchParams.price_range?.toString() ? undefined : slug,
 						}))}
 					/>
 				</Box>
@@ -225,8 +287,26 @@ const Filters = ({setSearchParams, searchParams, colors, tags, designers, isSung
 	)
 }
 
-
-
+type TagPanelProps = {
+	title: string
+	list: Attribute[] | Category[] | {name: string, slug: string}[]
+	isActive: (slug: string) => boolean
+	onClick: (slug: string) => void
+}
+const TextPanel = ({title, list, onClick, isActive}: TagPanelProps) => (
+	<ExpansionPanel title={title}>
+		<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
+			{list.map(item => (
+				<FilterChip
+					key={item.slug}
+					tag={{name: item.name}}
+					onClick={() => onClick(item.slug)}
+					isActive={isActive(item.slug)}
+				/>
+			))}
+		</div>
+	</ExpansionPanel>
+)
 
 
 

@@ -28,6 +28,7 @@ export type ProductsRequestQuery = {
 	modello?: string | string[] | undefined,
 	montatura?: string | string[] | undefined,
 	montatura_lenti?: string | string[] | undefined,
+	sort?: string | string[] | undefined
 }
 
 export default async function handler(
@@ -59,6 +60,7 @@ export default async function handler(
 			modello,
 			montatura,
 			montatura_lenti,
+			sort
 		} = req.query;
 		try {
 			responseData.products = await getProducts({
@@ -82,6 +84,7 @@ export default async function handler(
 				modello,
 				montatura,
 				montatura_lenti,
+				sort
 			})
 			responseData.success = true
 			res.json(responseData)
@@ -117,7 +120,8 @@ export const getProducts = async ({
 	  lente,
 	  modello,
 	  montatura,
-	  montatura_lenti
+	  montatura_lenti,
+	  sort
 }: ProductsRequestQuery): Promise<BaseProduct[]> => {
 	const params = new URLSearchParams({
 		...(per_page && { per_page: per_page.toString() }),
@@ -133,13 +137,14 @@ export const getProducts = async ({
 		...(optical && { optical: 'true' }),
 		...(man && { man: 'true' }),
 		...(woman && { woman: 'true' }),
-		...(calibro && { colors: calibro.toString() }),
-		...(calibro_ponte && { colors: calibro_ponte.toString() }),
-		...(formato && { colors: formato.toString() }),
-		...(lente && { colors: lente.toString() }),
-		...(modello && { colors: modello.toString() }),
-		...(montatura && { colors: montatura.toString() }),
-		...(montatura_lenti && { colors: montatura_lenti.toString() }),
+		...(calibro && { calibro: calibro.toString() }),
+		...(calibro_ponte && { calibro_ponte: calibro_ponte.toString() }),
+		...(formato && { formato: formato.toString() }),
+		...(lente && { lente: lente.toString() }),
+		...(modello && { modello: modello.toString() }),
+		...(montatura && { montatura: montatura.toString() }),
+		...(montatura_lenti && { montatura_lenti: montatura_lenti.toString() }),
+		...(sort && { sort: sort.toString() }),
 	});
 	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
 		.then(res => res.json())

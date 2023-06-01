@@ -4,25 +4,16 @@ import {BreadCrumb, Menus} from "../../../src/types/settings";
 import {GooglePlaces} from "../../api/google-places";
 import {BaseProduct, Category, Color, ProductTag} from "../../../src/types/woocommerce";
 import dynamic from "next/dynamic";
+import {ShopProps} from "../../shop";
 
 const ProductsGrid = dynamic(() => import("../../../src/pages/shop/ProductsGrid"));
 
-export type DesignersProps = {
-	menus: Menus,
-	googlePlaces: GooglePlaces,
-	products: BaseProduct[],
-	breadcrumbs?: BreadCrumb[]
-	colors: Color[],
-	tags: ProductTag[],
-	designers: Category[]
-}
-
 export default function ShopOpticalMan({
-    menus, googlePlaces, products, breadcrumbs, colors, tags, designers
-}: DesignersProps) {
+    menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
+}: ShopProps) {
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<ProductsGrid products={products} colors={colors} tags={tags} designers={designers} isOptical isMan />
+			<ProductsGrid products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isOptical isMan />
 		</Layout>
 	);
 }

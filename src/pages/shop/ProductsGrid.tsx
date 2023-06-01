@@ -1,4 +1,4 @@
-import {BaseProduct, Category, Color, ProductTag} from "../../types/woocommerce";
+import {Attribute, BaseProduct, Category, Color, ProductTag} from "../../types/woocommerce";
 import {Backdrop, CircularProgress, Container, Grid, Typography} from "@mui/material";
 import ProductCard from "../../components/ProductCard";
 import {useEffect, useState} from "react";
@@ -12,6 +12,7 @@ import Loading from "../../components/Loading";
 type ProductsGridProps = {
 	products: BaseProduct[]
 	colors: Color[]
+	attributes: Attribute[]
 	tags: ProductTag[],
 	designers: Category[]
 	isSunglasses?: boolean
@@ -38,9 +39,10 @@ export type SearchParams = {
 	calibro_ponte?: string | string[] | undefined,
 	formato?: string | string[] | undefined,
 	montatura_lenti?: string | string[] | undefined,
+	sort?: 'name_asc' | 'name_desc' | 'price_asc' | 'price_desc' | 'best_sells' | undefined
 }
 
-const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptical, isMan, isWoman }: ProductsGridProps) => {
+const ProductsGrid = ({ products, colors, attributes, tags, designers, isSunglasses, isOptical, isMan, isWoman }: ProductsGridProps) => {
 	const [searchParams, setSearchParams] = useState<SearchParams>({})
 	const {locale} = useRouter()
 
@@ -63,7 +65,8 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 				sunglasses: isSunglasses ? true : searchParams.sunglasses,
 				optical: isOptical ? true : searchParams.optical,
 				man: isMan ? true : searchParams.man,
-				woman: isWoman ? true : searchParams.woman
+				woman: isWoman ? true : searchParams.woman,
+				sort: searchParams.sort
 			}).filter(([_, value]) => value !== undefined))
 
 			const {products: data} = await fetch(NEXT_API_ENDPOINT + '/products?' + new URLSearchParams({
@@ -103,6 +106,7 @@ const ProductsGrid = ({ products, colors, tags, designers, isSunglasses, isOptic
 				isOptical={isOptical}
 				isMan={isMan}
 				isWoman={isWoman}
+				attributes={attributes}
 			/>
 			<Container sx={{marginTop: '20px', marginBottom: '20px', minHeight: '500px'}}>
 				{status === "success" && (

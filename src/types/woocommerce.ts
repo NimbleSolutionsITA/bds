@@ -46,6 +46,10 @@ export interface Color {
 	name: string;
 	code: string;
 	type?: 'colore'|'lente'|'modello'|'montatura';
+}export interface Attribute {
+	slug: string;
+	name: string;
+	type?: 'calibro'|'formato'|'calibro-ponte'
 }
 
 export interface ImageColor {
