@@ -7,8 +7,8 @@ import Image from "next/image";
 import {motion, Variants} from "framer-motion";
 import {KeyboardArrowDown} from "@mui/icons-material";
 import {MenuItem, Menus} from "../../types/settings";
-import Link from "next/link";
-import {sanitize} from "../../utils/utils";
+import {getRelativePath, sanitize} from "../../utils/utils";
+import Link from "../../components/Link";
 
 type AppBarProps = {
     leftMenu: Menus['leftMenu'],
@@ -107,6 +107,8 @@ const NavButton = ({item}: {item: MenuItem}) => {
                             marginLeft: 0
                         }
                     }}
+                    component={Link}
+                    href={getRelativePath(item.url)}
                     endIcon={EndIcon}
                 >
                     {item.title}
@@ -180,6 +182,8 @@ const SubItem = ({subItem}: {subItem: MenuItem}) => (
         <Button
             variant="text"
             size="small"
+            component={Link}
+            href={getRelativePath(subItem.url)}
             sx={{
                 color: 'black',
                 minWidth: 0,

@@ -3,7 +3,7 @@ import {
 	WORDPRESS_MENUS_ENDPOINT,
 	WORDPRESS_RANK_MATH_SEO_ENDPOINT
 } from "./endpoints"
-import {AcfImage, Category, Image, WooProductCategory} from "../types/woocommerce";
+import {AcfImage, Category, Image, Page, WooProductCategory, WPPage} from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
 import {getProductCategory} from "../../pages/api/products/categories/[slug]";
@@ -88,11 +88,14 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 	const googlePlaces = await getGooglePlaces(locale)
 	return { menus, googlePlaces}
 }
-export const getPageProps = async (slug: string, locale: 'it' | 'en') => {
-	const page = (await fetch(`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}`).then(response => response.json()))[0]
+export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: number) => {
+	const page: WPPage = (await fetch(
+		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
+	)
+		.then(response => response.json()))[0]
 	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${page.link}`).then(response => response.json()))
 	const { menus, googlePlaces } = await getLayoutProps(locale)
-	return { page, seo: seo.head, menus, googlePlaces }
+	return { page: mapPage(page), seo: seo.head, menus, googlePlaces }
 }
 
 export const getDesignersPageProps = async (locale: 'it' | 'en') => {
@@ -115,7 +118,7 @@ export const mapCategory = ({id, name, slug, count}: Category) => ({
 	id, name: sanitize(name), slug, count
 })
 
-export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}) => {
+export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}, slug = 'shop', parent?: number) => {
 	const [
 		{ page, seo, menus, googlePlaces },
 		products,
@@ -123,7 +126,7 @@ export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?:
 		tags,
 		designers
 	] = await Promise.all([
-		getPageProps("shop", locale),
+		getPageProps(slug, locale, parent),
 		getProducts({
 			lang: locale,
 			per_page: '12',
@@ -151,6 +154,26 @@ export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?:
 	}
 }
 
+export const getAllPagesIds = async () => {
+	const pages: WPPage[] = (await fetch(`${ WORDPRESS_API_ENDPOINT}/pages?per_page=99`).then(response => response.json()))
+	return pages.filter(({slug}) => ![
+		'fragranze',
+		'man',
+		'woman',
+		'optical',
+		'sunglasses',
+		'nostra-produzione',
+		'dentro-diaries',
+		'shop',
+		'home',
+		'designers'
+	].includes(slug)).map(page => ({
+		params: {
+			page: page.slug,
+		}
+	}))
+}
+
 export const mapProductCategory = (category: WooProductCategory) => ({
 	id: category.id,
 	name: category.name,
@@ -169,4 +192,8 @@ export const mapImage = ({id, src, name, alt}: Image) => ({
 
 export const mapAcfImage = ({id, url, title, alt, width, height}: AcfImage) => ({
 	id, url, title, alt, width, height
+})
+
+export const mapPage = ({id, slug, title, content, translations, link, acf}: WPPage): Page => ({
+	id, slug, translations, link, acf, title: title.rendered, content: content.rendered
 })

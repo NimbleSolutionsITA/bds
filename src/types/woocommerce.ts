@@ -266,5 +266,34 @@ export type WooLineItem = {
 		key: string;
 		value: string;
 	}[]
+}
 
+export type WPPage = {
+	id: number;
+	title: {
+		rendered: string;
+	};
+	slug: string;
+	content: {
+		rendered: string;
+	};
+	translations: {
+		it: number
+		eb: number
+	}
+	link: string;
+	acf: any
+}
+
+export type Page = {
+	id: number;
+	title: string;
+	slug: string;
+	content: string
+	translations: {
+		it: number
+		eb: number
+	}
+	link: string;
+	acf: any
 }

@@ -16,7 +16,7 @@ export default function ShopOptical({
 }
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
-	const props =  await getShopPageProps(locale, {optical: true})
+	const props =  await getShopPageProps(locale, {optical: true}, 'optical')
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	return {
 		props: {

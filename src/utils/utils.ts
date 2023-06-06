@@ -34,6 +34,11 @@ export const LIQUIDES_IMAGINAIRES_CATEGORY = {
     it: 51,
     en: 518
 }
+
+export const SHOP_CATEGORIES = {
+    optical: { it: 2796, en: 9604 },
+    sunglasses: { it: 2990, en: 9602 }
+}
 export const MAIN_CATEGORIES = [
     EYEWEAR_CATEGORY.it,
     EYEWEAR_CATEGORY.en,
@@ -157,4 +162,14 @@ export function shippingMethodApplies(method: ShippingMethod, totalOrderAmount: 
     }
     // If none of the conditions above matched, the method applies
     return true;
+}
+
+export function getRelativePath(url: string): string {
+    try {
+        const urlObject = new URL(url);
+        return urlObject.pathname + urlObject.search + urlObject.hash;
+    } catch (e) {
+        // If it's not a valid URL, assume it's a relative path
+        return url;
+    }
 }

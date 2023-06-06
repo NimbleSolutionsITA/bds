@@ -16,7 +16,7 @@ export default function ShopSunglasses({
 }
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
-	const props =  await getShopPageProps(locale, {sunglasses: true})
+	const props =  await getShopPageProps(locale, {sunglasses: true}, 'sunglasses')
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	return {
 		props: {
