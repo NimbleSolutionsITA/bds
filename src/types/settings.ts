@@ -3,6 +3,8 @@ export type MenuItem = {
 	title: string
 	url: string
 	child_items: MenuItem[] | null
+	groups?: string[] | null
+	parent?: string | null
 }
 
 export type Menus = {

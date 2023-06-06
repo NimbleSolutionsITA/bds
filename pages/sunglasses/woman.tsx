@@ -1,9 +1,9 @@
-import Layout from "../../../src/layout/Layout";
-import {getShopPageProps} from "../../../src/utils/wordpress_api";
+import Layout from "../../src/layout/Layout";
+import {getShopPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
-import {ShopProps} from "../../shop";
+import {ShopProps} from "../shop";
 
-const ProductsGrid = dynamic(() => import("../../../src/pages/shop/ProductsGrid"));
+const ProductsGrid = dynamic(() => import("../../src/pages/shop/ProductsGrid"));
 
 export default function ShopSunglassesWoman({
     menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
@@ -22,9 +22,8 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 		props: {
 			...props,
 			breadcrumbs: [
-				...props.breadcrumbs,
-				{ name: 'Sunglasses', href: urlPrefix + '/shop/sunglasses' },
-				{ name: 'Woman', href: urlPrefix + '/shop/sunglasses/woman' }
+				{ name: 'Sunglasses', href: urlPrefix + '/sunglasses' },
+				{ name: 'Woman', href: urlPrefix + '/sunglasses/woman' }
 			]
 		},
 		revalidate: 10

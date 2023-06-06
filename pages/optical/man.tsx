@@ -5,25 +5,25 @@ import {ShopProps} from "../shop";
 
 const ProductsGrid = dynamic(() => import("../../src/pages/shop/ProductsGrid"));
 
-export default function ShopOptical({
-     menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
- }: ShopProps) {
+export default function ShopOpticalMan({
+    menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
+}: ShopProps) {
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<ProductsGrid products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isOptical />
+			<ProductsGrid products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isOptical isMan />
 		</Layout>
 	);
 }
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
-	const props =  await getShopPageProps(locale, {optical: true})
+	const props = await getShopPageProps(locale, {optical: true, man: true})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	return {
 		props: {
 			...props,
 			breadcrumbs: [
-				...props.breadcrumbs,
-				{ name: 'Optical', href: urlPrefix + '/shop/optical' }
+				{ name: 'Optical', href: urlPrefix + '/optical' },
+				{ name: 'Man', href: urlPrefix + '/optical/man' }
 			]
 		},
 		revalidate: 10

@@ -8,6 +8,7 @@ import {motion, Variants} from "framer-motion";
 import {KeyboardArrowDown} from "@mui/icons-material";
 import {MenuItem, Menus} from "../../types/settings";
 import Link from "next/link";
+import {sanitize} from "../../utils/utils";
 
 type AppBarProps = {
     leftMenu: Menus['leftMenu'],
@@ -84,6 +85,8 @@ const NavButton = ({item}: {item: MenuItem}) => {
         </motion.div>
     ) : undefined
 
+
+
     return (
         <motion.div
             initial={false}
@@ -138,32 +141,58 @@ const NavButton = ({item}: {item: MenuItem}) => {
                         flexDirection: 'column',
                         backgroundColor: '#ffffff',
                         padding: '10px',
-                        marginLeft: '-10px'
+                        marginLeft: '-10px',
+                        zIndex: 1101
                     }}
                 >
-                    {item.child_items.map(subItem => (
-                        <motion.div variants={itemVariants} key={subItem.id}>
-                            <Button
-                                variant="text"
-                                size="small"
-                                sx={{
-                                    color: 'black',
-                                    minWidth: 0,
-                                    fontWeight: 300,
-                                    '& .MuiButton-endIcon': {
-                                        marginLeft: 0
-                                    },
-                                    '&:hover': {
-                                        fontWeight: 500
-                                    }
-                                }}
-                            >
-                                {subItem.title}
-                            </Button>
-                        </motion.div>
+                    {item.groups ? (
+                        <GroupedItems items={item.child_items} groups={item.groups} />
+                    ) : item.child_items.map(subItem => (
+                        <SubItem key={subItem.id} subItem={subItem} />
                     ))}
                 </motion.div>
             )}
         </motion.div>
     )
 }
+
+const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) => (
+    <div style={{display: 'flex'}}>
+        {groups.map((group) => (
+            <div key={group} style={{display: 'flex', flexDirection: 'column', marginRight: '20px'}}>
+                <div style={{
+                    fontSize: '14px',
+                    fontWeight: 500,
+                    marginBottom: '5px',
+                    padding: '5px',
+                    backgroundColor: 'rgba(0,0,0,0.1)'
+                }}>{group}</div>
+                {items.filter(item => item.parent === group).map(subItem => (
+                    <SubItem key={subItem.id} subItem={subItem} />
+                ))}
+            </div>
+        ))}
+    </div>
+)
+
+const SubItem = ({subItem}: {subItem: MenuItem}) => (
+    <motion.div variants={itemVariants} key={subItem.id}>
+        <Button
+            variant="text"
+            size="small"
+            sx={{
+                color: 'black',
+                minWidth: 0,
+                fontWeight: 300,
+                '& .MuiButton-endIcon': {
+                    marginLeft: 0
+                },
+                '&:hover': {
+                    fontWeight: 500
+                }
+            }}
+        >
+            <span dangerouslySetInnerHTML={{__html: sanitize(subItem.title)}}></span>
+        </Button>
+    </motion.div>
+)

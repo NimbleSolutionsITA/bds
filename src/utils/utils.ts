@@ -26,7 +26,14 @@ export const EYEWEAR_CATEGORY = {
   it: 188,
   en: 496
 }
-
+export const PROFUMUM_ROMA_CATEGORY = {
+    it:1166,
+    en: 11732
+}
+export const LIQUIDES_IMAGINAIRES_CATEGORY = {
+    it: 51,
+    en: 518
+}
 export const MAIN_CATEGORIES = [
     EYEWEAR_CATEGORY.it,
     EYEWEAR_CATEGORY.en,

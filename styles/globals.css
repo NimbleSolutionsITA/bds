@@ -102,3 +102,9 @@ strong, b {
 .preTitle strong, .preTitle b {
   font-weight: 500;
 }
+
+@media (max-width: 900px) {
+  .title {
+    font-size: 2.5rem;
+  }
+}
