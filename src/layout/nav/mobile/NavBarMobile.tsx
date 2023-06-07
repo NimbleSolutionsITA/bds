@@ -9,6 +9,8 @@ import LanguageButton from "../../../components/LanguageButton";
 import {Facebook, Instagram, PhoneEnabledSharp} from "@mui/icons-material";
 import {useRouter} from "next/router";
 import {IconButtonProps} from "@mui/material/IconButton/IconButton";
+import Link from "../../../components/Link";
+import {getRelativePath} from "../../../utils/utils";
 
 type NavBarMobileProps = {
     mobileMenu: Menus['mobileMenu']
@@ -21,7 +23,6 @@ export default function NavBarMobile({
     const [open, setOpen] = useState(false)
     const router = useRouter()
     function handleClick(nav: MenuItem) {
-        console.log(nav)
         setOpen(false)
     }
 
@@ -143,6 +144,8 @@ const NavButton = ({nav , handleClick}: {nav: MenuItem, handleClick: (nav: MenuI
         variant="text"
         sx={{color: 'black', minWidth: 0}}
         onClick={() => handleClick(nav)}
+        component={Link}
+        href={getRelativePath(nav.url)}
     >
         {nav.title}
     </Button>

@@ -39,7 +39,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
             fragrances: [...fragrances.profumum, ...fragrances.liquides],
             breadcrumbs: [
                 { name: 'Home', href: urlPrefix + '/' },
-                { name: 'Fragrances', href: urlPrefix + '/fragrances' }
+                { name: 'Fragranze', href: urlPrefix + '/fragrances' }
             ],
             seo
         },
