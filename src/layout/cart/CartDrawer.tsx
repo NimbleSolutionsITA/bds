@@ -5,11 +5,13 @@ import {closeCartDrawer, openCartDrawer} from "../../redux/cartSlice";
 import {CloseOutlined} from "@mui/icons-material";
 import CartItem from "./CartItem";
 import Link from "next/link";
+import PriceFormat from "../../components/PriceFormat";
 
 const CartDrawer = () => {
 	const { cartDrawerOpen, items } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch()
 	const totalItems = items.reduce((previousValue, currentValue) => previousValue + currentValue.qty, 0)
+	const subtotal = items.reduce((previousValue, currentValue) => previousValue + (currentValue.price * currentValue.qty), 0)
 	return (
 		<SwipeableDrawer
 			open={cartDrawerOpen}
@@ -49,7 +51,9 @@ const CartDrawer = () => {
 					<>
 						<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px'}}>
 							<Typography variant="h6">Subtotale</Typography>
-							<Typography variant="h6">{items.reduce((previousValue, currentValue) => previousValue + (currentValue.price * currentValue.qty), 0)} €</Typography>
+							<Typography variant="h6">
+								<PriceFormat value={subtotal} decimalScale={0} />
+							</Typography>
 						</div>
 						<Button component={Link} href="/checkout">VAI AL CHECKOUT</Button>
 					</>

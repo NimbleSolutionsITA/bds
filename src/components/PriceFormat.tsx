@@ -3,8 +3,9 @@ import {NumericFormat} from "react-number-format";
 type PriceFormatProps = {
 	value: number | string,
 	prefix?: string
+	decimalScale?: number
 }
-const PriceFormat = ({value, prefix}: PriceFormatProps) => (
+const PriceFormat = ({value, prefix, decimalScale = 2}: PriceFormatProps) => (
 	<NumericFormat
 		value={value}
 		displayType={'text'}
@@ -13,7 +14,7 @@ const PriceFormat = ({value, prefix}: PriceFormatProps) => (
 		fixedDecimalScale
 		prefix={prefix}
 		suffix={' €'}
-		decimalScale={2}
+		decimalScale={decimalScale}
 	/>
 )
 

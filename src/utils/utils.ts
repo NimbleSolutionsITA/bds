@@ -26,6 +26,16 @@ export const EYEWEAR_CATEGORY = {
   it: 188,
   en: 496
 }
+
+export const SUNGLASSES_CATEGORY = {
+    it: 18,
+    en: 517
+}
+
+export const OPTICAL_CATEGORY = {
+    it: 43,
+    en: 493
+}
 export const PROFUMUM_ROMA_CATEGORY = {
     it:1166,
     en: 11732

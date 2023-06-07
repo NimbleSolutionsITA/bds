@@ -5,7 +5,12 @@ import {
     BaseVariation,
 } from "../types/woocommerce";
 import {Box, Card, CardContent, IconButton, Typography} from "@mui/material";
-import {findVariationFromAttributes, getDefaultProduct, MAIN_CATEGORIES, sanitize} from "../utils/utils";
+import {
+    findVariationFromAttributes,
+    getDefaultProduct,
+    MAIN_CATEGORIES, OPTICAL_CATEGORY,
+    sanitize, SUNGLASSES_CATEGORY
+} from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
 import {useDispatch} from "react-redux";
 import {addCartItem} from "../redux/cartSlice";
@@ -17,11 +22,17 @@ import {AttributeCheckboxes} from "./AttributeCheckboxes";
 
 type ProductCardProps = {
     product: BaseProduct;
-    imageRatio?: number;
-    attributesAlwaysVisible?: boolean;
 }
 
-const ProductCard = ({ product, imageRatio = 45, attributesAlwaysVisible = false }: ProductCardProps) => {
+const ProductCard = ({ product }: ProductCardProps) => {
+    console.log(product.categories)
+    const isEyewear = product.categories.find(({id, }) => [
+        SUNGLASSES_CATEGORY.it,
+        SUNGLASSES_CATEGORY.en,
+        OPTICAL_CATEGORY.it,
+        OPTICAL_CATEGORY.en
+    ].includes(id)) !== undefined;
+    const imageRatio = isEyewear ? 45 : 130;
     const [hover, setHover] = useState(false);
     const init = getDefaultProduct(product);
     const defaultProduct = init.defaultProduct as BaseVariation;
@@ -113,10 +124,10 @@ const ProductCard = ({ product, imageRatio = 45, attributesAlwaysVisible = false
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        opacity: (attributesAlwaysVisible || hover) ? 1 : 0,
+                        opacity: (!isEyewear || hover) ? 1 : 0,
                         transition: 'opacity .5s ease',
                         width: '100%',
-                        zIndex: 1
+                        zIndex: 2
                     }}>
                         <AttributeCheckboxes
                             product={product}
@@ -126,7 +137,7 @@ const ProductCard = ({ product, imageRatio = 45, attributesAlwaysVisible = false
                         <IconButton
                             size="small"
                             onClick={handleAddToCart}
-                            disabled={currentProduct.stock_status !== 'instock'}
+                            disabled={currentProduct.stock_status !== 'instock' || !currentProduct.price}
                         >
                             <CartIcon />
                         </IconButton>
@@ -134,8 +145,9 @@ const ProductCard = ({ product, imageRatio = 45, attributesAlwaysVisible = false
                     <Typography sx={{
                         fontSize: currentProduct.price ?  '20px' : '16px',
                         top: '3px',
-                        position:  (hover && !attributesAlwaysVisible) ?  'relative' : 'absolute',
-                        width: '100%'
+                        left: 'calc(50% - 50px)',
+                        position:  (hover && isEyewear) ?  'relative' : 'absolute',
+                        width: '100px'
                     }}>{currentProduct.price ? `${Number(currentProduct.price)} €` : 'upon request'}</Typography>
                 </div>
             </CardContent>

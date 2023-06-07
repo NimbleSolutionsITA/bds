@@ -1,5 +1,4 @@
-import {useDispatch} from "react-redux";
-import {CartItem, CartItem as CartItemType, updateCartItem} from "../../redux/cartSlice";
+import {CartItem} from "../../redux/cartSlice";
 import Image from "next/image";
 import {
 	Box,
@@ -10,25 +9,23 @@ import {
 	FormHelperText,
 	Grid,
 	Hidden,
-	IconButton,
 	InputLabel,
 	MenuItem,
 	Select,
 	TextField,
 	Typography,
 } from "@mui/material";
-import {AddCircleOutlineSharp, RemoveCircleOutlineSharp} from '@mui/icons-material';
 import {Control, Controller, FieldErrors} from "react-hook-form";
 import {ShippingMethod} from "../../types/woocommerce";
 import {CheckoutCartItem, Inputs} from "./CheckoutGrid";
 import Link from "next/link";
-import {ReactNode} from "react";
 import PriceFormat from "../../components/PriceFormat";
 import {LocalShippingSharp, StorefrontSharp} from "@mui/icons-material";
 import Payments from "../../components/Payments";
-import Loading from "../../components/Loading";
 import PriceRecap from "./PriceRecap";
 import HelperText from "../../components/HelperText";
+import Minus from "../../layout/cart/Minus";
+import Plus from "../../layout/cart/Plus";
 
 type RecapProps = {
 	control: Control<Inputs>
@@ -92,6 +89,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 								</Typography>
 							))}
 							<Typography sx={{fontSize: '12px', lineHeight: '16px'}}>
+								{/* eslint-disable-next-line react/jsx-no-undef */}
 								QUANTITÀ: <Minus item={item} disabled={isLoading || checkoutStep > 2} />{item.qty}<Plus disabled={isLoading || checkoutStep > 2} item={item} />
 							</Typography>
 						</div>
@@ -189,44 +187,6 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 				<Payments />
 			</Hidden>
 		</Box>
-	)
-}
-
-type CartButtonProps = {
-	item: CartItemType
-	disabled?: boolean
-}
-
-const Plus = ({item, disabled}:CartButtonProps) => {
-	const dispatch = useDispatch()
-	return (
-		<IconButton
-			disabled={item.stock_quantity <= item.qty || disabled}
-			size="small"
-			onClick={() => dispatch(updateCartItem({
-				product_id: item.product_id,
-				variation_id: item.variation_id,
-				qty: item.qty + 1
-			}))}
-		>
-			<AddCircleOutlineSharp sx={{fontSize: '16px'}} />
-		</IconButton>
-	)
-}
-const Minus = ({item, disabled}: CartButtonProps) => {
-	const dispatch = useDispatch()
-	return (
-		<IconButton
-			size="small"
-			disabled={item.qty <= 1 || disabled}
-			onClick={() => dispatch(updateCartItem({
-				product_id: item.product_id,
-				variation_id: item.variation_id,
-				qty: item.qty - 1
-			}))}
-		>
-			<RemoveCircleOutlineSharp sx={{fontSize: '16px'}} />
-		</IconButton>
 	)
 }
 

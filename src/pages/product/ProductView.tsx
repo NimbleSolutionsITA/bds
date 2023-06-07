@@ -7,7 +7,7 @@ import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
 import React, {useState} from "react";
 import {addCartItem} from "../../redux/cartSlice";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {AttributeCheckboxes} from "../../components/AttributeCheckboxes";
 import InStock from "../../icons/InStock";
 import SocialShare from "./SocialShare";
@@ -15,6 +15,8 @@ import InStockNotifier from "./InStockNotifier";
 import Image from "next/image";
 import {ArrowForwardIosSharp, ArrowBackIosSharp} from "@mui/icons-material";
 import placeholder from "../../images/placeholder.jpg";
+import {RootState} from "../../redux/store";
+import PriceFormat from "../../components/PriceFormat";
 
 type ProductViewProps = {
 	product: Product
@@ -23,6 +25,7 @@ type ProductViewProps = {
 
 const ProductView = ({product, category}: ProductViewProps) => {
 	const init = getDefaultProduct(product);
+	const { items } = useSelector((state: RootState) => state.cart);
 	const defaultProduct = init.defaultProduct as Variation;
 	const {defaultAttributes} = init;
 	const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
@@ -33,7 +36,10 @@ const ProductView = ({product, category}: ProductViewProps) => {
 	].filter(v => v)
 	const [galleryIndex, setGalleryIndex] = useState(galleryImages.findIndex(v => v.variation === defaultProduct.id));
 	const dispatch = useDispatch();
-
+    const cartQuantity = items.find(v =>
+	    v.product_id === product.id &&
+	    v.variation_id === (product.type === 'variable' ? currentProduct.id : undefined)
+    )?.qty ?? 0;
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
 		const newAttributes = {...currentAttributes, [attribute]: slug};
 		await setCurrentAttributes(newAttributes)
@@ -158,7 +164,7 @@ const ProductView = ({product, category}: ProductViewProps) => {
 					)}
 					{Number(currentProduct.price) > 0 && (
 						<Typography variant="h3" sx={{fontFamily: 'Apercu', fontSize: '25px', fontWeight: 300, marginTop: '10px'}} component="div">
-							{Number(currentProduct.price)} €
+							<PriceFormat value={product.price} decimalScale={0} />
 						</Typography>
 					)}
 					<HtmlBlock
@@ -185,6 +191,7 @@ const ProductView = ({product, category}: ProductViewProps) => {
 						<Button
 							onClick={handleAddToCart}
 							fullWidth
+							disabled={cartQuantity >= (currentProduct.stock_quantity ?? 0)}
 							sx={{
 								marginTop: '20px',
 							}}

@@ -11,7 +11,7 @@ const FragranceProductGrid = ({products}:FragranceProductGridProps) => {
 			<Grid container spacing={3}>
 				{products.map((product) => (
 					<Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
-						<ProductCard product={product} imageRatio={130} attributesAlwaysVisible />
+						<ProductCard product={product} />
 					</Grid>
 				))}
 			</Grid>

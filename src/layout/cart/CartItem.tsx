@@ -3,6 +3,9 @@ import {Box, IconButton, Typography} from "@mui/material";
 import {DeleteOutlineSharp} from "@mui/icons-material";
 import {CartItem as CartItemType, deleteCartItem} from "../../redux/cartSlice";
 import Image from "next/image";
+import Minus from "./Minus";
+import Plus from "./Plus";
+import PriceFormat from "../../components/PriceFormat";
 
 type CartItemProps = {
 	item: CartItemType
@@ -33,16 +36,18 @@ const CartItem = ({item}: CartItemProps) => {
 				/>
 			</div>
 			<div style={{width: '75%', padding: '10px', position: 'relative'}}>
-				<Typography sx={{fontFamily: 'Apercu', fontWeight: 500, lineHeight: '16px', marginBottom: '8px'}}>
+				<Typography sx={{fontWeight: 500, lineHeight: '16px', marginBottom: '8px'}}>
 					{item.category} - {item.name}<br />
-					{item.price} €
+					<PriceFormat value={item.price} decimalScale={0} />
 				</Typography>
 				{item.attributes.map((attribute) => (
-					<Typography sx={{fontFamily: 'Apercu', fontSize: '12px', lineHeight: '16px'}} key={attribute.id}>
+					<Typography sx={{fontSize: '12px', lineHeight: '16px'}} key={attribute.id}>
 						{attribute.id.toString().replace("pa_", "").toUpperCase()}: {attribute.name}
 					</Typography>
 				))}
-				<Typography sx={{fontFamily: 'Apercu', fontSize: '12px', lineHeight: '16px'}}>QUANTITÀ: {item.qty}</Typography>
+				<Typography sx={{fontSize: '12px', lineHeight: '16px'}}>
+					QUANTITÀ: <Minus item={item} />{item.qty}<Plus item={item} />
+				</Typography>
 				<IconButton
 					size="small"
 					onClick={() => dispatch(deleteCartItem({ product_id: item.product_id, variation_id: item.variation_id}))}
