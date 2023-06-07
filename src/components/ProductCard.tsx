@@ -19,6 +19,7 @@ import Link from "./Link";
 import placeholder from "../images/placeholder.jpg";
 import blur from "../images/blur.jpg";
 import {AttributeCheckboxes} from "./AttributeCheckboxes";
+import PriceFormat from "./PriceFormat";
 
 type ProductCardProps = {
     product: BaseProduct;
@@ -148,7 +149,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         left: 'calc(50% - 50px)',
                         position:  (hover && isEyewear) ?  'relative' : 'absolute',
                         width: '100px'
-                    }}>{currentProduct.price ? `${Number(currentProduct.price)} €` : 'upon request'}</Typography>
+                    }}>
+                        {currentProduct.price ?
+                            <PriceFormat value={parseFloat(currentProduct.price as string)} decimalScale={0} /> : 'upon request'
+                        }
+                    </Typography>
                 </div>
             </CardContent>
         </Card>
