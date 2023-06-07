@@ -8,7 +8,7 @@ import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
 import {getProducts} from "../api/products";
-import {EYEWEAR_CATEGORY} from "../../src/utils/utils";
+import {LIQUIDES_IMAGINAIRES_CATEGORY, PROFUMUM_ROMA_CATEGORY} from "../../src/utils/utils";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/fragrances/FragranceProductGrid"))
@@ -73,9 +73,13 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths() {
-	const productCategories = await getProductCategories(undefined);
-	const paths = productCategories
-		.filter(({parent}) => parent && [EYEWEAR_CATEGORY.it, EYEWEAR_CATEGORY.en].includes(parent))
+	const productCategories = await getProductCategories();
+	const paths = productCategories.filter(({parent}) => parent && [
+			PROFUMUM_ROMA_CATEGORY.it,
+			PROFUMUM_ROMA_CATEGORY.en,
+			LIQUIDES_IMAGINAIRES_CATEGORY.it,
+			LIQUIDES_IMAGINAIRES_CATEGORY.en
+		].includes(parent))
 		.map(({slug}: WooProductCategory) => ({ params: { slug } }));
 	return {
 		paths,

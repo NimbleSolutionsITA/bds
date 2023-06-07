@@ -173,7 +173,7 @@ export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?:
 export const getAllPagesIds = async () => {
 	const pages: WPPage[] = (await fetch(`${ WORDPRESS_API_ENDPOINT}/pages?per_page=99`).then(response => response.json()))
 	return pages.filter(({slug}) => ![
-		'fragranze',
+		'fragrances',
 		'man',
 		'woman',
 		'optical',

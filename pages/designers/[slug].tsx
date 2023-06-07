@@ -72,7 +72,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths() {
-	const productCategories = await getProductCategories(undefined);
+	const productCategories = await getProductCategories();
 	const paths = productCategories
 		.filter(({parent}) => parent && [EYEWEAR_CATEGORY.it, EYEWEAR_CATEGORY.en].includes(parent))
 		.map(({slug}: WooProductCategory) => ({ params: { slug } }));
