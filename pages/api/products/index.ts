@@ -29,6 +29,7 @@ export type ProductsRequestQuery = {
 	montatura?: string | string[] | undefined,
 	montatura_lenti?: string | string[] | undefined,
 	sort?: string | string[] | undefined
+	fragrances?: boolean | undefined
 }
 
 export default async function handler(
@@ -60,7 +61,8 @@ export default async function handler(
 			modello,
 			montatura,
 			montatura_lenti,
-			sort
+			sort,
+			fragrances
 		} = req.query;
 		try {
 			responseData.products = await getProducts({
@@ -84,7 +86,8 @@ export default async function handler(
 				modello,
 				montatura,
 				montatura_lenti,
-				sort
+				sort,
+				fragrances: fragrances === "true"
 			})
 			responseData.success = true
 			res.json(responseData)
@@ -121,7 +124,8 @@ export const getProducts = async ({
 	  modello,
 	  montatura,
 	  montatura_lenti,
-	  sort
+	  sort,
+	  fragrances
 }: ProductsRequestQuery): Promise<BaseProduct[]> => {
 	const params = new URLSearchParams({
 		...(per_page && { per_page: per_page.toString() }),
@@ -145,6 +149,7 @@ export const getProducts = async ({
 		...(montatura && { montatura: montatura.toString() }),
 		...(montatura_lenti && { montatura_lenti: montatura_lenti.toString() }),
 		...(sort && { sort: sort.toString() }),
+		...(fragrances && { fragrances: 'true' }),
 	});
 	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
 		.then(res => res.json())

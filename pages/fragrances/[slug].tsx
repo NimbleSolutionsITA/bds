@@ -10,29 +10,29 @@ import {getProductCategories} from "../api/products/categories";
 import {getProducts} from "../api/products";
 import {EYEWEAR_CATEGORY} from "../../src/utils/utils";
 
-const DesignerTop = dynamic(() => import("../../src/components/CategoryTop"))
-const DesignerProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
-const DesignersBottom = dynamic(() => import("../../src/components/CategoryBottom"))
+const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
+const FragranceProductGrid = dynamic(() => import("../../src/pages/fragrances/FragranceProductGrid"))
+const FragrancesBottom = dynamic(() => import("../../src/components/CategoryBottom"))
 
-export type DesignerProps = {
+export type FragranceProps = {
 	menus: Menus,
 	googlePlaces: GooglePlaces,
 	productCategory: WooProductCategory,
 	products: BaseProduct[],
 	breadcrumbs?: BreadCrumb[]
 }
-export default function Designer({
-  menus, googlePlaces, productCategory, products, breadcrumbs
-}: DesignerProps) {
+export default function Fragrance({
+	                                 menus, googlePlaces, productCategory, products, breadcrumbs
+                                 }: FragranceProps) {
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<DesignerTop
+			<FragranceTop
 				name={productCategory.name}
 				gallery={productCategory.acf.gallery}
 				description={productCategory.description}
 			/>
-			<DesignerProductGrid products={products} />
-			<DesignersBottom bottomText={productCategory.acf.bottomText} />
+			<FragranceProductGrid products={products} />
+			<FragrancesBottom bottomText={productCategory.acf.bottomText} />
 		</Layout>
 	);
 }
@@ -51,13 +51,14 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	const products = await getProducts({
 		categories: slug,
 		lang: locale,
-		per_page: '24'
+		per_page: '99',
+		fragrances: true
 	})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
-		{ name: 'Designers', href: urlPrefix + '/designers' },
-		{ name: sanitize(productCategory.name), href: urlPrefix +  '/designers/' + productCategory.slug },
+		{ name: 'Fragrances', href: urlPrefix + '/fragrances' },
+		{ name: sanitize(productCategory.name), href: urlPrefix +  '/fragrances/' + productCategory.slug },
 	]
 	return {
 		props: {

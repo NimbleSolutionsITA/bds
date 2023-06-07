@@ -6,7 +6,6 @@ import {
 import {AcfImage, Category, Image, Page, WooProductCategory, WPPage} from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
-import {getProductCategory} from "../../pages/api/products/categories/[slug]";
 import {EYEWEAR_CATEGORY, PROFUMUM_ROMA_CATEGORY, LIQUIDES_IMAGINAIRES_CATEGORY, sanitize} from "./utils";
 import {getShippingInfo} from "../../pages/api/shipping";
 import {getProducts} from "../../pages/api/products";
@@ -28,7 +27,7 @@ function mapMenuItem(categories?: MenuCategories) {
 			groups = ['A-J', 'K-Z']
 			child_items = categories.designers.map(categoryToMenu('designers'))
 		}
-		else if (item.slug ==='fragranze' && categories?.fragrances) {
+		else if (item.slug ==='fragrances' && categories?.fragrances) {
 			groups = ['liquides-imaginaires', 'profumum-roma']
 			child_items = [
 				...categories.fragrances.profumum.map(categoryToMenu('profumum-roma')),
@@ -50,17 +49,19 @@ function mapMenuItem(categories?: MenuCategories) {
 function categoryToMenu(path: string) {
 	return function (category: WooProductCategory) {
 		let parent
+		let base = path
 		if(path === 'designers') {
 			const regex = /^[a-jA-J0-9\W]/;
 			parent = regex.test(category.name) ? 'A-J' : 'K-Z'
 		}
 		else {
 			parent = path
+			base = 'fragrances'
 		}
 		return {
 			id: category.id,
 			title: category.name,
-			url: '/' + path + '/' + category.slug,
+			url: '/' + base + '/' + category.slug,
 			child_items: null,
 			parent
 		}
@@ -68,11 +69,12 @@ function categoryToMenu(path: string) {
 }
 
 export const getLayoutProps = async (locale: 'it' | 'en') => {
+	const productCategories = (await getProductCategories(locale))
 	const categories = {
-		designers: await getProductCategories(locale, EYEWEAR_CATEGORY[locale].toString()),
+		designers: productCategories.filter(cat => cat.parent === EYEWEAR_CATEGORY[locale]),
 		fragrances: {
-			profumum: await getProductCategories(locale, PROFUMUM_ROMA_CATEGORY[locale].toString()),
-			liquides: await getProductCategories(locale, LIQUIDES_IMAGINAIRES_CATEGORY[locale].toString())
+			profumum: productCategories.filter(cat => cat.parent === PROFUMUM_ROMA_CATEGORY[locale]),
+			liquides: productCategories.filter(cat => cat.parent === LIQUIDES_IMAGINAIRES_CATEGORY[locale])
 		}
 	}
 	const menus = {
@@ -86,7 +88,17 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 			.then(response => response.json())).items.map(mapMenuItem())
 	}
 	const googlePlaces = await getGooglePlaces(locale)
-	return { menus, googlePlaces}
+	return {
+		menus,
+		googlePlaces,
+		categories: {
+			designers: categories.designers.map(mapProductCategory),
+			fragrances: {
+				profumum: categories.fragrances.profumum.map(mapProductCategory),
+				liquides: categories.fragrances.liquides.map(mapProductCategory)
+			}
+		}
+	}
 }
 export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: number) => {
 	const page: WPPage = (await fetch(
@@ -94,19 +106,23 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 	)
 		.then(response => response.json()))[0]
 	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${page.link}`).then(response => response.json()))
-	const { menus, googlePlaces } = await getLayoutProps(locale)
-	return { page: mapPage(page), seo: seo.head, menus, googlePlaces }
+	const { menus, googlePlaces, categories } = await getLayoutProps(locale)
+	return { page: mapPage(page), seo: seo.head, menus, googlePlaces, categories }
 }
 
-export const getDesignersPageProps = async (locale: 'it' | 'en') => {
-	const productCategories = await getProductCategories(locale, EYEWEAR_CATEGORY[locale].toString())
-	return { productCategories: productCategories.map(mapProductCategory) }
+export const getFragrancesPageProps = async (locale: 'it' | 'en') => {
+	const productCategories = await getProductCategories(locale, LIQUIDES_IMAGINAIRES_CATEGORY[locale].toString())
+	return {productCategories: productCategories.map(mapProductCategory)}
 }
 
-export const getDesignerPageProps = async (locale: 'it' | 'en', slug: string) => {
-	const productCategory = await getProductCategory(locale, slug)
-	const { menus, googlePlaces } = await getLayoutProps(locale)
-	return { menus, googlePlaces, productCategory: productCategory ? mapProductCategory(productCategory) : null }
+export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) => {
+	const { menus, googlePlaces, categories  } = await getLayoutProps(locale)
+	const productCategory = [
+		...categories.designers,
+		...categories.fragrances.liquides,
+		...categories.fragrances.profumum
+	].find(cat => cat.slug === slug)
+	return { menus, googlePlaces, productCategory }
 }
 
 export const getCheckoutPageProps = async (locale: string) => {

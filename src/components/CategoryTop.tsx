@@ -1,5 +1,5 @@
 import {Box, Grid, Typography} from "@mui/material";
-import {sanitize} from "../../utils/utils";
+import {sanitize} from "../utils/utils";
 import Carousel from "react-material-ui-carousel";
 import Image from "next/image";
 
@@ -8,7 +8,7 @@ type DesignerTopProps = {
 	gallery: string[]
 	description: string
 }
-const DesignerTop = ({name, gallery, description}: DesignerTopProps) => {
+const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
 	return (
 		<Grid container sx={{flexDirection: {xs: 'column-reverse', md: 'row'}}}>
 			<Grid item xs={12} md={5} sx={{alignItems: 'center', display: 'flex'}}>
@@ -56,4 +56,4 @@ const DesignerTop = ({name, gallery, description}: DesignerTopProps) => {
 	)
 }
 
-export default DesignerTop
+export default CategoryTop

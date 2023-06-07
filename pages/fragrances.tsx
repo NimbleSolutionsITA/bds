@@ -5,41 +5,41 @@ import {GooglePlaces} from "./api/google-places";
 import {WooProductCategory} from "../src/types/woocommerce";
 import dynamic from "next/dynamic";
 
-const DesignersList = dynamic(() => import("../src/pages/designers/DesignersList"));
+const FragrancesList = dynamic(() => import("../src/pages/fragrances/FragrancesList"));
 
-export type DesignersProps = {
+export type FragrancesProps = {
     menus: Menus,
     googlePlaces: GooglePlaces,
-    productCategories: WooProductCategory[],
+    fragrances: WooProductCategory[],
     breadcrumbs?: BreadCrumb[],
     seo: string
 }
 
-export default function Designers({
-    menus, googlePlaces, productCategories, breadcrumbs, seo
-}: DesignersProps) {
+export default function Fragrances({
+    menus, googlePlaces, fragrances, breadcrumbs, seo
+}: FragrancesProps) {
     return (
       <Layout seo={seo} menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-          <DesignersList designers={productCategories} />
+          <FragrancesList fragrances={fragrances} />
       </Layout>
     );
 }
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
-        { page, seo, menus, googlePlaces, categories: {designers} },
+        { page, seo, menus, googlePlaces, categories: {fragrances} },
     ] = await Promise.all([
-        getPageProps("designers", locale)
+        getPageProps("fragrances", locale),
     ]);
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     return {
         props: {
             menus,
             googlePlaces,
-            productCategories: designers,
+            fragrances: [...fragrances.profumum, ...fragrances.liquides],
             breadcrumbs: [
                 { name: 'Home', href: urlPrefix + '/' },
-                { name: 'Designers', href: urlPrefix + '/designers' }
+                { name: 'Fragrances', href: urlPrefix + '/fragrances' }
             ],
             seo
         },

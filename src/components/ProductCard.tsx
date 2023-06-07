@@ -18,9 +18,10 @@ import {AttributeCheckboxes} from "./AttributeCheckboxes";
 type ProductCardProps = {
     product: BaseProduct;
     imageRatio?: number;
+    attributesAlwaysVisible?: boolean;
 }
 
-const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
+const ProductCard = ({ product, imageRatio = 45, attributesAlwaysVisible = false }: ProductCardProps) => {
     const [hover, setHover] = useState(false);
     const init = getDefaultProduct(product);
     const defaultProduct = init.defaultProduct as BaseVariation;
@@ -112,7 +113,7 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        opacity: hover ? 1 : 0,
+                        opacity: (attributesAlwaysVisible || hover) ? 1 : 0,
                         transition: 'opacity .5s ease',
                         width: '100%',
                         zIndex: 1
@@ -132,8 +133,8 @@ const ProductCard = ({ product, imageRatio = 45 }: ProductCardProps) => {
                     </div>
                     <Typography sx={{
                         fontSize: currentProduct.price ?  '20px' : '16px',
-                        top: 0,
-                        position:  hover ?  'relative' : 'absolute',
+                        top: '3px',
+                        position:  (hover && !attributesAlwaysVisible) ?  'relative' : 'absolute',
                         width: '100%'
                     }}>{currentProduct.price ? `${Number(currentProduct.price)} €` : 'upon request'}</Typography>
                 </div>
