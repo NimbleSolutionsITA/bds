@@ -1,10 +1,10 @@
 import {Color} from "../../types/woocommerce";
 import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
-import {SearchParams} from "./ProductsGrid";
 import {closestColor, palette} from "../../utils/utils";
 import {Divider} from "@mui/material";
 import ExpansionPanel from "../../components/ExpansionPanel";
 import FilterChip from "./FilterChip";
+import {SearchParams} from "./ShopLayout";
 
 type ColorPanelProps = {
 	colors: Color[]
