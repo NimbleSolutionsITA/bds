@@ -1,5 +1,5 @@
-import {IconButton, InputAdornment, TextField} from "@mui/material";
-import {Close} from '@mui/icons-material';
+import {InputAdornment, TextField} from "@mui/material";
+import {Close, SearchSharp} from '@mui/icons-material';
 import {ChangeEvent} from "react"; // import the clear icon
 
 type NameFieldProps = {
@@ -23,31 +23,28 @@ const NameField = ({onChange, value, disabled}: NameFieldProps) => {
 		onChange={handleChange}
 		size="small"
 		variant="filled"
-		color="secondary"
+		color="primary"
 		disabled={disabled}
 		InputProps={{
-			endAdornment: value ? (
-				<InputAdornment position="end">
-					<IconButton color="secondary" size="small" onClick={handleClear}>
-						<Close fontSize="small"  />
-					</IconButton>
+			endAdornment: (
+				<InputAdornment position="end" onClick={() =>  value && handleClear()}>
+					{value ? <Close  />: <SearchSharp />}
 				</InputAdornment>
-			) : null,
+			)
 		}}
 		sx={{
 			opacity: disabled ? 0.5 : 1,
 			transition: 'opacity 0.3s ease-in-out',
 			fontSize: '10px',
 			borderRadius: 0,
+			paddingRight: '12px',
 			'& .MuiInputBase-root.Mui-focused': {
 				backgroundColor: 'rgba(255,255,255,.15)',
 			},
 			'& .MuiInputBase-input': {
-				padding: '7.5px',
-				color: '#fff',
+				padding: '18px 10px',
 				'&::placeholder': {
 					textOverflow: 'ellipsis !important',
-					color: '#fff',
 					opacity: 1,
 				},
 			},
@@ -55,10 +52,10 @@ const NameField = ({onChange, value, disabled}: NameFieldProps) => {
 				color: 'rgba(255,255,255,.43)',
 				WebkitTextFillColor: 'rgba(255,255,255,.43)',
 			},
-			'& .MuiInputBase-colorSecondary::before': {
+			'& .MuiInputBase-colorPrimary::before': {
 				display: 'none !important',
 			},
-			'& .MuiInputBase-colorSecondary::after': {
+			'& .MuiInputBase-colorPrimary::after': {
 				display: 'none !important',
 			}
 		}}

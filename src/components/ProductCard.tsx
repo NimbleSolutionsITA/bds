@@ -26,7 +26,6 @@ type ProductCardProps = {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-    console.log(product.categories)
     const isEyewear = product.categories.find(({id, }) => [
         SUNGLASSES_CATEGORY.it,
         SUNGLASSES_CATEGORY.en,

@@ -5,7 +5,7 @@ import {GooglePlaces} from "./api/google-places";
 import {Attribute, BaseProduct, Category, Color, ProductTag} from "../src/types/woocommerce";
 import dynamic from "next/dynamic";
 
-const ProductsGrid = dynamic(() => import("../src/pages/shop/ProductsGrid"));
+const ShopLayout = dynamic(() => import("../src/pages/shop/ShopLayout"));
 
 export type ShopProps = {
 	menus: Menus,
@@ -23,7 +23,13 @@ export default function Shop({
 }: ShopProps) {
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<ProductsGrid products={products} colors={colors} tags={tags} designers={designers} attributes={attributes} />
+			<ShopLayout
+				products={products}
+				colors={colors}
+				tags={tags}
+				designers={designers}
+				attributes={attributes}
+			/>
 		</Layout>
 	);
 }

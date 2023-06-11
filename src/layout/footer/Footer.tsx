@@ -13,26 +13,28 @@ type FooterProps = {
 
 const Footer = ({googlePlaces}: FooterProps) => {
 	return (
-		<Container component="footer" sx={{padding: '24px 20px', position: 'relative', zIndex: (theme) => theme.zIndex.appBar - 2, backgroundColor: '#fff'}}>
-			<Grid container>
-				<Grid item xs={12} md={3} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-					<LogoButton />
+		<footer style={{backgroundColor: '#fff', position: 'relative'}}>
+			<Container sx={{padding: '24px 20px', zIndex: (theme) => theme.zIndex.appBar - 2}}>
+				<Grid container>
+					<Grid item xs={12} md={3} sx={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+						<LogoButton />
+					</Grid>
+					<Grid item xs={12} sm={6} md={3} sx={{padding: '0 14px', textAlign: {xs: 'center', md: 'left'}}}>
+						<GoogleAddress whatsApp="349 6393775" name="BOTTEGA DI SGUARDI" address={googlePlaces.main} />
+					</Grid>
+					<Grid item xs={12} sm={6} md={3} sx={{padding: '0 14px', textAlign: {xs: 'center', md: 'left'}}}>
+						<GoogleAddress whatsApp="334 1577915" name="BOTTEGA DI SGUARDI - DENTRO" address={googlePlaces.secondary} />
+					</Grid>
+					<Grid item xs={12} md={3} sx={{padding: '0 14px', textAlign: 'center'}}>
+						<GoogleReviews address={googlePlaces.main} />
+						<Payments />
+					</Grid>
+					<Grid item xs={12} sx={{borderTop: '1px solid #ccc', marginTop: '20px'}}>
+						<BottomLinks />
+					</Grid>
 				</Grid>
-				<Grid item xs={12} sm={6} md={3} sx={{padding: '0 14px', textAlign: {xs: 'center', md: 'left'}}}>
-					<GoogleAddress whatsApp="349 6393775" name="BOTTEGA DI SGUARDI" address={googlePlaces.main} />
-				</Grid>
-				<Grid item xs={12} sm={6} md={3} sx={{padding: '0 14px', textAlign: {xs: 'center', md: 'left'}}}>
-					<GoogleAddress whatsApp="334 1577915" name="BOTTEGA DI SGUARDI - DENTRO" address={googlePlaces.secondary} />
-				</Grid>
-			    <Grid item xs={12} md={3} sx={{padding: '0 14px', textAlign: 'center'}}>
-				    <GoogleReviews address={googlePlaces.main} />
-				    <Payments />
-				</Grid>
-				<Grid item xs={12} sx={{borderTop: '1px solid #ccc', marginTop: '20px'}}>
-					<BottomLinks />
-				</Grid>
-			</Grid>
-		</Container>
+			</Container>
+		</footer>
     );
 }
 export default Footer;

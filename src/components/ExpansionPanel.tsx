@@ -6,9 +6,10 @@ type ExpansionPanelProps = {
 	children: ReactNode
 	title: ReactNode | string
 	plusMinus?: boolean
+	color?: 'primary' | 'secondary'
 }
 
-const ExpansionPanel = ({children ,title, plusMinus}: ExpansionPanelProps) => {
+const ExpansionPanel = ({children ,title, plusMinus, color = "primary"}: ExpansionPanelProps) => {
 	const [expanded, setExpanded] = useState<boolean | string>(false)
 
 	const handleChange = (panel: boolean | string) => (event: SyntheticEvent, isExpanded: boolean) => {
@@ -16,8 +17,8 @@ const ExpansionPanel = ({children ,title, plusMinus}: ExpansionPanelProps) => {
 	}
 
 	const expandIcon = () => {
-		if (plusMinus) return expanded ? <Remove color="secondary" /> : <Add color="secondary" />
-		return <ExpandMore color="secondary" />
+		if (plusMinus) return expanded ? <Remove color={color} /> : <Add color={color} />
+		return <ExpandMore color={color} />
 	}
 
 	return (
@@ -51,7 +52,7 @@ const ExpansionPanel = ({children ,title, plusMinus}: ExpansionPanelProps) => {
 				sx={{
 					padding: 0,
 					minHeight: '25px',
-					color: '#fff',
+					color,
 					fontWeight: 500,
 					'&.Mui-expanded': {
 						minHeight: '25px',
@@ -70,7 +71,7 @@ const ExpansionPanel = ({children ,title, plusMinus}: ExpansionPanelProps) => {
 			>
 				{title}
 			</AccordionSummary>
-			<AccordionDetails style={{ display: 'block', padding: 0}}>
+			<AccordionDetails style={{ display: 'block', padding: 0, overflowX: 'scroll', maxHeight: '220px', paddingBottom: '10px'}}>
 				{children}
 			</AccordionDetails>
 		</Accordion>

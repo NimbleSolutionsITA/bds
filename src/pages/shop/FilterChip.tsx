@@ -11,7 +11,7 @@ type FilterChipProps = {
 const FilterChip = ({onClick, tag, isActive, color}: FilterChipProps) => (
 	<Chip
 		label={<span dangerouslySetInnerHTML={{__html: tag.name}} />}
-		color="secondary"
+		color="primary"
 		onClick={onClick}
 		clickable
 		size="small"
@@ -20,7 +20,7 @@ const FilterChip = ({onClick, tag, isActive, color}: FilterChipProps) => (
 			borderRadius: 0,
 			paddingLeft: color ? '5px' : 0,
 			'&.MuiChip-filled': {
-				backgroundColor: 'rgba(255,255,255,0.8)',
+				backgroundColor: 'primary',
 			}
 		}}
 		avatar={<ColorBox color={color} />}
