@@ -1,9 +1,9 @@
 import {ProductTag} from "../../types/woocommerce";
 import React, {Dispatch, SetStateAction} from "react";
-import {SearchParams} from "./ProductsGrid";
 import {Divider} from "@mui/material";
 import ExpansionPanel from "../../components/ExpansionPanel";
 import FilterChip from "./FilterChip";
+import {SearchParams} from "./ShopLayout";
 
 type TagPanelProps = {
 	tags: ProductTag[]
