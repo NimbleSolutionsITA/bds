@@ -4,14 +4,14 @@ import dynamic from "next/dynamic";
 import {ShopProps} from "../shop";
 import {SHOP_CATEGORIES} from "../../src/utils/utils";
 
-const ProductsGrid = dynamic(() => import("../../src/pages/shop/ProductsGrid"));
+const ShopLayout = dynamic(() => import("../../src/pages/shop/ShopLayout"));
 
 export default function ShopSunglassesWoman({
     menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
 }: ShopProps) {
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<ProductsGrid products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isSunglasses isWoman />
+			<ShopLayout products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isSunglasses isWoman />
 		</Layout>
 	);
 }

@@ -3,14 +3,14 @@ import {getShopPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {ShopProps} from "../shop";
 
-const ProductsGrid = dynamic(() => import("../../src/pages/shop/ProductsGrid"));
+const ShopLayout = dynamic(() => import("../../src/pages/shop/ShopLayout"));
 
 export default function ShopOptical({
      menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
  }: ShopProps) {
 	return (
 		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<ProductsGrid products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isOptical />
+			<ShopLayout products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isOptical />
 		</Layout>
 	);
 }
