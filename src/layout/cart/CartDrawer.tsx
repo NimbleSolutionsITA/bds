@@ -6,8 +6,15 @@ import {CloseOutlined} from "@mui/icons-material";
 import CartItem from "./CartItem";
 import Link from "next/link";
 import PriceFormat from "../../components/PriceFormat";
+import StripePaymentButton from "../../components/StripePaymentButton";
+import React from "react";
+import {ShippingClass} from "../../types/woocommerce";
 
-const CartDrawer = () => {
+type CartDrawerProps = {
+	shipping: ShippingClass[]
+}
+
+const CartDrawer = ({shipping}: CartDrawerProps) => {
 	const { cartDrawerOpen, items } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch()
 	const totalItems = items.reduce((previousValue, currentValue) => previousValue + currentValue.qty, 0)
@@ -56,6 +63,9 @@ const CartDrawer = () => {
 							</Typography>
 						</div>
 						<Button component={Link} href="/checkout">VAI AL CHECKOUT</Button>
+						<div style={{marginTop: '20px'}}>
+							<StripePaymentButton  items={items} shipping={shipping} />
+						</div>
 					</>
 				)}
 			</Container>

@@ -1,9 +1,8 @@
 import React, {useEffect} from "react";
 import NavBar from "./nav/NavBar";
 import NavBarMobile from "./nav/mobile/NavBarMobile";
-import {BreadCrumb, Menus} from "../types/settings";
+import {BaseLayoutProps} from "../types/settings";
 import Footer from "./footer/Footer";
-import {GooglePlaces} from "../../pages/api/google-places";
 import {useDispatch} from "react-redux";
 import {initCart} from "../redux/cartSlice";
 import CartDrawer from "./cart/CartDrawer";
@@ -11,19 +10,20 @@ import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {Hidden} from "@mui/material";
 import { parse, HTMLElement } from 'node-html-parser'
 import Head from "next/head";
+import {loadStripe} from "@stripe/stripe-js";
+import {Elements} from '@stripe/react-stripe-js';
 
 type LayoutProps = {
     children: React.ReactNode,
-    menus: Menus,
-    googlePlaces: GooglePlaces,
-    breadcrumbs?: BreadCrumb[]
-    seo?: string
+    layout: BaseLayoutProps
 }
 const VOID_TAGS = [
     'area', 'base', 'br', 'col', 'command', 'embed', 'hr', 'img',
     'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
 ];
-export default function Layout({children, seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}}: LayoutProps) {
+export default function Layout({children, layout: {
+    seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping
+}}: LayoutProps) {
     const dispatch = useDispatch()
     const root = parse(seo ?? '');
     const headElements = root.childNodes;
@@ -32,8 +32,14 @@ export default function Layout({children, seo, breadcrumbs, googlePlaces, menus:
         dispatch(initCart())
     })
 
+    const stripePublicKey = process.env.NODE_ENV === 'production' ?
+        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_PRODUCTION :
+        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_SANDBOX;
+
+    const stripePromise = loadStripe(stripePublicKey ?? '');
+
     return (
-        <>
+        <Elements stripe={stripePromise}>
             <Head>
                 {headElements.map((node, index) => {
                     if (node instanceof HTMLElement) {
@@ -57,10 +63,10 @@ export default function Layout({children, seo, breadcrumbs, googlePlaces, menus:
             <Hidden mdDown>
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />
             </Hidden>
-            <CartDrawer />
+            <CartDrawer shipping={shipping} />
             <NewsletterDrawer />
             {children}
             <Footer googlePlaces={googlePlaces} />
-        </>
+        </Elements>
     )
 }

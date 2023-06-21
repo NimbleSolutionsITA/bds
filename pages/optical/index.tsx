@@ -5,11 +5,9 @@ import {ShopProps} from "../shop";
 
 const ShopLayout = dynamic(() => import("../../src/pages/shop/ShopLayout"));
 
-export default function ShopOptical({
-     menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
- }: ShopProps) {
+export default function ShopOptical({ layout, products, colors, tags, designers, attributes }: ShopProps) {
 	return (
-		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
+		<Layout layout={layout}>
 			<ShopLayout products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isOptical />
 		</Layout>
 	);
@@ -21,9 +19,13 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 	return {
 		props: {
 			...props,
-			breadcrumbs: [
-				{ name: 'Optical', href: urlPrefix + '/optical' }
-			]
+			layout: {
+				...props.layout,
+				breadcrumbs: [
+					{ name: 'Home', href: urlPrefix + '/' },
+					{ name: 'Optical', href: urlPrefix + '/optical' }
+				]
+			}
 		},
 		revalidate: 10
 	}

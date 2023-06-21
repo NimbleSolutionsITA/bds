@@ -1,4 +1,11 @@
-import {AttributeType, ImageDetailed, Product, ProductCategory, Variation} from "../../types/woocommerce";
+import {
+	AttributeType,
+	ImageDetailed,
+	Product,
+	ProductCategory,
+	ShippingClass,
+	Variation
+} from "../../types/woocommerce";
 import {Button, Container, Grid, Tooltip, Typography} from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
@@ -17,13 +24,15 @@ import {ArrowForwardIosSharp, ArrowBackIosSharp} from "@mui/icons-material";
 import placeholder from "../../images/placeholder.jpg";
 import {RootState} from "../../redux/store";
 import PriceFormat from "../../components/PriceFormat";
+import StripePaymentButton from "../../components/StripePaymentButton";
 
 type ProductViewProps = {
 	product: Product
 	category?: ProductCategory
+	shipping: ShippingClass[]
 }
 
-const ProductView = ({product, category}: ProductViewProps) => {
+const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const init = getDefaultProduct(product);
 	const { items } = useSelector((state: RootState) => state.cart);
 	const defaultProduct = init.defaultProduct as Variation;
@@ -51,20 +60,22 @@ const ProductView = ({product, category}: ProductViewProps) => {
 		}
 	}
 
+	const cartItem = {
+		product_id: product.id,
+		variation_id: product.type === 'variable' ? currentProduct.id : undefined,
+		name: product.name,
+		image: currentProduct.image.url ?? product.image.url,
+		price: parseFloat(currentProduct.price as string),
+		qty: 1,
+		stock_quantity: Number(currentProduct.stock_quantity),
+		attributes: currentProduct.attributes ?? [],
+		category: category?.name ?? '',
+		slug: product.slug,
+	}
+
 	const handleAddToCart = () => {
 		if (currentProduct.stock_status === 'instock') {
-			dispatch(addCartItem({
-				product_id: product.id,
-				variation_id: product.type === 'variable' ? currentProduct.id : undefined,
-				name: product.name,
-				image: currentProduct.image.url ?? product.image.url,
-				price: Number(currentProduct.price),
-				qty: 1,
-				stock_quantity: Number(currentProduct.stock_quantity),
-				attributes: currentProduct.attributes ?? [],
-				category: category?.name ?? '',
-				slug: product.slug,
-			}));
+			dispatch(addCartItem(cartItem));
 		}
 	}
 
@@ -162,9 +173,9 @@ const ProductView = ({product, category}: ProductViewProps) => {
 							href={`/designers/${category.slug}`}
 						/>
 					)}
-					{Number(currentProduct.price) > 0 && (
+					{cartItem.price > 0 && (
 						<Typography variant="h3" sx={{fontFamily: 'Apercu', fontSize: '25px', fontWeight: 300, marginTop: '10px'}} component="div">
-							<PriceFormat value={product.price} decimalScale={0} />
+							<PriceFormat value={cartItem.price} decimalScale={0} />
 						</Typography>
 					)}
 					<HtmlBlock
@@ -198,6 +209,11 @@ const ProductView = ({product, category}: ProductViewProps) => {
 						>
 							Aggiungi alla shopping bag
 						</Button>
+					)}
+					{cartItem.stock_quantity > 0 && cartItem.price > 0 && (
+						<div style={{marginTop: '20px'}}>
+							<StripePaymentButton  items={[cartItem]} shipping={shipping} />
+						</div>
 					)}
 					<SocialShare
 						facebookUrl={'/'}

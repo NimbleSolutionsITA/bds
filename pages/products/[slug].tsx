@@ -1,7 +1,6 @@
 import React from "react";
 import Layout from "../../src/layout/Layout";
-import {BreadCrumb, Menus} from "../../src/types/settings";
-import {GooglePlaces} from "../api/google-places";
+import {PageBaseProps} from "../../src/types/settings";
 import {Product as ProductType} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
@@ -13,19 +12,14 @@ const ProductView = dynamic(() => import('../../src/pages/product/ProductView'),
 const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
 const SeoFooter = dynamic(() => import('../../src/pages/product/SeoFooter'), { ssr: false });
 
-export type DesignerProps = {
-	menus: Menus,
-	googlePlaces: GooglePlaces,
+export type ProductPageProps = PageBaseProps & {
 	product: ProductType,
-	breadcrumbs?: BreadCrumb[]
 }
-export default function Product({
-	menus, googlePlaces, product, breadcrumbs
-}: DesignerProps) {
+export default function Product({ product, layout }: ProductPageProps) {
 	const category = product.categories.find((category) => MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
 	return (
-		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
-			<ProductView product={product} category={category} />
+		<Layout layout={layout}>
+			<ProductView product={product} category={category} shipping={layout.shipping} />
 			<ProductsSlider products={product.related ?? []} title="Prodotti correlati" />
 			<SeoFooter category={category} />
 		</Layout>
@@ -34,8 +28,8 @@ export default function Product({
 
 export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
 	const [
-		{ menus, googlePlaces },
-		product
+		layoutProps,
+		product,
 	] = await Promise.all([
 		getLayoutProps(locale),
 		getProduct(slug, locale)
@@ -53,10 +47,11 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	]
 	return {
 		props: {
-			menus,
-			googlePlaces,
+			layout: {
+				...layoutProps,
+				breadcrumbs
+			},
 			product,
-			breadcrumbs
 		},
 		revalidate: 10
 	}

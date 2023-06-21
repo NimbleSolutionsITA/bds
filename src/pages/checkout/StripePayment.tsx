@@ -39,7 +39,7 @@ const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProp
 			// redirected to the `return_url`.
 			setCheckoutStep(7);
 		}
-		handlePay();
+		handlePay().then(r => r);
 	}, [isReadyToPay, stripe, elements, order, setCheckoutStep]);
 
 

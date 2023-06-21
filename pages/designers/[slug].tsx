@@ -1,8 +1,7 @@
 import React from "react";
 import Layout from "../../src/layout/Layout";
 import {getCategoryPageProps} from "../../src/utils/wordpress_api";
-import {BreadCrumb, Menus} from "../../src/types/settings";
-import {GooglePlaces} from "../api/google-places";
+import {PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
@@ -14,18 +13,15 @@ const DesignerTop = dynamic(() => import("../../src/components/CategoryTop"))
 const DesignerProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
 const DesignersBottom = dynamic(() => import("../../src/components/CategoryBottom"))
 
-export type DesignerProps = {
-	menus: Menus,
-	googlePlaces: GooglePlaces,
+export type DesignerProps = PageBaseProps & {
 	productCategory: WooProductCategory,
-	products: BaseProduct[],
-	breadcrumbs?: BreadCrumb[]
+	products: BaseProduct[]
 }
 export default function Designer({
-  menus, googlePlaces, productCategory, products, breadcrumbs
+  productCategory, products, layout
 }: DesignerProps) {
 	return (
-		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
+		<Layout layout={layout}>
 			<DesignerTop
 				name={productCategory.name}
 				gallery={productCategory.acf.gallery}
@@ -39,7 +35,7 @@ export default function Designer({
 
 export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
 	const [
-		{ productCategory, menus, googlePlaces }
+		{ productCategory, layout }
 	] = await Promise.all([
 		getCategoryPageProps(locale, slug)
 	]);
@@ -61,10 +57,11 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	]
 	return {
 		props: {
-			menus,
-			googlePlaces,
+			layout: {
+				...layout,
+				breadcrumbs,
+			},
 			productCategory,
-			breadcrumbs,
 			products
 		},
 		revalidate: 10

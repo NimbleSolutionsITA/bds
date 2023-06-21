@@ -88,6 +88,7 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 			.then(response => response.json())).items.map(mapMenuItem())
 	}
 	const googlePlaces = await getGooglePlaces(locale)
+	const { classes: shipping} = await getShippingInfo(locale)
 	return {
 		menus,
 		googlePlaces,
@@ -97,7 +98,8 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 				profumum: categories.fragrances.profumum.map(mapProductCategory),
 				liquides: categories.fragrances.liquides.map(mapProductCategory)
 			}
-		}
+		},
+		shipping
 	}
 }
 export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: number) => {
@@ -106,8 +108,7 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 	)
 		.then(response => response.json()))[0]
 	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${page.link}`).then(response => response.json()))
-	const { menus, googlePlaces, categories } = await getLayoutProps(locale)
-	return { page: mapPage(page), seo: seo.head, menus, googlePlaces, categories }
+	return { page: mapPage(page), seo: seo.head }
 }
 
 export const getFragrancesPageProps = async (locale: 'it' | 'en') => {
@@ -116,13 +117,13 @@ export const getFragrancesPageProps = async (locale: 'it' | 'en') => {
 }
 
 export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) => {
-	const { menus, googlePlaces, categories  } = await getLayoutProps(locale)
+	const { categories, ...layout  } = await getLayoutProps(locale)
 	const productCategory = [
 		...categories.designers,
 		...categories.fragrances.liquides,
 		...categories.fragrances.profumum
 	].find(cat => cat.slug === slug)
-	return { menus, googlePlaces, productCategory }
+	return { layout, productCategory }
 }
 
 export const getCheckoutPageProps = async (locale: string) => {
@@ -136,12 +137,14 @@ export const mapCategory = ({id, name, slug, count}: Category) => ({
 
 export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}, slug = 'shop', parent?: number) => {
 	const [
-		{ page, seo, menus, googlePlaces },
+		layoutProps,
+		{ seo },
 		products,
-		{colors, attributes},
+		{ colors, attributes },
 		tags,
 		designers
 	] = await Promise.all([
+		getLayoutProps(locale),
 		getPageProps(slug, locale, parent),
 		getProducts({
 			lang: locale,
@@ -155,16 +158,17 @@ export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?:
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	return {
-		seo,
-		menus,
-		googlePlaces,
+		layout: {
+			...layoutProps,
+			seo,
+			breadcrumbs: [
+				{ name: 'Home', href: urlPrefix + '/' },
+				{ name: 'Shop', href: urlPrefix + '/shop' }
+			],
+		},
 		products,
 		colors,
 		attributes,
-		breadcrumbs: [
-			{ name: 'Home', href: urlPrefix + '/' },
-			{ name: 'Shop', href: urlPrefix + '/shop' }
-		],
 		tags,
 		designers: designers.map(mapCategory)
 	}

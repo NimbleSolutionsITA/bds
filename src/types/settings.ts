@@ -1,3 +1,6 @@
+import {GooglePlaces} from "../../pages/api/google-places";
+import {ShippingClass} from "./woocommerce";
+
 export type MenuItem = {
 	id: number
 	title: string
@@ -17,4 +20,16 @@ export type Menus = {
 export type BreadCrumb = {
 	name: string,
 	href: string
+}
+
+export type PageBaseProps = {
+	layout: BaseLayoutProps
+}
+
+export type BaseLayoutProps = {
+	menus: Menus,
+	googlePlaces: GooglePlaces,
+	breadcrumbs?: BreadCrumb[]
+	shipping: ShippingClass[]
+	seo: string
 }

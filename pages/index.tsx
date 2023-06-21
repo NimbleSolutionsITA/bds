@@ -1,10 +1,9 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
-import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
-import {Menus} from "../src/types/settings";
+import {getLayoutProps, getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
+import {PageBaseProps} from "../src/types/settings";
 import {AcfAdvancedLink, AcfImage, AcfProductCategory, BaseProduct} from "../src/types/woocommerce";
-import {GooglePlaces} from "./api/google-places";
 
 const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
 const ProductsSlider = dynamic(() => import("../src/components/ProductsSlider"));
@@ -17,7 +16,7 @@ const BannerBottom2 = dynamic(() => import("../src/pages/home/BannerBottom2"));
 const BannerTestimonials = dynamic(() => import("../src/pages/home/BannerTestimonials"));
 const BannerContact = dynamic(() => import("../src/pages/home/BannerContact"));
 
-export type HomeProps = {
+export type HomeProps = PageBaseProps & {
     page: {
         sliderWithText: {
             body: string
@@ -63,15 +62,12 @@ export type HomeProps = {
             }
             image: AcfImage
         }
-    },
-    menus: Menus,
-    googlePlaces: GooglePlaces
-    seo: string
+    }
 }
 
-export default function Home({page, menus, googlePlaces, seo}: HomeProps) {
+export default function Home({page, layout}: HomeProps) {
     return (
-      <Layout menus={menus} googlePlaces={googlePlaces} seo={seo}>
+      <Layout layout={layout}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
           <ProductsSlider products={page.ourSelection.products ?? []} title={page.ourSelection.title} />
           <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
@@ -79,7 +75,7 @@ export default function Home({page, menus, googlePlaces, seo}: HomeProps) {
           <BannerDesigners designers={page.designers}/>
           <BannerTop bannerTop={page.bannerTop} />
           <BannerBottom bannerBottom={page.bannerBottom} />
-          <BannerTestimonials reviews={googlePlaces.main.reviews} />
+          <BannerTestimonials reviews={layout.googlePlaces.main.reviews} />
           <BannerBottom2 bannerBottom2={page.bannerBottom2} />
           <BannerContact />
       </Layout>
@@ -88,7 +84,8 @@ export default function Home({page, menus, googlePlaces, seo}: HomeProps) {
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
-        { page: { acf: {
+        layoutProps,
+        { seo, page: { acf: {
             sliderWithText,
             ourSelection,
             newsletter,
@@ -97,8 +94,9 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
             bannerTop: { imageLeft, body, imageRight },
             bannerBottom: { leftColumn, imageCenter, rightColumn },
             bannerBottom2
-        } }, seo, menus, googlePlaces }
+        } } }
     ] = await Promise.all([
+        getLayoutProps(locale),
         getPageProps('home', locale)
     ]);
     return {
@@ -121,9 +119,10 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
                 },
                 bannerBottom2
             },
-            seo,
-            menus,
-            googlePlaces
+            layout: {
+                ...layoutProps,
+                seo
+            }
         },
         revalidate: 10
     }

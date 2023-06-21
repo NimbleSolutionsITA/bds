@@ -1,17 +1,13 @@
 import Layout from "../src/layout/Layout";
 import {getShopPageProps} from "../src/utils/wordpress_api";
-import {BreadCrumb, Menus} from "../src/types/settings";
-import {GooglePlaces} from "./api/google-places";
+import {PageBaseProps} from "../src/types/settings";
 import {Attribute, BaseProduct, Category, Color, ProductTag} from "../src/types/woocommerce";
 import dynamic from "next/dynamic";
 
 const ShopLayout = dynamic(() => import("../src/pages/shop/ShopLayout"));
 
-export type ShopProps = {
-	menus: Menus,
-	googlePlaces: GooglePlaces,
+export type ShopProps = PageBaseProps & {
 	products: BaseProduct[],
-	breadcrumbs?: BreadCrumb[]
 	colors: Color[],
 	attributes: Attribute[],
 	tags: ProductTag[],
@@ -19,10 +15,10 @@ export type ShopProps = {
 }
 
 export default function Shop({
-  menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
+  colors, tags, designers, attributes, layout, products
 }: ShopProps) {
 	return (
-		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
+		<Layout layout={layout}>
 			<ShopLayout
 				products={products}
 				colors={colors}

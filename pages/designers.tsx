@@ -1,25 +1,18 @@
 import Layout from "../src/layout/Layout";
-import {getPageProps} from "../src/utils/wordpress_api";
-import {BreadCrumb, Menus} from "../src/types/settings";
-import {GooglePlaces} from "./api/google-places";
+import {getLayoutProps, getPageProps} from "../src/utils/wordpress_api";
+import {PageBaseProps} from "../src/types/settings";
 import {WooProductCategory} from "../src/types/woocommerce";
 import dynamic from "next/dynamic";
 
 const DesignersList = dynamic(() => import("../src/pages/designers/DesignersList"));
 
-export type DesignersProps = {
-    menus: Menus,
-    googlePlaces: GooglePlaces,
-    productCategories: WooProductCategory[],
-    breadcrumbs?: BreadCrumb[],
-    seo: string
+export type DesignersProps = PageBaseProps & {
+    productCategories: WooProductCategory[]
 }
 
-export default function Designers({
-    menus, googlePlaces, productCategories, breadcrumbs, seo
-}: DesignersProps) {
+export default function Designers({ layout, productCategories }: DesignersProps) {
     return (
-      <Layout seo={seo} menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
+      <Layout layout={layout}>
           <DesignersList designers={productCategories} />
       </Layout>
     );
@@ -27,21 +20,24 @@ export default function Designers({
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
-        { page, seo, menus, googlePlaces, categories: {designers} },
+        { categories: {designers}, ...layoutProps },
+        { seo },
     ] = await Promise.all([
+        getLayoutProps(locale),
         getPageProps("designers", locale)
     ]);
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     return {
         props: {
-            menus,
-            googlePlaces,
             productCategories: designers,
-            breadcrumbs: [
-                { name: 'Home', href: urlPrefix + '/' },
-                { name: 'Designers', href: urlPrefix + '/designers' }
-            ],
-            seo
+            layout: {
+                ...layoutProps,
+                breadcrumbs: [
+                    { name: 'Home', href: urlPrefix + '/' },
+                    { name: 'Designers', href: urlPrefix + '/designers' }
+                ],
+                seo
+            }
         },
         revalidate: 10
     }

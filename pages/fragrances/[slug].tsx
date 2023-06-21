@@ -1,8 +1,7 @@
 import React from "react";
 import Layout from "../../src/layout/Layout";
 import {getCategoryPageProps} from "../../src/utils/wordpress_api";
-import {BreadCrumb, Menus} from "../../src/types/settings";
-import {GooglePlaces} from "../api/google-places";
+import { PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
@@ -14,18 +13,13 @@ const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/fragrances/FragranceProductGrid"))
 const FragrancesBottom = dynamic(() => import("../../src/components/CategoryBottom"))
 
-export type FragranceProps = {
-	menus: Menus,
-	googlePlaces: GooglePlaces,
+export type FragranceProps = PageBaseProps & {
 	productCategory: WooProductCategory,
 	products: BaseProduct[],
-	breadcrumbs?: BreadCrumb[]
 }
-export default function Fragrance({
-	                                 menus, googlePlaces, productCategory, products, breadcrumbs
-                                 }: FragranceProps) {
+export default function Fragrance({ productCategory, products, layout }: FragranceProps) {
 	return (
-		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
+		<Layout layout={layout}>
 			<FragranceTop
 				name={productCategory.name}
 				gallery={productCategory.acf.gallery}
@@ -39,7 +33,7 @@ export default function Fragrance({
 
 export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
 	const [
-		{ productCategory, menus, googlePlaces }
+		{ productCategory, layout }
 	] = await Promise.all([
 		getCategoryPageProps(locale, slug)
 	]);
@@ -62,10 +56,11 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	]
 	return {
 		props: {
-			menus,
-			googlePlaces,
+			layout: {
+				...layout,
+				breadcrumbs,
+			},
 			productCategory,
-			breadcrumbs,
 			products
 		},
 		revalidate: 10

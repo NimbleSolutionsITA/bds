@@ -25,9 +25,14 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 		payment_intent,
 		payment_intent_client_secret,
 		redirect_status,
+		paid
 	} = router.query
 
 	useEffect(() => {
+		if (paid === 'true') {
+			setResult('succeeded')
+			dispatch(destroyCart())
+		}
 		if (!stripePromise || !payment_intent || !payment_intent_client_secret || !redirect_status)
 			return;
 

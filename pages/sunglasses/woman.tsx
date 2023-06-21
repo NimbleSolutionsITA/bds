@@ -6,11 +6,9 @@ import {SHOP_CATEGORIES} from "../../src/utils/utils";
 
 const ShopLayout = dynamic(() => import("../../src/pages/shop/ShopLayout"));
 
-export default function ShopSunglassesWoman({
-    menus, googlePlaces, products, breadcrumbs, colors, tags, designers, attributes
-}: ShopProps) {
+export default function ShopSunglassesWoman({ layout, products, colors, tags, designers, attributes }: ShopProps) {
 	return (
-		<Layout menus={menus} googlePlaces={googlePlaces} breadcrumbs={breadcrumbs}>
+		<Layout layout={layout}>
 			<ShopLayout products={products} attributes={attributes} colors={colors} tags={tags} designers={designers} isSunglasses isWoman />
 		</Layout>
 	);
@@ -22,10 +20,13 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 	return {
 		props: {
 			...props,
-			breadcrumbs: [
-				{ name: 'Sunglasses', href: urlPrefix + '/sunglasses' },
-				{ name: 'Woman', href: urlPrefix + '/sunglasses/woman' }
-			]
+			layout: {
+				...props.layout,
+				breadcrumbs: [
+					{ name: 'Sunglasses', href: urlPrefix + '/sunglasses' },
+					{ name: 'Woman', href: urlPrefix + '/sunglasses/woman' }
+				]
+			}
 		},
 		revalidate: 10
 	}

@@ -183,3 +183,11 @@ export function getRelativePath(url: string): string {
         return url;
     }
 }
+
+export function getName(fullName?: string | null): [string | undefined, string | undefined] {
+    const [name, ...lastName] = fullName?.split(' ') ?? []
+    return [
+        name,
+        lastName.join(' ')
+    ]
+}

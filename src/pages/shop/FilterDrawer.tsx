@@ -36,7 +36,6 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 		}
 		window.addEventListener("scroll",updateScroll)
 		updateScroll()
-		console.log(filterBarRef.current?.getBoundingClientRect().top)
 		return () => {
 			window.removeEventListener("scroll", updateScroll)
 		}

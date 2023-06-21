@@ -2,6 +2,7 @@ import {useState, useEffect, ReactNode} from "react";
 import {Elements} from "@stripe/react-stripe-js";
 import {loadStripe} from "@stripe/stripe-js";
 import {WooOrder} from "../../types/woocommerce";
+import {stripeTheme} from "../../theme/theme";
 
 type StripeCheckoutProps = {
 	order?: WooOrder
@@ -48,22 +49,7 @@ const StripeWrapper = ({order, children}: StripeCheckoutProps) => {
 		<Elements
 			options={{
 				clientSecret,
-				appearance: {
-					theme: 'stripe',
-					labels: 'floating',
-					variables: {
-						fontWeightNormal: '500',
-						borderRadius: '0',
-						colorPrimary: '#000',
-						colorIconTabSelected: 'rgba(0, 0, 0, 0.1)',
-						spacingGridRow: '16px',
-						focusBoxShadow: 'none',
-						fontFamily: 'Apercu, sans-serif',
-					},
-					rules: {
-
-					}
-				},
+				appearance: stripeTheme,
 			}}
 			stripe={stripePromise}
 		>

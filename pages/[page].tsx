@@ -1,22 +1,17 @@
 import {Container} from "@mui/material";
-import {BreadCrumb, Menus} from "../src/types/settings";
-import {GooglePlaces} from "./api/google-places";
-import {getAllPagesIds, getPageProps} from "../src/utils/wordpress_api";
+import {PageBaseProps} from "../src/types/settings";
+import {getAllPagesIds, getLayoutProps, getPageProps} from "../src/utils/wordpress_api";
 import Layout from "../src/layout/Layout";
 import {Page} from "../src/types/woocommerce";
 import HtmlBlock from "../src/components/HtmlBlock";
 
-export type GenericPageProps = {
-    menus: Menus,
-    googlePlaces: GooglePlaces
-    seo: string
+export type GenericPageProps = PageBaseProps & {
     page: Page
-    breadcrumbs?: BreadCrumb[],
 }
 
-export default function GenericPage({page, menus, googlePlaces, seo, breadcrumbs}: GenericPageProps) {
+export default function GenericPage({page, layout}: GenericPageProps) {
     return (
-        <Layout menus={menus} googlePlaces={googlePlaces} seo={seo} breadcrumbs={breadcrumbs}>
+        <Layout layout={layout}>
             <Container>
                 <HtmlBlock sx={{width: '100%', overflowX: 'hidden'}} html={page.content} />
             </Container>
@@ -27,8 +22,10 @@ export default function GenericPage({page, menus, googlePlaces, seo, breadcrumbs
 export async function getStaticProps({ locale, params: { page: slug } }: { locale: 'it' | 'en', params: {page: string}}) {
     // @ts-ignore
     const [
-        { page, seo, menus, googlePlaces }
+        layoutProps,
+        { page, seo }
     ] = await Promise.all([
+        getLayoutProps(locale),
         getPageProps(slug, locale)
     ]);
     const redirect = REDIRECTS.find(r => r.page === slug)
@@ -45,13 +42,14 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
     return page ? {
         props: {
             page,
-            seo,
-            menus,
-            googlePlaces,
-            breadcrumbs: [
-                { name: 'Home', href: urlPrefix + '/' },
-                { name: page.title, href: urlPrefix + '/' + page.slug },
-            ]
+            layout: {
+                seo,
+                ...layoutProps,
+                breadcrumbs: [
+                    { name: 'Home', href: urlPrefix + '/' },
+                    { name: page.title, href: urlPrefix + '/' + page.slug },
+                ]
+            }
         },
         revalidate: 10
     } : {
