@@ -1,8 +1,9 @@
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import Loading from "../../components/Loading";
+import {OrderResponseBody} from "@paypal/paypal-js";
 
 type PaypalButtonProps = {
-	setPaid: (transaction_id: number) => void
+	setPaid: (payPal: OrderResponseBody) => void
 	setError: () => void
 	orderTotal?: string
 }
@@ -21,8 +22,7 @@ const PaypalButton = ({ setPaid, orderTotal, setError }: PaypalButtonProps) => o
 			}}
 			onApprove={(data, actions) => {
 				// This function captures the funds from the transaction.
-				// @ts-ignore
-				return actions.order.capture().then((payPal) => setPaid(payPal.id));
+				return actions.order?.capture().then((payPal) => setPaid(payPal)) ?? Promise.reject();
 			}}
 			onError={() => setError()}
 		/>

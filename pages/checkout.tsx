@@ -17,9 +17,9 @@ export type CheckoutProps = {
 	}
 }
 
-const CLIENT_ID = process.env.NODE_ENV === "production" ?
+const CLIENT_ID = (process.env.NODE_ENV === "production" ?
 	process.env.NEXT_PUBLIC_PAYPAL_PRODUCTION :
-	process.env.NEXT_PUBLIC_PAYPAL_SANDBOX;
+	process.env.NEXT_PUBLIC_PAYPAL_SANDBOX) as string;
 
 export default function Checkout({
      shipping
@@ -33,13 +33,11 @@ export default function Checkout({
 		dispatch(initCart());
 	}, [dispatch]);
 
-	if (items.length > 0 && !cartReady) {
+	if (items.length > 0 && !cartReady && !!CLIENT_ID) {
 		setCartReady(true)
 	}
 
-	const isReady = items.length > 0 && !!CLIENT_ID
-
-	return isReady ? (
+	return cartReady ? (
 		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons' }}>
 			<CheckoutGrid shipping={shipping} items={items} />
 		</PayPalScriptProvider>

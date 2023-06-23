@@ -126,6 +126,7 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 				console.log(`Payment ${paymentIntent.status}: ${paymentIntent.id}`);
 
 				console.log(e)
+				console.log(paymentIntent)
 
 				const { order } = await fetch(NEXT_API_ENDPOINT + '/orders', {
 					method: 'POST',
@@ -138,7 +139,7 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 							{
 								key: "_stripe_intent_id",
 								value: paymentIntentId,
-							},
+							}
 						],
 						line_items: items.map(item => ({
 							product_id: item.product_id,

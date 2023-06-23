@@ -43,6 +43,12 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 				body: JSON.stringify({
 					set_paid: true,
 					transaction_id: payment_intent,
+					meta_data: [
+						{
+							key: "_stripe_intent_id",
+							value: payment_intent,
+						}
+					],
 				}),
 				headers: [["Content-Type", 'application/json']],
 			})

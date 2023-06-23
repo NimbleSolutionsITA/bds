@@ -1,6 +1,7 @@
 import {PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import {Dispatch, SetStateAction, useEffect} from "react";
 import {WooOrder} from "../../types/woocommerce";
+import {useRouter} from "next/router";
 
 type StripePaymentProps = {
 	isReadyToPay: boolean,
@@ -11,7 +12,7 @@ type StripePaymentProps = {
 const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProps) => {
 	const stripe = useStripe();
 	const elements = useElements();
-
+	const router = useRouter();
 
 	useEffect(() => {
 		const handlePay = async () => {
@@ -28,7 +29,7 @@ const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProp
 				confirmParams: {
 					// Make sure to change this to your payment completion page
 					return_url: `${window.location.href}/${order.id}`,
-					receipt_email: 'totti@asroma.it',
+					receipt_email: order.billing.email,
 				},
 			});
 
@@ -37,7 +38,7 @@ const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProp
 			// your `return_url`. For some payment methods like iDEAL, your customer will
 			// be redirected to an intermediate site first to authorize the payment, then
 			// redirected to the `return_url`.
-			setCheckoutStep(7);
+			setCheckoutStep(4);
 		}
 		handlePay().then(r => r);
 	}, [isReadyToPay, stripe, elements, order, setCheckoutStep]);

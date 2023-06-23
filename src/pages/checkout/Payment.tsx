@@ -16,12 +16,13 @@ import Loading from "../../components/Loading";
 import PayPal from "../../icons/PayPal2";
 import MotionPanel from "../../components/MotionPanel";
 import StripePayment from "./StripePayment";
+import {OrderResponseBody} from "@paypal/paypal-js";
 
 type PaymentProps = {
 	order?: WooOrder
 	isLoading: boolean
 	editAddress: (tab: number) => void
-	setPaid: (transaction_id: number) => void
+	setPaid: (payPal: OrderResponseBody) => void
 	checkoutStep: number
 	setCheckoutStep: Dispatch<SetStateAction<number>>
 }

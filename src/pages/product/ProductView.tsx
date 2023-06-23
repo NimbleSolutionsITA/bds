@@ -34,7 +34,7 @@ type ProductViewProps = {
 
 const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const init = getDefaultProduct(product);
-	const { items } = useSelector((state: RootState) => state.cart);
+	const { items, cartDrawerOpen } = useSelector((state: RootState) => state.cart);
 	const defaultProduct = init.defaultProduct as Variation;
 	const {defaultAttributes} = init;
 	const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
@@ -210,7 +210,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 							Aggiungi alla shopping bag
 						</Button>
 					)}
-					{cartItem.stock_quantity > 0 && cartItem.price > 0 && (
+					{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
 						<div style={{marginTop: '20px'}}>
 							<StripePaymentButton  items={[cartItem]} shipping={shipping} />
 						</div>

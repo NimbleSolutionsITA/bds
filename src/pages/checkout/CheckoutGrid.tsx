@@ -1,17 +1,17 @@
 import {Backdrop, CircularProgress, useMediaQuery, useTheme} from "@mui/material";
 import {BaseSyntheticEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
-import {useDispatch} from "react-redux";
 import {shippingMethodApplies} from "../../utils/utils";
 import {Control, ErrorOption, FieldErrors, FieldPath, useForm} from "react-hook-form";
 import {useMutation} from "@tanstack/react-query";
 import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
 import {Country, ShippingClass, ShippingMethod, WooOrder} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
-import {CartItem, destroyCart,} from "../../redux/cartSlice";
+import {CartItem} from "../../redux/cartSlice";
 import CheckoutDesktop from "./CheckoutDesktop";
 import PaymentResult from "./PaymentResult";
 import CheckoutMobile from "./CheckoutMobile";
 import StripeWrapper from "./StripeWrapper";
+import {OrderResponseBody} from "@paypal/paypal-js";
 
 export type CheckoutGridProps = {
 	shipping: {
@@ -82,7 +82,7 @@ export type CheckoutComponentProps = {
 	checkoutStep: number
 	setCheckoutStep: Dispatch<SetStateAction<number>>
 	order?: WooOrder
-	setPaid: (transaction_id: number) => void
+	setPaid: (payPal: OrderResponseBody) => void
 }
 
 const defaultAddressValues = {
@@ -103,7 +103,6 @@ const CheckoutGrid = ({
 	const [checkoutStep, setCheckoutStep] = useState(0);
 	const [addressTab, setAddressTab] = useState(0);
 	const [order, setOrder] = useState<WooOrder>();
-	const dispatch = useDispatch()
 	const cartItemsTotal = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
 	const defaultShippingMethod = shipping.classes.find(sc => sc.locations.includes('IT'))
 		?.methods.find(method => shippingMethodApplies(method, cartItemsTotal, 0));
@@ -251,28 +250,18 @@ const CheckoutGrid = ({
 		}
 	}
 
-	const mutateWithCoupon = (payload: any) => {
-		const couponCode = watch('coupon_code')
-		setError('coupon_code', {})
-		return couponCode ?
-			mutate({orderId: order?.id, coupon_lines: []}, {
-					onSuccess: () => mutate({orderId: order?.id, ...payload, coupon_lines: [{code: couponCode}]}, {
-						onError: () => setError('coupon_code', {message: 'Coupon non valido'})
-					})
-				}) :
-			mutate(payload)
-	}
-
-	const setPaid = (transaction_id: string|number) => {
-		if (order?.id && checkoutStep === 5) {
+	const setPaid = (payPal: OrderResponseBody) => {
+		if (order?.id) {
 			console.log('set paypal paid')
 			mutate({
 				orderId: order.id,
 				set_paid: true,
-				transaction_id
+				meta_data: [
+					{key: '_ppcp_paypal_order_id', value: payPal.id},
+					{key: '_ppcp_paypal_intent', value: payPal.intent},
+				]
 			})
 			setCheckoutStep(6)
-			dispatch(destroyCart())
 		}
 	}
 

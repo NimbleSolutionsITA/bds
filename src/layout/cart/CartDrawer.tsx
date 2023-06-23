@@ -63,9 +63,11 @@ const CartDrawer = ({shipping}: CartDrawerProps) => {
 							</Typography>
 						</div>
 						<Button component={Link} href="/checkout">VAI AL CHECKOUT</Button>
-						<div style={{marginTop: '20px'}}>
-							<StripePaymentButton  items={items} shipping={shipping} />
-						</div>
+						{cartDrawerOpen && (
+							<div style={{marginTop: '10px'}}>
+								<StripePaymentButton  items={items} shipping={shipping} />
+							</div>
+						)}
 					</>
 				)}
 			</Container>
