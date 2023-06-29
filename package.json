@@ -25,6 +25,7 @@
     "@types/sanitize-html": "^2.9.0",
     "@types/woocommerce__woocommerce-rest-api": "^1.0.2",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
+    "date-fns": "^2.30.0",
     "form-data": "^4.0.0",
     "framer-motion": "^10.10.0",
     "lodash": "^4.17.21",

@@ -63,6 +63,12 @@ export interface TextAttribute {
 	slug: string;
 }
 
+export interface PostCategory {
+	id: number;
+	name: string;
+	slug: string;
+}
+
 export interface Category {
 	id: number;
 	name: string;
@@ -285,6 +291,25 @@ export type WPPage = {
 	acf: any
 }
 
+export type WPArticle = WPPage & {
+	date: string;
+	link: string;
+	categories_data: PostCategory[]
+	author_data: {
+		display_name: string;
+		url?: string;
+	}
+	tags_data: PostCategory[]
+	excerpt: {
+		rendered: string;
+	};
+	image: {
+		medium: string;
+		full: string;
+	};
+	minutes_read: number;
+}
+
 export type Page = {
 	id: number;
 	title: string;
@@ -296,4 +321,48 @@ export type Page = {
 	}
 	link: string;
 	acf: any
+}
+
+export type Article = Page & ListArticle & {
+	date: string;
+	link: string;
+	categories: PostCategory[]
+	tags: PostCategory[]
+	excerpt: string;
+}
+
+export type ACFListArticle = {
+	ID: number;
+	post_title: string;
+	post_name: string;
+	post_date: string;
+	post_excerpt: string;
+	minutes_read: number;
+	featured_image: {
+		medium: string;
+		full: string;
+	};
+	category_data: PostCategory[]
+	author_data: {
+		display_name: string;
+		url?: string;
+	}
+}
+
+export type ListArticle = {
+	id: number;
+	title: string;
+	slug: string;
+	date: string;
+	excerpt: string;
+	minutesRead?: number;
+	categories: PostCategory[]
+	image: {
+		medium: string;
+		full: string;
+	};
+	author: {
+		displayName: string;
+		url?: string;
+	}
 }

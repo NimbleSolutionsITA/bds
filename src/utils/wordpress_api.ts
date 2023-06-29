@@ -3,7 +3,16 @@ import {
 	WORDPRESS_MENUS_ENDPOINT,
 	WORDPRESS_RANK_MATH_SEO_ENDPOINT
 } from "./endpoints"
-import {AcfImage, Category, Image, Page, WooProductCategory, WPPage} from "../types/woocommerce";
+import {
+	AcfImage,
+	ACFListArticle, Article,
+	Category,
+	Image,
+	ListArticle,
+	Page, PostCategory,
+	WooProductCategory, WPArticle,
+	WPPage
+} from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
 import {EYEWEAR_CATEGORY, PROFUMUM_ROMA_CATEGORY, LIQUIDES_IMAGINAIRES_CATEGORY, sanitize} from "./utils";
@@ -11,6 +20,7 @@ import {getShippingInfo} from "../../pages/api/shipping";
 import {getProducts} from "../../pages/api/products";
 import {getAttributes} from "../../pages/api/products/colors";
 import {getProductTags} from "../../pages/api/products/tags";
+import {mapArticle} from "./mappers";
 
 type MenuCategories = {
 	designers: WooProductCategory[],
@@ -88,6 +98,7 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 			.then(response => response.json())).items.map(mapMenuItem())
 	}
 	const googlePlaces = await getGooglePlaces(locale)
+
 	const { classes: shipping} = await getShippingInfo(locale)
 	return {
 		menus,
@@ -111,9 +122,27 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 	return { page: mapPage(page), seo: seo.head }
 }
 
-export const getFragrancesPageProps = async (locale: 'it' | 'en') => {
-	const productCategories = await getProductCategories(locale, LIQUIDES_IMAGINAIRES_CATEGORY[locale].toString())
-	return {productCategories: productCategories.map(mapProductCategory)}
+export const getPosts = async (locale: 'it' | 'en', page?: number, perPage?: number, slug?: string, categories?: number[], tags?: number[]) => {
+	const posts = await fetch(
+		`${ WORDPRESS_API_ENDPOINT}/posts?lang=${locale}&page=${page || 1}&per_page=${perPage || 10}${slug ? '&slug=${slug}' : ''}${categories ? `&categories=${categories.join(',')}` : ''}${tags ? `&tags=${tags.join(',')}` : ''}`
+	)
+		.then(response => response.json())
+	return {posts: posts.map(mapArticle)}
+}
+
+export const getPostsAttributes = async (locale: 'it' | 'en'): Promise<{ tags: PostCategory[], categories: PostCategory[] }> => {
+	const tags = await fetch(
+		`${ WORDPRESS_API_ENDPOINT}/tags?lang=${locale}&per_page=100&hide_empty=true`
+	)
+		.then(response => response.json())
+	const categories = await fetch(
+		`${ WORDPRESS_API_ENDPOINT}/categories?lang=${locale}&per_page=100&hide_empty=true`
+	)
+		.then(response => response.json())
+	return {
+		tags: tags.map(mapTag),
+		categories: categories.map(mapTag)
+	}
 }
 
 export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) => {
@@ -133,6 +162,10 @@ export const getCheckoutPageProps = async (locale: string) => {
 
 export const mapCategory = ({id, name, slug, count}: Category) => ({
 	id, name: sanitize(name), slug, count
+})
+
+export const mapTag = ({id, name, slug}: Category) => ({
+	id, name: sanitize(name), slug
 })
 
 export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}, slug = 'shop', parent?: number) => {
@@ -216,4 +249,19 @@ export const mapAcfImage = ({id, url, title, alt, width, height}: AcfImage) => (
 
 export const mapPage = ({id, slug, title, content, translations, link, acf}: WPPage): Page => ({
 	id, slug, translations, link, acf, title: title.rendered, content: content.rendered
+})
+
+export const mapListArticle = ({ID, post_title, post_excerpt, featured_image, post_date, author_data, post_name, category_data, minutes_read}: ACFListArticle): ListArticle => ({
+	id: ID,
+	slug: post_name,
+	title: post_title,
+	excerpt: post_excerpt,
+	image: featured_image,
+	date: post_date,
+	minutesRead: minutes_read,
+	categories: category_data,
+	author: {
+		displayName: author_data.display_name,
+		url: author_data.url ?? '',
+	},
 })

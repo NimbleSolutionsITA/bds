@@ -8,6 +8,9 @@ import {
     ShippingMethod,
     Variation
 } from "../types/woocommerce";
+import { formatDistance as fd } from 'date-fns';
+import { it } from 'date-fns/locale';
+
 
 export const sanitize = (html: string) => {
   return sanitizeHtml(html, {
@@ -190,4 +193,9 @@ export function getName(fullName?: string | null): [string | undefined, string |
         name,
         lastName.join(' ')
     ]
+}
+
+export function formatDistance(date: Date | number, locale: 'it'|'en') {
+    const lang = locale === 'it' ? {locale: it} : {};
+    return fd(date, new Date(), { addSuffix: true, ...lang });
 }
