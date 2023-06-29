@@ -1,5 +1,6 @@
 import Image from "next/image";
 import {Box, Typography} from "@mui/material";
+import HtmlBlock from "../../components/HtmlBlock";
 
 type TopBannerProps = {
 	image: {
@@ -9,9 +10,10 @@ type TopBannerProps = {
 		alt: string
 	}
 	title: string
+	content: string
 }
 
-const TopBanner = ({image, title}: TopBannerProps) => {
+const TopBanner = ({image, title, content}: TopBannerProps) => {
 	return (
 		<Box sx={{
 			textAlign: 'center',
@@ -36,15 +38,13 @@ const TopBanner = ({image, title}: TopBannerProps) => {
 			>
 				{title}
 			</Typography>
-			<Typography
+			<HtmlBlock
 				sx={{
 					maxWidth: '500px',
 					margin: '0 auto 140px'
 				}}
-			>
-				Bottega di Sguardi è uno store brand fiorentino fondato sull'eyewear che ha sede in via Marconi, iconico punto vendita dell'attività, e nel cuore del centro storico, con una boutique su due piani, in Via del Parione, che è un piccolo tempio di raffinatezza dal lusso discreto. Bottega di Sguardi offre la più ricercata selezione di designer e tendenze legate al mondo dell'occhiale e propone al visitatore un'esperienza di acquisto customizzata e multisensoriale.
-			</Typography>
-
+				html={content}
+			/>
 			<div style={{border: '1px solid #000', padding: '20px'}}>
 				<div
 					style={{
@@ -61,7 +61,7 @@ const TopBanner = ({image, title}: TopBannerProps) => {
 						}}
 						src={image.url}
 						alt={image.alt}
-						layout="fill"
+						fill
 					/>
 				</div>
 			</div>

@@ -23,15 +23,17 @@ export type DentroDiariesProps = PageBaseProps & {
 		type: string
 		id: number
 		posts: Article[]
-	}[]
+	}[],
+	title: string
+	content: string
 }
 
-export default function DentroDiaries({headerImage, featuredArticles, layout, preview, postsByCategory}: DentroDiariesProps) {
+export default function DentroDiaries({headerImage, featuredArticles, layout, preview, postsByCategory, title, content}: DentroDiariesProps) {
 	return (
 		<Layout layout={layout}>
 			<NewsletterTopBar />
 			<Container maxWidth="lg" sx={{marginTop: '20px'}}>
-				<TopBanner image={headerImage} title="Dentro Diaries" />
+				<TopBanner image={headerImage} title={title} content={content} />
 				<FeaturedArticles title="Notizie in evidenza" articles={featuredArticles} />
 			</Container>
 			<ArticlePreview article={preview} />
@@ -87,7 +89,9 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 					{ name: page.title, href: urlPrefix + '/' + page.slug },
 				]
 			},
-			postsByCategory
+			postsByCategory,
+			title: page.title,
+			content: page.content,
 		},
 		revalidate: 10
 	} : {
