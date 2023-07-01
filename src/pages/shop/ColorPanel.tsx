@@ -3,8 +3,8 @@ import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {closestColor, palette} from "../../utils/utils";
 import {Divider} from "@mui/material";
 import ExpansionPanel from "../../components/ExpansionPanel";
-import FilterChip from "./FilterChip";
 import {SearchParams} from "./ShopLayout";
+import Chip from "../../components/Chip";
 
 type ColorPanelProps = {
 	colors: Color[]
@@ -42,10 +42,10 @@ const ColorPanel = ({colors, params, setSearchParams, type}: ColorPanelProps) =>
 	return (
 		<>
 			<Divider light sx={{margin: '5px 0'}} />
-			<ExpansionPanel title={type}>
+			<ExpansionPanel title={type} fontSize="12px">
 				<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
 					{paletteColors.map(color => (
-						<FilterChip
+						<Chip
 							key={color.slug}
 							tag={color}
 							onClick={async () => {

@@ -73,7 +73,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 	return (
 		<Box sx={{
 			width: '100%',
-			marginRight: {
+			marginLeft: {
 				xs: '-100%',
 				md:  `-${drawerWidth}px`
 			},
@@ -90,7 +90,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 					easing: theme.transitions.easing.easeOut,
 					duration: theme.transitions.duration.enteringScreen,
 				}),
-				marginRight: {
+				marginLeft: {
 					xs: 0,
 					md: '24px'
 				},
@@ -105,7 +105,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 					dataLength={data?.pages.length * 24}
 					next={fetchNextPage}
 					hasMore={hasNextPage || false}
-					loader={<Loading />}
+					loader={<div style={{width: '100%', textAlign: 'center'}}><Loading /></div>}
 					scrollableTarget="html"
 				>
 					{data?.pages[0]?.length > 0 ? (

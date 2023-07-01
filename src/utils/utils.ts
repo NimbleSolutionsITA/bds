@@ -48,6 +48,26 @@ export const LIQUIDES_IMAGINAIRES_CATEGORY = {
     en: 518
 }
 
+export const BOTTEGA_DI_SGUARDI_CATEGORY = {
+    it: 33,
+    en: 498
+}
+
+export const BOTTEGA_DI_SGUARDI_HORN_COLLECTION_CATEGORY = {
+    it: 1581,
+    en: 11664
+}
+
+export const VIBES_365_CATEGORY = {
+    it: 38,
+    en: 514
+}
+
+export const OUR_PRODUCTION_CATEGORIES = {
+    it: [BOTTEGA_DI_SGUARDI_CATEGORY.it, BOTTEGA_DI_SGUARDI_HORN_COLLECTION_CATEGORY.it, VIBES_365_CATEGORY.it],
+    en: [BOTTEGA_DI_SGUARDI_CATEGORY.en, BOTTEGA_DI_SGUARDI_HORN_COLLECTION_CATEGORY.en, VIBES_365_CATEGORY.en]
+}
+
 export const SHOP_CATEGORIES = {
     optical: { it: 2796, en: 9604 },
     sunglasses: { it: 2990, en: 9602 }

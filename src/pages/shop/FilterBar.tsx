@@ -51,12 +51,14 @@ const FilterBar = forwardRef(({setSearchParams, searchParams, open, setOpen}: Fi
 					justifyContent: 'space-between',
 				}}
 			>
-				<NameField
-					value={searchParams.name ?? ''}
-					onChange={(name?: string) => setSearchParams(params => ({...params, name}))}
-				/>
 				<div style={{display: 'flex'}}>
 					<div>
+						<IconButton size="small" onClick={() => setOpen(!open)}>
+							{open ?
+								<Close /> :
+								<TuneSharp />
+							}
+						</IconButton>
 						<IconButton onClick={handleClick}>
 							<SortByAlphaSharp />
 						</IconButton>
@@ -80,19 +82,17 @@ const FilterBar = forwardRef(({setSearchParams, searchParams, open, setOpen}: Fi
 								</MenuItem>
 							))}
 						</Menu>
+						{Object.keys(searchParams).length > 0 && (
+							<IconButton onClick={() => setSearchParams({})}>
+								<RestartAltSharp  />
+							</IconButton>
+						)}
 					</div>
-					{Object.keys(searchParams).length > 0 && (
-						<IconButton onClick={() => setSearchParams({})}>
-							<RestartAltSharp  />
-						</IconButton>
-					)}
-					<IconButton size="small" onClick={() => setOpen(!open)}>
-						{open ?
-							<Close /> :
-							<TuneSharp />
-						}
-					</IconButton>
 				</div>
+				<NameField
+					value={searchParams.name ?? ''}
+					onChange={(name?: string) => setSearchParams(params => ({...params, name}))}
+				/>
 			</Container>
 		</Box>
 	)

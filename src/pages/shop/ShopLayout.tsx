@@ -53,16 +53,6 @@ const ShopLayout = ({ products, colors, attributes, tags, designers, isSunglasse
 				setSearchParams={setSearchParams}
 			/>
 			<Container sx={{marginTop: '20px', marginBottom: '20px', minHeight: '500px', display: 'flex'}}>
-				<ProductsGrid
-					searchParams={searchParams}
-					products={products}
-					open={open}
-					drawerWidth={drawerWidth}
-					isMan={isMan}
-					isWoman={isWoman}
-					isOptical={isOptical}
-					isSunglasses={isSunglasses}
-				/>
 				<FilterDrawer
 					open={open}
 					setOpen={setOpen}
@@ -74,6 +64,16 @@ const ShopLayout = ({ products, colors, attributes, tags, designers, isSunglasse
 					designers={designers}
 					filterBarRef={ref}
 					drawerWidth={drawerWidth}
+				/>
+				<ProductsGrid
+					searchParams={searchParams}
+					products={products}
+					open={open}
+					drawerWidth={drawerWidth}
+					isMan={isMan}
+					isWoman={isWoman}
+					isOptical={isOptical}
+					isSunglasses={isSunglasses}
 				/>
 			</Container>
 		</div>

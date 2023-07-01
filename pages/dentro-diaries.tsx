@@ -3,7 +3,7 @@ import {PageBaseProps} from "../src/types/settings";
 import {getLayoutProps, getPageProps, getPosts, getPostsAttributes, mapListArticle} from "../src/utils/wordpress_api";
 import Layout from "../src/layout/Layout";
 import FeaturedArticles from "../src/pages/dentro-diaries/FeaturedArticles";
-import {Article, ListArticle, PostCategory} from "../src/types/woocommerce";
+import {Article, ListArticle} from "../src/types/woocommerce";
 import TopBanner from "../src/pages/dentro-diaries/TopBanner";
 import NewsletterTopBar from "../src/pages/dentro-diaries/NewsletterTopBar";
 import ArticlesRow from "../src/components/ArticlesRow";
@@ -17,7 +17,7 @@ export type DentroDiariesProps = PageBaseProps & {
 		height: number
 		alt: string
 	}
-	preview: ListArticle
+	preview: ListArticle|null
 	featuredArticles: ListArticle[]
 	postsByCategory: {
 		type: string
@@ -36,7 +36,7 @@ export default function DentroDiaries({headerImage, featuredArticles, layout, pr
 				<TopBanner image={headerImage} title={title} content={content} />
 				<FeaturedArticles title="Notizie in evidenza" articles={featuredArticles} />
 			</Container>
-			<ArticlePreview article={preview} />
+			{preview && <ArticlePreview article={preview}/>}
 			<Container maxWidth="lg" sx={{marginTop: '20px'}}>
 				{postsByCategory.map(({type, posts, id}) => (
 					<ArticlesRow key={type} postsByCategory={{type, posts, id}} />
@@ -65,6 +65,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 		posts
 	}));
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
+
 	return page ? {
 		props: {
 			headerImage: {
@@ -73,7 +74,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 				height: page.acf.headerImage.height,
 				alt: page.acf.headerImage.alt,
 			},
-			preview: mapListArticle(page.acf.preview[0]),
+			preview: page.acf.preview[0] ? mapListArticle(page.acf.preview[0]) : null,
 			featuredArticles: [
 				mapListArticle(page.acf.featured.middleColumn.post[0]),
 				mapListArticle(page.acf.featured.leftColumn.postTopL[0]),

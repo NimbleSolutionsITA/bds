@@ -61,7 +61,8 @@ const WhatsAppButton = ({label, phone}: ContactButtonProps) => {
 				},
 			}}
 			component="a"
-			href={`https://api.whatsapp.com/send?phone=${phone}text=Ciao!`}
+			href={`https://api.whatsapp.com/send?phone=${phone}&text=Ciao!`}
+			target="_blank"
 			startIcon={<WhatsApp />}
 		>
 			{label}
@@ -85,6 +86,7 @@ const EmailButton = ({label, email}: ContactButtonProps) => {
 			component="a"
 			href={`mailto:${email}`}
 			startIcon={<Email />}
+			target="_blank"
 		>
 			{label}
 		</Button>

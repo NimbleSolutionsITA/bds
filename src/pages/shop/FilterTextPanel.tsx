@@ -1,7 +1,6 @@
 import {Attribute, Category} from "../../types/woocommerce";
 import ExpansionPanel from "../../components/ExpansionPanel";
-import FilterChip from "./FilterChip";
-
+import Chip from "../../components/Chip";
 type TagPanelProps = {
 	title: string
 	list: Attribute[] | Category[] | {name: string, slug: string}[]
@@ -9,10 +8,10 @@ type TagPanelProps = {
 	onClick: (slug: string) => void
 }
 const FilterTextPanel = ({title, list, onClick, isActive}: TagPanelProps) => (
-	<ExpansionPanel title={title}>
+	<ExpansionPanel title={title} fontSize="12px">
 		<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
 			{list.map(item => (
-				<FilterChip
+				<Chip
 					key={item.slug}
 					tag={{name: item.name}}
 					onClick={() => onClick(item.slug)}

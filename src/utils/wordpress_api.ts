@@ -5,12 +5,12 @@ import {
 } from "./endpoints"
 import {
 	AcfImage,
-	ACFListArticle, Article,
+	ACFListArticle,
 	Category,
 	Image,
 	ListArticle,
 	Page, PostCategory,
-	WooProductCategory, WPArticle,
+	WooProductCategory,
 	WPPage
 } from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
@@ -146,11 +146,11 @@ export const getPostsAttributes = async (locale: 'it' | 'en'): Promise<{ tags: P
 }
 
 export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) => {
-	const { categories, ...layout  } = await getLayoutProps(locale)
+	const layout = await getLayoutProps(locale)
 	const productCategory = [
-		...categories.designers,
-		...categories.fragrances.liquides,
-		...categories.fragrances.profumum
+		...layout.categories.designers,
+		...layout.categories.fragrances.liquides,
+		...layout.categories.fragrances.profumum
 	].find(cat => cat.slug === slug)
 	return { layout, productCategory }
 }
@@ -227,7 +227,7 @@ export const getAllPagesIds = async () => {
 	}))
 }
 
-export const mapProductCategory = (category: WooProductCategory) => ({
+export const mapProductCategory = (category: WooProductCategory): WooProductCategory => ({
 	id: category.id,
 	name: category.name,
 	slug: category.slug,

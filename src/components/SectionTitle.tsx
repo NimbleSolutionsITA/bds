@@ -1,6 +1,5 @@
-import {Box, IconButton, Typography, CircularProgress} from "@mui/material";
+import {Box, IconButton, Typography} from "@mui/material";
 import {NavigateNextSharp, NavigateBeforeSharp} from '@mui/icons-material';
-
 
 type SectionTitleProps = {
 	title: string
@@ -24,12 +23,12 @@ const SectionTitle = ({ title, onNext, onPrev, disableNext, disablePrev, isLoadi
 		<Box flexGrow={1} borderBottom={1} ml={2} mr={1} borderColor="text.primary"/>
 		{onPrev && (
 			<IconButton color="primary" size="small" onClick={onPrev} sx={{padding: 0}} disabled={isLoading || disablePrev}>
-				{isLoading ? <CircularProgress sx={{padding: '5px'}} size={30} /> : <NavigateBeforeSharp sx={{fontSize: '30px'}}/>}
+				<NavigateBeforeSharp sx={{fontSize: '30px'}}/>
 			</IconButton>
 		)}
 		{onNext && (
 			<IconButton color="primary" size="small" onClick={onNext} sx={{padding: 0}} disabled={isLoading || disableNext}>
-				{isLoading ? <CircularProgress sx={{padding: '5px'}} size={30} /> : <NavigateNextSharp sx={{fontSize: '30px'}} />}
+				<NavigateNextSharp sx={{fontSize: '30px'}} />
 			</IconButton>
 		)}
 	</Box>

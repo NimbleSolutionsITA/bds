@@ -7,9 +7,10 @@ type ExpansionPanelProps = {
 	title: ReactNode | string
 	plusMinus?: boolean
 	color?: 'primary' | 'secondary'
+	fontSize?: string | number
 }
 
-const ExpansionPanel = ({children ,title, plusMinus, color = "primary"}: ExpansionPanelProps) => {
+const ExpansionPanel = ({children ,title, plusMinus, color = "primary", fontSize}: ExpansionPanelProps) => {
 	const [expanded, setExpanded] = useState<boolean | string>(false)
 
 	const handleChange = (panel: boolean | string) => (event: SyntheticEvent, isExpanded: boolean) => {
@@ -52,6 +53,7 @@ const ExpansionPanel = ({children ,title, plusMinus, color = "primary"}: Expansi
 				sx={{
 					padding: 0,
 					minHeight: '25px',
+					fontSize,
 					color,
 					fontWeight: 500,
 					'&.Mui-expanded': {

@@ -22,7 +22,7 @@ const VOID_TAGS = [
     'input', 'keygen', 'link', 'meta', 'param', 'source', 'track', 'wbr'
 ];
 export default function Layout({children, layout: {
-    seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping
+    seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping, categories
 }}: LayoutProps) {
     const dispatch = useDispatch()
     const root = parse(seo ?? '');
@@ -63,7 +63,7 @@ export default function Layout({children, layout: {
             <Hidden mdDown>
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />
             </Hidden>
-            <CartDrawer shipping={shipping} />
+            <CartDrawer shipping={shipping} categories={categories} />
             <NewsletterDrawer />
             {children}
             <Footer googlePlaces={googlePlaces} />

@@ -99,7 +99,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </Link>
             <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
                 {category &&(
-                    <Link href={`/designers/${category.name}`} style={{textDecoration: 'none'}}>
+                    <Link prefetch={false} href={`/designers/${category.name}`} style={{textDecoration: 'none'}}>
                         <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(category.name)}} />
                     </Link>
                 )}
@@ -112,7 +112,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     borderTop: '1px solid',
                     borderBottom: '1px solid'
                 }}>
-                    <Link href={`/products/${product.slug}`} style={{textDecoration: 'none', width: '100%'}}>
+                    <Link prefetch={false} href={`/products/${product.slug}`} style={{textDecoration: 'none', width: '100%'}}>
                         <Typography
                             variant="h3"
                             sx={{

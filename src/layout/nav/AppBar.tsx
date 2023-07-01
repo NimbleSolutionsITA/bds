@@ -163,11 +163,11 @@ const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) =>
         {groups.map((group) => (
             <div key={group} style={{display: 'flex', flexDirection: 'column', marginRight: '20px'}}>
                 <div style={{
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: 500,
                     marginBottom: '5px',
                     padding: '5px',
-                    backgroundColor: 'rgba(0,0,0,0.1)'
+                    borderBottom: '1px solid #000000'
                 }}>{group}</div>
                 {items.filter(item => item.parent === group).map(subItem => (
                     <SubItem key={subItem.id} subItem={subItem} />

@@ -8,14 +8,18 @@ import Link from "next/link";
 import PriceFormat from "../../components/PriceFormat";
 import StripePaymentButton from "../../components/StripePaymentButton";
 import React from "react";
-import {ShippingClass} from "../../types/woocommerce";
+import {Category, ShippingClass} from "../../types/woocommerce";
+import {BaseLayoutProps} from "../../types/settings";
+import Chip from "../../components/Chip";
+import {useRouter} from "next/router";
 
 type CartDrawerProps = {
 	shipping: ShippingClass[]
+	categories: BaseLayoutProps['categories']
 }
 
-const CartDrawer = ({shipping}: CartDrawerProps) => {
-	const { cartDrawerOpen, items } = useSelector((state: RootState) => state.cart);
+const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
+	const { cartDrawerOpen, items } = useSelector((state: RootState) => state.cart);{}
 	const dispatch = useDispatch()
 	const totalItems = items.reduce((previousValue, currentValue) => previousValue + currentValue.qty, 0)
 	const subtotal = items.reduce((previousValue, currentValue) => previousValue + (currentValue.price * currentValue.qty), 0)
@@ -51,11 +55,11 @@ const CartDrawer = ({shipping}: CartDrawerProps) => {
 						<CloseOutlined fontSize="small" />
 					</IconButton>
 				</div>
-				{items.map((item) => (
-					<CartItem key={item.variation_id??''+item.product_id} item={item} />
-				))}
-				{items.length > 0 && (
+				{items.length > 0 ? (
 					<>
+						{items.map((item) => (
+							<CartItem key={item.variation_id??''+item.product_id} item={item} />
+						))}
 						<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px'}}>
 							<Typography variant="h6">Subtotale</Typography>
 							<Typography variant="h6">
@@ -69,9 +73,49 @@ const CartDrawer = ({shipping}: CartDrawerProps) => {
 							</div>
 						)}
 					</>
+				) : (
+					<>
+						<Typography variant="h4" sx={{textAlign: 'center'}}>
+							La tua shopping bag è vuota.
+						</Typography>
+						<Typography sx={{textAlign: 'center'}}>
+							Esplora i nostri prodotti iniziando a selezionare una delle categorie qui sotto.
+						</Typography>
+						<CategoryChips title="Designers" categories={categories.designers} path="/designers" />
+						<CategoryChips title="Liquides Imaginaries" categories={categories.fragrances.liquides} path="/fragrances" />
+						<CategoryChips title="Profumum Roma" categories={categories.fragrances.profumum} path="/fragrances" />
+					</>
 				)}
 			</Container>
 		</SwipeableDrawer>
     )
+}
+
+type CategoryChipsProps = {
+	categories: Category[]
+	title: string
+	path: string
+}
+
+const CategoryChips = ({categories, title, path}: CategoryChipsProps) => {
+	const router = useRouter()
+	const dispatch = useDispatch()
+	return (
+		<div style={{marginTop: '40px', textAlign: 'center'}}>
+			<Typography variant="h4">{title}</Typography>
+			<div style={{display: 'flex', flexWrap: 'wrap', gap: '10px', margin: '20px 0', justifyContent: 'center'}}>
+				{categories.map((category) => (
+					<Chip
+						key={category.slug}
+						tag={{name: category.name}}
+						onClick={() => {
+							dispatch(closeCartDrawer())
+							router.push(`${path}/${category.slug}`)
+						}}
+					/>
+				))}
+			</div>
+		</div>
+	)
 }
 export default CartDrawer

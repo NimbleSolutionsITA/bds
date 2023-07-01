@@ -106,19 +106,14 @@ export interface AcfProductCategory {
 	image: string;
 }
 
-export interface WooProductCategory {
-	id: number;
+export type WooProductCategory = BaseCategory & Category & {
 	acf: {
 		bottomText: string;
 		gallery: string[];
 	}
-	count: number;
 	description: string;
-	image: Image;
+	image: Image|null;
 	menu_order: number;
-	name: string;
-	slug: string;
-	parent?: number;
 }
 
 export type BaseAttributes = {
@@ -135,7 +130,7 @@ export type BaseCategory = {
 	id: number;
 	name: string;
 	slug: string;
-	parent: number;
+	parent?: number;
 }
 
 export type BaseProduct = {

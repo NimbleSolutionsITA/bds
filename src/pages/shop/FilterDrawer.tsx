@@ -43,7 +43,7 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 	return (
 		<Drawer
 			variant="persistent"
-			anchor="right"
+			anchor="left"
 			open={open}
 			elevation={0}
 			sx={{
@@ -51,25 +51,25 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 					xs: '100%',
 					md: drawerWidth+'px'
 				},
-				marginLeft: {
+				marginRight: {
 					xs: '-16px',
 					md: 0
 				},
 				flexShrink: 0,
 				flex: '0 0 auto',
-				zIndex: 'auto'
+				zIndex: 'auto',
+				position: 'relative'
 			}}
 			PaperProps={{
 				sx: {
 					zIndex: 'auto',
-					width: '100%',
 					backgroundColor: '#e5e5e5',
 					boxSizing: 'border-box',
 					height: '100%',
 					top: (filterBarRef.current?.getBoundingClientRect().top ?? 160)+'px',
 					paddingTop: '60px',
-					right: 'auto',
-					paddingRight: {
+					left: 0,
+					paddingLeft: {
 						xs: 0,
 						md: '24px'
 					}
@@ -79,7 +79,7 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 			<Box sx={{
 				padding: {
 					xs: '16px',
-					md: '20px 0 20px 20px',
+					md: '20px 20px 20px 0',
 				},
 				width: {
 					xs: '100%',
