@@ -17,6 +17,7 @@ import PayPal from "../../icons/PayPal2";
 import MotionPanel from "../../components/MotionPanel";
 import StripePayment from "./StripePayment";
 import {OrderResponseBody} from "@paypal/paypal-js";
+import {useTranslation} from "next-i18next";
 
 type PaymentProps = {
 	order?: WooOrder
@@ -30,6 +31,7 @@ type PaymentProps = {
 const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheckoutStep}: PaymentProps) => {
 	const shippingAddress = order?.shipping.first_name ? `${order.shipping.address_1}, ${order.shipping.postcode}, ${order.shipping.city} ${order.shipping.state}, ${order.shipping.country}` : null;
 	const billingAddress = `${order?.billing.address_1}, ${order?.billing.postcode}, ${order?.billing.city} ${order?.billing.state}, ${order?.billing.country}`;
+	const { t } = useTranslation('common')
 
 	return (
 		<div style={{width: '100%', position: 'relative'}}>
@@ -40,20 +42,20 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 						'& tr:last-child td': { border: 0 }
 					}}>
 						<RecapRow
-							label="Contact"
+							label={t('checkout.contact')}
 							value={`${order?.billing.email}`}
 							isLoading={isLoading}
 							edit={() => editAddress(0)}
 						/>
 						<RecapRow
-							label="Ship to"
+							label={t('checkout.ship-to')}
 							value={shippingAddress ?? billingAddress}
 							isLoading={isLoading}
 							edit={() => editAddress(shippingAddress ? 1 : 0)}
 						/>
 						{shippingAddress && (
 							<RecapRow
-								label="Bill to"
+								label={t('common.bill-to')}
 								value={billingAddress}
 								isLoading={isLoading}
 								edit={() => editAddress(0)}
@@ -62,8 +64,8 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>Pagamento</Typography>
-			<Typography sx={{marginBottom: '20px'}}>Tutte le transazioni sono sicure e criptate.</Typography>
+			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.payment')}</Typography>
+			<Typography sx={{marginBottom: '20px'}}>{t('checkout.secured')}</Typography>
 			<FormControlLabel labelPlacement="start" control={(
 				<Switch
 					checked={checkoutStep === 5}
@@ -72,7 +74,7 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 				/>
 			)} label={(
 				<div style={{display: 'flex', alignItems: 'center'}}>
-					{'Voglio pagare con'}&nbsp;&nbsp;&nbsp;&nbsp;<PayPal sx={{fontSize: '80px'}} />&nbsp;&nbsp;
+					{t('checkout.pay-with')}&nbsp;&nbsp;&nbsp;&nbsp;<PayPal sx={{fontSize: '80px'}} />&nbsp;&nbsp;
 				</div>
 			)} />
 			<MotionPanel key="stripe" active={checkoutStep !== 5}>
@@ -93,17 +95,20 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 	)
 }
 
-const EditButton = ({onClick}: {onClick: () => void}) => (
-	<Button
-		sx={{textTransform: 'none', textDecoration: 'underline', padding: 0, minWidth: 0, fontWeight: 300}}
-		size="small"
-		variant="text"
-		color="primary"
-		onClick={onClick}
-	>
-		Modifica
-	</Button>
-)
+const EditButton = ({onClick}: {onClick: () => void}) => {
+	const { t } = useTranslation('common')
+	return (
+		<Button
+			sx={{textTransform: 'none', textDecoration: 'underline', padding: 0, minWidth: 0, fontWeight: 300}}
+			size="small"
+			variant="text"
+			color="primary"
+			onClick={onClick}
+		>
+			{t('edit')}
+		</Button>
+	)
+}
 
 const RecapRow = ({label, value, edit, isLoading}: {label: string, value: string, isLoading: boolean, edit: () => void}) => (
 	<TableRow>

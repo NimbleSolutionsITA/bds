@@ -2,11 +2,13 @@ import {ListArticle} from "../types/woocommerce";
 import Box from "@mui/material/Box";
 import Image from "next/image";
 import {Card, CardContent, Typography} from "@mui/material";
-import placeholder from "../images/placeholder.jpg";
 import blur from "../images/blur.jpg";
 import Link from "./Link";
 import {formatDistance} from "../utils/utils";
 import {useRouter} from "next/router";
+import {BLOG_POST_SUB_PATH} from "../utils/endpoints";
+import {useTranslation} from "next-i18next";
+import HtmlBlock from "./HtmlBlock";
 
 type ArticleCardProps = {
 	article: ListArticle
@@ -14,23 +16,15 @@ type ArticleCardProps = {
 }
 
 const ArticleCard = ({article, isVertical}: ArticleCardProps) => {
-	const options: Intl.DateTimeFormatOptions = {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit'
-	};
 	const {locale} = useRouter()
 	const formattedDate = formatDistance(new Date(article.date), locale as 'it'|'en');
-
+	const { t } = useTranslation('common')
 	return (
 		<Card
 			sx={{width: '100%', height: 'auto'}}
 			elevation={0}
 		>
-			<Link href={`/dentro-diaries/${article.slug}`}>
+			<Link href={`/${BLOG_POST_SUB_PATH}/${article.slug}`}>
 				<Box sx={{
 					width: '100%',
 					paddingBottom: {
@@ -60,8 +54,10 @@ const ArticleCard = ({article, isVertical}: ArticleCardProps) => {
 				>
 					{article.categories.map(c => c.name.toUpperCase()).join(' | ')}
 				</Typography>
-				<Link href={`/dentro-diaries/${article.slug}`} sx={{textDecoration: 'none'}}>
-					<Typography
+				<Link href={`/${BLOG_POST_SUB_PATH}/${article.slug}`} sx={{textDecoration: 'none'}}>
+					<HtmlBlock
+						component={Typography}
+						html={article.title}
 						sx={{
 							fontFamily: 'Ogg Roman',
 							lineHeight: 1.2,
@@ -71,12 +67,10 @@ const ArticleCard = ({article, isVertical}: ArticleCardProps) => {
 							},
 							margin: '5px 0'
 						}}
-					>
-						{article.title}
-					</Typography>
+					/>
 				</Link>
 				<TextLine text={`By ${article.author.displayName}, ${formattedDate}`} />
-				<TextLine text={`${article.minutesRead} minutes read`} />
+				<TextLine text={t('minutes-read', {count: article.minutesRead})} />
 			</CardContent>
 
 		</Card>

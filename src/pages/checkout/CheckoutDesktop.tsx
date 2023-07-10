@@ -1,7 +1,6 @@
 import {
 	Box,
 	Button,
-	Divider,
 	Grid,
 	Step,
 	StepConnector,
@@ -15,6 +14,7 @@ import Recap from "./Recap";
 import Payment from "./Payment";
 import {CheckoutComponentProps} from "./CheckoutGrid";
 import {Check} from "@mui/icons-material";
+import {useTranslation} from "next-i18next";
 
 
 const CheckoutDesktop = ({
@@ -45,6 +45,7 @@ const CheckoutDesktop = ({
 		setTab(tab)
 	}
 	const payWithStripe = () => setCheckoutStep(4)
+	const { t } = useTranslation('common')
 	return (
 		<Grid container sx={{height: '100vh', position: 'relative'}}>
 			<Grid item xs={12} md={7} sx={{display: 'flex', alignItems: 'flex-end', flexDirection: 'column'}}>
@@ -65,7 +66,7 @@ const CheckoutDesktop = ({
 						connector={<CheckoutStepConnector />}
 						sx={{width: '100%', marginBottom: '20px'}}
 					>
-						{['Indirizzo', 'Pagamento'].map((label, index) => (
+						{[t('checkout.address'), t('checkout.payment')].map((label, index) => (
 							<Step key={label}>
 								<StepLabel
 									StepIconComponent={CheckoutStepIcon}

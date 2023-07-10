@@ -1,4 +1,3 @@
-import Logo from "./Logo";
 import AddressForm from "./AddressForm";
 import Recap from "./Recap";
 import {useState} from "react";
@@ -8,6 +7,7 @@ import {AnimatePresence, motion} from "framer-motion";
 import {Button, Container, Grid} from "@mui/material";
 import * as React from "react";
 import PriceRecap from "./PriceRecap";
+import {useTranslation} from "next-i18next";
 
 const CheckoutMobile = ({
 	control,
@@ -33,6 +33,7 @@ const CheckoutMobile = ({
 	setPaid,
 }: CheckoutComponentProps) => {
 	const [mobileCheckoutStep, setMobileCheckoutStep] = useState(1)
+	const { t } = useTranslation('common')
 	const editAddress = (tab: number) => {
 		setCheckoutStep(2)
 		setMobileCheckoutStep(1)
@@ -160,21 +161,21 @@ const CheckoutMobile = ({
 					{mobileCheckoutStep === 2 && (
 						<Grid item xs={6}>
 							<Button fullWidth onClick={() => handleChangeStep(mobileCheckoutStep - 1)}>
-								INDIRIZZO
+								{t('checkout.address')}
 							</Button>
 						</Grid>
 					)}
 					{mobileCheckoutStep < 3 && (
 						<Grid item xs={mobileCheckoutStep === 1 ? 12 : 6}>
 							<Button fullWidth onClick={() => handleChangeStep(mobileCheckoutStep + 1)}>
-								{mobileCheckoutStep === 1 ? 'SPEDIZIONE' : 'PAGAMENTO'}
+								{mobileCheckoutStep === 1 ? t('checkout.shipping') : t('checkout.payment')}
 							</Button>
 						</Grid>
 					)}
 					{mobileCheckoutStep === 3 && (
 						<Grid item xs={12}>
 							<Button fullWidth onClick={() => handleChangeStep(4)}>
-								PAGA ORA
+								{t('checkout.pay-now')}
 							</Button>
 						</Grid>
 					)}

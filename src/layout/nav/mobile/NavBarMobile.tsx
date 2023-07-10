@@ -12,6 +12,7 @@ import {IconButtonProps} from "@mui/material/IconButton/IconButton";
 import Link from "../../../components/Link";
 import {getRelativePath} from "../../../utils/utils";
 import ShippingBanner from "../ShippingBanner";
+import {useTranslation} from "next-i18next";
 
 type NavBarMobileProps = {
     mobileMenu: Menus['mobileMenu']
@@ -23,6 +24,7 @@ export default function NavBarMobile({
 }: NavBarMobileProps) {
     const [open, setOpen] = useState(false)
     const router = useRouter()
+    const { t } = useTranslation('common')
     function handleClick() {
         setOpen(false)
     }
@@ -96,18 +98,18 @@ export default function NavBarMobile({
                     alignItems: 'start'
                 }}>
                     <div style={{display: 'flex', marginBottom: '20px', gap: '20px'}}>
-                        <TopNavButtons title="UOMO" nav1={opticalMan} nav2={sunglassesMan} handleClick={handleClick} />
-                        <TopNavButtons title="DONNA" nav1={opticalWoman} nav2={sunglassesWoman} handleClick={handleClick} />
+                        <TopNavButtons title={t('man').toUpperCase()} nav1={opticalMan} nav2={sunglassesMan} handleClick={handleClick} />
+                        <TopNavButtons title={t('woman').toUpperCase()} nav1={opticalWoman} nav2={sunglassesWoman} handleClick={handleClick} />
                     </div>
                     {mobileMenu.map(nav => (
                         <NavButton key={nav.id} nav={nav} handleClick={handleClick} />
                     ))}
                     <div style={{marginTop: '20px'}}>
                         <PhoneButton
-                            title="NEGOZIO VIA MARCONI"
+                            title={t('shop', {address: "VIA MARCONI"})}
                         />
                         <PhoneButton
-                            title="NEGOZIO VIA DEL PARIONE"
+                            title={t('shop', {address: "VIA DEL PARIONE"})}
                         />
                     </div>
                     <div style={{flexGrow: 1}} />

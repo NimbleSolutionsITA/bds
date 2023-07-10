@@ -49,7 +49,7 @@ export default function DentroDiaries({headerImage, featuredArticles, layout, pr
 export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 	// @ts-ignore
 	const [
-		layoutProps,
+		{ssrTranslations, ...layoutProps},
 		{ page, seo },
 		{  categories },
 	] = await Promise.all([
@@ -93,6 +93,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 			postsByCategory,
 			title: page.title,
 			content: page.content,
+			...ssrTranslations
 		},
 		revalidate: 10
 	} : {

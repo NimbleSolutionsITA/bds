@@ -10,6 +10,8 @@ import '../styles/globals.css';
 import {Provider} from "react-redux";
 import {store} from "../src/redux/store";
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
+import { appWithTranslation } from 'next-i18next'
+
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -20,7 +22,7 @@ export interface BDGAppProps extends AppProps {
 // Create a client
 const queryClient = new QueryClient()
 
-export default function MyApp(props: BDGAppProps) {
+function MyApp(props: BDGAppProps) {
     const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
     return (
         <Provider store={store}>
@@ -39,3 +41,5 @@ export default function MyApp(props: BDGAppProps) {
         </Provider>
     );
 }
+
+export default appWithTranslation(MyApp);

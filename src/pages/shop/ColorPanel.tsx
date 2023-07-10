@@ -5,6 +5,7 @@ import {Divider} from "@mui/material";
 import ExpansionPanel from "../../components/ExpansionPanel";
 import {SearchParams} from "./ShopLayout";
 import Chip from "../../components/Chip";
+import {useTranslation} from "next-i18next";
 
 type ColorPanelProps = {
 	colors: Color[]
@@ -31,6 +32,7 @@ const ColorPanel = ({colors, params, setSearchParams, type}: ColorPanelProps) =>
 		slug: key,
 		code: palette[key].color
 	})).filter(color => availableColors.includes(color.slug))
+	const {t} = useTranslation()
 
 	useEffect(() => {
 		if (!params || params.length === 0) {
@@ -42,12 +44,12 @@ const ColorPanel = ({colors, params, setSearchParams, type}: ColorPanelProps) =>
 	return (
 		<>
 			<Divider light sx={{margin: '5px 0'}} />
-			<ExpansionPanel title={type} fontSize="12px">
+			<ExpansionPanel title={t(type)} fontSize="12px">
 				<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap', padding: '10px 0'}}>
 					{paletteColors.map(color => (
 						<Chip
 							key={color.slug}
-							tag={color}
+							tag={{...color, name: t('filter-colors.'+color.slug)}}
 							onClick={async () => {
 								let updatedColors = selectedColors
 								if (selectedColors.includes(color.slug)) {

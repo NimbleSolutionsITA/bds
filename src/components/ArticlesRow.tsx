@@ -1,4 +1,4 @@
-import {Article, WPArticle} from "../types/woocommerce";
+import {Article} from "../types/woocommerce";
 import SectionTitle from "./SectionTitle";
 import ArticleCard from "./ArticleCard";
 import {Grid} from "@mui/material";

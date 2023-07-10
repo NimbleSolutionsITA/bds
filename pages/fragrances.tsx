@@ -1,26 +1,30 @@
 import Layout from "../src/layout/Layout";
 import {getLayoutProps, getPageProps} from "../src/utils/wordpress_api";
 import {PageBaseProps} from "../src/types/settings";
-import {WooProductCategory} from "../src/types/woocommerce";
 import dynamic from "next/dynamic";
 
 const FragrancesList = dynamic(() => import("../src/pages/fragrances/FragrancesList"));
 
 export type FragrancesProps = PageBaseProps & {
-    fragrances: WooProductCategory[],
+
 }
 
-export default function Fragrances({ fragrances, layout }: FragrancesProps) {
+export default function Fragrances({ layout }: FragrancesProps) {
     return (
       <Layout layout={layout}>
-          <FragrancesList fragrances={fragrances} />
+          <FragrancesList
+              fragrances={[
+                  ...layout.categories.fragrances.profumum,
+                  ...layout.categories.fragrances.liquides
+              ]}
+          />
       </Layout>
     );
 }
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
-        { categories: {fragrances}, ...layoutProps },
+        {ssrTranslations, ...layoutProps},
         {  seo },
     ] = await Promise.all([
         getLayoutProps(locale),
@@ -29,7 +33,6 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     return {
         props: {
-            fragrances: [...fragrances.profumum, ...fragrances.liquides],
             layout: {
                 ...layoutProps,
                 breadcrumbs: [
@@ -37,7 +40,8 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
                     { name: 'Fragranze', href: urlPrefix + '/fragrances' }
                 ],
                 seo,
-            }
+            },
+            ...ssrTranslations
         },
         revalidate: 10
     }

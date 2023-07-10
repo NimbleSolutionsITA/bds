@@ -10,6 +10,7 @@ export type Product = Omit<BaseProduct, 'image' | 'variations' | 'categories'> &
 	gallery: ImageDetailed[];
 	image: ImageDetailed;
 	variations: Variation[];
+	link: string;
 }
 
 export type ProductCategory = BaseCategory & { bottomText: string | null }
@@ -114,6 +115,7 @@ export type WooProductCategory = BaseCategory & Category & {
 	description: string;
 	image: Image|null;
 	menu_order: number;
+	link: string;
 }
 
 export type BaseAttributes = {

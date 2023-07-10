@@ -70,22 +70,37 @@ const theme = createTheme({
                     fontWeight: 600,
                     textTransform: 'uppercase',
                     fontSize: '15px',
-                    lineHeight: 1
+                    lineHeight: 1.4,
+                    maxHeight: '61px'
                 },
                 containedPrimary: {
                     color: '#ffffff',
+                },
+                outlined: {
+                    padding: '20px 40px',
+                    fontWeight: 400,
+                    fontSize: '15px',
+                    textAlign: 'center',
+                    textTransform: 'uppercase',
+                    lineHeight: 1.4,
+                    maxHeight: '61px'
                 }
             }
         },
         MuiInputBase: {
             styleOverrides: {
+                root: {
+                    '& input::placeholder': {
+                        textTransform: 'uppercase',
+                    }
+                },
                 colorSecondary: {
                     color: '#ffffff',
                     '&:before': {
                         borderColor: 'rgba(255,255,255,0.5) !important'
                     },
                     '& input::placeholder': {
-                        color: 'rgba(255,255,255,0.5)'
+                        color: 'rgba(255,255,255,0.5)',
                     }
                 }
             }

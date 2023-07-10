@@ -3,6 +3,7 @@ import {Close, RestartAltSharp, TuneSharp, SortByAlphaSharp} from '@mui/icons-ma
 import {Dispatch, SetStateAction, forwardRef, useState, MouseEvent} from "react";
 import NameField from "./NameField";
 import {SearchParams} from "./ShopLayout";
+import {useTranslation} from "next-i18next";
 
 type FilterBarProps = {
 	open: boolean;
@@ -14,18 +15,19 @@ type FilterBarProps = {
 const FilterBar = forwardRef(({setSearchParams, searchParams, open, setOpen}: FilterBarProps, ref) => {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 	const selectOpen = Boolean(anchorEl);
+	const { t } = useTranslation('common')
 	const sortOptions: {slug: 'name_asc'|'name_desc'|'price_asc'|'price_desc'|'best_sells', name: string}[] = [
-		{slug: 'name_asc', name: 'Nome (A-Z)'},
-		{slug: 'name_desc', name: 'Nome (Z-A)'},
-		{slug: 'price_asc', name: 'Prezzo (crescente)'},
-		{slug: 'price_desc', name: 'Prezzo (decrescente)'},
-		{slug: 'best_sells', name: 'Più venduti'},
+		{slug: 'name_asc', name: t('name')+' (A-Z)'},
+		{slug: 'name_desc', name: t('name')+' (Z-A)'},
+		{slug: 'price_asc', name: t('price')+' ('+t('ascending')+')'},
+		{slug: 'price_desc', name: t('price')+' ('+t('descending')+')'},
+		{slug: 'best_sells', name: t('most-popular')},
 	]
 	const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
 		setAnchorEl(event.currentTarget);
 	};
 	const handleClose = () => {
-		setAnchorEl(null);
+		setAnchorEl(null)
 
 	};
 	return (

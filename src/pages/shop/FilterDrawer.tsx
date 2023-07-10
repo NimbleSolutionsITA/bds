@@ -5,6 +5,7 @@ import {Attribute, Category, Color, ProductTag} from "../../types/woocommerce";
 import {SearchParams} from "./ShopLayout";
 import {Dispatch, RefObject, SetStateAction, useEffect, useState} from "react";
 import FilterTextPanel from "./FilterTextPanel";
+import {useTranslation} from "next-i18next";
 
 type FilterDrawerProps = {
 	open: boolean;
@@ -30,6 +31,7 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 	const calibri = attributes.filter(attribute => attribute.type === 'calibro')
 	const calibriPonte = attributes.filter(attribute => attribute.type === 'calibro-ponte')
 	const [yOffSet, setYoffSet] = useState(0)
+	const {t} = useTranslation()
 	useEffect(() => {
 		const updateScroll = () => {
 			setYoffSet(window.scrollY)
@@ -99,8 +101,8 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 					<>
 						<Divider light sx={{margin: '5px 0'}} />
 						<FilterTextPanel
-							title="Genere"
-							list={[{name: 'uomo', slug: 'man'}, {name: 'donna', slug: 'woman'}]}
+							title={t('gender')}
+							list={[{name: t('man'), slug: 'man'}, {name: t('woman'), slug: 'woman'}]}
 							isActive={(slug) => searchParams[slug as 'man'|'woman'] ?? false}
 							onClick={(slug) => setSearchParams(params => ({
 								...params,
@@ -114,8 +116,8 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 					<>
 						<Divider light sx={{margin: '5px 0'}} />
 						<FilterTextPanel
-							title="Tipologia"
-							list={[{name: 'vista', slug: 'optical'}, {name: 'sole', slug: 'sunglasses'}]}
+							title={t('lens-type')}
+							list={[{name: t('optical'), slug: 'optical'}, {name: t('sunglasses'), slug: 'sunglasses'}]}
 							isActive={(slug) => searchParams[slug as 'optical'|'sunglasses'] ?? false}
 							onClick={(slug) => setSearchParams(params => ({
 								...params,
@@ -126,14 +128,14 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 					</>
 				)}
 				<TagPanel
-					title="Materiali"
+					title={t('materials')}
 					name="materials"
 					params={searchParams.materials}
 					tags={tags.filter(tag => tag.filter === 'material')}
 					setSearchParams={setSearchParams}
 				/>
 				<TagPanel
-					title="Stili"
+					title={t('styles')}
 					name="styles"
 					params={searchParams.styles}
 					tags={tags.filter(tag => tag.filter === 'style')}
@@ -175,7 +177,7 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 					<>
 						<Divider light sx={{margin: '5px 0'}} />
 						<FilterTextPanel
-							title="Calibro"
+							title={t('frame-size')}
 							list={calibri}
 							isActive={(slug) => searchParams.calibro?.toString() === slug}
 							onClick={(slug) => setSearchParams(params => ({
@@ -189,7 +191,7 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 					<>
 						<Divider light sx={{margin: '5px 0'}} />
 						<FilterTextPanel
-							title="Calibro Ponte"
+							title={t('frame-size-bridge')}
 							list={calibriPonte}
 							isActive={(slug) => searchParams.calibro_ponte?.toString() === slug}
 							onClick={(slug) => setSearchParams(params => ({
@@ -201,15 +203,15 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 				)}
 				<Divider light sx={{margin: '5px 0'}} />
 				<FilterTextPanel
-					title="Prezzo"
+					title={t('price')}
 					list={[
-						{name: 'fino a 200€', slug: '0,200'},
+						{name: t('up-to')+' 200€', slug: '0,200'},
 						{name: '200€ - 300€', slug: '200,300'},
 						{name: '300€ - 400€', slug: '300,400'},
 						{name: '400€ - 500€', slug: '400,500'},
 						{name: '500€ - 750€', slug: '500,750'},
 						{name: '750€ - 1000€', slug: '750,1000'},
-						{name: 'oltre i 1000€', slug: '1000,5000'},
+						{name: t('over')+' 1000€', slug: '1000,5000'},
 					]}
 					isActive={(slug) => searchParams.price_range?.toString() === slug}
 					onClick={(slug) => setSearchParams(params => ({

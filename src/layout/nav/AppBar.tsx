@@ -9,6 +9,7 @@ import {KeyboardArrowDown} from "@mui/icons-material";
 import {MenuItem, Menus} from "../../types/settings";
 import {getRelativePath, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
+import {useTranslation} from "next-i18next";
 
 type AppBarProps = {
     leftMenu: Menus['leftMenu'],
@@ -158,24 +159,28 @@ const NavButton = ({item}: {item: MenuItem}) => {
     )
 }
 
-const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) => (
-    <div style={{display: 'flex'}}>
-        {groups.map((group) => (
-            <div key={group} style={{display: 'flex', flexDirection: 'column', marginRight: '20px'}}>
-                <div style={{
-                    fontSize: '16px',
-                    fontWeight: 500,
-                    marginBottom: '5px',
-                    padding: '5px',
-                    borderBottom: '1px solid #000000'
-                }}>{group}</div>
-                {items.filter(item => item.parent === group).map(subItem => (
-                    <SubItem key={subItem.id} subItem={subItem} />
-                ))}
-            </div>
-        ))}
-    </div>
-)
+const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) => {
+    const { t } = useTranslation('common');
+    return (
+        <div style={{display: 'flex'}}>
+            {groups.map((group) => (
+                <div key={group} style={{display: 'flex', flexDirection: 'column', marginRight: '20px'}}>
+                    <div style={{
+                        fontSize: '14px',
+                        fontWeight: 500,
+                        marginBottom: '5px',
+                        padding: '5px',
+                        borderBottom: '1px solid #000000',
+                        textTransform: 'uppercase'
+                    }}>{t(group)}</div>
+                    {items.filter(item => item.parent === group).map(subItem => (
+                        <SubItem key={subItem.id} subItem={subItem} />
+                    ))}
+                </div>
+            ))}
+        </div>
+    )
+}
 
 const SubItem = ({subItem}: {subItem: MenuItem}) => (
     <motion.div variants={itemVariants} key={subItem.id}>

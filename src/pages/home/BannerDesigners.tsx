@@ -5,6 +5,7 @@ import HtmlBlock from "../../components/HtmlBlock";
 import Carousel from 'react-material-ui-carousel';
 import {motion} from "framer-motion";
 import {ArrowBackIosSharp, ArrowForwardIosSharp} from "@mui/icons-material";
+import {useTranslation} from "next-i18next";
 
 type BannerDesignersProps = {
 	designers: HomeProps['page']['designers']
@@ -16,6 +17,7 @@ const BannerDesigners = ({designers}: BannerDesignersProps) => {
 		hidden: { opacity: 0, scale: 0 },
 		visible: { opacity: 1, scale: 1 },
 	};
+	const { t } = useTranslation('common');
 	return (
 		<Grid container>
 			<Grid item xs={12} md={8}>
@@ -67,7 +69,7 @@ const BannerDesigners = ({designers}: BannerDesignersProps) => {
 									{designer.name}
 								</Typography>
 								<Button>
-									Acquista ora
+									{t('buy-now')}
 								</Button>
 							</motion.div>
 						</div>

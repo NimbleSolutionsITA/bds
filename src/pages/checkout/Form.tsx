@@ -3,6 +3,7 @@ import {Control, Controller, DeepRequired, ErrorOption, FieldErrorsImpl, FieldPa
 import {Country} from "../../types/woocommerce";
 import {Inputs} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
+import {useTranslation} from "next-i18next";
 
 type FormProps = {
 	control: Control<Inputs, any>
@@ -15,6 +16,7 @@ type FormProps = {
 const Form = ({control, errors, isShipping, countries, country, setError}: FormProps) => {
 	const type: 'billing' | 'shipping' = isShipping ? 'shipping' : 'billing';
 	const hideState = country === '' || countries.find(c => c.code === country)?.states?.length === 0
+	const { t } = useTranslation('common')
 	return (
 		<Grid container spacing={2} paddingY={2}>
 			<TextInput
@@ -22,7 +24,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 				error={errors[type]?.first_name?.message ?? ''}
 				type={type}
 				name="first_name"
-				label="First Name"
+				label={t('form.name')}
 				setError={setError}
 			/>
 			<TextInput
@@ -30,7 +32,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 				error={errors[type]?.last_name?.message ?? ''}
 				type={type}
 				name="last_name"
-				label="Last Name"
+				label={t('form.lastname')}
 				setError={setError}
 			/>
 			<TextInput
@@ -38,7 +40,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 				error={errors[type]?.company?.message ?? ''}
 				type={type}
 				name="company"
-				label="Company (facoltativo)"
+				label={t('form.company')}
 				optional
 				md={12}
 				setError={setError}
@@ -48,11 +50,11 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 					control={control}
 					name={`${type}.country`}
 					rules={{
-						required: 'Country is required',
+						required: t('form.required', {field: t('form.country')}),
 					}}
 					render={({ field }) => (
 						<FormControl fullWidth>
-							<InputLabel>Country</InputLabel>
+							<InputLabel>{t('form.country')}</InputLabel>
 							<Select
 								{...field}
 								onChange={(e) => {
@@ -60,7 +62,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 									setError(field.name, {})
 								}}
 								variant="outlined"
-								label="Country"
+								label={t('form.country')}
 							>
 								{countries.map((country) => (
 									<MenuItem key={country.code} value={country.code}>
@@ -81,11 +83,11 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 						control={control}
 						name={`${type}.state`}
 						rules={{
-							required: 'State is required',
+							required: t('validation.required', {context: 'female', field: t('form.state')}),
 						}}
 						render={({field}) => (
 							<FormControl fullWidth>
-								<InputLabel>State</InputLabel>
+								<InputLabel>{t('form.state')}</InputLabel>
 								<Select
 									{...field}
 									onChange={(e) => {
@@ -93,7 +95,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 										setError(field.name, {})
 									}}
 									variant="outlined"
-									label="State"
+									label={t('form.state')}
 								>
 									{countries.find(c => c.code === country)?.states?.map((state) => (
 										<MenuItem key={state.code} value={state.code}>
@@ -114,7 +116,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 				error={errors[type]?.address_1?.message ?? ''}
 				type={type}
 				name="address_1"
-				label="Address"
+				label={t('form.address')}
 				md={12}
 				setError={setError}
 			/>
@@ -123,7 +125,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 				error={errors[type]?.city?.message ?? ''}
 				type={type}
 				name="city"
-				label="City"
+				label={t('form.city')}
 				setError={setError}
 			/>
 			<TextInput
@@ -131,7 +133,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 				error={errors[type]?.postcode?.message ?? ''}
 				type={type}
 				name="postcode"
-				label="Postal code"
+				label={t('form.zip')}
 				setError={setError}
 			/>
 			{type === 'billing' && (
@@ -140,7 +142,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 					error={errors.billing?.phone?.message ?? ''}
 					type={type}
 					name="phone"
-					label="Phone number"
+					label={t('form.phone')}
 					md={12}
 					setError={setError}
 				/>
@@ -160,30 +162,33 @@ type TextInputProps = {
 	setError: (name: (FieldPath<Inputs> | `root.${string}` | "root"), error: ErrorOption, options?: {shouldFocus: boolean}) => void
 }
 
-const TextInput = ({control, error, type, name, label, optional, md = 6, setError}: TextInputProps) => (
-	<Grid item xs={12} md={md}>
-		<Controller
-			control={control}
-			name={`${type}.${name}` as keyof Inputs}
-			rules={optional ? {} : {
-				required: `${label} is required`,
-			}}
-			render={({ field }) => (
-				<TextField
-					{...field}
-					onChange={(e) => {
-						field.onChange(e)
-						setError(field.name, {})
-					}}
-					fullWidth
-					variant="outlined"
-					label={label}
-					helperText={<HelperText message={error} />}
-				/>
-			)}
-		/>
-	</Grid>
-)
+const TextInput = ({control, error, type, name, label, optional, md = 6, setError}: TextInputProps) => {
+	const { t } = useTranslation('common')
+	return (
+		<Grid item xs={12} md={md}>
+			<Controller
+				control={control}
+				name={`${type}.${name}` as keyof Inputs}
+				rules={optional ? {} : {
+					required: t('validation.required', {field: label}),
+				}}
+				render={({ field }) => (
+					<TextField
+						{...field}
+						onChange={(e) => {
+							field.onChange(e)
+							setError(field.name, {})
+						}}
+						fullWidth
+						variant="outlined"
+						label={label}
+						helperText={<HelperText message={error} />}
+					/>
+				)}
+			/>
+		</Grid>
+	)
+}
 
 
 export default Form

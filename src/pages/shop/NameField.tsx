@@ -1,6 +1,7 @@
 import {InputAdornment, TextField} from "@mui/material";
 import {Close, SearchSharp} from '@mui/icons-material';
-import {ChangeEvent} from "react"; // import the clear icon
+import {ChangeEvent} from "react";
+import {useTranslation} from "next-i18next"; // import the clear icon
 
 type NameFieldProps = {
 	onChange: (name?: string) => void
@@ -17,9 +18,11 @@ const NameField = ({onChange, value, disabled}: NameFieldProps) => {
 		onChange("");
 	};
 
+	const { t } = useTranslation('common')
+
 	return <TextField
 		value={value}
-		placeholder="Cerca per nome"
+		placeholder={t('search-by-name')}
 		onChange={handleChange}
 		size="small"
 		variant="filled"

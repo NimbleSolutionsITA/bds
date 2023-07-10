@@ -5,6 +5,7 @@ import googleReviews from "../../images/google-reviews.png";
 import Star from "../../icons/Star";
 import {Button} from "@mui/material";
 import GoogleG from "../../icons/GoogleG";
+import {useTranslation} from "next-i18next";
 
 const GoogleReviews = ({address}: {address: GooglePlaces['main']}) => {
 	function openSmallWindow(url: string, event: MouseEvent) {
@@ -13,6 +14,7 @@ const GoogleReviews = ({address}: {address: GooglePlaces['main']}) => {
 
 		window.open(url, '_blank', windowFeatures);
 	}
+	const { t } = useTranslation('common');
 	return (
 		<div>
 			<Image src={googleReviews} alt="Google Reviews" style={{width: '100%', height: 'auto', maxWidth: '200px', margin: '20px auto'}} />
@@ -43,7 +45,7 @@ const GoogleReviews = ({address}: {address: GooglePlaces['main']}) => {
 				target="_blank"
 				onClick={(e) => openSmallWindow(`https://search.google.com/local/writereview?placeid=${process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID}`, e)}
 			>
-				review us on
+				{t('review-on-us')}
 			</Button>
 			<br />
 			<Button
@@ -54,7 +56,7 @@ const GoogleReviews = ({address}: {address: GooglePlaces['main']}) => {
 				onClick={(e) => openSmallWindow(`https://search.google.com/local/reviews?placeid=${process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID}`, e)}
 				sx={{color: '#2c7cff', textTransform: 'none', fontSize: '12px'}}
 			>
-				Guarda tutte le recensioni
+				{t('read-reviews')}
 			</Button>
 		</div>
 	)

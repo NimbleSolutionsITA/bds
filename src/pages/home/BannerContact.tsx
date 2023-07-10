@@ -1,19 +1,23 @@
 import {Box, Button, Container, Typography} from "@mui/material";
 import {WhatsApp, Email} from "@mui/icons-material";
+import {HomeProps} from "../../../pages";
 
-const BannerContact = () => {
+type BannerContactProps = {
+	bannerContact: HomeProps['page']['bannerContact']
+}
+
+const BannerContact = ({bannerContact: { title, subtitle, subtitle2, email, whatsapp2, whatsapp1}}: BannerContactProps) => {
 	return (
 		<div style={{borderTop: '1px solid black', borderBottom: '1px solid black', padding: '50px 0'}}>
 			<Container maxWidth="md" sx={{textAlign: 'center'}}>
-				<Typography variant="h6">
-					CONTATTACI
+				<Typography variant="h6" sx={{textTransform: 'uppercase'}}>
+					{title}
 				</Typography>
-				<Typography variant="h1" sx={{padding: '10px 0 5px'}}>
-					I nostri consulenti sono<br />
-					a tua completa disposizione
+				<Typography variant="h1" sx={{padding: '10px 0 5px', maxWidth: '400px', margin: '0 auto'}}>
+					{subtitle}
 				</Typography>
 				<Typography>
-					Contattaci per qualsiasi richiesta
+					{subtitle2}
 				</Typography>
 				<Box
 					sx={{
@@ -31,9 +35,9 @@ const BannerContact = () => {
 						}
 					}}
 				>
-					<WhatsAppButton label="Bottega di Sguardi" phone="393496393775" />
-					<WhatsAppButton label="Bottega di Sguardi - dentro" phone="393341577915" />
-					<EmailButton label="Email" email="info@bottegadisguardi.com" />
+					<WhatsAppButton label="Bottega di Sguardi" url={whatsapp1} />
+					<WhatsAppButton label="Bottega di Sguardi - dentro" url={whatsapp2} />
+					<EmailButton label="Email" email={email} />
 				</Box>
 			</Container>
 		</div>
@@ -42,10 +46,10 @@ const BannerContact = () => {
 
 type ContactButtonProps = {
 	label: string
-	phone?: string
+	url?: string
 	email?: string
 }
-const WhatsAppButton = ({label, phone}: ContactButtonProps) => {
+const WhatsAppButton = ({label, url}: ContactButtonProps) => {
 	return (
 		<Button
 			fullWidth={false}
@@ -61,7 +65,7 @@ const WhatsAppButton = ({label, phone}: ContactButtonProps) => {
 				},
 			}}
 			component="a"
-			href={`https://api.whatsapp.com/send?phone=${phone}&text=Ciao!`}
+			href={url}
 			target="_blank"
 			startIcon={<WhatsApp />}
 		>

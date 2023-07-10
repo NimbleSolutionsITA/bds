@@ -12,6 +12,7 @@ import {Category, ShippingClass} from "../../types/woocommerce";
 import {BaseLayoutProps} from "../../types/settings";
 import Chip from "../../components/Chip";
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
 
 type CartDrawerProps = {
 	shipping: ShippingClass[]
@@ -23,6 +24,7 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 	const dispatch = useDispatch()
 	const totalItems = items.reduce((previousValue, currentValue) => previousValue + currentValue.qty, 0)
 	const subtotal = items.reduce((previousValue, currentValue) => previousValue + (currentValue.price * currentValue.qty), 0)
+	const { t } = useTranslation('common')
 	return (
 		<SwipeableDrawer
 			open={cartDrawerOpen}
@@ -49,7 +51,7 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 			<Container sx={{display: 'flex', flexDirection: 'column', gap: '10px', position: 'relative'}}>
 				<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '60px'}}>
 					<Typography variant="h6">
-						La tua shopping bag ({totalItems} {totalItems === 1 ? 'articolo' : 'articoli'})
+						{t('cart.title')} ({totalItems} {totalItems === 1 ? t('product') : t('products')})
 					</Typography>
 					<IconButton size="small" onClick={() => dispatch(closeCartDrawer())}>
 						<CloseOutlined fontSize="small" />
@@ -61,12 +63,12 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 							<CartItem key={item.variation_id??''+item.product_id} item={item} />
 						))}
 						<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px'}}>
-							<Typography variant="h6">Subtotale</Typography>
+							<Typography variant="h6" sx={{textTransform: 'capitalize'}}>{t('subtotal')}</Typography>
 							<Typography variant="h6">
 								<PriceFormat value={subtotal} decimalScale={0} />
 							</Typography>
 						</div>
-						<Button component={Link} href="/checkout">VAI AL CHECKOUT</Button>
+						<Button component={Link} href="/checkout">{t('cart.cta')}</Button>
 						{cartDrawerOpen && (
 							<div style={{marginTop: '10px'}}>
 								<StripePaymentButton  items={items} shipping={shipping} />
@@ -76,10 +78,10 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 				) : (
 					<>
 						<Typography variant="h4" sx={{textAlign: 'center'}}>
-							La tua shopping bag è vuota.
+							{t('cart.empty.title')}
 						</Typography>
 						<Typography sx={{textAlign: 'center'}}>
-							Esplora i nostri prodotti iniziando a selezionare una delle categorie qui sotto.
+							{t('cart.empty.subtitle')}
 						</Typography>
 						<CategoryChips title="Designers" categories={categories.designers} path="/designers" />
 						<CategoryChips title="Liquides Imaginaries" categories={categories.fragrances.liquides} path="/fragrances" />

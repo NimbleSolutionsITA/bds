@@ -26,7 +26,7 @@ const StripeWrapper = ({order, children}: StripeCheckoutProps) => {
 		if(order?.id && orderTotal > 0) {
 			if (orderTotal !== total) {
 				console.log('total stripe intent updated', orderTotal, total)
-				fetch('api/orders/stripe-intent', {
+				fetch('/api/orders/stripe-intent', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({

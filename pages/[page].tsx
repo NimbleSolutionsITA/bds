@@ -28,6 +28,7 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
         getLayoutProps(locale),
         getPageProps(slug, locale)
     ]);
+    console.log(page)
     const redirect = REDIRECTS.find(r => r.page === slug)
     if (redirect) {
         return {

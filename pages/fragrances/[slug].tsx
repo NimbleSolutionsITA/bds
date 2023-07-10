@@ -33,7 +33,7 @@ export default function Fragrance({ productCategory, products, layout }: Fragran
 
 export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
 	const [
-		{ productCategory, layout }
+		{ productCategory, layout: {ssrTranslations, ...layout} }
 	] = await Promise.all([
 		getCategoryPageProps(locale, slug)
 	]);
@@ -61,7 +61,8 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 				breadcrumbs,
 			},
 			productCategory,
-			products
+			products,
+			...ssrTranslations
 		},
 		revalidate: 10
 	}

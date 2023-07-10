@@ -1,18 +1,23 @@
-import {sanitize} from "../utils/utils";
-import React from "react";
-import {Box, SxProps, Theme} from "@mui/material";
+import { ElementType } from "react";
+import { sanitize } from "../utils/utils";
+import { Box, SxProps, Theme } from "@mui/material";
 
 type HtmlBlockProps = {
-	html: string
-	sx?:  SxProps<Theme> | undefined
-}
-const HtmlBlock = ({html, sx}: HtmlBlockProps) => {
-  return (
-	  <Box
-		  dangerouslySetInnerHTML={{__html: sanitize(html)}}
-		  sx={sx}
-	  />
-  );
+	html: string;
+	sx?: SxProps<Theme> | undefined;
+	component?: ElementType;
+};
+
+const HtmlBlock = ({ html, sx, component }: HtmlBlockProps) => {
+	const Component = component ?? 'div';
+
+	return (
+		<Box
+			component={Component}
+			dangerouslySetInnerHTML={{ __html: sanitize(html) }}
+			sx={sx}
+		/>
+	);
 };
 
 export default HtmlBlock;

@@ -6,6 +6,7 @@ import {ShippingClass} from "../types/woocommerce";
 import {NEXT_API_ENDPOINT} from "../utils/endpoints";
 import {useRouter} from "next/router";
 import {getName} from "../utils/utils";
+import {useTranslation} from "next-i18next";
 
 type StripePaymentButtonProps = {
 	items: CartItem[]
@@ -24,6 +25,7 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 	const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
 	const total = items.reduce((acc, item) => acc + item.price * item.qty, 0) * 100;
 	const router = useRouter();
+	const { t } = useTranslation();
 
 	console.log('Total: ' + total);
 
@@ -42,7 +44,7 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 		if (paymentRequest) {
 			paymentRequest.update({
 				total: {
-					label: 'Totale',
+					label: t('total'),
 					amount: total,
 				},
 				displayItems: items.map(item => ({
@@ -61,7 +63,7 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 				country: 'IT',
 				currency: 'eur',
 				total: {
-					label: 'Totale',
+					label: t('total'),
 					amount: total,
 				},
 				requestPayerName: true,

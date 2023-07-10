@@ -19,7 +19,7 @@ export default function Designers({ layout }: DesignersProps) {
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
-        layoutProps,
+        {ssrTranslations, ...layoutProps},
         { seo },
     ] = await Promise.all([
         getLayoutProps(locale),
@@ -36,7 +36,8 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
                     { name: 'Designers', href: urlPrefix + '/designers' }
                 ],
                 seo
-            }
+            },
+            ...ssrTranslations
         },
         revalidate: 10
     }

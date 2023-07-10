@@ -26,6 +26,7 @@ import PriceRecap from "./PriceRecap";
 import HelperText from "../../components/HelperText";
 import Minus from "../../layout/cart/Minus";
 import Plus from "../../layout/cart/Plus";
+import {useTranslation} from "next-i18next";
 
 type RecapProps = {
 	control: Control<Inputs>
@@ -49,6 +50,8 @@ type RecapProps = {
 	checkoutStep: number
 }
 const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, items, prices, isLoading, errors, recapAction, checkoutStep}: RecapProps) => {
+	const { t } = useTranslation('common');
+	console.log(t('shipping.line1'))
 	return (
 		<Box sx={{padding: {xs: '0 0 20px', md: '30px 0 20px'}, width: '100%', display: 'flex', flexDirection: 'column'}}>
 			<div style={{padding: '30px 0 20px', width: '100%', display: 'flex', flexDirection: 'column', gap: '15px'}}>
@@ -85,12 +88,12 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 							<div style={{flexGrow: 1}} />
 							{item.attributes.map((attribute) => (
 								<Typography sx={{fontSize: '12px', lineHeight: '16px'}} key={attribute.id}>
-									{attribute.id.toString().replace("pa_", "").toUpperCase()}: {attribute.name}
+									{t('attributes.'+attribute.id).toUpperCase()}: {attribute.name}
 								</Typography>
 							))}
 							<Typography sx={{fontSize: '12px', lineHeight: '16px'}}>
 								{/* eslint-disable-next-line react/jsx-no-undef */}
-								QUANTITÀ: <Minus item={item} disabled={isLoading || checkoutStep > 2} />{item.qty}<Plus disabled={isLoading || checkoutStep > 2} item={item} />
+								{t('quantity').toUpperCase()}: <Minus item={item} disabled={isLoading || checkoutStep > 2} />{item.qty}<Plus disabled={isLoading || checkoutStep > 2} item={item} />
 							</Typography>
 						</div>
 						<Typography component="div" sx={{width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', fontWeight: 500}}>
@@ -111,7 +114,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 								disabled={isLoading || checkoutStep > 2}
 								fullWidth
 								variant="outlined"
-								label="Coupon code"
+								label={t('checkout.coupon-code')}
 								helperText={<HelperText message={errors.coupon_code?.message} absolute />}
 							/>
 						)}
@@ -124,7 +127,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 						disabled={isLoading || checkoutStep > 2}
 						endIcon={isLoading && <CircularProgress size={16} />}
 					>
-						APPLICA
+						{t('checkout.apply').toUpperCase()}
 					</Button>
 				</Grid>
 			</Grid>
@@ -134,12 +137,12 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 				name="shipping_method"
 				render={({ field }) => (
 					<FormControl fullWidth sx={{margin: '20px 0'}}>
-						<InputLabel>Spedizione</InputLabel>
+						<InputLabel>{t('checkout.shipping')}</InputLabel>
 						<Select
 							{...field}
 							disabled={isLoading || checkoutStep > 2}
 							variant="outlined"
-							label="Spedizione"
+							label={t('checkout.shipping')}
 							sx={{
 								'& .MuiSelect-select': {
 									paddingLeft: '8px'
@@ -182,7 +185,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 					disabled={isLoading || checkoutStep > 4}
 					startIcon={(isLoading || checkoutStep === 4.5) && <CircularProgress size={16} />}
 				>
-					{(checkoutStep === 3 || checkoutStep === 4.5) ? 'PAGA ORA' : 'VAI AL PAGAMENTO'}
+					{(checkoutStep === 3 || checkoutStep === 4.5) ? t('checkout.pay-now') : t('checkout.go-to-payment')}
 				</Button>
 				<Payments />
 			</Hidden>

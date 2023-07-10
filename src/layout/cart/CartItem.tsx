@@ -6,12 +6,14 @@ import Image from "next/image";
 import Minus from "./Minus";
 import Plus from "./Plus";
 import PriceFormat from "../../components/PriceFormat";
+import {useTranslation} from "next-i18next";
 
 type CartItemProps = {
 	item: CartItemType
 }
 const CartItem = ({item}: CartItemProps) => {
 	const dispatch = useDispatch()
+	const { t } = useTranslation('common')
 	return (
 		<Box sx={{
 			border: '1px solid #fff',
@@ -42,11 +44,11 @@ const CartItem = ({item}: CartItemProps) => {
 				</Typography>
 				{item.attributes.map((attribute) => (
 					<Typography sx={{fontSize: '12px', lineHeight: '16px'}} key={attribute.id}>
-						{attribute.id.toString().replace("pa_", "").toUpperCase()}: {attribute.name}
+						{t('attributes.'+attribute.id).toUpperCase()}: {attribute.name}
 					</Typography>
 				))}
 				<Typography sx={{fontSize: '12px', lineHeight: '16px'}}>
-					QUANTITÀ: <Minus item={item} />{item.qty}<Plus item={item} />
+					{t('quantity').toUpperCase()}: <Minus item={item} />{item.qty}<Plus item={item} />
 				</Typography>
 				<IconButton
 					size="small"

@@ -40,12 +40,12 @@ export const OPTICAL_CATEGORY = {
     en: 493
 }
 export const PROFUMUM_ROMA_CATEGORY = {
-    it:1166,
-    en: 11732
-}
-export const LIQUIDES_IMAGINAIRES_CATEGORY = {
     it: 51,
     en: 518
+}
+export const LIQUIDES_IMAGINAIRES_CATEGORY = {
+    it: 1166,
+    en: 1188
 }
 
 export const BOTTEGA_DI_SGUARDI_CATEGORY = {
@@ -55,7 +55,7 @@ export const BOTTEGA_DI_SGUARDI_CATEGORY = {
 
 export const BOTTEGA_DI_SGUARDI_HORN_COLLECTION_CATEGORY = {
     it: 1581,
-    en: 11664
+    en: 12497
 }
 
 export const VIBES_365_CATEGORY = {

@@ -5,11 +5,13 @@ import {RootState} from "../../redux/store";
 import {useState} from "react";
 import Link from "../../components/Link";
 import {CloseSharp} from "@mui/icons-material";
+import {Trans, useTranslation} from "react-i18next";
 
 const NewsletterDrawer = () => {
 	const [email, setEmail] = useState<string>('')
 	const { newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
 	const dispatch = useDispatch()
+	const { t } = useTranslation('common');
 	return (
 		<SwipeableDrawer
 			anchor="right"
@@ -36,10 +38,10 @@ const NewsletterDrawer = () => {
 					<CloseSharp />
 				</IconButton>
 				<Typography sx={{fontFamily: 'Ogg Roman', fontSize: '22px'}}>
-					Iscriviti alla newsletter
+					{t('newsletter.title')}
 				</Typography>
 				<Typography sx={{margin: '25px 0'}}>
-					Abbonati alla nostra newsletter per ottenere aggiornamenti su esclusive anteprime di collezioni, eventi eccezionali e offerte di stagione.
+					{t('newsletter.body')}
 				</Typography>
 				<form>
 					<TextField
@@ -52,7 +54,7 @@ const NewsletterDrawer = () => {
 						onChange={(e) => setEmail(e.target.value)}
 					/>
 					<Typography sx={{fontStyle: 'italic', fontSize: '13px', lineHeight: '1.3', marginTop: '10px'}}>
-						Abbonandoti alla newsletter, confermi di aver letto la <Link href="/privacy-plicy" >Privacy Policy</Link> e acconsenti al trattamento dei tuoi dati personali per finalità di marketing.
+						<Trans i18nKey="newsletter.consentText" components={[<Link key={0} href="/privacy-policy" />]} />
 					</Typography>
 					<Button
 						type="submit"
@@ -61,7 +63,7 @@ const NewsletterDrawer = () => {
 						fullWidth
 						sx={{marginTop: '20px'}}
 					>
-						Iscriviti
+						{t('subscribe')}
 					</Button>
 				</form>
 			</Container>

@@ -6,6 +6,7 @@ import {Country} from "../../types/woocommerce";
 import {Inputs} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
 import MotionPanel from "../../components/MotionPanel";
+import {useTranslation} from "next-i18next";
 
 type AddressFormProps = {
 	control: Control<Inputs>
@@ -23,15 +24,15 @@ const AddressForm = ({isLoading, control, errors, countries, shippingCountry, bi
 	const handleChange = (event: SyntheticEvent, newValue: number) => {
 		setTab(newValue);
 	};
-
+	const { t } = useTranslation('common');
 	return (
 		<div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
 			<Controller
 				control={control}
 				name="billing.email"
 				rules={{
-					required: 'Email Address is required',
-					pattern: {value: /\S+@\S+\.\S+/, message: 'Entered a valid email'}
+					required: t('validation.emailRequired'),
+					pattern: {value: /\S+@\S+\.\S+/, message: t('validation.emailValid')}
 				}}
 				render={({ field }) => (
 					<TextField
@@ -54,7 +55,7 @@ const AddressForm = ({isLoading, control, errors, countries, shippingCountry, bi
 				render={({ field }) => (
 					<FormControlLabel sx={{marginTop: '10px', marginRight: 'auto'}} labelPlacement="start" control={(
 						<Switch checked={hasShipping} {...field} />
-					)} label="Voglio spedire a un indirizzo diverso" />
+					)} label={t('checkout.different-address')} />
 				)}
 			/>
 			<Tabs
@@ -63,8 +64,8 @@ const AddressForm = ({isLoading, control, errors, countries, shippingCountry, bi
 				variant="fullWidth"
 
 			>
-				<Tab label={hasShipping ? 'Fatturazione' : 'Fatturazione e spedizione'} />
-				{hasShipping && <Tab label="Spedizione" />}
+				<Tab label={hasShipping ? t('checkout.billing') : t('checkout.billing-shipping')} />
+				{hasShipping && <Tab label={t('checkout.shipping')} />}
 			</Tabs>
 			<div style={{position: 'relative'}}>
 				<MotionPanel active={!hasShipping || tab === 0}>

@@ -1,11 +1,12 @@
 import {
+	DESIGNERS_SUB_PATH, FRAGRANCES_SUB_PATH, OUR_PRODUCTION_SUB_PATH,
 	WORDPRESS_API_ENDPOINT,
 	WORDPRESS_MENUS_ENDPOINT,
 	WORDPRESS_RANK_MATH_SEO_ENDPOINT
 } from "./endpoints"
 import {
 	AcfImage,
-	ACFListArticle,
+	ACFListArticle, Article,
 	Category,
 	Image,
 	ListArticle,
@@ -15,12 +16,19 @@ import {
 } from "../types/woocommerce";
 import {getGooglePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
-import {EYEWEAR_CATEGORY, PROFUMUM_ROMA_CATEGORY, LIQUIDES_IMAGINAIRES_CATEGORY, sanitize} from "./utils";
+import {
+	EYEWEAR_CATEGORY,
+	PROFUMUM_ROMA_CATEGORY,
+	LIQUIDES_IMAGINAIRES_CATEGORY,
+	sanitize,
+	OUR_PRODUCTION_CATEGORIES
+} from "./utils";
 import {getShippingInfo} from "../../pages/api/shipping";
 import {getProducts} from "../../pages/api/products";
 import {getAttributes} from "../../pages/api/products/colors";
 import {getProductTags} from "../../pages/api/products/tags";
 import {mapArticle} from "./mappers";
+import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
 type MenuCategories = {
 	designers: WooProductCategory[],
@@ -28,21 +36,25 @@ type MenuCategories = {
 		profumum: WooProductCategory[],
 		liquides: WooProductCategory[]
 	},
+	ourProduction: WooProductCategory[]
 }
 function mapMenuItem(categories?: MenuCategories) {
 	return function (item: any) {
 		let child_items
 		let groups = null
-		if (item.slug ==='designers' && categories?.designers) {
+		if (item.slug === DESIGNERS_SUB_PATH && categories?.designers) {
 			groups = ['A-J', 'K-Z']
-			child_items = categories.designers.map(categoryToMenu('designers'))
+			child_items = categories.designers.map(categoryToMenu(DESIGNERS_SUB_PATH))
 		}
-		else if (item.slug ==='fragrances' && categories?.fragrances) {
+		else if (item.slug === FRAGRANCES_SUB_PATH && categories?.fragrances) {
 			groups = ['liquides-imaginaires', 'profumum-roma']
 			child_items = [
 				...categories.fragrances.profumum.map(categoryToMenu('profumum-roma')),
 				...categories.fragrances.liquides.map(categoryToMenu('liquides-imaginaires'))
 			]
+		}
+		else if (item.slug === OUR_PRODUCTION_SUB_PATH) {
+			child_items = categories?.ourProduction.map(categoryToMenu(OUR_PRODUCTION_SUB_PATH)) ?? null
 		}
 		else {
 			child_items = item.child_items ? item.child_items.map(mapMenuItem()) : null
@@ -58,9 +70,12 @@ function mapMenuItem(categories?: MenuCategories) {
 }
 function categoryToMenu(path: string) {
 	return function (category: WooProductCategory) {
-		let parent
+		let parent = null
 		let base = path
-		if(path === 'designers') {
+		if (path === 'our-production') {
+			base = 'designers'
+		}
+		else if(path === 'designers') {
 			const regex = /^[a-jA-J0-9\W]/;
 			parent = regex.test(category.name) ? 'A-J' : 'K-Z'
 		}
@@ -78,14 +93,25 @@ function categoryToMenu(path: string) {
 	}
 }
 
+const getSSRTranslations = async (locale: 'it' | 'en') => {
+	return await serverSideTranslations(locale, [
+		'common',
+	])
+}
+
 export const getLayoutProps = async (locale: 'it' | 'en') => {
+	const ssrTranslations = await getSSRTranslations(locale)
 	const productCategories = (await getProductCategories(locale))
 	const categories = {
 		designers: productCategories.filter(cat => cat.parent === EYEWEAR_CATEGORY[locale]),
 		fragrances: {
 			profumum: productCategories.filter(cat => cat.parent === PROFUMUM_ROMA_CATEGORY[locale]),
 			liquides: productCategories.filter(cat => cat.parent === LIQUIDES_IMAGINAIRES_CATEGORY[locale])
-		}
+		},
+		ourProduction: productCategories.filter(cat => [
+			...OUR_PRODUCTION_CATEGORIES.it,
+			...OUR_PRODUCTION_CATEGORIES.en
+		].includes(cat.id))
 	}
 	const menus = {
 		leftMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-left${locale !== 'it' ? '-'+locale : ''}`)
@@ -110,7 +136,8 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 				liquides: categories.fragrances.liquides.map(mapProductCategory)
 			}
 		},
-		shipping
+		shipping,
+		ssrTranslations
 	}
 }
 export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: number) => {
@@ -118,13 +145,18 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
 	)
 		.then(response => response.json()))[0]
-	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${page.link}`).then(response => response.json()))
-	return { page: mapPage(page), seo: seo.head }
+	const seo = await getSeo(page.link)
+	return { page: mapPage(page), seo }
 }
 
-export const getPosts = async (locale: 'it' | 'en', page?: number, perPage?: number, slug?: string, categories?: number[], tags?: number[]) => {
+export const getSeo = async (link: string) => {
+	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${link}`).then(response => response.json()))
+	return seo.head ?? null
+}
+
+export const getPosts = async (locale?: 'it' | 'en', page?: number, perPage?: number, slug?: string, categories?: number[], tags?: number[]): Promise<{posts: Article[]}> => {
 	const posts = await fetch(
-		`${ WORDPRESS_API_ENDPOINT}/posts?lang=${locale}&page=${page || 1}&per_page=${perPage || 10}${slug ? '&slug=${slug}' : ''}${categories ? `&categories=${categories.join(',')}` : ''}${tags ? `&tags=${tags.join(',')}` : ''}`
+		`${ WORDPRESS_API_ENDPOINT}/posts?&page=${page || 1}&per_page=${perPage || 99}${locale ? '&lang='+locale : ''}${slug ? '&slug='+slug : ''}${categories ? `&categories=${categories.join(',')}` : ''}${tags ? `&tags=${tags.join(',')}` : ''}`
 	)
 		.then(response => response.json())
 	return {posts: posts.map(mapArticle)}
@@ -152,12 +184,14 @@ export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) =>
 		...layout.categories.fragrances.liquides,
 		...layout.categories.fragrances.profumum
 	].find(cat => cat.slug === slug)
-	return { layout, productCategory }
+	const seo =  productCategory && await getSeo(productCategory?.link)
+	return { layout: { ...layout, seo: seo ?? null }, productCategory }
 }
 
-export const getCheckoutPageProps = async (locale: string) => {
+export const getCheckoutPageProps = async (locale: 'it' | 'en') => {
 	const shipping = await getShippingInfo(locale)
-	return { shipping }
+	const ssrTranslations = await getSSRTranslations(locale)
+	return { shipping, ssrTranslations }
 }
 
 export const mapCategory = ({id, name, slug, count}: Category) => ({
@@ -170,7 +204,7 @@ export const mapTag = ({id, name, slug}: Category) => ({
 
 export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}, slug = 'shop', parent?: number) => {
 	const [
-		layoutProps,
+		{ssrTranslations, ...layoutProps},
 		{ seo },
 		products,
 		{ colors, attributes },
@@ -203,12 +237,36 @@ export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?:
 		colors,
 		attributes,
 		tags,
-		designers: designers.map(mapCategory)
+		designers: designers.map(mapCategory),
+		...ssrTranslations
 	}
 }
 
 export const getAllPagesIds = async () => {
-	const pages: WPPage[] = (await fetch(`${ WORDPRESS_API_ENDPOINT}/pages?per_page=99`).then(response => response.json()))
+	let pages: WPPage[] = [];
+	let page: number = 1;
+
+	while (true) {
+		const response = await fetch(`${WORDPRESS_API_ENDPOINT}/pages?per_page=100&page=${page}`);
+
+		if (!response.ok) {
+			if (response.status === 400) {
+				break;
+			} else {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+		}
+
+		const pageData: WPPage[] = await response.json();
+		pages = pages.concat(pageData);
+
+		if (pageData.length === 0) {
+			break;
+		}
+
+		page++;
+	}
+
 	return pages.filter(({slug}) => ![
 		'fragrances',
 		'man',
@@ -219,12 +277,46 @@ export const getAllPagesIds = async () => {
 		'dentro-diaries',
 		'shop',
 		'home',
-		'designers'
+		'designers',
+		'cookie-settings',
+		'store'
 	].includes(slug)).map(page => ({
 		params: {
 			page: page.slug,
 		}
-	}))
+	}));
+}
+
+export const getAllPostIds = async () => {
+	let posts: Article[] = [];
+	let page: number = 1;
+
+	while (true) {
+		const response = await fetch(`${WORDPRESS_API_ENDPOINT}/posts?per_page=100&page=${page}`);
+
+		if (!response.ok) {
+			if (response.status === 400) {
+				break;
+			} else {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+		}
+
+		const postData: Article[] = await response.json();
+		posts = posts.concat(postData);
+
+		if (postData.length === 0) {
+			break;
+		}
+
+		page++;
+	}
+
+	return posts.map(post => ({
+		params: {
+			post: post.slug,
+		}
+	}));
 }
 
 export const mapProductCategory = (category: WooProductCategory): WooProductCategory => ({
@@ -237,6 +329,7 @@ export const mapProductCategory = (category: WooProductCategory): WooProductCate
 	count: category.count,
 	acf: category.acf,
 	parent: category.parent,
+	link: category.link
 })
 
 export const mapImage = ({id, src, name, alt}: Image) => ({

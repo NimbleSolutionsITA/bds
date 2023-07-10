@@ -61,6 +61,14 @@ export type HomeProps = PageBaseProps & {
                 cta: AcfAdvancedLink
             }
             image: AcfImage
+        },
+        bannerContact: {
+            title: string
+            subtitle: string
+            subtitle2: string
+            whatsapp1: string
+            whatsapp2: string
+            email: string
         }
     }
 }
@@ -77,14 +85,14 @@ export default function Home({page, layout}: HomeProps) {
           <BannerBottom bannerBottom={page.bannerBottom} />
           <BannerTestimonials reviews={layout.googlePlaces.main.reviews} />
           <BannerBottom2 bannerBottom2={page.bannerBottom2} />
-          <BannerContact />
+          <BannerContact bannerContact={page.bannerContact}  />
       </Layout>
     );
 }
 
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
-        layoutProps,
+        {ssrTranslations, ...layoutProps},
         { seo, page: { acf: {
             sliderWithText,
             ourSelection,
@@ -93,7 +101,8 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
             designers,
             bannerTop: { imageLeft, body, imageRight },
             bannerBottom: { leftColumn, imageCenter, rightColumn },
-            bannerBottom2
+            bannerBottom2,
+            bannerContact
         } } }
     ] = await Promise.all([
         getLayoutProps(locale),
@@ -117,12 +126,14 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
                     imageCenter: mapAcfImage(imageCenter),
                     rightColumn
                 },
-                bannerBottom2
+                bannerBottom2,
+                bannerContact
             },
             layout: {
                 ...layoutProps,
                 seo
-            }
+            },
+            ...ssrTranslations
         },
         revalidate: 10
     }

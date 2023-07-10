@@ -4,7 +4,7 @@ import {
     BaseProduct,
     BaseVariation,
 } from "../types/woocommerce";
-import {Box, Card, CardContent, IconButton, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, IconButton, Typography} from "@mui/material";
 import {
     EYEWEAR_CATEGORY,
     findVariationFromAttributes,
@@ -21,6 +21,10 @@ import placeholder from "../images/placeholder.jpg";
 import blur from "../images/blur.jpg";
 import {AttributeCheckboxes} from "./AttributeCheckboxes";
 import PriceFormat from "./PriceFormat";
+import {openInStockNotifierDrawer} from "../redux/layout";
+import {DESIGNERS_SUB_PATH, PRODUCT_SUB_PATH} from "../utils/endpoints";
+import {useTranslation} from "next-i18next";
+
 
 type ProductCardProps = {
     product: BaseProduct;
@@ -36,7 +40,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         EYEWEAR_CATEGORY.en,
     ];
     const isEyewear = product.categories.find(({id, parent }) =>
-        eyewearCategories.includes(id) || eyewearCategories.includes(parent)
+        eyewearCategories.includes(id) || eyewearCategories.includes(parent as number)
     ) !== undefined;
     const imageRatio = isEyewear ? 45 : 130;
     const [hover, setHover] = useState(false);
@@ -49,7 +53,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
     const [currentImage, setCurrentImage] = useState<string>(currentProduct.image);
 
     const dispatch = useDispatch();
-    const category = product.categories.find((cat) => MAIN_CATEGORIES.includes(cat.parent)) ?? product.categories[0];
+    const { t } = useTranslation();
+    const category = product.categories.find((cat) => MAIN_CATEGORIES.includes(cat.parent as number)) ?? product.categories[0];
 
     const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
         const newAttributes = {...currentAttributes, [attribute]: slug};
@@ -84,7 +89,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
         >
-            <Link href={`/products/${product.slug}`}>
+            <Link href={`/${PRODUCT_SUB_PATH}/${product.slug}`}>
                 <Box sx={{width: '100%', paddingBottom: imageRatio+'%', position: 'relative'}}>
                     <Image
                         src={currentImage}
@@ -99,7 +104,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </Link>
             <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
                 {category &&(
-                    <Link prefetch={false} href={`/designers/${category.name}`} style={{textDecoration: 'none'}}>
+                    <Link prefetch={false} href={`/${DESIGNERS_SUB_PATH}/${category.name}`} style={{textDecoration: 'none'}}>
                         <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(category.name)}} />
                     </Link>
                 )}
@@ -112,7 +117,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     borderTop: '1px solid',
                     borderBottom: '1px solid'
                 }}>
-                    <Link prefetch={false} href={`/products/${product.slug}`} style={{textDecoration: 'none', width: '100%'}}>
+                    <Link prefetch={false} href={`/${PRODUCT_SUB_PATH}/${product.slug}`} style={{textDecoration: 'none', width: '100%'}}>
                         <Typography
                             variant="h3"
                             sx={{
@@ -140,13 +145,32 @@ const ProductCard = ({ product }: ProductCardProps) => {
                             currentAttributes={currentAttributes}
                             handleClickAttribute={handleClickAttribute}
                         />
-                        <IconButton
-                            size="small"
-                            onClick={handleAddToCart}
-                            disabled={currentProduct.stock_status !== 'instock' || !currentProduct.price}
-                        >
-                            <CartIcon />
-                        </IconButton>
+                        {currentProduct.stock_status === 'instock' && currentProduct.price ? (
+                            <IconButton
+                                size="small"
+                                onClick={handleAddToCart}
+                            >
+                                <CartIcon />
+                            </IconButton>
+                        ) : (
+                            <Button
+                                size="small"
+                                variant="text"
+                                onClick={() => dispatch(openInStockNotifierDrawer({
+                                    productId: product.id,
+                                    variationId: product.id !== currentProduct.id ? currentProduct.id : undefined,
+                                    name: product.name,
+                                    category: category?.name,
+                                    attributes: currentProduct.attributes?.map((attribute) => attribute.option).join(', ')
+                                }))}
+                                sx={{
+                                    fontSize: '12px',
+                                    padding: '10px'
+                                }}
+                            >
+                                {t('notify me')}
+                            </Button>
+                        )}
                     </div>
                     <Typography sx={{
                         fontSize: currentProduct.price ?  '20px' : '16px',

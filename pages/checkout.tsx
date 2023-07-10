@@ -52,13 +52,15 @@ export default function Checkout({
 }
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
 	const [
-		{ shipping },
+		{ shipping, ssrTranslations },
 	] = await Promise.all([
 		getCheckoutPageProps(locale),
 	]);
 	return {
 		props: {
-			shipping
+			shipping,
+			...ssrTranslations
+
 		},
 		revalidate: 10
 	}

@@ -7,6 +7,7 @@ import sanitize from "sanitize-html";
 import {getLayoutProps} from "../../src/utils/wordpress_api";
 import {getProduct} from "../api/products/[slug]";
 import {MAIN_CATEGORIES} from "../../src/utils/utils";
+import {WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "../../src/utils/endpoints";
 
 const ProductView = dynamic(() => import('../../src/pages/product/ProductView'), { ssr: false });
 const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
@@ -16,7 +17,7 @@ export type ProductPageProps = PageBaseProps & {
 	product: ProductType,
 }
 export default function Product({ product, layout }: ProductPageProps) {
-	const category = product.categories.find((category) => MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
+	const category = product.categories.find((category) => category.parent && MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
 	return (
 		<Layout layout={layout}>
 			<ProductView product={product} category={category} shipping={layout.shipping} />
@@ -28,7 +29,7 @@ export default function Product({ product, layout }: ProductPageProps) {
 
 export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
 	const [
-		layoutProps,
+		{ssrTranslations, ...layoutProps},
 		product,
 	] = await Promise.all([
 		getLayoutProps(locale),
@@ -39,19 +40,22 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
+	const seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${product.link}`).then(response => response.json())
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
 		{ name: 'Shop', href: urlPrefix + '/shop' },
-		{ name: sanitize(product.name), href: urlPrefix +  '/designers/' + slug },
+		{ name: sanitize(product.name), href: urlPrefix +  '/products/' + slug },
 	]
 	return {
 		props: {
 			layout: {
 				...layoutProps,
-				breadcrumbs
+				breadcrumbs,
+				seo: seo.head ?? null,
 			},
 			product,
+			...ssrTranslations
 		},
 		revalidate: 10
 	}

@@ -1,11 +1,13 @@
 import {AnimatePresence, motion} from "framer-motion";
 import {useEffect, useState} from "react";
+import {useTranslation} from "next-i18next";
 
 const ShippingBanner = () => {
+	const { t } = useTranslation('common');
 	const shippingPromos = [
-		"COSTI DI SPEDIZIONE GRATUITI per ordini superiori a 150€",
-		"SPEDIZIONE IN ITALIA entro 24/48 ore",
-		"SPEDIZIONE IN EUROPA entro 2/3 giorni"
+		t('shipping.line1'),
+		t('shipping.line2'),
+		t('shipping.line3')
 	]
 	const [index, setIndex] = useState(0);
 

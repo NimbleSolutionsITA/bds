@@ -17,14 +17,17 @@ import {addCartItem} from "../../redux/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {AttributeCheckboxes} from "../../components/AttributeCheckboxes";
 import InStock from "../../icons/InStock";
-import SocialShare from "./SocialShare";
-import InStockNotifier from "./InStockNotifier";
 import Image from "next/image";
 import {ArrowForwardIosSharp, ArrowBackIosSharp} from "@mui/icons-material";
 import placeholder from "../../images/placeholder.jpg";
 import {RootState} from "../../redux/store";
 import PriceFormat from "../../components/PriceFormat";
 import StripePaymentButton from "../../components/StripePaymentButton";
+import {openInStockNotifierDrawer} from "../../redux/layout";
+import DHL from "../../icons/DHL";
+import GLS from "../../icons/GLS";
+import {useTranslation} from "next-i18next";
+import {Trans} from "react-i18next";
 
 type ProductViewProps = {
 	product: Product
@@ -45,6 +48,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	].filter(v => v)
 	const [galleryIndex, setGalleryIndex] = useState(galleryImages.findIndex(v => v.variation === defaultProduct.id));
 	const dispatch = useDispatch();
+	const { t } = useTranslation('common');
     const cartQuantity = items.find(v =>
 	    v.product_id === product.id &&
 	    v.variation_id === (product.type === 'variable' ? currentProduct.id : undefined)
@@ -189,13 +193,28 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						extended
 					/>
 					{currentProduct.stock_status !== 'instock' ? (
-						<InStockNotifier
-							productId={product.id}
-							variationId={currentProduct.id}
-						/>
+						<>
+							<Typography sx={{margin: '20px 0'}}>
+								{t('notifier.title')}
+							</Typography>
+							<Button
+								fullWidth
+								onClick={() => dispatch(openInStockNotifierDrawer({
+									productId: product.id,
+									variationId: product.type === 'variable' ? currentProduct.id : undefined,
+									name: product.name,
+									category: category?.name,
+									attributes: currentProduct.attributes?.map((attribute) => attribute.option).join(', ')
+
+								}))}
+								sx={{marginTop: '20px'}}
+							>
+								{t('notifier.cta')}
+							</Button>
+						</>
 					) : (
 						<Typography sx={{fontSize: '18px', display: 'flex', fontStyle: 'italic', margin: '10px 0'}}>
-							<InStock sx={{fontSize: '30px', marginRight: '10px'}}/> disponibile
+							<InStock sx={{fontSize: '30px', marginRight: '10px'}}/> {t('available').toLowerCase()}
 						</Typography>
 					)}
 					{currentProduct.stock_status === 'instock'  && (
@@ -207,7 +226,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 								marginTop: '20px',
 							}}
 						>
-							Aggiungi alla shopping bag
+							{t('cart.add')}
 						</Button>
 					)}
 					{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
@@ -215,22 +234,18 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 							<StripePaymentButton  items={[cartItem]} shipping={shipping} />
 						</div>
 					)}
-					<SocialShare
-						facebookUrl={'/'}
-						facebookMessengerAppId={'/'}
-						facebookMessengerUrl={'/'}
-						whatsappUrl={'/'}
-						telegramUrl={'/'}
-						twitterUrl={'/'}
-						emailUrl={'/'}
-					/>
-					<Typography sx={{marginTop: '20px'}}>
-						<b>Costi di spedizione</b> gratuiti per ordini superiori a 150€.
-						<br/>
-						<b>Spedizione in Italia</b> entro 24/48 ore con corriere DHL o GLS.
-						<br />
-						<b>Spedizione in Europa</b> entro 2/3 giorni con corrire DHL o GLS.
-					</Typography>
+					<div style={{marginTop: '20px', lineHeight: 1}}>
+						<Typography component="div" sx={{marginTop: '20px'}}>
+							<DHL sx={{fontSize: '40px', marginRight: '10px'}} />
+							<GLS sx={{fontSize: '40px'}} />
+							<br />
+							<Trans i18nKey="shipping.line1b" components={[<b key={0} />]} />
+							<br/>
+							<Trans i18nKey="shipping.line2b" components={[<b key={0} />]} />
+							<br />
+							<Trans i18nKey="shipping.line3b" components={[<b key={0} />]} />
+						</Typography>
+					</div>
 				</Grid>
 			</Grid>
 		</Container>
