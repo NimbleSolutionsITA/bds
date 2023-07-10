@@ -1,4 +1,13 @@
-import {FormControl, FormHelperText, Grid, InputLabel, MenuItem, Select, TextField} from "@mui/material";
+import {
+	FormControl,
+	FormHelperText,
+	Grid,
+	InputLabel,
+	MenuItem,
+	Select,
+	SelectChangeEvent,
+	TextField
+} from "@mui/material";
 import {Control, Controller, DeepRequired, ErrorOption, FieldErrorsImpl, FieldPath, GlobalError} from "react-hook-form";
 import {Country} from "../../types/woocommerce";
 import {Inputs} from "./CheckoutGrid";
@@ -57,7 +66,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 							<InputLabel>{t('form.country')}</InputLabel>
 							<Select
 								{...field}
-								onChange={(e) => {
+								onChange={(e: SelectChangeEvent<string>) => {
 									field.onChange(e)
 									setError(field.name, {})
 								}}
@@ -90,7 +99,7 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 								<InputLabel>{t('form.state')}</InputLabel>
 								<Select
 									{...field}
-									onChange={(e) => {
+									onChange={(e: SelectChangeEvent<string>) => {
 										field.onChange(e)
 										setError(field.name, {})
 									}}
