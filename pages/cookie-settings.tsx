@@ -122,7 +122,7 @@ export default function CookieSettingsPage({layout}: GenericPageProps) {
 export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
 	// @ts-ignore
 	const [
-		layoutProps,
+		{ssrTranslations, ...layoutProps},
 	] = await Promise.all([
 		getLayoutProps(locale),
 	]);
@@ -135,7 +135,8 @@ export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
 					{ name: 'Home', href: urlPrefix + '/' },
 					{ name: 'Preferenze Cookie', href: urlPrefix + '/cookie-settings' },
 				]
-			}
-		}
+			},
+			...ssrTranslations
+		},
 	}
 }

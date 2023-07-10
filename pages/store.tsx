@@ -37,7 +37,7 @@ export default function StorePage({acf, layout}: StorePageProps) {
 
 export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
 	const [
-		layoutProps,
+		{ ssrTranslations, ...layoutProps},
 		{ seo, page: { acf } }
 	] = await Promise.all([
 		getLayoutProps(locale),
@@ -54,8 +54,10 @@ export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
 					{ name: 'Home', href: urlPrefix + '/' },
 					{ name: 'Store', href: urlPrefix + '/store' },
 				]
-			}
-		}
+			},
+			...ssrTranslations
+		},
+		revalidate: 10
 	}
 }
 
