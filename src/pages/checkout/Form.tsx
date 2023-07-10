@@ -5,7 +5,6 @@ import {
 	InputLabel,
 	MenuItem,
 	Select,
-	SelectChangeEvent,
 	TextField
 } from "@mui/material";
 import {Control, Controller, DeepRequired, ErrorOption, FieldErrorsImpl, FieldPath, GlobalError} from "react-hook-form";
@@ -66,8 +65,8 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 							<InputLabel>{t('form.country')}</InputLabel>
 							<Select
 								{...field}
-								onChange={(e: SelectChangeEvent<string>) => {
-									field.onChange(e)
+								onChange={(e) => {
+									field.onChange(e.target.value)
 									setError(field.name, {})
 								}}
 								variant="outlined"
@@ -99,8 +98,8 @@ const Form = ({control, errors, isShipping, countries, country, setError}: FormP
 								<InputLabel>{t('form.state')}</InputLabel>
 								<Select
 									{...field}
-									onChange={(e: SelectChangeEvent<string>) => {
-										field.onChange(e)
+									onChange={(e) => {
+										field.onChange(e.target.value)
 										setError(field.name, {})
 									}}
 									variant="outlined"
@@ -185,7 +184,7 @@ const TextInput = ({control, error, type, name, label, optional, md = 6, setErro
 					<TextField
 						{...field}
 						onChange={(e) => {
-							field.onChange(e)
+							field.onChange(e.target.value)
 							setError(field.name, {})
 						}}
 						fullWidth
