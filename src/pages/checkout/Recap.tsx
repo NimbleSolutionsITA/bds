@@ -140,6 +140,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 						<InputLabel>{t('checkout.shipping')}</InputLabel>
 						<Select
 							{...field}
+							onChange={(e) => field.onChange(e.target.value)}
 							disabled={isLoading || checkoutStep > 2}
 							variant="outlined"
 							label={t('checkout.shipping')}
