@@ -22,13 +22,12 @@ export default function GenericPage({page, layout}: GenericPageProps) {
 export async function getStaticProps({ locale, params: { page: slug } }: { locale: 'it' | 'en', params: {page: string}}) {
     // @ts-ignore
     const [
-        layoutProps,
+        { ssrTranslations, ...layoutProps },
         { page, seo }
     ] = await Promise.all([
         getLayoutProps(locale),
         getPageProps(slug, locale)
     ]);
-    console.log(page)
     const redirect = REDIRECTS.find(r => r.page === slug)
     if (redirect) {
         return {
@@ -50,7 +49,8 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
                     { name: 'Home', href: urlPrefix + '/' },
                     { name: page.title, href: urlPrefix + '/' + page.slug },
                 ]
-            }
+            },
+            ...ssrTranslations
         },
         revalidate: 10
     } : {
