@@ -4,6 +4,7 @@ import {PageBaseProps} from "../src/types/settings";
 import dynamic from "next/dynamic";
 import {OUR_PRODUCTION_CATEGORIES} from "../src/utils/utils";
 import {WooProductCategory} from "../src/types/woocommerce";
+import {OUR_PRODUCTION_SUB_PATH} from "../src/utils/endpoints";
 
 const DesignersList = dynamic(() => import("../src/pages/designers/DesignersList"));
 
@@ -25,7 +26,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 		{ seo },
 	] = await Promise.all([
 		getLayoutProps(locale),
-		getPageProps("our-production", locale)
+		getPageProps(OUR_PRODUCTION_SUB_PATH, locale)
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	return {
@@ -38,7 +39,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 				...layoutProps,
 				breadcrumbs: [
 					{ name: 'Home', href: urlPrefix + '/' },
-					{ name: 'Nostra Produzione', href: urlPrefix + '/our-production' }
+					{ name: 'Nostra Produzione', href: urlPrefix + '/'+OUR_PRODUCTION_SUB_PATH }
 				],
 				seo
 			},
