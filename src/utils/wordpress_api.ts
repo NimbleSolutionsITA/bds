@@ -1,9 +1,10 @@
 import {
+	BLOG_POST_SUB_PATH, CHECKOUT_SUB_PATH,
 	DESIGNERS_SUB_PATH,
 	FRAGRANCES_SUB_PATH,
-	LIQUIDES_IMAGINAIRES_SUB_PATH,
+	LIQUIDES_IMAGINAIRES_SUB_PATH, OPTICAL_SUB_PATH,
 	OUR_PRODUCTION_SUB_PATH,
-	PROFUMUM_ROMA_SUB_PATH,
+	PROFUMUM_ROMA_SUB_PATH, SUNGLASSES_SUB_PATH,
 	WORDPRESS_API_ENDPOINT,
 	WORDPRESS_MENUS_ENDPOINT,
 	WORDPRESS_RANK_MATH_SEO_ENDPOINT
@@ -273,16 +274,19 @@ export const getAllPagesIds = async () => {
 	}
 
 	return pages.filter(({slug}) => ![
-		'fragranze',
-		'occhiali-da-sole',
-		'occhiali-da-vista',
-		'eyewear-designers',
-		'checkout',
-		'blog',
+		FRAGRANCES_SUB_PATH,
+		SUNGLASSES_SUB_PATH,
+		OPTICAL_SUB_PATH,
+		DESIGNERS_SUB_PATH,
+		CHECKOUT_SUB_PATH,
+		BLOG_POST_SUB_PATH,
+		PROFUMUM_ROMA_SUB_PATH,
+		LIQUIDES_IMAGINAIRES_SUB_PATH,
 		'shop',
 		'home',
 		'cookie-settings',
-		'negozi-ottica-firenze'
+		'negozi-ottica-firenze',
+		OUR_PRODUCTION_SUB_PATH
 	].includes(slug)).map(page => ({
 		params: {
 			page: page.slug,
