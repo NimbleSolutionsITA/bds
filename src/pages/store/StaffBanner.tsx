@@ -1,5 +1,5 @@
 import { Grid, Typography, Container} from "@mui/material";
-import {StorePageProps} from "../../../pages/store";
+import {StorePageProps} from "../../../pages/negozi-ottica-firenze";
 import Image from "next/image";
 import HtmlBlock from "../../components/HtmlBlock";
 

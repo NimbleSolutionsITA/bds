@@ -1,7 +1,7 @@
-import {StorePageProps} from "../../../pages/store";
 import {Button, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
 import Image from "next/image";
+import {StorePageProps} from "../../../pages/negozi-ottica-firenze";
 
 type BannerContactProps = {
 	data: StorePageProps['acf']['contactsBanner']

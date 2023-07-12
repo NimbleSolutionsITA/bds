@@ -1,7 +1,7 @@
 import {Button, Grid, Typography} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock"
 import FullPageSlider from "../../components/FullPageSlider";
-import {StorePageProps} from "../../../pages/store";
+import {StorePageProps} from "../../../pages/negozi-ottica-firenze";
 import Image from "next/image";
 import Link from "next/link";
 
