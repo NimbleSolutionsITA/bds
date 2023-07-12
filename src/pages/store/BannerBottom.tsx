@@ -1,8 +1,7 @@
 import {Button, Grid, Typography} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock"
 import FullPageSlider from "../../components/FullPageSlider";
-import {StorePageProps} from "../../../pages/store";
-import Link from "next/link";
+import {StorePageProps} from "../../../pages/negozi-ottica-firenze";
 
 type SliderWithTextProps = {
 	data: StorePageProps['acf']['bannerBottom']
