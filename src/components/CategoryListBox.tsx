@@ -2,6 +2,7 @@ import {Box, Button, Hidden, Typography} from "@mui/material";
 import Link from "./Link";
 import {WooProductCategory} from "../types/woocommerce";
 import {sanitize} from "../utils/utils";
+import {DESIGNERS_SUB_PATH} from "../utils/endpoints";
 
 const boxProps = {
 	backgroundColor: '#000',
@@ -13,7 +14,7 @@ const boxProps = {
 	textAlign: 'center',
 	padding: '10px'
 }
-const CategoryListBox = ({ category, index }: { category: WooProductCategory, index: number }) => (
+const CategoryListBox = ({ category, index, subpath = DESIGNERS_SUB_PATH }: { category: WooProductCategory, index: number, subpath?: string }) => (
 	<div
 		key={category.id}
 		style={{
@@ -30,13 +31,13 @@ const CategoryListBox = ({ category, index }: { category: WooProductCategory, in
 					...boxProps
 				}}
 			>
-				<CategoryButton name={category.name} slug={category.slug} color="#fff" />
+				<CategoryButton name={category.name} slug={category.slug} color="#fff" subpath={subpath} />
 			</Box>
 		</Hidden>
 		<Hidden mdDown>
 			<Box
 				component={Link}
-				href={`/categorys/${category.slug}`}
+				href={`/${subpath}/${category.slug}`}
 				sx={{
 					width: '50%',
 					height: '50vw',
@@ -58,16 +59,16 @@ const CategoryListBox = ({ category, index }: { category: WooProductCategory, in
 				},
 			}}
 		>
-			<CategoryButton name={category.name} slug={category.slug} />
+			<CategoryButton name={category.name} slug={category.slug} subpath={subpath} />
 		</Box>
 	</div>
 )
 
-const CategoryButton = ({name, slug, color = '#000'}: {name: string, slug: string, color?: string}) => (
+const CategoryButton = ({name, slug, color = '#000', subpath}: {name: string, slug: string, color?: string, subpath: string}) => (
 	<Button
 		variant="text"
 		component={Link}
-		href={`/fragrances/${slug}`}
+		href={`/${subpath}/${slug}`}
 		sx={{color}}
 	>
 		<Typography

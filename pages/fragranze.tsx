@@ -9,7 +9,7 @@ export type FragrancesProps = PageBaseProps & {
 
 }
 
-export default function Fragrances({ layout }: FragrancesProps) {
+export default function Fragranze({ layout }: FragrancesProps) {
     return (
       <Layout layout={layout}>
           <FragrancesList

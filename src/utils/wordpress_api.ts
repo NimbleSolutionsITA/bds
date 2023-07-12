@@ -1,5 +1,9 @@
 import {
-	DESIGNERS_SUB_PATH, FRAGRANCES_SUB_PATH, OUR_PRODUCTION_SUB_PATH,
+	DESIGNERS_SUB_PATH,
+	FRAGRANCES_SUB_PATH,
+	LIQUIDES_IMAGINAIRES_SUB_PATH,
+	OUR_PRODUCTION_SUB_PATH,
+	PROFUMUM_ROMA_SUB_PATH,
 	WORDPRESS_API_ENDPOINT,
 	WORDPRESS_MENUS_ENDPOINT,
 	WORDPRESS_RANK_MATH_SEO_ENDPOINT
@@ -47,10 +51,10 @@ function mapMenuItem(categories?: MenuCategories) {
 			child_items = categories.designers.map(categoryToMenu(DESIGNERS_SUB_PATH))
 		}
 		else if (item.slug === FRAGRANCES_SUB_PATH && categories?.fragrances) {
-			groups = ['liquides-imaginaires', 'profumum-roma']
+			groups = [PROFUMUM_ROMA_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH]
 			child_items = [
-				...categories.fragrances.profumum.map(categoryToMenu('profumum-roma')),
-				...categories.fragrances.liquides.map(categoryToMenu('liquides-imaginaires'))
+				...categories.fragrances.profumum.map(categoryToMenu(PROFUMUM_ROMA_SUB_PATH)),
+				...categories.fragrances.liquides.map(categoryToMenu(LIQUIDES_IMAGINAIRES_SUB_PATH))
 			]
 		}
 		else if (item.slug === OUR_PRODUCTION_SUB_PATH) {
@@ -72,16 +76,16 @@ function categoryToMenu(path: string) {
 	return function (category: WooProductCategory) {
 		let parent = null
 		let base = path
-		if (path === 'our-production') {
-			base = 'designers'
+		if (path === OUR_PRODUCTION_SUB_PATH) {
+			base = path
 		}
-		else if(path === 'designers') {
+		else if(path === DESIGNERS_SUB_PATH) {
 			const regex = /^[a-jA-J0-9\W]/;
 			parent = regex.test(category.name) ? 'A-J' : 'K-Z'
 		}
 		else {
 			parent = path
-			base = 'fragrances'
+			base = path
 		}
 		return {
 			id: category.id,
@@ -145,12 +149,13 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
 	)
 		.then(response => response.json()))[0]
+
 	const seo = await getSeo(page.link)
 	return { page: mapPage(page), seo }
 }
 
 export const getSeo = async (link: string) => {
-	const seo = (await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${link}`).then(response => response.json()))
+	const seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${link}`).then(response => response.json())
 	return seo.head ?? null
 }
 
@@ -268,19 +273,16 @@ export const getAllPagesIds = async () => {
 	}
 
 	return pages.filter(({slug}) => ![
-		'fragrances',
-		'man',
-		'woman',
-		'optical',
-		'sunglasses',
-		'our-production',
+		'fragranze',
+		'occhiali-da-sole',
+		'occhiali-da-vista',
+		'eyewear-designers',
 		'checkout',
-		'dentro-diaries',
+		'blog',
 		'shop',
 		'home',
-		'designers',
 		'cookie-settings',
-		'store'
+		'negozi-ottica-firenze'
 	].includes(slug)).map(page => ({
 		params: {
 			page: page.slug,

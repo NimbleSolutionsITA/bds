@@ -58,18 +58,31 @@ export default function Layout({children, layout: {
                 {/* Set HTML language attribute */}
                 <meta httpEquiv="content-language" content={locale} />
                 {seo && parse(seo)}
-                {/* Google Tag Manager code */}
-                {isAnalyticsEnabled && googleTagManagerId && (<>
-                    <Script id="google-analytics">
-                        {`
+            </Head>
+            {/* Google Tag Manager code */}
+            {isAnalyticsEnabled && googleTagManagerId && (<>
+                <Script id="google-analytics">
+                    {`
                             window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
                             ga('create', '${googleTagManagerId}', 'auto');
                             ga('send', 'pageview');
                         `}
-                    </Script>
-                    <Script src="https://www.google-analytics.com/analytics.js" />
-                </>)}
-            </Head>
+                </Script>
+                <Script src="https://www.google-analytics.com/analytics.js" />
+            </>)}
+            <Script id="twak" type="text/javascript">
+                {`
+                        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+                        (function(){
+                            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+                            s1.async=true;
+                            s1.src='https://embed.tawk.to/623ae69c5a88d50db1a6e778/1fur19kvb';
+                            s1.charset='UTF-8';
+                            s1.setAttribute('crossorigin','*');
+                            s0.parentNode.insertBefore(s1,s0);
+                        })();
+                    `}
+            </Script>
             <Hidden mdUp>
                 <NavBarMobile mobileMenu={mobileMenu} />
             </Hidden>

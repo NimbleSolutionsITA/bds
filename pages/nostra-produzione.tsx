@@ -11,7 +11,7 @@ export type OurProductionProps = PageBaseProps & {
 	ourProductionCategories: WooProductCategory[]
 }
 
-export default function OurProduction({ layout, ourProductionCategories }: OurProductionProps) {
+export default function NostraProduzione({ layout, ourProductionCategories }: OurProductionProps) {
 	return (
 		<Layout layout={layout}>
 			<DesignersList designers={ourProductionCategories} />

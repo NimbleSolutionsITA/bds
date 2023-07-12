@@ -73,7 +73,7 @@ const ExpansionPanel = ({children ,title, plusMinus, color = "primary", fontSize
 			>
 				{title}
 			</AccordionSummary>
-			<AccordionDetails style={{ display: 'block', padding: 0, overflowX: 'scroll', maxHeight: '220px', paddingBottom: '10px'}}>
+			<AccordionDetails style={{ display: 'block', padding: 0, overflowY: 'auto', maxHeight: '220px', paddingBottom: '10px'}}>
 				{children}
 			</AccordionDetails>
 		</Accordion>

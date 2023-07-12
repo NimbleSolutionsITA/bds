@@ -1,34 +1,33 @@
 import React from "react";
 import Layout from "../../src/layout/Layout";
 import {getCategoryPageProps} from "../../src/utils/wordpress_api";
-import {PageBaseProps} from "../../src/types/settings";
+import { PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
 import {getProducts} from "../api/products";
-import {EYEWEAR_CATEGORY} from "../../src/utils/utils";
+import {LIQUIDES_IMAGINAIRES_CATEGORY, PROFUMUM_ROMA_CATEGORY} from "../../src/utils/utils";
+import {FRAGRANCES_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH} from "../../src/utils/endpoints";
 
-const DesignerTop = dynamic(() => import("../../src/components/CategoryTop"))
-const DesignerProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
-const DesignersBottom = dynamic(() => import("../../src/components/CategoryBottom"))
+const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
+const FragranceProductGrid = dynamic(() => import("../../src/pages/fragrances/FragranceProductGrid"))
+const FragrancesBottom = dynamic(() => import("../../src/components/CategoryBottom"))
 
-export type DesignerProps = PageBaseProps & {
+export type FragranceProps = PageBaseProps & {
 	productCategory: WooProductCategory,
-	products: BaseProduct[]
+	products: BaseProduct[],
 }
-export default function Designer({
-  productCategory, products, layout
-}: DesignerProps) {
+export default function Fragrance({ productCategory, products, layout }: FragranceProps) {
 	return (
 		<Layout layout={layout}>
-			<DesignerTop
+			<FragranceTop
 				name={productCategory.name}
 				gallery={productCategory.acf.gallery}
 				description={productCategory.description}
 			/>
-			<DesignerProductGrid products={products} />
-			<DesignersBottom bottomText={productCategory.acf.bottomText} />
+			<FragranceProductGrid products={products} />
+			<FragrancesBottom bottomText={productCategory.acf.bottomText} />
 		</Layout>
 	);
 }
@@ -47,13 +46,14 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	const products = await getProducts({
 		categories: slug,
 		lang: locale,
-		per_page: '24'
+		per_page: '99',
+		fragrances: true
 	})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
-		{ name: 'Designers', href: urlPrefix + '/designers' },
-		{ name: sanitize(productCategory.name), href: urlPrefix +  '/designers/' + productCategory.slug },
+		{ name: 'Fragranze', href: urlPrefix + '/'+FRAGRANCES_SUB_PATH },
+		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+LIQUIDES_IMAGINAIRES_SUB_PATH+'/' + productCategory.slug },
 	]
 	return {
 		props: {
@@ -71,8 +71,12 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 
 export async function getStaticPaths() {
 	const productCategories = await getProductCategories();
-	const paths = productCategories
-		.filter(({parent}) => parent && [EYEWEAR_CATEGORY.it, EYEWEAR_CATEGORY.en].includes(parent))
+	const paths = productCategories.filter(({parent}) => parent && [
+			PROFUMUM_ROMA_CATEGORY.it,
+			PROFUMUM_ROMA_CATEGORY.en,
+			LIQUIDES_IMAGINAIRES_CATEGORY.it,
+			LIQUIDES_IMAGINAIRES_CATEGORY.en
+		].includes(parent))
 		.map(({slug}: WooProductCategory) => ({ params: { slug } }));
 	return {
 		paths,

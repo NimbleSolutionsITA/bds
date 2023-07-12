@@ -144,5 +144,18 @@
     "state":"State"
   },
   "read-more":"Read more",
-  "available":"Available"
+  "available":"Available",
+  "cookies": {
+    "title": "Cookie Preferences",
+    "mandatory": "Functional Cookies (not optional)",
+    "mandatory-body": "Cookies are pieces of information saved in small text files on your browser when you visit a website. These cookies allow the sender to identify your device during the validity period of consent, which is usually one year.",
+    "analytics": "Analytical Cookies",
+    "analytics-body": "Other cookies are used to analyze the behavior of visitors and monitor site performance. By accepting these cookies, you help us to improve our website and provide an optimal browsing experience.",
+    "profiling": "Advertising Profiling Cookies",
+    "profiling-body": "Furthermore, there are cookies that allow Bottega di Sguardi to show you advertisements based on your preferences, in line with the information collected during your navigation. These cookies are set by both us and carefully selected third parties. If you disable these cookies, the ads you will see may be less relevant to your personal interests.",
+    "usage": "Cookies to personalize your experience on Bottega di Sguardi",
+    "usage-body": "Finally, there are cookies that collect information about how the user uses the site in order to improve its quality, customize its features, and ensure an optimized browsing experience.",
+    "save": "Save preferences",
+    "accept": "Accept all"
+  }
 }

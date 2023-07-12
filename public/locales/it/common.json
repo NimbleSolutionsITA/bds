@@ -148,5 +148,19 @@
     "state":"Provincia",
     "read-more":"Leggi di più",
     "available":"Disponibile"
+  },
+  "cookies": {
+    "title": "Preferenze Cookie",
+    "body": "I cookie sono delle informazione salvate in piccoli file di testo sul tuo browser quando visiti un sito web. Questi cookie consentono al mittente di identificare il tuo dispositivo durante il periodo di validità del consenso, che di solito è di un anno.",
+    "mandatory": "Cookie funzionali (non facoltativi)",
+    "mandatory-body": "Alcuni di questi cookie sono essenziali per garantire il corretto funzionamento del sito e non possono essere disabilitati. Essi forniscono funzionalità chiave al sito (come la selezione della lingua, il carrello degli acquisti, la lista dei desideri, ecc.), oltre a contribuire alla protezione del sito da attacchi malevoli.",
+    "analytics": "Cookie analitici",
+    "analytics-body": "Altri cookie vengono utilizzati per analizzare il comportamento dei visitatori e monitorare le performance del sito. Accettando questi cookie, ci aiuti a migliorare il nostro sito web e a offrire un'esperienza di navigazione ottimale.",
+    "profiling": "Cookie di profilazione pubblicitaria",
+    "profiling-body": "Inoltre, ci sono cookie che consentono al sito di Bottega di Sguardi di mostrarti annunci pubblicitari basati sulle tue preferenze, in linea con le informazioni raccolte durante la tua navigazione. Questi cookie sono impostati sia da noi che da terze parti attentamente selezionate. Nel caso in cui disabiliti questi cookie, gli annunci che visualizzerai potrebbero essere meno pertinenti ai tuoi interessi personali.",
+    "usage": "Cookie per la personalizzare la tua esperienza su Bottega di Sguardi",
+    "usage-body": "Infine, esistono cookie che raccolgono informazioni sulle modalità di utilizzo del sito da parte dell'utente, al fine di migliorarne la qualità, personalizzarne le funzionalità e garantire un'esperienza di navigazione ottimizzata.",
+    "save": "Salva preferenze",
+    "accept": "Accetta tutti"
   }
 }

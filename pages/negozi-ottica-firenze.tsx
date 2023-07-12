@@ -41,7 +41,7 @@ export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
 		{ seo, page: { acf } }
 	] = await Promise.all([
 		getLayoutProps(locale),
-		getPageProps('store', locale)
+		getPageProps('negozi-ottica-firenze', locale)
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	return {
@@ -52,7 +52,7 @@ export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
 				...layoutProps,
 				breadcrumbs: [
 					{ name: 'Home', href: urlPrefix + '/' },
-					{ name: 'Store', href: urlPrefix + '/store' },
+					{ name: 'Store', href: urlPrefix + '/negozi-ottica-firenze' },
 				]
 			},
 			...ssrTranslations

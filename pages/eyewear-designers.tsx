@@ -2,6 +2,7 @@ import Layout from "../src/layout/Layout";
 import {getLayoutProps, getPageProps} from "../src/utils/wordpress_api";
 import {PageBaseProps} from "../src/types/settings";
 import dynamic from "next/dynamic";
+import {DESIGNERS_SUB_PATH} from "../src/utils/endpoints";
 
 const DesignersList = dynamic(() => import("../src/pages/designers/DesignersList"));
 
@@ -9,7 +10,7 @@ export type DesignersProps = PageBaseProps & {
 
 }
 
-export default function Designers({ layout }: DesignersProps) {
+export default function EyewearDesigners({ layout }: DesignersProps) {
     return (
       <Layout layout={layout}>
           <DesignersList designers={layout.categories.designers} />
@@ -23,7 +24,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
         { seo },
     ] = await Promise.all([
         getLayoutProps(locale),
-        getPageProps("designers", locale)
+        getPageProps(DESIGNERS_SUB_PATH, locale)
     ]);
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     return {
@@ -33,7 +34,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
                 ...layoutProps,
                 breadcrumbs: [
                     { name: 'Home', href: urlPrefix + '/' },
-                    { name: 'Designers', href: urlPrefix + '/designers' }
+                    { name: 'Designers', href: urlPrefix + '/'+DESIGNERS_SUB_PATH }
                 ],
                 seo
             },

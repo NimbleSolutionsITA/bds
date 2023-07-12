@@ -6,6 +6,7 @@ import Layout from "../src/layout/Layout";
 import Cookies from 'js-cookie';
 import {openCookiesSavedDrawer} from "../src/redux/layout";
 import {useDispatch} from "react-redux";
+import {useTranslation} from "next-i18next";
 
 
 export type GenericPageProps = PageBaseProps & {
@@ -17,6 +18,7 @@ export default function CookieSettingsPage({layout}: GenericPageProps) {
 	const analyticsCookie = Cookies.get('analytics') === 'true';
 	// const profilingCookie = Cookies.get('profiling') === 'true';
 	const usageCookie = Cookies.get('usage') === 'true';
+	const { t } = useTranslation('common');
 
 
 	const [analytics, setAnalytics] = useState(analyticsCookie);
@@ -42,50 +44,47 @@ export default function CookieSettingsPage({layout}: GenericPageProps) {
 		marginRight: 'auto',
 		textTransform: 'uppercase'
 	}
-
-	console.log(analyticsCookie, analytics)
-	console.log(usageCookie, usage)
 	return (
 		<Layout layout={layout}>
 			<Container>
 				<Typography variant="h1">
-					Preferenze Cookie
+					{t('cookies.title')}
 				</Typography>
 				<Typography sx={{marginTop: '20px'}}>
-					I cookie sono delle informazione salvate in piccoli file di testo sul tuo browser quando visiti un sito web. Questi cookie consentono al mittente di identificare il tuo dispositivo durante il periodo di validità del consenso, che di solito è di un anno.
+					{t('cookies.body')}
 				</Typography>
 				<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
 					<Switch checked disabled />
 				)} label="Cookie funzionali (non facoltativi)" />
 				<Typography>
-					Alcuni di questi cookie sono essenziali per garantire il corretto funzionamento del sito e non possono essere disabilitati. Essi forniscono funzionalità chiave al sito (come la selezione della lingua, il carrello degli acquisti, la lista dei desideri, ecc.), oltre a contribuire alla protezione del sito da attacchi malevoli.
+					{t('cookies.mandatory-body')}
 				</Typography>
 				<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
 					<Switch checked={analytics} onChange={(e, value) => {
 						setSaved(false)
 						setAnalytics(value)
 					}} />
-				)} label="Cookie analitici" />
+				)} label={t('cookies.analytics')} />
 				<Typography>
-					{`Altri cookie vengono utilizzati per analizzare il comportamento dei visitatori e monitorare le performance del sito. Accettando questi cookie, ci aiuti a migliorare il nostro sito web e a offrire un'esperienza di navigazione ottimale.`}
+					{t('cookies.analytics-body')}
 				</Typography>
 				{/*<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
 					<Switch checked={profiling} onChange={(e, value) => {
 						setSaved(false)
 						setProfiling(value)
 					}} />
-				)} label="Cookie di profilazione pubblicitaria" />
+				)} label={t('cookies.profiling')} />
 				<Typography>
-					Inoltre, ci sono cookie che consentono al sito di Bottega di Sguardi di mostrarti annunci pubblicitari basati sulle tue preferenze, in linea con le informazioni raccolte durante la tua navigazione. Questi cookie sono impostati sia da noi che da terze parti attentamente selezionate. Nel caso in cui disabiliti questi cookie, gli annunci che visualizzerai potrebbero essere meno pertinenti ai tuoi interessi personali.
+					{t('cookies.profiling-body')}
 				</Typography>*/}
 				<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
 					<Switch checked={usage} onChange={(e, value) => {
 						setSaved(false)
 						setUsage(value)
 					}} />
-				)} label="Cookie per la personalizzare la tua esperienza su Bottega di Sguardi" />
+				)} label={t('cookies.usage')} />
 				<Typography>
-					{`Infine, esistono cookie che raccolgono informazioni sulle modalità di utilizzo del sito da parte dell'utente, al fine di migliorarne la qualità, personalizzarne le funzionalità e garantire un'esperienza di navigazione ottimizzata.`}
+					{t('cookies.usage-body')}
 				</Typography>
 				<Grid container spacing={2} sx={{margin: '20px 0 40px'}}>
 					<Grid item xs={6} md={3}>
@@ -98,7 +97,7 @@ export default function CookieSettingsPage({layout}: GenericPageProps) {
 							href="/cookie-settings"
 							sx={{marginTop: '20px'}}
 						>
-							Salve le preferenze
+							{t('cookies.save')}
 						</Button>
 					</Grid>
 					<Grid item xs={6} md={3}>
@@ -110,7 +109,7 @@ export default function CookieSettingsPage({layout}: GenericPageProps) {
 							fullWidth
 							sx={{marginTop: '20px'}}
 						>
-							Accetta tuttti i cookie
+							{t('cookies.accept')}
 						</Button>
 					</Grid>
 				</Grid>

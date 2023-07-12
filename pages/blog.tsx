@@ -28,7 +28,7 @@ export type DentroDiariesProps = PageBaseProps & {
 	content: string
 }
 
-export default function DentroDiaries({headerImage, featuredArticles, layout, preview, postsByCategory, title, content}: DentroDiariesProps) {
+export default function Blog({headerImage, featuredArticles, layout, preview, postsByCategory, title, content}: DentroDiariesProps) {
 	return (
 		<Layout layout={layout}>
 			<NewsletterTopBar />
@@ -54,7 +54,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 		{  categories },
 	] = await Promise.all([
 		getLayoutProps(locale),
-		getPageProps('dentro-diaries', locale),
+		getPageProps('blog', locale),
 		getPostsAttributes(locale)
 	]);
 	const postsByCategory = (await Promise.all(categories.map(category =>

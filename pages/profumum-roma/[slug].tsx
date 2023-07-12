@@ -8,6 +8,7 @@ import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
 import {getProducts} from "../api/products";
 import {LIQUIDES_IMAGINAIRES_CATEGORY, PROFUMUM_ROMA_CATEGORY} from "../../src/utils/utils";
+import {FRAGRANCES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../src/utils/endpoints";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/fragrances/FragranceProductGrid"))
@@ -51,8 +52,8 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
-		{ name: 'Fragranze', href: urlPrefix + '/fragrances' },
-		{ name: sanitize(productCategory.name), href: urlPrefix +  '/fragrances/' + productCategory.slug },
+		{ name: 'Fragranze', href: urlPrefix + '/'+FRAGRANCES_SUB_PATH },
+		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+PROFUMUM_ROMA_SUB_PATH+'/' + productCategory.slug },
 	]
 	return {
 		props: {

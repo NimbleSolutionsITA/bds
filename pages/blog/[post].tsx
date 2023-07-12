@@ -41,8 +41,8 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
                 ...layoutProps,
                 breadcrumbs: [
                     { name: 'Home', href: urlPrefix + '/' },
-                    { name: 'Dentro Diaries', href: urlPrefix + '/dentro-diaries' },
-                    { name: post.title, href: urlPrefix + '/' + post.slug },
+                    { name: 'Dentro Diaries', href: urlPrefix + '/blog' },
+                    { name: post.title, href: urlPrefix + '/blog/' + post.slug },
                 ]
             }
         },
