@@ -3,7 +3,7 @@ import {AppBar, Button, IconButton, SwipeableDrawer, Toolbar, Container, Typogra
 import {MenuToggle} from "./MenuToggle";
 import Image from "next/image";
 import logo from "../../../images/bottega-di-sguardi-logo.png";
-import {MenuItem, Menus} from "../../../types/settings";
+import {BreadCrumb, MenuItem, Menus} from "../../../types/settings";
 import CartIndicator from "../../../components/CartIndicator";
 import LanguageButton from "../../../components/LanguageButton";
 import {Facebook, Instagram, PhoneEnabledSharp} from "@mui/icons-material";
@@ -13,14 +13,16 @@ import Link from "../../../components/Link";
 import {getRelativePath} from "../../../utils/utils";
 import ShippingBanner from "../ShippingBanner";
 import {useTranslation} from "next-i18next";
+import BottomBar from "../BottomBar";
 
 type NavBarMobileProps = {
     mobileMenu: Menus['mobileMenu']
+    breadcrumbs?: BreadCrumb[]
 }
 
 const drawerBleeding = 56;
 export default function NavBarMobile({
-    mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, ...mobileMenu]
+    mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, ...mobileMenu], breadcrumbs
 }: NavBarMobileProps) {
     const [open, setOpen] = useState(false)
     const router = useRouter()
@@ -36,7 +38,7 @@ export default function NavBarMobile({
                 elevation={0}
                 position="sticky"
                 sx={{
-                    height: '80px',
+                    height: '101px',
                     zIndex: (theme) => theme.zIndex.drawer + 1,
             }}
             >
@@ -51,24 +53,24 @@ export default function NavBarMobile({
                     </IconButton>
                     <CartIndicator iconProps={{fontSize: 'large'}} />
                 </Toolbar>
+                {breadcrumbs && !open ? <BottomBar breadcrumbs={breadcrumbs}/> : <div style={{height: '30px', width: '100%'}}/>}
+                {/*<Box
+                    sx={{
+                        width: '100%',
+                        height: '20px',
+                        fontFamily: 'Apercu',
+                        backgroundColor: 'rgba(255,255,255,0.5)',
+                        textAlign: 'center',
+                        fontWeight: 500,
+                        color: 'rgba(0,0,0,0.54)',
+                        fontSize: '12px',
+                        zIndex: (theme) => theme.zIndex.drawer - 1,
+                        padding: '1px 0'
+                    }}
+                >
+                    <ShippingBanner />
+                </Box>*/}
             </AppBar>
-            <Box
-                sx={{
-                    width: '100%',
-                    height: '20px',
-                    position: 'absolute',
-                    fontFamily: 'Apercu',
-                    backgroundColor: 'rgba(255,255,255,0.5)',
-                    textAlign: 'center',
-                    fontWeight: 500,
-                    color: 'rgba(0,0,0,0.54)',
-                    fontSize: '12px',
-                    zIndex: (theme) => theme.zIndex.drawer - 1,
-                    padding: '1px 0'
-                }}
-            >
-                <ShippingBanner />
-            </Box>
             <SwipeableDrawer
                 onClose={() => setOpen(false)}
                 onOpen={() => setOpen(true)}
@@ -85,7 +87,7 @@ export default function NavBarMobile({
                     position: 'relative',
                     '& .MuiPaper-root': {
                         top: '80px',
-                        height: 'calc(100% - 80px)',
+                        height: 'calc(100% - 101px)',
                     }
                 }}
             >

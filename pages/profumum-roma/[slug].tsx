@@ -11,7 +11,7 @@ import {LIQUIDES_IMAGINAIRES_CATEGORY, PROFUMUM_ROMA_CATEGORY} from "../../src/u
 import {FRAGRANCES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../src/utils/endpoints";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
-const FragranceProductGrid = dynamic(() => import("../../src/pages/fragrances/FragranceProductGrid"))
+const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
 const FragrancesBottom = dynamic(() => import("../../src/components/CategoryBottom"))
 
 export type FragranceProps = PageBaseProps & {

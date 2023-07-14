@@ -12,7 +12,7 @@ const NewsletterTopBar = () => {
 			color: '#fff',
 		}}>
 			<Container sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-				<Typography sx={{fontSize: '16px'}}>
+				<Typography sx={{fontSize: {xs: '14px', md: '16px'}}}>
 					<Trans i18nKey="newsletter.promo-text" components={[<b key={0} />]} />
 				</Typography>
 				<Button

@@ -15,7 +15,7 @@ export type OurProductionProps = PageBaseProps & {
 export default function NostraProduzione({ layout, ourProductionCategories }: OurProductionProps) {
 	return (
 		<Layout layout={layout}>
-			<DesignersList designers={ourProductionCategories} />
+			<DesignersList designers={ourProductionCategories} subpath={OUR_PRODUCTION_SUB_PATH} />
 		</Layout>
 	);
 }

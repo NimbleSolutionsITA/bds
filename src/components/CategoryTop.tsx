@@ -36,7 +36,7 @@ const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
 							key={index}
 							sx={{
 								height: {
-									xs: 'calc(100vh - 80px)',
+									xs: 'calc(100vh - 101px)',
 									md: 'calc(100vh - 160px)'
 								},
 								width: '100%'
@@ -46,7 +46,7 @@ const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
 								src={image}
 								alt={name}
 								fill
-								style={{objectFit: 'contain', objectPosition: 'center center'}}
+								style={{objectFit: 'cover', objectPosition: 'center center'}}
 							/>
 						</Box>
 					))}

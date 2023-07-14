@@ -45,7 +45,7 @@ const FullPageSlider = ({images, disableFullPage}: {images: string[], disableFul
 					width: '100%',
 					height: disableFullPage ? '100%' : {
 						md: 'calc(100vh - 160px)',
-						xs: 'calc(100vh - 80px)',
+						xs: 'calc(100vh - 101px)',
 					},
 					position: 'relative'
 				}}>

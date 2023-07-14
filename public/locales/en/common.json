@@ -157,5 +157,8 @@
     "usage-body": "Finally, there are cookies that collect information about how the user uses the site in order to improve its quality, customize its features, and ensure an optimized browsing experience.",
     "save": "Save preferences",
     "accept": "Accept all"
+  },
+  "shop": {
+    "sunglasses": "{{type}}"
   }
 }

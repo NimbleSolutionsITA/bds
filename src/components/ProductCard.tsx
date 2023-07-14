@@ -104,7 +104,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </Link>
             <CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
                 {category &&(
-                    <Link prefetch={false} href={`/${DESIGNERS_SUB_PATH}/${category.name}`} style={{textDecoration: 'none'}}>
+                    <Link prefetch={false} href={`/${DESIGNERS_SUB_PATH}/${category.slug}`} style={{textDecoration: 'none'}}>
                         <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(category.name)}} />
                     </Link>
                 )}

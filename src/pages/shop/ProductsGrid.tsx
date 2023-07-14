@@ -18,9 +18,10 @@ type ProductsGridProps = {
 	searchParams: SearchParams
 	open: boolean
 	drawerWidth: number
+	title?: string
 }
 
-const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searchParams, open, drawerWidth }: ProductsGridProps) => {
+const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searchParams, open, drawerWidth, title }: ProductsGridProps) => {
 	const {locale} = useRouter()
 	const { data, status, fetchNextPage, hasNextPage, isRefetching } = useInfiniteQuery(
 		["products", searchParams],
@@ -74,7 +75,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 		<Box sx={{
 			width: '100%',
 			marginLeft: {
-				xs: '-100%',
+				xs: 'calc(-100% + 16px)',
 				md:  `-${drawerWidth}px`
 			},
 			transition: (theme) => theme.transitions.create(['margin', 'width'], {
@@ -96,6 +97,9 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 				},
 			}),
 		}}>
+			<Typography variant="h1" sx={{textAlign: 'center', marginTop: '20px', marginBottom: '20px', textTransform: 'capitalize'}}>
+				{title}
+			</Typography>
 			{status === "success" && (
 				<InfiniteScroll
 					style={{

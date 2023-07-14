@@ -1,4 +1,4 @@
-import {Box, Divider, Drawer} from "@mui/material";
+import {Box, Button, Divider, Drawer} from "@mui/material";
 import TagPanel from "./TagPanel";
 import ColorPanel from "./ColorPanel";
 import {Attribute, Category, Color, ProductTag} from "../../types/woocommerce";
@@ -23,7 +23,7 @@ type FilterDrawerProps = {
 	filterBarRef: RefObject<HTMLDivElement>
 	drawerWidth: number
 }
-const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, attributes, tags, designers, isSunglasses, isOptical, isWoman, isMan, filterBarRef}: FilterDrawerProps) => {
+const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams, colors, attributes, tags, designers, isSunglasses, isOptical, isWoman, isMan, filterBarRef}: FilterDrawerProps) => {
 	const colori = colors.filter(color => color.type === 'colore')
 	const lenti = colors.filter(color => color.type === 'lente')
 	const montature = colors.filter(color => color.type === 'montatura')
@@ -219,6 +219,7 @@ const FilterDrawer =({drawerWidth, open, setSearchParams, searchParams, colors, 
 						price_range: slug === searchParams.price_range?.toString() ? undefined : slug,
 					}))}
 				/>
+				<Button sx={{marginTop: '40px', display: {md: 'none'}}} fullWidth onClick={() => setOpen(false)}>{t('search')}</Button>
 			</Box>
 		</Drawer>
 	)

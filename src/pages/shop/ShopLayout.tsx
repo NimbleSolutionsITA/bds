@@ -3,7 +3,10 @@ import {Attribute, BaseProduct, Category, Color, ProductTag} from "../../types/w
 import ProductsGrid from "./ProductsGrid";
 import {useRef, useState} from "react";
 import FilterBar from "./FilterBar";
-import FilterDrawer from "./FilterDrawer";
+import {useTranslation} from "next-i18next";
+import dynamic from 'next/dynamic'
+
+const FilterDrawer = dynamic(() => import('./FilterDrawer'))
 
 type ShopLayoutProps = {
 	products: BaseProduct[]
@@ -43,6 +46,7 @@ const ShopLayout = ({ products, colors, attributes, tags, designers, isSunglasse
 	const [open, setOpen] = useState(!isMobile);
 	const ref = useRef<HTMLDivElement | null>(null);
 	const drawerWidth = 240;
+	const { t } = useTranslation('common');
 	return(
 		<div style={{height: '100%'}}>
 			<FilterBar
@@ -66,6 +70,7 @@ const ShopLayout = ({ products, colors, attributes, tags, designers, isSunglasse
 					drawerWidth={drawerWidth}
 				/>
 				<ProductsGrid
+					title={`${t(isSunglasses ? 'sunglasses_long' : 'optical_long')}${(isMan || isWoman) && ' ' + t(isMan ? 'man' : 'woman')}`}
 					searchParams={searchParams}
 					products={products}
 					open={open}

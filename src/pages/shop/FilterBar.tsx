@@ -40,7 +40,7 @@ const FilterBar = forwardRef(({setSearchParams, searchParams, open, setOpen}: Fi
 				width: '100%',
 				position: 'sticky',
 				top: {
-					xs: '80px',
+					xs: '101px',
 					md: '90px'
 				},
 			}}

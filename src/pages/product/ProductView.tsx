@@ -93,6 +93,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						index={galleryIndex}
 						sx={{
 							minHeight: '100%',
+							maxHeight: '1000px',
 							display: 'flex',
 							alignItems: 'center',
 						}}

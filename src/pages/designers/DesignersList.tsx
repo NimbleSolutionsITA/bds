@@ -6,8 +6,9 @@ import {useTranslation} from "next-i18next";
 
 type DesignersListProps = {
 	designers: WooProductCategory[]
+	subpath?: string
 }
-const DesignersList = ({ designers }: DesignersListProps) => {
+const DesignersList = ({ designers, subpath }: DesignersListProps) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const { t } = useTranslation('common');
 	return (
@@ -32,6 +33,7 @@ const DesignersList = ({ designers }: DesignersListProps) => {
 					key={designer.id}
 					category={designer}
 					index={index}
+					subpath={subpath}
 				/>
 			)}
 		</>

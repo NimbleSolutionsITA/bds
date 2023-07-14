@@ -8,6 +8,7 @@ import {Button, Container, Grid} from "@mui/material";
 import * as React from "react";
 import PriceRecap from "./PriceRecap";
 import {useTranslation} from "next-i18next";
+import Logo from "./Logo";
 
 const CheckoutMobile = ({
 	control,
@@ -127,7 +128,10 @@ const CheckoutMobile = ({
 
 	return (
 		<>
-			<Container sx={{width: '100%', height: `calc(100vh - ${bottomBarHeight})`, overflow: 'hidden scroll', paddingY: '20px'}}>
+			<Container sx={{width: '100%', height: `calc(100vh - ${bottomBarHeight})`, overflow: 'hidden scroll', paddingY: '0 20px'}}>
+				<div style={{width: '100%', textAlign: 'center'}}>
+					<Logo sx={{margin: '10px'}} />
+				</div>
 				<AnimatePresence custom={mobileCheckoutStep}>
 					<motion.div
 						key={mobileCheckoutStep}
@@ -168,7 +172,7 @@ const CheckoutMobile = ({
 					{mobileCheckoutStep < 3 && (
 						<Grid item xs={mobileCheckoutStep === 1 ? 12 : 6}>
 							<Button fullWidth onClick={() => handleChangeStep(mobileCheckoutStep + 1)}>
-								{mobileCheckoutStep === 1 ? t('checkout.shipping') : t('checkout.payment')}
+								{mobileCheckoutStep === 1 ? t('checkout.go-to-payment') : t('checkout.payment')}
 							</Button>
 						</Grid>
 					)}

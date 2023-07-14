@@ -14,7 +14,7 @@ const Breadcrumbs = ({breadcrumbs}: BreadcrumbsProps) => (
 					key={href}
 					href={index === breadcrumbs.length - 1 ? undefined : href}
 					color={index === breadcrumbs.length - 1 ? 'text.primary' : 'inherit'}
-					component={index === breadcrumbs.length - 1 ? 'h1' : Link}
+					component={index === breadcrumbs.length - 1 ? 'span' : Link}
 				>
 					{name}
 				</MuiLink>

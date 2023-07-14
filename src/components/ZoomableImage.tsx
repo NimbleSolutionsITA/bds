@@ -6,7 +6,6 @@ import placeholder from "../images/placeholder.jpg";
 
 interface ZoomProps {
 	img: string;
-
 	ratio?: number;
 	zoomScale?: number;
 	transitionTime?: number;

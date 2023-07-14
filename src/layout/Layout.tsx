@@ -84,7 +84,7 @@ export default function Layout({children, layout: {
                     `}
             </Script>
             <Hidden mdUp>
-                <NavBarMobile mobileMenu={mobileMenu} />
+                <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} />
             </Hidden>
             <Hidden mdDown>
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />

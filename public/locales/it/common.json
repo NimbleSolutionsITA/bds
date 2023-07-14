@@ -30,7 +30,9 @@
   "man":"uomo",
   "woman":"donna",
   "optical":"vista",
+  "optical_long": "occhiali da vista",
   "sunglasses":"sole",
+  "sunglasses_long": "occhiali da sole",
   "up-to":"fino a",
   "over":"oltre i",
   "cart":{

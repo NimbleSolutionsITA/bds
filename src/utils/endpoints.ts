@@ -12,7 +12,7 @@ export const DESIGNERS_SUB_PATH = 'eyewear-designers'
 export const FRAGRANCES_SUB_PATH = 'fragranze'
 
 export const PROFUMUM_ROMA_SUB_PATH = 'profumum-roma'
-export const LIQUIDES_IMAGINAIRES_SUB_PATH = 'liquid-imaginaires'
+export const LIQUIDES_IMAGINAIRES_SUB_PATH = 'liquides-imaginaires'
 export const OUR_PRODUCTION_SUB_PATH = 'nostra-produzione'
 export const PRODUCT_SUB_PATH = 'products'
 export const SUNGLASSES_SUB_PATH = 'occhiali-da-sole'
