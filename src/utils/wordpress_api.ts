@@ -288,11 +288,13 @@ export const getAllPagesIds = async () => {
 		BLOG_POST_SUB_PATH,
 		PROFUMUM_ROMA_SUB_PATH,
 		LIQUIDES_IMAGINAIRES_SUB_PATH,
+		OUR_PRODUCTION_SUB_PATH,
 		'shop',
 		'home',
 		'cookie-settings',
 		'negozi-ottica-firenze',
-		OUR_PRODUCTION_SUB_PATH
+		'store',
+		'designers'
 	].includes(slug)).map(page => ({
 		params: {
 			page: page.slug,

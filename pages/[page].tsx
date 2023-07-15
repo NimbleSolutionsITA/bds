@@ -28,16 +28,6 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
         getLayoutProps(locale),
         getPageProps(slug, locale)
     ]);
-    const redirect = REDIRECTS.find(r => r.page === slug)
-    if (redirect) {
-        return {
-            redirect: {
-                destination: redirect.destination,
-                permanent: true,
-                // statusCode: 301
-            },
-        }
-    }
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     return page ? {
         props: {
@@ -65,10 +55,3 @@ export async function getStaticPaths() {
         fallback: 'blocking',
     };
 }
-
-const REDIRECTS = [
-    {
-        page: 'xxx',
-        destination: '/xxx',
-    }
-]

@@ -43,6 +43,36 @@ module.exports =  {
                 permanent: true,
             },
             {
+                source: '/eyewar-designers/bottega-di-sguardi',
+                destination: '/nostra-produzione/bottega-di-sguardi',
+                permanent: true,
+            },
+            {
+                source: '/en/eyewar-designers/bottega-di-sguardi',
+                destination: '/en/nostra-produzione/bottega-di-sguardi',
+                permanent: true,
+            },
+            {
+                source: '/eyewar-designers/bottega-di-sguardi-horn-collections',
+                destination: '/nostra-produzione/bottega-di-sguardi-horn-collections',
+                permanent: true,
+            },
+            {
+                source: '/en/eyewar-designers/bottega-di-sguardi-horn-collections',
+                destination: '/en/nostra-produzione/bottega-di-sguardi-horn-collections',
+                permanent: true,
+            },
+            {
+                source: '/eyewar-designers/vibes365',
+                destination: '/nostra-produzione/vibes365',
+                permanent: true,
+            },
+            {
+                source: '/en/eyewar-designers/vibes365',
+                destination: '/en/nostra-produzione/vibes365',
+                permanent: true,
+            },
+            {
                 source: '/category/eyewear/bottega-di-sguardi',
                 destination: '/nostra-produzione/bottega-di-sguardi',
                 permanent: true,
