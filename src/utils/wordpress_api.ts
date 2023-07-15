@@ -302,6 +302,38 @@ export const getAllPagesIds = async () => {
 	}));
 }
 
+export const getAllProductsIds = async () => {
+	let pages: WPPage[] = [];
+	let page: number = 1;
+
+	while (true) {
+		const response = await fetch(`${WORDPRESS_API_ENDPOINT}/product?per_page=100&page=${page}`);
+
+		if (!response.ok) {
+			if (response.status === 400) {
+				break;
+			} else {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+		}
+
+		const products: WPPage[] = await response.json();
+		pages = pages.concat(products);
+
+		if (products.length === 0) {
+			break;
+		}
+
+		page++;
+	}
+
+	return pages.map(page => ({
+		params: {
+			slug: page.slug,
+		}
+	}));
+}
+
 export const getAllPostIds = async () => {
 	let posts: Article[] = [];
 	let page: number = 1;

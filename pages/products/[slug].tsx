@@ -4,7 +4,7 @@ import {PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, Product as ProductType, ProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
-import {getLayoutProps} from "../../src/utils/wordpress_api";
+import {getAllProductsIds, getLayoutProps} from "../../src/utils/wordpress_api";
 import {getProduct} from "../api/products/[slug]";
 import {getProductMainCategory} from "../../src/utils/utils";
 import {
@@ -64,8 +64,9 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths() {
+	const paths = await getAllProductsIds();
 	return {
-		paths: [],
+		paths,
 		fallback: 'blocking',
 	};
 }

@@ -73,9 +73,7 @@ export async function getStaticPaths() {
 	const productCategories = await getProductCategories();
 	const paths = productCategories.filter(({parent}) => parent && [
 			PROFUMUM_ROMA_CATEGORY.it,
-			PROFUMUM_ROMA_CATEGORY.en,
-			LIQUIDES_IMAGINAIRES_CATEGORY.it,
-			LIQUIDES_IMAGINAIRES_CATEGORY.en
+			PROFUMUM_ROMA_CATEGORY.en
 		].includes(parent))
 		.map(({slug}: WooProductCategory) => ({ params: { slug } }));
 	return {
