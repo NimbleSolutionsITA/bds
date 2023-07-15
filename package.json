@@ -37,6 +37,7 @@
     "next": "latest",
     "next-i18next": "^14.0.0",
     "next-sitemap": "^4.1.8",
+    "nextjs-progressbar": "^0.0.16",
     "node-html-parser": "^6.1.5",
     "react": "latest",
     "react-dom": "latest",
