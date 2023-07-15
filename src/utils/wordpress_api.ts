@@ -110,6 +110,8 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 	const categories = {
 		designers: productCategories.filter(cat => cat.parent === EYEWEAR_CATEGORY[locale]),
 		fragrances: {
+			profumumMain: productCategories.filter(cat => cat.id === PROFUMUM_ROMA_CATEGORY[locale]),
+			liquidesMain: productCategories.filter(cat => cat.id === LIQUIDES_IMAGINAIRES_CATEGORY[locale]),
 			profumum: productCategories.filter(cat => cat.parent === PROFUMUM_ROMA_CATEGORY[locale]),
 			liquides: productCategories.filter(cat => cat.parent === LIQUIDES_IMAGINAIRES_CATEGORY[locale])
 		},
@@ -137,6 +139,8 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 		categories: {
 			designers: categories.designers.map(mapProductCategory),
 			fragrances: {
+				profumumMain: categories.fragrances.profumumMain.map(mapProductCategory),
+				liquidesMain: categories.fragrances.liquidesMain.map(mapProductCategory),
 				profumum: categories.fragrances.profumum.map(mapProductCategory),
 				liquides: categories.fragrances.liquides.map(mapProductCategory)
 			}
@@ -188,7 +192,9 @@ export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) =>
 	const productCategory = [
 		...layout.categories.designers,
 		...layout.categories.fragrances.liquides,
-		...layout.categories.fragrances.profumum
+		...layout.categories.fragrances.profumum,
+		...layout.categories.fragrances.profumumMain,
+		...layout.categories.fragrances.liquidesMain
 	].find(cat => cat.slug === slug)
 	const seo =  productCategory && await getSeo(productCategory?.link)
 	return { layout: { ...layout, seo: seo ?? null }, productCategory }

@@ -8,7 +8,7 @@ import {Box, Button, Card, CardContent, IconButton, Typography} from "@mui/mater
 import {
     EYEWEAR_CATEGORY,
     findVariationFromAttributes,
-    getDefaultProduct,
+    getDefaultProduct, getProductMainCategory,
     MAIN_CATEGORIES, OPTICAL_CATEGORY,
     sanitize, SUNGLASSES_CATEGORY
 } from "../utils/utils";
@@ -54,7 +54,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
     const dispatch = useDispatch();
     const { t } = useTranslation();
-    const category = product.categories.find((cat) => MAIN_CATEGORIES.includes(cat.parent as number)) ?? product.categories[0];
+    const category = getProductMainCategory(product);
 
     const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
         const newAttributes = {...currentAttributes, [attribute]: slug};
@@ -164,6 +164,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                                     attributes: currentProduct.attributes?.map((attribute) => attribute.option).join(', ')
                                 }))}
                                 sx={{
+                                    minWidth: '90px',
                                     fontSize: '12px',
                                     padding: '10px'
                                 }}

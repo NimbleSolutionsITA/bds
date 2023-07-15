@@ -10,7 +10,6 @@ export const BLOG_POST_SUB_PATH = 'blog'
 export const CHECKOUT_SUB_PATH = 'checkout'
 export const DESIGNERS_SUB_PATH = 'eyewear-designers'
 export const FRAGRANCES_SUB_PATH = 'fragranze'
-
 export const PROFUMUM_ROMA_SUB_PATH = 'profumum-roma'
 export const LIQUIDES_IMAGINAIRES_SUB_PATH = 'liquides-imaginaires'
 export const OUR_PRODUCTION_SUB_PATH = 'nostra-produzione'

@@ -1,15 +1,16 @@
 import sanitizeHtml from 'sanitize-html';
 import {
-    AttributeType,
+    AttributeType, BaseCategory,
     BaseProduct,
     BaseVariation,
     Color,
-    Product,
+    Product, ProductCategory,
     ShippingMethod,
     Variation
 } from "../types/woocommerce";
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
+import {LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "./endpoints";
 
 
 export const sanitize = (html: string) => {
@@ -218,4 +219,11 @@ export function getName(fullName?: string | null): [string | undefined, string |
 export function formatDistance(date: Date | number, locale: 'it'|'en') {
     const lang = locale === 'it' ? {locale: it} : {};
     return fd(date, new Date(), { addSuffix: true, ...lang });
+}
+
+export function getProductMainCategory(product: BaseProduct): BaseCategory {
+    const fragrance = product.categories.find((category) => [LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH].includes(category.slug))
+    if (fragrance)
+        return fragrance;
+    return product.categories.find((category) => category.parent && MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
 }

@@ -50,14 +50,20 @@ const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
 					value={sortOption}
 					onChange={(e) => setSortOption(e.target.value as SortOption)}
 				>
-					<MenuItem value="price-asc">Price Low to High</MenuItem>
-					<MenuItem value="price-desc">Price High to Low</MenuItem>
-					<MenuItem value="name-asc">Name A-Z</MenuItem>
-					<MenuItem value="name-desc">Name Z-A</MenuItem>
+					<MenuItem value="price-asc">{t('price-asc')}</MenuItem>
+					<MenuItem value="price-desc">{t('price-desc')}</MenuItem>
+					<MenuItem value="name-asc">{t('name-asc')}</MenuItem>
+					<MenuItem value="name-desc">{t('name-desc')}</MenuItem>
 				</Select>
 				<Box sx={{display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap', flexDirection: {xs: 'column', sm: 'row'}}}>
 					{Object.keys(availableAttributes).map((attribute) => (
 						<Select
+							sx={{
+								textTransform: 'capitalize',
+								"& .MuiMenuItem-root": {
+									textTransform: 'capitalize'
+								}
+							}}
 							key={attribute}
 							value={filters[attribute as keyof BaseAttributes] ?? 'all'}
 							onChange={(e) => setFilters((filters) => ({ ...filters, [attribute]: e.target.value === 'all' ? null : e.target.value }))}

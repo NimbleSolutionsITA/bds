@@ -28,6 +28,7 @@ import DHL from "../../icons/DHL";
 import GLS from "../../icons/GLS";
 import {useTranslation} from "next-i18next";
 import {Trans} from "react-i18next";
+import {DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../utils/endpoints";
 
 type ProductViewProps = {
 	product: Product
@@ -53,6 +54,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	    v.product_id === product.id &&
 	    v.variation_id === (product.type === 'variable' ? currentProduct.id : undefined)
     )?.qty ?? 0;
+	const categoryLink = (category && ([LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH].includes(category.slug) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
 		const newAttributes = {...currentAttributes, [attribute]: slug};
 		await setCurrentAttributes(newAttributes)
@@ -175,7 +177,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 							}}
 							dangerouslySetInnerHTML={{__html: sanitize(category.name)}}
 							component={Link}
-							href={`/designers/${category.slug}`}
+							href={categoryLink}
 						/>
 					)}
 					{cartItem.price > 0 && (

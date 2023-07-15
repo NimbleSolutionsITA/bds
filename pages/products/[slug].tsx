@@ -1,13 +1,15 @@
 import React from "react";
 import Layout from "../../src/layout/Layout";
 import {PageBaseProps} from "../../src/types/settings";
-import {Product as ProductType} from "../../src/types/woocommerce";
+import {BaseProduct, Product as ProductType, ProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getLayoutProps} from "../../src/utils/wordpress_api";
 import {getProduct} from "../api/products/[slug]";
-import {MAIN_CATEGORIES} from "../../src/utils/utils";
-import {WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "../../src/utils/endpoints";
+import {getProductMainCategory} from "../../src/utils/utils";
+import {
+	WORDPRESS_RANK_MATH_SEO_ENDPOINT
+} from "../../src/utils/endpoints";
 
 const ProductView = dynamic(() => import('../../src/pages/product/ProductView'), { ssr: false });
 const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
@@ -17,7 +19,7 @@ export type ProductPageProps = PageBaseProps & {
 	product: ProductType,
 }
 export default function Product({ product, layout }: ProductPageProps) {
-	const category = product.categories.find((category) => category.parent && MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
+	const category = getProductMainCategory(product as unknown as BaseProduct) as ProductCategory
 	return (
 		<Layout layout={layout}>
 			<ProductView product={product} category={category} shipping={layout.shipping} />

@@ -108,6 +108,12 @@
     "line2b":"<0>Shippimg in Italy</0> with DHL or GLS within 24/48 hours",
     "line3b":"<0>Shippimg in Europe</0> with DHL or GLS within 2/3 days"
   },
+  "sorting": {
+    "price-desc": "Price: Low to High",
+    "price-asc": "Price: High to Low",
+    "name-asc": "Name: A-Z",
+    "name-desc": "Name: Z-A"
+  },
   "checkout":{
     "different-address":"I want to ship to a different address",
     "billing":"Billing",
@@ -157,8 +163,5 @@
     "usage-body": "Finally, there are cookies that collect information about how the user uses the site in order to improve its quality, customize its features, and ensure an optimized browsing experience.",
     "save": "Save preferences",
     "accept": "Accept all"
-  },
-  "shop": {
-    "sunglasses": "{{type}}"
   }
 }

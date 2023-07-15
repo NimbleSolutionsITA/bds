@@ -35,6 +35,12 @@
   "sunglasses_long": "occhiali da sole",
   "up-to":"fino a",
   "over":"oltre i",
+  "sorting": {
+    "price-desc": "Prezzo: dal più alto",
+    "price-asc": "Prezzo: dal più basso",
+    "name-asc": "Nome: A-Z",
+    "name-desc": "Nome: Z-A"
+  },
   "cart":{
     "title":"La tua shopping bag",
     "cta":"vai al checkout",
@@ -148,9 +154,9 @@
     "vat":"Partita IVA",
     "company":"Azienda (facoltativo)",
     "state":"Provincia",
-    "read-more":"Leggi di più",
-    "available":"Disponibile"
+    "read-more":"Leggi di più"
   },
+  "available":"Disponibile",
   "cookies": {
     "title": "Preferenze Cookie",
     "body": "I cookie sono delle informazione salvate in piccoli file di testo sul tuo browser quando visiti un sito web. Questi cookie consentono al mittente di identificare il tuo dispositivo durante il periodo di validità del consenso, che di solito è di un anno.",
