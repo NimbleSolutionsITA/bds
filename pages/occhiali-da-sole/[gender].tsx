@@ -24,18 +24,33 @@ export default function ShopSunglassesMan({ layout, products, colors, tags, desi
 }
 
 export async function getStaticProps({ locale, params: {gender} }: { locale: 'it' | 'en', params: {gender: 'uomo' | 'donna'} }) {
+	console.log('PDPDPD')
 	const man = gender === 'uomo'
 	const woman = gender === 'donna'
 	const props = await getShopPageProps(locale, {sunglasses: true, woman, man}, gender, SHOP_CATEGORIES.sunglasses[locale])
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
+	const category = {
+		it: "Sole",
+		en: "Sunglasses"
+	}
+	const title = {
+		it: {
+			uomo: "Occhiali da sole uomo",
+			donna: "Occhiali da sole donna"
+		},
+		en: {
+			uomo: "Sunglasses man",
+			donna: "Sunglasses woman"
+		}
+	}
 	return {
 		props: {
 			...props,
 			layout: {
 				...props.layout,
 				breadcrumbs: [
-					{ name: 'Sole', href: urlPrefix + '/occhiali-da-sole' },
-					{ name: 'Occhiali da sole ' + gender, href: urlPrefix + `/occhiali-da-sole/${gender}` }
+					{ name: category[locale], href: urlPrefix + '/occhiali-da-sole' },
+					{ name: title[locale][gender], href: urlPrefix + `/occhiali-da-sole/${gender}` }
 				]
 			},
 			isMan: man
@@ -46,14 +61,17 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: 'it
 
 export const getStaticPaths = async () => {
 	const genders = ['uomo', 'donna'];
+	const locales = ['it', 'en'];
 
-	// Generate all combinations of type and gender
-	const paths = genders.map(gender => ({
-		params: { gender },
-	}));
+	const paths = locales.flatMap(locale =>
+		genders.map(gender => ({
+			params: { gender },
+			locale,
+		})),
+	);
 
 	return {
 		paths,
-		fallback: false, // or 'blocking' based on your requirement
+		fallback: false,
 	};
 };

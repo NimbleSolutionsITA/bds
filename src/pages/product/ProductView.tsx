@@ -36,6 +36,17 @@ type ProductViewProps = {
 	shipping: ShippingClass[]
 }
 
+const removeDuplicates = (array: ImageDetailed[]) => {
+	let uniqueUrls: string[] = [];
+	return array.filter((item) => {
+		if (!uniqueUrls.includes(item.url)) {
+			uniqueUrls.push(item.url);
+			return true;
+		}
+		return false;
+	})
+}
+
 const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const init = getDefaultProduct(product);
 	const { items, cartDrawerOpen } = useSelector((state: RootState) => state.cart);
@@ -43,11 +54,11 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const {defaultAttributes} = init;
 	const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
 	const [currentProduct, setCurrentProduct] = useState(defaultProduct);
-	const galleryImages = [
-		...(product.gallery.length > 0 ? product.gallery : [product.image] ),
-		...product.variations.map(v => ({...v.image, variation: v.id}))
-	].filter(v => v)
-	const [galleryIndex, setGalleryIndex] = useState(galleryImages.findIndex(v => v.variation === defaultProduct.id));
+
+	const galleryImages = removeDuplicates([...product.gallery, ...product.variations.map(v => v.image)])
+
+
+	const [galleryIndex, setGalleryIndex] = useState(galleryImages.findIndex(v => v.url === defaultProduct.image.url) ?? 0);
 	const dispatch = useDispatch();
 	const { t } = useTranslation('common');
     const cartQuantity = items.find(v =>
@@ -55,15 +66,13 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	    v.variation_id === (product.type === 'variable' ? currentProduct.id : undefined)
     )?.qty ?? 0;
 	const categoryLink = (category && ([LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH].includes(category.slug) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
+
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
 		const newAttributes = {...currentAttributes, [attribute]: slug};
 		await setCurrentAttributes(newAttributes)
 		const newProduct = findVariationFromAttributes(product, newAttributes) as Variation ?? defaultProduct
 		setCurrentProduct(newProduct)
-		const index = galleryImages.findIndex(v => v.variation === newProduct.id)
-		if(index !== -1) {
-			setGalleryIndex(index)
-		}
+		setGalleryIndex(galleryImages.findIndex(v => v.url === newProduct.image?.url) ?? 0)
 	}
 
 	const cartItem = {

@@ -28,14 +28,28 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: 'it
 	const woman = gender === 'donna'
 	const props = await getShopPageProps(locale, {optical: true, woman, man}, gender, SHOP_CATEGORIES.optical[locale])
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
+	const category = {
+		it: "Vista",
+		en: "Optical"
+	}
+	const title = {
+		it: {
+			uomo: "Occhiali da vista uomo",
+			donna: "Occhiali da vista donna"
+		},
+		en: {
+			uomo: "Optical man",
+			donna: "Optical woman"
+		}
+	}
 	return {
 		props: {
 			...props,
 			layout: {
 				...props.layout,
 				breadcrumbs: [
-					{ name: 'Vista', href: urlPrefix + '/occhiali-da-vista' },
-					{ name: 'Occhiali da vista ' + gender, href: urlPrefix + `/occhiali-da-vista/${gender}` }
+					{ name: category[locale], href: urlPrefix + '/occhiali-da-vista' },
+					{ name: title[locale][gender], href: urlPrefix + `/occhiali-da-vista/${gender}` }
 				]
 			},
 			isMan: man
@@ -46,14 +60,17 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: 'it
 
 export const getStaticPaths = async () => {
 	const genders = ['uomo', 'donna'];
+	const locales = ['it', 'en'];
 
-	// Generate all combinations of type and gender
-	const paths = genders.map(gender => ({
-		params: { gender },
-	}));
+	const paths = locales.flatMap(locale =>
+		genders.map(gender => ({
+			params: { gender },
+			locale,
+		})),
+	);
 
 	return {
 		paths,
-		fallback: false, // or 'blocking' based on your requirement
+		fallback: false,
 	};
 };
