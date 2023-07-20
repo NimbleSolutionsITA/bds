@@ -2,6 +2,7 @@ import {HomeProps} from "../../../pages";
 import {Box, Button, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
 import React from "react";
+import Link from "../../components/Link";
 
 type BannerBottom2Props = {
 	bannerBottom2: HomeProps['page']['bannerBottom2']
@@ -25,7 +26,7 @@ const BannerBottom2 = ({bannerBottom2: {leftColumn, image}}: BannerBottom2Props)
 				sx={{padding: '10% 10% 5% 10%', textAlign: 'left'}}
 				html={leftColumn.body}
 			/>
-			<Button sx={{marginBottom: 2}}>
+			<Button sx={{marginBottom: 2}} component="a" href={leftColumn.cta.url}>
 				{leftColumn.cta.title}
 			</Button>
 		</Grid>

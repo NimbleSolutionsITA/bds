@@ -6,6 +6,8 @@ import Carousel from 'react-material-ui-carousel';
 import {motion} from "framer-motion";
 import {ArrowBackIosSharp, ArrowForwardIosSharp} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
+import Link from "next/link";
+import {DESIGNERS_SUB_PATH} from "../../utils/endpoints";
 
 type BannerDesignersProps = {
 	designers: HomeProps['page']['designers']
@@ -68,7 +70,7 @@ const BannerDesigners = ({designers}: BannerDesignersProps) => {
 								>
 									{designer.name}
 								</Typography>
-								<Button>
+								<Button component={Link} href={`${DESIGNERS_SUB_PATH}/${designer.slug}`}>
 									{t('buy-now')}
 								</Button>
 							</motion.div>
