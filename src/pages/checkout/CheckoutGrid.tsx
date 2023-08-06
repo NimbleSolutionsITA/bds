@@ -193,7 +193,7 @@ const CheckoutGrid = ({
 			setMobileCheckoutStep(2)
 		}
 	}
-14
+
 	const onInvalid: SubmitErrorHandler<Inputs> = (data) => {
 		if(hasShipping &&  data.shipping && !data.billing) {
 			setAddressTab(1);
