@@ -32,8 +32,9 @@ const CheckoutMobile = ({
     setCheckoutStep,
     order,
 	setPaid,
+	mobileCheckoutStep,
+	setMobileCheckoutStep
 }: CheckoutComponentProps) => {
-	const [mobileCheckoutStep, setMobileCheckoutStep] = useState(1)
 	const { t } = useTranslation('common')
 	const editAddress = (tab: number) => {
 		setCheckoutStep(2)
@@ -44,8 +45,7 @@ const CheckoutMobile = ({
 	const handleChangeStep = async ( value: any) => {
 		if (mobileCheckoutStep === 1) {
 			await setAddress()
-			if (errors.shipping || errors.billing)
-				return
+			return
 		}
 		switch (value) {
 			case 1:

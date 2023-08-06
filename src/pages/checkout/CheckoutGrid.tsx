@@ -81,6 +81,8 @@ export type CheckoutComponentProps = {
 	setTab: Dispatch<SetStateAction<number>>
 	checkoutStep: number
 	setCheckoutStep: Dispatch<SetStateAction<number>>
+	mobileCheckoutStep: number
+	setMobileCheckoutStep: Dispatch<SetStateAction<number>>
 	order?: WooOrder
 	setPaid: (payPal: OrderResponseBody) => void
 }
@@ -101,6 +103,7 @@ const CheckoutGrid = ({
 	items
 }: CheckoutGridProps) => {
 	const [checkoutStep, setCheckoutStep] = useState(0);
+	const [mobileCheckoutStep, setMobileCheckoutStep] = useState(1)
 	const [addressTab, setAddressTab] = useState(0);
 	const [order, setOrder] = useState<WooOrder>();
 	const cartItemsTotal = items.reduce((acc, item) => acc + (Number(item.price) * item.qty), 0);
@@ -185,12 +188,12 @@ const CheckoutGrid = ({
 				billing: data.billing,
 				shipping: data.has_shipping ? data.shipping : {...defaultAddressValues, country: ''},
 			});
-			if (!isMobile) {
+			if (!isMobile)
 				setCheckoutStep(3)
-			}
+			setMobileCheckoutStep(2)
 		}
 	}
-
+14
 	const onInvalid: SubmitErrorHandler<Inputs> = (data) => {
 		if(hasShipping &&  data.shipping && !data.billing) {
 			setAddressTab(1);
@@ -375,6 +378,8 @@ const CheckoutGrid = ({
 						setTab={setAddressTab}
 						checkoutStep={checkoutStep}
 						setCheckoutStep={setCheckoutStep}
+						mobileCheckoutStep={mobileCheckoutStep}
+						setMobileCheckoutStep={setMobileCheckoutStep}
 						order={order}
 						setPaid={setPaid}
 					/>
