@@ -9,7 +9,7 @@ import {
 import {Button, Container, Grid, Tooltip, Typography} from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
-import {findVariationFromAttributes, getDefaultProduct, sanitize} from "../../utils/utils";
+import {EYEWEAR_CATEGORIES, findVariationFromAttributes, getDefaultProduct, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
 import React, {useState} from "react";
@@ -49,6 +49,9 @@ const removeDuplicates = (array: ImageDetailed[]) => {
 
 const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const init = getDefaultProduct(product);
+	const isEyewear = product.categories.find(({id, parent }) =>
+		EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
+	) !== undefined;
 	const { items, cartDrawerOpen } = useSelector((state: RootState) => state.cart);
 	const defaultProduct = init.defaultProduct as Variation;
 	const {defaultAttributes} = init;
@@ -97,7 +100,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	return (
 		<Container key={product.id}>
 			<Grid container spacing={5}>
-				<Grid item xs={12} md={7}>
+				<Grid item xs={12} md={isEyewear ? 7 : 5}>
 					<Carousel
 						animation="slide"
 						autoPlay={false}
@@ -162,7 +165,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						))}
 					</Carousel>
 				</Grid>
-				<Grid item xs={12} md={5}>
+				<Grid item xs={12} md={isEyewear ? 5 : 7}>
 					<Typography
 						variant="h1"
 						dangerouslySetInnerHTML={{__html: sanitize(product.name)}}

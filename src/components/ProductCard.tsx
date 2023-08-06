@@ -6,6 +6,7 @@ import {
 } from "../types/woocommerce";
 import {Box, Button, Card, CardContent, IconButton, Typography} from "@mui/material";
 import {
+    EYEWEAR_CATEGORIES,
     EYEWEAR_CATEGORY,
     findVariationFromAttributes,
     getDefaultProduct, getProductMainCategory,
@@ -31,16 +32,8 @@ type ProductCardProps = {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-    const eyewearCategories = [
-        SUNGLASSES_CATEGORY.it,
-        SUNGLASSES_CATEGORY.en,
-        OPTICAL_CATEGORY.it,
-        OPTICAL_CATEGORY.en,
-        EYEWEAR_CATEGORY.it,
-        EYEWEAR_CATEGORY.en,
-    ];
     const isEyewear = product.categories.find(({id, parent }) =>
-        eyewearCategories.includes(id) || eyewearCategories.includes(parent as number)
+        EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
     ) !== undefined;
     const imageRatio = isEyewear ? 45 : 130;
     const [hover, setHover] = useState(false);

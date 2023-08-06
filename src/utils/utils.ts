@@ -77,6 +77,14 @@ export const MAIN_CATEGORIES = [
     EYEWEAR_CATEGORY.it,
     EYEWEAR_CATEGORY.en,
 ]
+export const EYEWEAR_CATEGORIES = [
+    SUNGLASSES_CATEGORY.it,
+    SUNGLASSES_CATEGORY.en,
+    OPTICAL_CATEGORY.it,
+    OPTICAL_CATEGORY.en,
+    EYEWEAR_CATEGORY.it,
+    EYEWEAR_CATEGORY.en,
+];
 
 
 type RGB = [number, number, number];
