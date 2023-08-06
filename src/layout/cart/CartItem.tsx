@@ -1,12 +1,13 @@
 import {useDispatch} from "react-redux";
 import {Box, IconButton, Typography} from "@mui/material";
 import {DeleteOutlineSharp} from "@mui/icons-material";
-import {CartItem as CartItemType, deleteCartItem} from "../../redux/cartSlice";
+import {CartItem as CartItemType, closeCartDrawer, deleteCartItem} from "../../redux/cartSlice";
 import Image from "next/image";
 import Minus from "./Minus";
 import Plus from "./Plus";
 import PriceFormat from "../../components/PriceFormat";
 import {useTranslation} from "next-i18next";
+import Link from "../../components/Link";
 
 type CartItemProps = {
 	item: CartItemType
@@ -39,7 +40,7 @@ const CartItem = ({item}: CartItemProps) => {
 			</div>
 			<div style={{width: '75%', padding: '10px', position: 'relative'}}>
 				<Typography sx={{fontWeight: 500, lineHeight: '16px', marginBottom: '8px'}}>
-					{item.category} - {item.name}<br />
+					<Link onClick={() => dispatch(closeCartDrawer())} href={'/products/'+item.slug}>{item.category} - {item.name}</Link><br />
 					<PriceFormat value={item.price} decimalScale={0} />
 				</Typography>
 				{item.attributes.map((attribute) => (

@@ -80,7 +80,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 						</div>
 						<div style={{width: 'calc(45% - 20px)', margin: '0 10px', display: 'flex', flexDirection: 'column'}}>
 							<Typography sx={{fontSize: '15px', fontWeight: 500, lineHeight: '16px'}}>
-								<Link href={'/products'+item.slug}>{item.name}</Link>
+								<Link href={'/products/'+item.slug}>{item.name}</Link>
 							</Typography>
 							<Typography sx={{fontSize: '12px', lineHeight: '16px', marginBottom: '8px'}}>
 								{item.category}
