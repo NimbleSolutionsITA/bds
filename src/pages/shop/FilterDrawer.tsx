@@ -49,6 +49,7 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 			open={open}
 			elevation={0}
 			sx={{
+				zIndex: 1,
 				width: {
 					xs: '100%',
 					md: drawerWidth+'px'
@@ -57,9 +58,16 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 					xs: '-16px',
 					md: 0
 				},
+				height: {
+					xs: 'calc(100vh - 210px)',
+					md: 'auto'
+				},
+				overflowY: {
+					xs: 'scroll',
+					md: 'auto'
+				},
 				flexShrink: 0,
 				flex: '0 0 auto',
-				zIndex: 'auto',
 				position: 'relative'
 			}}
 			PaperProps={{
@@ -219,7 +227,9 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 						price_range: slug === searchParams.price_range?.toString() ? undefined : slug,
 					}))}
 				/>
-				<Button sx={{marginTop: '40px', display: {md: 'none'}}} fullWidth onClick={() => setOpen(false)}>{t('search')}</Button>
+			</Box>
+			<Box sx={{padding: '16px', display: {md: 'none'}}}>
+				<Button fullWidth onClick={() => setOpen(false)}>{t('search')}</Button>
 			</Box>
 		</Drawer>
 	)

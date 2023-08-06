@@ -1,5 +1,5 @@
 import Slider from "./Slider";
-import {Container, Theme, Typography, useMediaQuery} from "@mui/material";
+import {Box, Container, Theme, Typography, useMediaQuery} from "@mui/material";
 import React from "react";
 import ProductCard from "./ProductCard";
 import {BaseProduct} from "../types/woocommerce";
@@ -17,15 +17,17 @@ const ProductsSlider = ({products, title}: ProductsSliderProps) => {
 		return 3;
 	}
 	return (
-		<Container maxWidth="md" sx={{margin: '40px auto', textAlign: 'center'}}>
+		<Container maxWidth="xl" sx={{margin: '40px auto', textAlign: 'center'}}>
 			{title && (
 				<Typography variant="h3" component="div" sx={{margin: '20px 0 30px'}}>
 					{title}
 				</Typography>
 			)}
-			<Slider slides={getSlides()}>
-				{products.map((product) => <ProductCard product={product} key={product.id} />)}
-			</Slider>
+			<Box p={{xs: 0, md: '10%'}}>
+				<Slider slides={getSlides()}>
+					{products.map((product) => <ProductCard product={product} key={product.id} />)}
+				</Slider>
+			</Box>
 		</Container>
 	);
 }

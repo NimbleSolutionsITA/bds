@@ -2,6 +2,7 @@ import {ListArticle} from "../../types/woocommerce";
 import Image from "next/image";
 import {Button, Grid, Typography} from "@mui/material";
 import {useTranslation} from "next-i18next";
+import Link from "../../components/Link";
 
 const ArticlePreview = ({ article }: { article: ListArticle }) => {
 	const { t } = useTranslation();
@@ -64,7 +65,7 @@ const ArticlePreview = ({ article }: { article: ListArticle }) => {
 					{article.excerpt}
 				</Typography>
 				<div style={{width: '100%', textAlign: 'center', padding: '20px 0'}} >
-					<Button>
+					<Button component={Link} href={`/blog/${article.slug}`}>
 						{t('read-more')}
 					</Button>
 				</div>
