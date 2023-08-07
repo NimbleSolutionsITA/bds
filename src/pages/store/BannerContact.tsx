@@ -29,10 +29,10 @@ const ContactBlock = ({ body, cta1, cta2, cta3 }: BannerContactProps['data']['ri
 		<Button target="_blank" variant="outlined" component="a" href={cta1.url} sx={{marginTop: '20px', width: 'fit-content'}}>
 			{cta1.title}
 		</Button>
-		<Button target="_blank" variant="outlined" component="a" href={cta1.url} sx={{marginTop: '20px', width: 'fit-content'}}>
+		<Button target="_blank" variant="outlined" component="a" href={cta2.url} sx={{marginTop: '20px', width: 'fit-content'}}>
 			{cta2.title}
 		</Button>
-		<Button target="_blank" variant="outlined" component="a" href={cta1.url} sx={{marginTop: '20px', width: 'fit-content'}}>
+		<Button target="_blank" variant="outlined" component="a" href={cta3.url} sx={{marginTop: '20px', width: 'fit-content'}}>
 			{cta3.title}
 		</Button>
 	</Grid>
