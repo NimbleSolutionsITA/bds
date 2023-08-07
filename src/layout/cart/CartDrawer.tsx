@@ -13,6 +13,13 @@ import {BaseLayoutProps} from "../../types/settings";
 import Chip from "../../components/Chip";
 import {useRouter} from "next/router";
 import {useTranslation} from "next-i18next";
+import {
+	CHECKOUT_SUB_PATH,
+	DESIGNERS_SUB_PATH,
+	FRAGRANCES_SUB_PATH,
+	LIQUIDES_IMAGINAIRES_SUB_PATH,
+	PROFUMUM_ROMA_SUB_PATH
+} from "../../utils/endpoints";
 
 type CartDrawerProps = {
 	shipping: ShippingClass[]
@@ -68,7 +75,7 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 								<PriceFormat value={subtotal} decimalScale={0} />
 							</Typography>
 						</div>
-						<Button component={Link} href="/checkout">{t('cart.cta')}</Button>
+						<Button component={Link} href={`/${CHECKOUT_SUB_PATH}`}>{t('cart.cta')}</Button>
 						{cartDrawerOpen && (
 							<div style={{marginTop: '10px'}}>
 								<StripePaymentButton  items={items} shipping={shipping} />
@@ -83,9 +90,9 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 						<Typography sx={{textAlign: 'center'}}>
 							{t('cart.empty.subtitle')}
 						</Typography>
-						<CategoryChips title="Designers" categories={categories.designers} path="/designers" />
-						<CategoryChips title="Liquides Imaginaries" categories={categories.fragrances.liquides} path="/fragrances" />
-						<CategoryChips title="Profumum Roma" categories={categories.fragrances.profumum} path="/fragrances" />
+						<CategoryChips title="Designers" categories={categories.designers} path={`/${DESIGNERS_SUB_PATH}`} />
+						<CategoryChips title="Liquides Imaginaries" categories={categories.fragrances.liquides} path={`/${LIQUIDES_IMAGINAIRES_SUB_PATH}`} />
+						<CategoryChips title="Profumum Roma" categories={categories.fragrances.profumum} path={`/${PROFUMUM_ROMA_SUB_PATH}`} />
 					</>
 				)}
 			</Container>
