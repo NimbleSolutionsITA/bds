@@ -30,13 +30,15 @@ const CartItem = ({item}: CartItemProps) => {
 				position: 'relative',
 				borderRight: '1px solid #fff'
 			}}>
-				<Image
-					src={item.image}
-					alt={item.name}
-					fill
-					style={{objectFit: 'contain'}}
+				<Link onClick={() => dispatch(closeCartDrawer())} href={'/products/'+item.slug}>
+					<Image
+						src={item.image}
+						alt={item.name}
+						fill
+						style={{objectFit: 'contain'}}
 
-				/>
+					/>
+				</Link>
 			</div>
 			<div style={{width: '75%', padding: '10px', position: 'relative'}}>
 				<Typography sx={{fontWeight: 500, lineHeight: '16px', marginBottom: '8px'}}>
