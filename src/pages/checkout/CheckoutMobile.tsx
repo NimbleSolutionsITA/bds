@@ -127,8 +127,8 @@ const CheckoutMobile = ({
 	const bottomBarHeight = prices.discount > 0 ? '225px' : '200px'
 
 	return (
-		<>
-			<Container sx={{width: '100%', height: `calc(100vh - ${bottomBarHeight})`, overflow: 'hidden scroll', paddingY: '0 20px'}}>
+		<div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
+			<Container sx={{width: '100%', flexGrow: 1, overflow: 'hidden scroll', paddingY: '0 20px'}}>
 				<div style={{width: '100%', textAlign: 'center'}}>
 					<Logo sx={{margin: '10px'}} />
 				</div>
@@ -185,7 +185,7 @@ const CheckoutMobile = ({
 					)}
 				</Grid>
 			</Container>
-		</>
+		</div>
 	)
 }
 

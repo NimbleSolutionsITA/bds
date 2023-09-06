@@ -53,7 +53,7 @@ const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 				ref={ref}
 				drag="x"
 				dragConstraints={{ right: 0, left: -constraint }}
-				dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+				dragTransition={{ bounceStiffness: 300, bounceDamping: 10 }}
 				dragElastic={0}
 				dragMomentum={false}
 				key={constraint}
