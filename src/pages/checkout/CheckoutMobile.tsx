@@ -128,7 +128,7 @@ const CheckoutMobile = ({
 
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-			<Container sx={{width: '100%', flexGrow: 1, overflow: 'hidden scroll', paddingY: '0 20px'}}>
+			<Container sx={{width: '100%', flexGrow: 1, overflow: 'hidden scroll', padding: '0 20px 200px 20px'}}>
 				<div style={{width: '100%', textAlign: 'center'}}>
 					<Logo sx={{margin: '10px'}} />
 				</div>
@@ -149,7 +149,7 @@ const CheckoutMobile = ({
 					</motion.div>
 				</AnimatePresence>
 			</Container>
-			<Container sx={{width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.1)'}}>
+			<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5'}}>
 				<PriceRecap
 					subtotal={cartTotal}
 					cartTax={prices.cartTax}

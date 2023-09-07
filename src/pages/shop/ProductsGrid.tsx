@@ -75,7 +75,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 		<Box sx={{
 			width: '100%',
 			marginLeft: {
-				xs: 'calc(-100% + 16px)',
+				xs: 0,
 				md:  `-${drawerWidth}px`
 			},
 			transition: (theme) => theme.transitions.create(['margin', 'width'], {

@@ -1,4 +1,4 @@
-import {Box, Button, Divider, Drawer} from "@mui/material";
+import {Box, Button, Divider, Drawer, useMediaQuery, useTheme} from "@mui/material";
 import TagPanel from "./TagPanel";
 import ColorPanel from "./ColorPanel";
 import {Attribute, Category, Color, ProductTag} from "../../types/woocommerce";
@@ -6,6 +6,7 @@ import {SearchParams} from "./ShopLayout";
 import {Dispatch, RefObject, SetStateAction, useEffect, useState} from "react";
 import FilterTextPanel from "./FilterTextPanel";
 import {useTranslation} from "next-i18next";
+import theme from "../../theme/theme";
 
 type FilterDrawerProps = {
 	open: boolean;
@@ -24,6 +25,11 @@ type FilterDrawerProps = {
 	drawerWidth: number
 }
 const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams, colors, attributes, tags, designers, isSunglasses, isOptical, isWoman, isMan, filterBarRef}: FilterDrawerProps) => {
+	const theme = useTheme()
+	const isDesktop = useMediaQuery(theme.breakpoints.up('md'), {
+		defaultMatches: false // assume mobile by default
+	});
+	const drawerVariant = isDesktop ? 'persistent' : 'temporary';
 	const colori = colors.filter(color => color.type === 'colore')
 	const lenti = colors.filter(color => color.type === 'lente')
 	const montature = colors.filter(color => color.type === 'montatura')
@@ -44,7 +50,7 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 	}, []);
 	return (
 		<Drawer
-			variant="persistent"
+			variant={drawerVariant}
 			anchor="left"
 			open={open}
 			elevation={0}
@@ -57,10 +63,6 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 				marginRight: {
 					xs: '-16px',
 					md: 0
-				},
-				height: {
-					xs: 'calc(100vh - 210px)',
-					md: 'auto'
 				},
 				overflowY: {
 					xs: 'scroll',
@@ -88,7 +90,7 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 		>
 			<Box sx={{
 				padding: {
-					xs: '16px',
+					xs: '16px 16px 160px 16px',
 					md: '20px 20px 20px 0',
 				},
 				width: {
@@ -228,7 +230,7 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 					}))}
 				/>
 			</Box>
-			<Box sx={{padding: '16px', display: {md: 'none'}}}>
+			<Box sx={{padding: '16px', display: {md: 'none'}, position: 'fixed', bottom: 0, width: '100%', backgroundColor: '#e5e5e5'}}>
 				<Button fullWidth onClick={() => setOpen(false)}>{t('search')}</Button>
 			</Box>
 		</Drawer>
