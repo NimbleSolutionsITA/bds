@@ -38,7 +38,7 @@ const SliderWithText = ({data: {
 					</Button>
 				</div>
 			</Grid>
-			<Grid item xs={6} lg={3} sx={{position: 'relative', display: 'flex', minHeight: '500px'}}>
+			<Grid item xs={12} md={6} lg={3} sx={{position: 'relative', display: 'flex', minHeight: '500px'}}>
 				<Image
 					src={image}
 					alt="Bottega di Sguardi home slider image"
@@ -46,7 +46,7 @@ const SliderWithText = ({data: {
 					style={{objectFit: 'cover', objectPosition: 'center center'}}
 				/>
 			</Grid>
-			<Grid item xs={6} lg={3} sx={{display: 'flex', paddingRight: {xs: '1%' , lg: 0}, paddingLeft: {xs: 0 , lg: '1%'}, minHeight: '500px'}}>
+			<Grid item xs={12} md={6} lg={3} sx={{display: 'flex', paddingRight: {xs: '1%' , lg: 0}, paddingLeft: {xs: 0 , lg: '1%'}, minHeight: '500px'}}>
 				<FullPageSlider images={slider} disableFullPage />
 			</Grid>
 		</Grid>

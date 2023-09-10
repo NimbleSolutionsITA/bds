@@ -18,6 +18,7 @@ import {openCookiesDrawer} from "../redux/layout";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import Script from 'next/script'
+import ShippingBannerMobile from "./nav/ShippingBannerMobile";
 
 const googleTagManagerId = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
@@ -86,6 +87,7 @@ export default function Layout({children, layout: {
             </Script>
             <Hidden mdUp>
                 <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} />
+                <ShippingBannerMobile />
             </Hidden>
             <Hidden mdDown>
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />

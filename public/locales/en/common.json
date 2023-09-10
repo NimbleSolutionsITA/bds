@@ -152,7 +152,6 @@
     "company":"Company (optional)",
     "state":"State"
   },
-  "read-more":"Read more",
   "available":"Available",
   "cookies": {
     "title": "Cookie Preferences",

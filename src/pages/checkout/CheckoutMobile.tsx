@@ -149,7 +149,7 @@ const CheckoutMobile = ({
 					</motion.div>
 				</AnimatePresence>
 			</Container>
-			<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5'}}>
+			<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 2}}>
 				<PriceRecap
 					subtotal={cartTotal}
 					cartTax={prices.cartTax}

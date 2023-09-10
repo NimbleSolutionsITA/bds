@@ -29,6 +29,7 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 	const isDesktop = useMediaQuery(theme.breakpoints.up('md'), {
 		defaultMatches: false // assume mobile by default
 	});
+	console.log({isMan, isWoman, isSunglasses, isOptical})
 	const drawerVariant = isDesktop ? 'persistent' : 'temporary';
 	const colori = colors.filter(color => color.type === 'colore')
 	const lenti = colors.filter(color => color.type === 'lente')
@@ -90,7 +91,7 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 		>
 			<Box sx={{
 				padding: {
-					xs: '16px 16px 160px 16px',
+					xs: '16px 16px 250px 16px',
 					md: '20px 20px 20px 0',
 				},
 				width: {

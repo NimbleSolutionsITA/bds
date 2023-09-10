@@ -177,7 +177,7 @@ const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) =>
                             textTransform: 'uppercase',
                             textDecoration: 'none'
                         }}
-                        href={isFragrances(group) ? getRelativePath(group) : undefined}
+                        href={isFragrances(group) ? '/'+getRelativePath(group) : undefined}
                     >
                         {t(group)}
                     </Box>

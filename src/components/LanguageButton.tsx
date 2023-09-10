@@ -4,8 +4,9 @@ import React from "react";
 
 type LanguageButtonProps = {
 	onClick?: () => void
+	color?: string
 }
-const LanguageButton = ({onClick}: LanguageButtonProps) => {
+const LanguageButton = ({onClick, color = 'black'}: LanguageButtonProps) => {
 	const {locale, locales, push, asPath} = useRouter()
 	const setLanguage = (language: string) => {
 		document.cookie = `NEXT_LOCALE=${language}; max-age=31536000; path=/`
@@ -21,7 +22,7 @@ const LanguageButton = ({onClick}: LanguageButtonProps) => {
 				}}
 				sx={{
 					minWidth: 0,
-					color: 'black',
+					color,
 					lineHeight: '12px',
 					borderRight: '1px solid black',
 				}}

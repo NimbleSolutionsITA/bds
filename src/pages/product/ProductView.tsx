@@ -29,6 +29,9 @@ import GLS from "../../icons/GLS";
 import {useTranslation} from "next-i18next";
 import {Trans} from "react-i18next";
 import {DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../utils/endpoints";
+import SaveMoney from "../../icons/SaveMoney";
+import FastShipping from "../../icons/FastShipping";
+import EuShipping from "../../icons/EuShipping";
 
 type ProductViewProps = {
 	product: Product
@@ -249,15 +252,21 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 							<StripePaymentButton  items={[cartItem]} shipping={shipping} />
 						</div>
 					)}
-					<div style={{marginTop: '20px', lineHeight: 1}}>
-						<Typography component="div" sx={{marginTop: '20px'}}>
+					<div style={{marginTop: '40px', lineHeight: 1}}>
+						<Typography>
 							<DHL sx={{fontSize: '40px', marginRight: '10px'}} />
 							<GLS sx={{fontSize: '40px'}} />
-							<br />
+						</Typography>
+						<Typography sx={{display: 'flex', alignItems: 'center'}}>
+							<SaveMoney fontSize="medium" sx={{marginRight: '10px'}} />
 							<Trans i18nKey="shipping.line1b" components={[<b key={0} />]} />
-							<br/>
+						</Typography>
+						<Typography sx={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
+							<FastShipping fontSize="medium" sx={{marginRight: '10px'}} />
 							<Trans i18nKey="shipping.line2b" components={[<b key={0} />]} />
-							<br />
+						</Typography>
+						<Typography sx={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
+							<EuShipping fontSize="medium" sx={{marginRight: '10px'}} />
 							<Trans i18nKey="shipping.line3b" components={[<b key={0} />]} />
 						</Typography>
 					</div>

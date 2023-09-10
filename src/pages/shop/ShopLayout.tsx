@@ -68,6 +68,10 @@ const ShopLayout = ({ products, colors, attributes, tags, designers, isSunglasse
 					designers={designers}
 					filterBarRef={ref}
 					drawerWidth={drawerWidth}
+					isSunglasses={isSunglasses}
+					isOptical={isOptical}
+					isMan={isMan}
+					isWoman={isWoman}
 				/>
 				<ProductsGrid
 					title={`${t(isSunglasses ? 'sunglasses_long' : 'optical_long')}${(isMan || isWoman) ? ' ' + t(isMan ? 'man' : 'woman') : ''}`}

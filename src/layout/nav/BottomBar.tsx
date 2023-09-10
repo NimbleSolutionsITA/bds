@@ -10,7 +10,7 @@ export default function BottomBar({breadcrumbs}: BottomBarProps) {
     return (
         <Container sx={{
             display: 'flex',
-            height: '30px',
+            height: '20px',
             alignItems: 'center',
             position: 'relative'
         }}>

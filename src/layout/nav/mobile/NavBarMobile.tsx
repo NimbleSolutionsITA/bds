@@ -31,6 +31,8 @@ export default function NavBarMobile({
         setOpen(false)
     }
 
+    const appbarHeight = (81 + (breadcrumbs ? 20 : 0)) + 'px'
+
     return (
         <>
             <AppBar
@@ -38,7 +40,7 @@ export default function NavBarMobile({
                 elevation={0}
                 position="sticky"
                 sx={{
-                    height: '101px',
+                    height: appbarHeight,
                     zIndex: (theme) => theme.zIndex.drawer + 1,
             }}
             >
@@ -53,23 +55,7 @@ export default function NavBarMobile({
                     </IconButton>
                     <CartIndicator iconProps={{fontSize: 'large'}} />
                 </Toolbar>
-                {breadcrumbs && !open ? <BottomBar breadcrumbs={breadcrumbs}/> : <div style={{height: '30px', width: '100%'}}/>}
-                {/*<Box
-                    sx={{
-                        width: '100%',
-                        height: '20px',
-                        fontFamily: 'Apercu',
-                        backgroundColor: 'rgba(255,255,255,0.5)',
-                        textAlign: 'center',
-                        fontWeight: 500,
-                        color: 'rgba(0,0,0,0.54)',
-                        fontSize: '12px',
-                        zIndex: (theme) => theme.zIndex.drawer - 1,
-                        padding: '1px 0'
-                    }}
-                >
-                    <ShippingBanner />
-                </Box>*/}
+                {breadcrumbs && <BottomBar breadcrumbs={breadcrumbs}/>}
             </AppBar>
             <SwipeableDrawer
                 onClose={() => setOpen(false)}
@@ -86,8 +72,8 @@ export default function NavBarMobile({
                 sx={{
                     position: 'relative',
                     '& .MuiPaper-root': {
-                        top: '80px',
-                        height: 'calc(100% - 101px)',
+                        top: appbarHeight,
+                        height: `calc(100% - ${appbarHeight})`,
                     }
                 }}
             >
@@ -147,7 +133,7 @@ const PhoneButton = ({title}: {title: string}) => (
 const LogoButton = (props: IconButtonProps) => (
     <IconButton sx={{
         position: 'absolute',
-        left: 'calc(50% - 30px)',
+        left: 'calc(50% - 38px)',
         '&:hover': {
             backgroundColor: 'inherit'
         }
