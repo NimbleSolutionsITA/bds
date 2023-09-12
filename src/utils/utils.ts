@@ -235,3 +235,4 @@ export function getProductMainCategory(product: BaseProduct): BaseCategory {
         return fragrance;
     return product.categories.find((category) => category.parent && MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
 }
+export const regExpEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
