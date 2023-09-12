@@ -7,6 +7,7 @@ import { CacheProvider, EmotionCache } from '@emotion/react';
 import theme from '../src/theme/theme';
 import createEmotionCache from '../src/theme/createEmotionCache';
 import '../styles/globals.css';
+import '../styles/wordpress.css';
 import {Provider} from "react-redux";
 import {store} from "../src/redux/store";
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'

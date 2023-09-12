@@ -253,22 +253,22 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						</div>
 					)}
 					<div style={{marginTop: '40px', lineHeight: 1}}>
-						<Typography>
+						<div>
 							<DHL sx={{fontSize: '40px', marginRight: '10px'}} />
 							<GLS sx={{fontSize: '40px'}} />
-						</Typography>
-						<Typography sx={{display: 'flex', alignItems: 'center'}}>
+						</div>
+						<div style={{display: 'flex', alignItems: 'center'}}>
 							<SaveMoney fontSize="medium" sx={{marginRight: '10px'}} />
-							<Trans i18nKey="shipping.line1b" components={[<b key={0} />]} />
-						</Typography>
-						<Typography sx={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
+							<p><Trans i18nKey="shipping.line1b" components={[<b key={0} />]} /></p>
+						</div>
+						<div style={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
 							<FastShipping fontSize="medium" sx={{marginRight: '10px'}} />
-							<Trans i18nKey="shipping.line2b" components={[<b key={0} />]} />
-						</Typography>
-						<Typography sx={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
+							<p><Trans i18nKey="shipping.line2b" components={[<b key={0} />]} /></p>
+						</div>
+						<div style={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
 							<EuShipping fontSize="medium" sx={{marginRight: '10px'}} />
-							<Trans i18nKey="shipping.line3b" components={[<b key={0} />]} />
-						</Typography>
+							<p><Trans i18nKey="shipping.line3b" components={[<b key={0} />]} /></p>
+						</div>
 					</div>
 				</Grid>
 			</Grid>

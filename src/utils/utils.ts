@@ -17,7 +17,7 @@ export const sanitize = (html: string) => {
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ]),
 	allowedAttributes: {
-      '*': ['style'],
+      '*': ['style', 'id'],
       'a': ['target', 'href', 'title'],
       'img': ['src', 'alt', 'width', 'height', 'title'],
     },
