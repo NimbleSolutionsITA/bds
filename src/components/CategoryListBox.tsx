@@ -69,7 +69,13 @@ const CategoryButton = ({name, slug, color = '#000', subpath}: {name: string, sl
 		variant="text"
 		component={Link}
 		href={`/${subpath}/${slug}`}
-		sx={{color}}
+		sx={{
+			color,
+			backgroundColor: {
+				xs: 'rgba(0,0,0,0.2)',
+				md: 'transparent'
+			},
+		}}
 	>
 		<Typography
 			variant="h1"
