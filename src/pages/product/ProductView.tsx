@@ -259,15 +259,15 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						</div>
 						<div style={{display: 'flex', alignItems: 'center'}}>
 							<SaveMoney fontSize="medium" sx={{marginRight: '10px'}} />
-							<p><Trans i18nKey="shipping.line1b" components={[<b key={0} />]} /></p>
+							<Typography><Trans i18nKey="shipping.line1b" components={[<b key={0} />]} /></Typography>
 						</div>
 						<div style={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
 							<FastShipping fontSize="medium" sx={{marginRight: '10px'}} />
-							<p><Trans i18nKey="shipping.line2b" components={[<b key={0} />]} /></p>
+							<Typography><Trans i18nKey="shipping.line2b" components={[<b key={0} />]} /></Typography>
 						</div>
 						<div style={{display: 'flex', alignItems: 'center', marginTop: '5px'}}>
 							<EuShipping fontSize="medium" sx={{marginRight: '10px'}} />
-							<p><Trans i18nKey="shipping.line3b" components={[<b key={0} />]} /></p>
+							<Typography><Trans i18nKey="shipping.line3b" components={[<b key={0} />]} /></Typography>
 						</div>
 					</div>
 				</Grid>
