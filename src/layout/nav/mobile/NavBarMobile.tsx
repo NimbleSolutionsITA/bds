@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useRef, useState} from "react";
 import {AppBar, Button, IconButton, SwipeableDrawer, Toolbar, Container, Typography, Box} from "@mui/material";
 import {MenuToggle} from "./MenuToggle";
 import Image from "next/image";
@@ -24,6 +24,7 @@ const drawerBleeding = 56;
 export default function NavBarMobile({
     mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, ...mobileMenu], breadcrumbs
 }: NavBarMobileProps) {
+    const ref = useRef<HTMLElement>(null);
     const [open, setOpen] = useState(false)
     const router = useRouter()
     const { t } = useTranslation('common')
@@ -31,18 +32,20 @@ export default function NavBarMobile({
         setOpen(false)
     }
 
-    const appbarHeight = (81 + (breadcrumbs ? 20 : 0)) + 'px'
+    const appbarHeight = ref.current ? ref.current.clientHeight : 0 + 'px'
 
     return (
         <>
             <AppBar
+                component="header"
+                ref={ref}
                 color="secondary"
                 elevation={0}
                 position="sticky"
                 sx={{
-                    height: appbarHeight,
+                    paddingTop: '5px',
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-            }}
+                }}
             >
                 <Toolbar sx={{position: 'relative', width: '100%', height: '100%', justifyContent: 'space-between'}}>
                     <LogoButton onClick={() => {

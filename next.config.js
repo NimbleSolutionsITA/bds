@@ -1,4 +1,5 @@
 const { i18n } = require('./next-i18next.config')
+const path = require('path')
 
 if (!process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL) {
     throw new Error(`
@@ -16,6 +17,9 @@ module.exports =  {
             'wpbds.nimble-lab.com',
         ],
         loader: 'default',
+    },
+    sassOptions: {
+        includePaths: [path.join(__dirname, 'styles')],
     },
     i18n,
     async redirects() {

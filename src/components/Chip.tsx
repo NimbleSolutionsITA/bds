@@ -3,7 +3,7 @@ import {Chip as MuiChip} from "@mui/material";
 import React from "react";
 
 type FilterChipProps = {
-	onClick: () => void
+	onClick?: () => void
 	tag: ProductTag | Color | Category | {name: string}
 	isActive?: boolean,
 	color?: string

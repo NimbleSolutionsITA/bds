@@ -10,6 +10,7 @@ const NewsletterTopBar = () => {
 		<div style={{
 			backgroundColor: '#000',
 			color: '#fff',
+			borderTop: '1px solid rgba(255, 255, 255, 0.25)',
 		}}>
 			<Container sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
 				<Typography sx={{fontSize: {xs: '14px', md: '16px'}}}>

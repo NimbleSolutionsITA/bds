@@ -1,19 +1,32 @@
-import {Container} from "@mui/material";
+import {Container, Grid} from "@mui/material";
 import {PageBaseProps} from "../../src/types/settings";
-import {getAllPostIds, getLayoutProps, getPosts, getSeo} from "../../src/utils/wordpress_api";
+import {getAllPostIds, getLayoutProps, getPosts, getPostsAttributes, getSeo} from "../../src/utils/wordpress_api";
 import Layout from "../../src/layout/Layout";
 import HtmlBlock from "../../src/components/HtmlBlock";
 import {Article} from "../../src/types/woocommerce";
+import ArticleSidebar from "../../src/pages/dentro-diaries/ArticleSidebar";
 
 export type GenericPageProps = PageBaseProps & {
     post: Article
+    postsByCategory: {
+        type: string
+        id: number
+        posts: Article[]
+    }[],
 }
 
-export default function BlogPage({post, layout}: GenericPageProps) {
+export default function BlogPage({post, postsByCategory, layout}: GenericPageProps) {
     return (
         <Layout layout={layout}>
             <Container>
-                <HtmlBlock sx={{width: '100%', overflowX: 'hidden'}} html={post.content} />
+                <Grid container spacing={5}>
+                    <Grid item xs={12} md={9}>
+                        <HtmlBlock sx={{width: '100%', overflowX: 'hidden'}} html={post.content} />
+                    </Grid>
+                    <Grid item xs={12} md={3}>
+                        <ArticleSidebar postsByCategory={postsByCategory} tags={post.tags} />
+                    </Grid>
+                </Grid>
             </Container>
         </Layout>
     )
@@ -21,21 +34,32 @@ export default function BlogPage({post, layout}: GenericPageProps) {
 
 export async function getStaticProps({ locale, params: { post: slug } }: { locale: 'it' | 'en', params: {post: string}}) {
     const [
-        layoutProps,
-        {posts: [post]}
+        {ssrTranslations, ...layoutProps},
+        {posts: [post]},
+        {  categories },
     ] = await Promise.all([
         getLayoutProps(locale),
-        getPosts(locale, undefined, undefined, slug)
+        getPosts(locale, undefined, undefined, slug),
+        getPostsAttributes(locale)
     ]);
 
     if (!post)
         return { notFound: true };
+
+    const postsByCategory = (await Promise.all(categories.map(category =>
+        getPosts(locale, 1, 4, undefined, [category.id])
+    ))).map(({posts}, index) => ({
+        type: categories[index].name,
+        id: categories[index].id,
+        posts
+    }));
 
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     const seo = await getSeo(post.link);
     return post ? {
         props: {
             post,
+            postsByCategory,
             layout: {
                 seo,
                 ...layoutProps,
@@ -44,7 +68,8 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
                     { name: 'Dentro Diaries', href: urlPrefix + '/blog' },
                     { name: post.title, href: urlPrefix + '/blog/' + post.slug },
                 ]
-            }
+            },
+            ...ssrTranslations
         },
         revalidate: 10
     } : {

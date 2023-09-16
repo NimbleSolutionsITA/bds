@@ -10,9 +10,12 @@ export default function BottomBar({breadcrumbs}: BottomBarProps) {
     return (
         <Container sx={{
             display: 'flex',
-            height: '20px',
             alignItems: 'center',
-            position: 'relative'
+            position: 'relative',
+            paddingTop: '5px',
+            paddingBottom: '3px',
+            borderBottom: '1px solid rgba(0, 0, 0, 0.10)',
+            marginBottom: { xs: 0, md: '5px' }
         }}>
             {breadcrumbs && <Breadcrumbs breadcrumbs={breadcrumbs} />}
         </Container>

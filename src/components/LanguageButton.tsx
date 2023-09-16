@@ -24,7 +24,7 @@ const LanguageButton = ({onClick, color = 'black'}: LanguageButtonProps) => {
 					minWidth: 0,
 					color,
 					lineHeight: '12px',
-					borderRight: '1px solid black',
+					borderRight: '1px solid white',
 				}}
 				size="small"
 				variant="text"

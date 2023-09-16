@@ -13,27 +13,22 @@ import HtmlBlock from "./HtmlBlock";
 type ArticleCardProps = {
 	article: ListArticle
 	isVertical?: boolean
-	isSidebar?: boolean
 }
 
-const ArticleCard = ({article, isVertical, isSidebar}: ArticleCardProps) => {
+const ArticleCardMini = ({article}: ArticleCardProps) => {
 	const {locale} = useRouter()
 	const formattedDate = formatDistance(new Date(article.date), locale as 'it'|'en');
 	const { t } = useTranslation('common')
 	return (
 		<Card
-			sx={{width: '100%', height: 'auto'}}
+			sx={{width: '100%', height: 'auto', display: 'flex'}}
 			elevation={0}
 		>
 			<Link href={`/${BLOG_POST_SUB_PATH}/${article.slug}`}>
 				<Box sx={{
-					width: '100%',
-					paddingBottom: {
-						xs: isVertical ?  '100%' : '75%',
-						md: isVertical ?  '150%' : '75%',
-						lg: isVertical ?  '132%' : '75%',
-					},
-					position: 'relative'
+					width: '70px',
+					height: '70px',
+					position: 'relative',
 				}}>
 					<Image
 						src={article.image.medium}
@@ -45,18 +40,7 @@ const ArticleCard = ({article, isVertical, isSidebar}: ArticleCardProps) => {
 					/>
 				</Box>
 			</Link>
-			<CardContent sx={{textAlign: 'center', padding: '16px 0'}}>
-				{!isSidebar && (
-					<Typography
-						sx={{
-							fontFamily: 'Apercu',
-							lineHeight: 1.2,
-							fontSize: '13px',
-						}}
-					>
-						{article.categories.map(c => c.name.toUpperCase()).join(' | ')}
-					</Typography>
-				)}
+			<CardContent sx={{padding: '0 0 0 10px'}}>
 				<Link href={`/${BLOG_POST_SUB_PATH}/${article.slug}`} sx={{textDecoration: 'none'}}>
 					<HtmlBlock
 						component={Typography}
@@ -64,16 +48,12 @@ const ArticleCard = ({article, isVertical, isSidebar}: ArticleCardProps) => {
 						sx={{
 							fontFamily: 'Ogg Roman',
 							lineHeight: 1.2,
-							fontSize: {
-								xs: '18px',
-								md: (isVertical && !isSidebar) ? '36px' : '22px'
-							},
+							fontSize: '16px',
 							margin: '5px 0'
 						}}
 					/>
 				</Link>
 				<TextLine text={`By ${article.author.displayName}, ${formattedDate}`} />
-				<TextLine text={t('minutes-read', {count: article.minutesRead})} />
 			</CardContent>
 
 		</Card>
@@ -94,4 +74,4 @@ const TextLine = ({text}: {text: string}) => (
 	</Typography>
 )
 
-export default ArticleCard;
+export default ArticleCardMini;

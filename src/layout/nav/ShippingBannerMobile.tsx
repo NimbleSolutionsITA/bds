@@ -1,13 +1,11 @@
 import {AnimatePresence, motion} from "framer-motion";
 import React, {useEffect, useState} from "react";
-import {useTranslation} from "next-i18next";
 import SaveMoney from "../../icons/SaveMoney";
 import FastShipping from "../../icons/FastShipping";
 import EuShipping from "../../icons/EuShipping";
 import {Trans} from "react-i18next";
 
 const ShippingBannerMobile = () => {
-	const { t } = useTranslation('common');
 	const shippingPromos = [
 		<Trans key="line1" i18nKey="shipping.line1b" components={[<b key={0} />]} />,
 		<Trans key="line2" i18nKey="shipping.line2b" components={[<b key={0} />]} />,
