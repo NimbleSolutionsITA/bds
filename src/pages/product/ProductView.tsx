@@ -103,16 +103,15 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	return (
 		<Container key={product.id}>
 			<Grid container spacing={5}>
-				<Grid item xs={12} md={isEyewear ? 7 : 5}>
+				<Grid item xs={12} md={isEyewear ? 7 : 5} lg={isEyewear ? 7 : 4} xl={isEyewear ? 7 : 3}>
 					<Carousel
 						animation="slide"
 						autoPlay={false}
 						index={galleryIndex}
 						sx={{
-							minHeight: '100%',
-							maxHeight: '1000px',
+							/*minHeight: isEyewear ? '100%' : undefined,
+							maxHeight: isEyewear ? '1000px' : undefined,*/
 							display: 'flex',
-							alignItems: 'center',
 						}}
 						NextIcon={<ArrowForwardIosSharp sx={{fontSize: '40px'}} />}
 						PrevIcon={<ArrowBackIosSharp sx={{fontSize: '40px'}} />}
@@ -168,7 +167,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						))}
 					</Carousel>
 				</Grid>
-				<Grid item xs={12} md={isEyewear ? 5 : 7}>
+				<Grid item xs={12} md={isEyewear ? 5 : 7} lg={isEyewear ? 5 : 8} xl={isEyewear ? 5 : 9}>
 					<Typography
 						variant="h1"
 						dangerouslySetInnerHTML={{__html: sanitize(product.name)}}
