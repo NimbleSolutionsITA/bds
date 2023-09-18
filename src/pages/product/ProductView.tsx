@@ -209,7 +209,11 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						handleClickAttribute={handleClickAttribute}
 						extended
 					/>
-					{currentProduct.stock_status !== 'instock' ? (
+					{currentProduct.stock_status === 'instock' && currentProduct.price ? (
+						<Typography sx={{fontSize: '18px', display: 'flex', fontStyle: 'italic', margin: '10px 0'}}>
+							<InStock sx={{fontSize: '30px', marginRight: '10px'}}/> {t('available').toLowerCase()}
+						</Typography>
+					) : (
 						<>
 							<Typography sx={{margin: '20px 0'}}>
 								{t('notifier.title')}
@@ -229,10 +233,6 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 								{t('notifier.cta')}
 							</Button>
 						</>
-					) : (
-						<Typography sx={{fontSize: '18px', display: 'flex', fontStyle: 'italic', margin: '10px 0'}}>
-							<InStock sx={{fontSize: '30px', marginRight: '10px'}}/> {t('available').toLowerCase()}
-						</Typography>
 					)}
 					{currentProduct.stock_status === 'instock'  && (
 						<Button

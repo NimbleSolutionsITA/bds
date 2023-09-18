@@ -21,7 +21,7 @@ const ArticleCardMini = ({article}: ArticleCardProps) => {
 	const { t } = useTranslation('common')
 	return (
 		<Card
-			sx={{width: '100%', height: 'auto', display: 'flex'}}
+			sx={{width: '100%', height: 'auto', display: 'flex', margin: '10px 0'}}
 			elevation={0}
 		>
 			<Link href={`/${BLOG_POST_SUB_PATH}/${article.slug}`}>

@@ -5,6 +5,9 @@ import {Typography} from "@mui/material";
 import Chip from "../../components/Chip";
 import NewsletterForm from "../../components/NewsletterForm";
 import {useTranslation} from "react-i18next";
+import {ReactNode} from "react";
+import SocialShare from "../product/SocialShare";
+import {useRouter} from "next/router";
 
 type ArticleSideBarProps = {
 	postsByCategory: {
@@ -16,23 +19,22 @@ type ArticleSideBarProps = {
 }
 const ArticleSidebar = ({postsByCategory, tags}: ArticleSideBarProps) => {
 	const { t } = useTranslation('common');
+	const router = useRouter()
 	return (
 		<div>
 			{postsByCategory.map(({type, posts, id}) => {
 				const [ latestArticle, ...otherArticles ] = posts
 				return (
-					<div key={type}>
-						<SectionTitle text={type} />
+					<Section key={type} title={type}>
 						<ArticleCard article={latestArticle} isVertical isSidebar />
 						{otherArticles.map(post => (
 							<ArticleCardMini key={post.id} article={post} />
 						))}
-					</div>
+					</Section>
 				)
 			})}
 			{tags.length > 0 && (
-				<div style={{padding: '10px 0'}}>
-					<SectionTitle text={'Tags'} />
+				<Section title={'Tags'}>
 					<div style={{display: 'flex', gap: '5px', flexWrap: 'wrap'}}>
 						{tags.map(tag => (
 							<Chip
@@ -43,32 +45,43 @@ const ArticleSidebar = ({postsByCategory, tags}: ArticleSideBarProps) => {
 							/>
 						))}
 					</div>
-				</div>
+				</Section>
 			)}
-			<div style={{padding: '10px 0'}}>
-				<SectionTitle text={'Newsletter'} />
+			<Section title={"Share"}>
+				<SocialShare
+					facebookUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
+					emailUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
+					twitterUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
+					telegramUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
+					whatsappUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
+				/>
+			</Section>
+			<Section title={'Newsletter'}>
 				<Typography sx={{margin: '25px 0'}}>
 					{t('newsletter.body')}
 				</Typography>
 				<NewsletterForm/>
-			</div>
+			</Section>
 		</div>
 	)
 }
 
-const SectionTitle = ({text}: {text: string}) => (
-	<Typography
-		variant="h4"
-		sx={{
-			textTransform: 'uppercase',
-			marginBottom: '10px',
-			paddingBottom: '5px',
-			borderBottom: '1px solid #000',
-			fontWeight: 500
-		}}
-	>
-		{text}
-	</Typography>
+const Section = ({children, title}: {children: ReactNode, title: string}) => (
+	<div style={{padding: '10px 0'}}>
+		<Typography
+			variant="h4"
+			sx={{
+				textTransform: 'uppercase',
+				marginBottom: '10px',
+				paddingBottom: '5px',
+				borderBottom: '1px solid #000',
+				fontWeight: 500
+			}}
+		>
+			{title}
+		</Typography>
+		{children}
+	</div>
 )
 
 export default ArticleSidebar
