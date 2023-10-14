@@ -43,7 +43,7 @@ export default function NavBarMobile({
                 elevation={0}
                 position="sticky"
                 sx={{
-                    paddingTop: '5px',
+                    height: '70px',
                     zIndex: (theme) => theme.zIndex.drawer + 1,
                 }}
             >
@@ -76,7 +76,7 @@ export default function NavBarMobile({
                     position: 'relative',
                     '& .MuiPaper-root': {
                         top: appbarHeight,
-                        height: `calc(100% - ${appbarHeight})`,
+                        height: `calc(100% - ${appbarHeight}px)`,
                     }
                 }}
             >

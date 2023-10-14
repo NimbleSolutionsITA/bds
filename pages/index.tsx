@@ -74,17 +74,18 @@ export type HomeProps = PageBaseProps & {
 }
 
 export default function Home({page, layout}: HomeProps) {
+    console.log(page.designers)
     return (
       <Layout layout={layout}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
           <ProductsSlider products={page.ourSelection.products ?? []} title={page.ourSelection.title} />
-          <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
-          <BannerShipping shipping={page.shipping} />
           <BannerDesigners designers={page.designers}/>
           <BannerTop bannerTop={page.bannerTop} />
           <BannerBottom bannerBottom={page.bannerBottom} />
-          <BannerTestimonials reviews={layout.googlePlaces.main.reviews} />
           <BannerBottom2 bannerBottom2={page.bannerBottom2} />
+          <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
+          <BannerShipping shipping={page.shipping} />
+          <BannerTestimonials reviews={layout.googlePlaces.main.reviews} />
           <BannerContact bannerContact={page.bannerContact}  />
       </Layout>
     );

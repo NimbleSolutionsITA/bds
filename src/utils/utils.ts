@@ -236,3 +236,32 @@ export function getProductMainCategory(product: BaseProduct): BaseCategory {
     return product.categories.find((category) => category.parent && MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
 }
 export const regExpEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+export function calculateImageDarkness(imageUrl: string, callback: Function) {
+    const img = new Image();
+    img.src = imageUrl;
+    img.crossOrigin = "anonymous";
+    img.onload = function() {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        if (ctx) {
+            ctx.drawImage(img, 0, 0, img.width, img.height);
+
+            // Calculate average luminance
+            let totalLuminance = 0;
+            const imageData = ctx.getImageData(0, 0, img.width, img.height);
+            for (let i = 0; i < imageData.data.length; i += 4) {
+                const r = imageData.data[i] / 255;
+                const g = imageData.data[i + 1] / 255;
+                const b = imageData.data[i + 2] / 255;
+                const luminance = 0.299 * r + 0.587 * g + 0.114 * b; // Relative luminance formula
+                totalLuminance += luminance;
+            }
+
+            const averageLuminance = totalLuminance / (imageData.data.length / 4);
+            callback(averageLuminance);
+        }
+    };
+}

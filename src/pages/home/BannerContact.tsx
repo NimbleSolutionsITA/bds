@@ -59,9 +59,9 @@ const WhatsAppButton = ({label, url}: ContactButtonProps) => {
 				textTransform: 'none',
 				padding: '12px 24px',
 				fontWeight: 400,
-				backgroundColor: '#69E19F',
+				backgroundColor: '#25d366',
 				'&:hover': {
-					backgroundColor: '#46b076'
+					backgroundColor: '#2bba60'
 				},
 			}}
 			component="a"

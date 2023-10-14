@@ -2,6 +2,7 @@
   "liquides-imaginaires":"Liquides Imaginaries",
   "profumum-roma":"Profumum Roma",
   "buy-now":"Buy now",
+  "explore-section":"Explore the section",
   "read-reviews":"Read all the reviews",
   "review-on-us":"review on us",
   "subscribe":"Subscribe",
@@ -36,6 +37,7 @@
   "over":"over",
   "search":"search",
   "read-more":"Read more",
+  "featured-news": "Featured news",
   "cart":{
     "title":"Your shopping bag",
     "cta":"Go to checkout",
@@ -109,8 +111,8 @@
     "line2":"SHIPPING IN ITALY within 24/48 hours",
     "line3":"SHIPPING IN EUROPE within 2/3 days",
     "line1b":"<0>Free shipping</0> for orders over 150€.",
-    "line2b":"<0>Shippimg in Italy</0> with DHL or GLS within 24/48 hours",
-    "line3b":"<0>Shippimg in Europe</0> with DHL or GLS within 2/3 days"
+    "line2b":"<0>Shipping in Italy</0> with DHL or GLS within 24/48 hours",
+    "line3b":"<0>Shipping in Europe</0> with DHL or GLS within 2/3 days"
   },
   "sorting": {
     "price-desc": "Price: Low to High",

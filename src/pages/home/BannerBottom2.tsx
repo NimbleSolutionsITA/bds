@@ -23,10 +23,10 @@ const BannerBottom2 = ({bannerBottom2: {leftColumn, image}}: BannerBottom2Props)
 			sx={{textAlign: 'center'}}
 		>
 			<HtmlBlock
-				sx={{padding: '10% 10% 5% 10%', textAlign: 'left'}}
+				sx={{padding: '10% 10% 10px 10%', textAlign: 'left'}}
 				html={leftColumn.body}
 			/>
-			<Button sx={{marginBottom: 2}} component="a" href={leftColumn.cta.url}>
+			<Button sx={{marginBottom: 3}} component="a" href={leftColumn.cta.url}>
 				{leftColumn.cta.title}
 			</Button>
 		</Grid>

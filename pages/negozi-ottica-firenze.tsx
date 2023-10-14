@@ -8,7 +8,7 @@ const FullPageSlider = dynamic(() => import("../src/components/FullPageSlider"))
 const BannerTop = dynamic(() => import("../src/pages/store/BannerTop"));
 const BannerBottom = dynamic(() => import("../src/pages/store/BannerBottom"));
 const BannerText = dynamic(() => import("../src/components/BannerText"));
-const StaffBanner = dynamic(() => import("../src/pages/store/StaffBanner"));
+// const StaffBanner = dynamic(() => import("../src/pages/store/StaffBanner"));
 const BannerContact = dynamic(() => import("../src/pages/store/BannerContact"));
 
 
@@ -27,7 +27,7 @@ export default function StorePage({acf, layout}: StorePageProps) {
 			<Container>
 				<BannerBottom data={acf.bannerBottom} />
 			</Container>
-			<StaffBanner staff={acf.staff} />
+			{/*<StaffBanner staff={acf.staff} />*/}
 			<Container>
 				<BannerContact data={acf.contactsBanner} />
 			</Container>

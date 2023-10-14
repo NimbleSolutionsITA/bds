@@ -1,19 +1,19 @@
 import Image from "next/image";
 import {Box, Typography} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
+import {AcfImage} from "../../types/woocommerce";
+import {Swiper, SwiperSlide} from "swiper/react";
+import { EffectFade, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/effect-fade';
 
 type TopBannerProps = {
-	image: {
-		url: string
-		width: number
-		height: number
-		alt: string
-	}
+	gallery: AcfImage[]
 	title: string
 	content: string
 }
 
-const TopBanner = ({image, title, content}: TopBannerProps) => {
+const TopBanner = ({gallery, title, content}: TopBannerProps) => {
 	return (
 		<Box sx={{
 			textAlign: 'center',
@@ -41,29 +41,38 @@ const TopBanner = ({image, title, content}: TopBannerProps) => {
 			<HtmlBlock
 				sx={{
 					maxWidth: '500px',
-					margin: '0 auto 140px'
+					margin: '0 auto 40px'
 				}}
 				html={content}
 			/>
 			<div style={{border: '1px solid #000', padding: '20px'}}>
-				<div
-					style={{
-						position: 'relative',
-						paddingBottom: `${(image.height / image.width) * 100}%`
+				<Swiper
+					centeredSlides={true}
+					autoplay={{
+						delay: 2500,
+						disableOnInteraction: false,
 					}}
+					slidesPerView={1}
+					modules={[EffectFade, Autoplay]}
+					effect="fade"
+					autoHeight
+					loop
 				>
-					<Image
-						style={{
-							height: '100%',
-							width: '100%',
-							position: 'absolute',
-							objectFit: 'cover',
-						}}
-						src={image.url}
-						alt={image.alt}
-						fill
-					/>
-				</div>
+					{gallery.map((image, index) => (
+						<SwiperSlide key={image.id}>
+							<Image
+								width={Number(image.width)}
+								height={Number(image.height)}
+								style={{
+									width: '100%',
+									height: 'auto',
+								}}
+								src={image.url}
+								alt={image.alt}
+							/>
+						</SwiperSlide>
+					))}
+				</Swiper>
 			</div>
 		</Box>
 	)

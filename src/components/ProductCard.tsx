@@ -123,7 +123,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         />
                     </Link>
                 </div>
-                <div style={{position: 'relative', paddingBottom: hover ? 0 : '27px'}}>
+                <div style={{position: 'relative', paddingBottom: hover ? 0 : '40px'}}>
                     <div style={{
                         display: 'flex',
                         justifyContent: 'space-between',

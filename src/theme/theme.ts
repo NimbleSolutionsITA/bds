@@ -66,10 +66,10 @@ const theme = createTheme({
             },
             styleOverrides: {
                 contained: {
-                    padding: '20px 40px',
+                    padding: '15px 30px',
                     fontWeight: 600,
                     textTransform: 'uppercase',
-                    fontSize: '15px',
+                    fontSize: '12px',
                     lineHeight: 1.4,
                     maxHeight: '61px'
                 },
@@ -77,9 +77,9 @@ const theme = createTheme({
                     color: '#ffffff',
                 },
                 outlined: {
-                    padding: '20px 40px',
+                    padding: '15px 30px',
                     fontWeight: 400,
-                    fontSize: '15px',
+                    fontSize: '12px',
                     textAlign: 'center',
                     textTransform: 'uppercase',
                     lineHeight: 1.4,

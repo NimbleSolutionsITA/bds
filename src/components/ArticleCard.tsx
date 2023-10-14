@@ -36,7 +36,7 @@ const ArticleCard = ({article, isVertical, isSidebar}: ArticleCardProps) => {
 					position: 'relative'
 				}}>
 					<Image
-						src={article.image.medium}
+						src={article.image.full}
 						alt={article.title}
 						fill
 						style={{objectFit: 'cover', objectPosition: 'center center'}}

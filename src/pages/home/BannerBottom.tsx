@@ -51,10 +51,10 @@ const SideGrid = ({column, isRight}: {isRight?: boolean, column: BannerBottomPro
 		}}
 	>
 		<HtmlBlock
-			sx={{padding: '0% 10% 5% 10%', width: '100%'}}
+			sx={{padding: '0% 10% 10px 10%', width: '100%'}}
 			html={column.body}
 		/>
-		<Button sx={{marginBottom: 2}} component="a" href={column.cta.url}>
+		<Button sx={{marginBottom: 3}} component="a" href={column.cta.url}>
 			{column.cta.title}
 		</Button>
 	</Grid>

@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {HomeProps} from "../../../pages";
 import {Button, Grid, Typography} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
@@ -8,6 +8,7 @@ import {ArrowBackIosSharp, ArrowForwardIosSharp} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
 import Link from "next/link";
 import {DESIGNERS_SUB_PATH} from "../../utils/endpoints";
+import {calculateImageDarkness} from "../../utils/utils";
 
 type BannerDesignersProps = {
 	designers: HomeProps['page']['designers']
@@ -15,11 +16,25 @@ type BannerDesignersProps = {
 
 const BannerDesigners = ({designers}: BannerDesignersProps) => {
 	const [activeSlide, setActiveSlide] = useState(0);
+	// const [fontColor, setFontColor] = useState('#fff'); // Default to white
 	const contentVariants = {
-		hidden: { opacity: 0, scale: 0 },
-		visible: { opacity: 1, scale: 1 },
+		hidden: { opacity: 0 },
+		visible: { opacity: 1 },
 	};
 	const { t } = useTranslation('common');
+
+	/*useEffect(() => {
+		designers.slider?.forEach((designer, index) => {
+			calculateImageDarkness(designer.image, (imageDarkness: number) => {
+				if (imageDarkness <= 0.5) {
+					setFontColor('#fff'); // Use white font color for dark images
+				} else {
+					setFontColor('#000'); // Use black font color for light images
+				}
+			});
+		});
+	}, [designers.slider]);*/
+
 	return (
 		<Grid container>
 			<Grid item xs={12} md={8}>
@@ -63,15 +78,17 @@ const BannerDesigners = ({designers}: BannerDesignersProps) => {
 									textAlign: 'center'
 								}}
 							>
-								<Typography
-									variant="h5"
-									color="secondary"
-									sx={{marginBottom: '20px'}}
-								>
-									{designer.name}
-								</Typography>
+								<HtmlBlock
+									html={designer.name}
+									sx={{
+										padding: '20px 80px',
+										fontWeight: 500,
+										color: '#fff', //fontColor,
+										fontSize: '30px',
+									}}
+								/>
 								<Button component={Link} href={`${DESIGNERS_SUB_PATH}/${designer.slug}`}>
-									{t('buy-now')}
+									{t('explore-section')}
 								</Button>
 							</motion.div>
 						</div>

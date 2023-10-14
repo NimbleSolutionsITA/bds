@@ -1,22 +1,25 @@
 import {Container} from "@mui/material";
 import {PageBaseProps} from "../src/types/settings";
-import {getLayoutProps, getPageProps, getPosts, getPostsAttributes, mapListArticle} from "../src/utils/wordpress_api";
+import {
+	getLayoutProps,
+	getPageProps,
+	getPosts,
+	getPostsAttributes,
+	mapAcfImage,
+	mapListArticle
+} from "../src/utils/wordpress_api";
 import Layout from "../src/layout/Layout";
 import FeaturedArticles from "../src/pages/dentro-diaries/FeaturedArticles";
-import {Article, ListArticle} from "../src/types/woocommerce";
+import {AcfImage, Article, ListArticle} from "../src/types/woocommerce";
 import TopBanner from "../src/pages/dentro-diaries/TopBanner";
 import NewsletterTopBar from "../src/pages/dentro-diaries/NewsletterTopBar";
 import ArticlesRow from "../src/components/ArticlesRow";
 import ArticlePreview from "../src/pages/dentro-diaries/ArticlePreview";
+import {useTranslation} from "next-i18next";
 
 
 export type DentroDiariesProps = PageBaseProps & {
-	headerImage: {
-		url: string
-		width: number
-		height: number
-		alt: string
-	}
+	headerGallery: AcfImage[]
 	preview: ListArticle|null
 	featuredArticles: ListArticle[]
 	postsByCategory: {
@@ -28,13 +31,14 @@ export type DentroDiariesProps = PageBaseProps & {
 	content: string
 }
 
-export default function Blog({headerImage, featuredArticles, layout, preview, postsByCategory, title, content}: DentroDiariesProps) {
+export default function Blog({headerGallery, featuredArticles, layout, preview, postsByCategory, title, content}: DentroDiariesProps) {
+	const { t } = useTranslation('common')
 	return (
 		<Layout layout={layout}>
 			<NewsletterTopBar />
 			<Container maxWidth="lg" sx={{marginTop: '20px'}}>
-				<TopBanner image={headerImage} title={title} content={content} />
-				<FeaturedArticles title="Notizie in evidenza" articles={featuredArticles} />
+				<TopBanner gallery={headerGallery} title={title} content={content} />
+				<FeaturedArticles title={t('featured-news')} articles={featuredArticles} />
 			</Container>
 			{preview && <ArticlePreview article={preview}/>}
 			<Container maxWidth="lg" sx={{marginTop: '20px'}}>
@@ -66,14 +70,11 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 	}));
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 
+	console.log(page.acf)
+
 	return page ? {
 		props: {
-			headerImage: {
-				url: page.acf.headerImage.url,
-				width: page.acf.headerImage.width,
-				height: page.acf.headerImage.height,
-				alt: page.acf.headerImage.alt,
-			},
+			headerGallery: page.acf.headerGallery.map(mapAcfImage),
 			preview: page.acf.preview[0] ? mapListArticle(page.acf.preview[0]) : null,
 			featuredArticles: [
 				mapListArticle(page.acf.featured.middleColumn.post[0]),
