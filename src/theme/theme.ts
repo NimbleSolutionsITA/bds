@@ -131,6 +131,19 @@ const theme = createTheme({
                     border: '1px solid rgba(0,0,0,0.1)'
                 }
             }
+        },
+        MuiChip: {
+            styleOverrides: {
+                root: {
+                    height: 'auto',
+                },
+                avatarMedium: {
+                    marginLeft: 0,
+                    borderRadius: 0,
+                    width: 'auto',
+                    height: '100px',
+                }
+            }
         }
     }
 });

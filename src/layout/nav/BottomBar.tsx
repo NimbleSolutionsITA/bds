@@ -15,7 +15,8 @@ export default function BottomBar({breadcrumbs}: BottomBarProps) {
             paddingTop: '5px',
             paddingBottom: '3px',
             borderBottom: '1px solid rgba(0, 0, 0, 0.10)',
-            marginBottom: { xs: 0, md: '5px' }
+            marginBottom: { xs: 0, md: '5px' },
+            backgroundColor: '#FFF',
         }}>
             {breadcrumbs && <Breadcrumbs breadcrumbs={breadcrumbs} />}
         </Container>

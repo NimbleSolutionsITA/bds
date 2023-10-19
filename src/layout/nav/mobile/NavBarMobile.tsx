@@ -14,6 +14,10 @@ import {getRelativePath} from "../../../utils/utils";
 import ShippingBanner from "../ShippingBanner";
 import {useTranslation} from "next-i18next";
 import BottomBar from "../BottomBar";
+import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layout";
+import SearchIcon from "@mui/icons-material/Search";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../../redux/store";
 
 type NavBarMobileProps = {
     mobileMenu: Menus['mobileMenu']
@@ -25,6 +29,8 @@ export default function NavBarMobile({
     mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, ...mobileMenu], breadcrumbs
 }: NavBarMobileProps) {
     const ref = useRef<HTMLElement>(null);
+    const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
+    const dispatch = useDispatch()
     const [open, setOpen] = useState(false)
     const router = useRouter()
     const { t } = useTranslation('common')
@@ -43,7 +49,7 @@ export default function NavBarMobile({
                 elevation={0}
                 position="sticky"
                 sx={{
-                    height: '70px',
+                    height: breadcrumbs ? '100px' : '70px',
                     zIndex: (theme) => theme.zIndex.drawer + 1,
                 }}
             >
@@ -56,7 +62,14 @@ export default function NavBarMobile({
                     <IconButton onClick={() => setOpen(open => !open)}>
                         <MenuToggle isOpen={open} />
                     </IconButton>
-                    <CartIndicator iconProps={{fontSize: 'large'}} />
+                    <div>
+                        <IconButton
+                            onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}
+                        >
+                            <SearchIcon fontSize="large" />
+                        </IconButton>
+                        <CartIndicator iconProps={{fontSize: 'large'}} />
+                    </div>
                 </Toolbar>
                 {breadcrumbs && <BottomBar breadcrumbs={breadcrumbs}/>}
             </AppBar>

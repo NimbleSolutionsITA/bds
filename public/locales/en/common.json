@@ -38,6 +38,10 @@
   "search":"search",
   "read-more":"Read more",
   "featured-news": "Featured news",
+  "fragrances": "Fragrances",
+  "perfumes": "Perfumes",
+  "eyewear": "Eyewear",
+  "designers": "Designers",
   "cart":{
     "title":"Your shopping bag",
     "cta":"Go to checkout",

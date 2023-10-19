@@ -19,6 +19,7 @@ import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import Script from 'next/script'
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
+import SearchModal from "./drawers/SearchModal";
 
 const googleTagManagerId = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
@@ -96,6 +97,11 @@ export default function Layout({children, layout: {
             <InStockNotifierDrawer />
             <NewsletterDrawer />
             <CartDrawer shipping={shipping} categories={categories} />
+            <SearchModal
+                designers={categories.designers}
+                profumum={categories.fragrances.profumum}
+                liquides={categories.fragrances.liquides}
+            />
             {children}
             <Footer googlePlaces={googlePlaces} />
         </Elements>

@@ -4,6 +4,7 @@ type LayoutState = {
 	newsletterDrawerOpen: boolean
 	cookiesDrawerOpen: boolean
 	cookiesSavedDrawerOpen: boolean
+	searchDrawerOpen: boolean
 	inStockNotifierDrawer: {
 		open: boolean
 		productId: number | null
@@ -18,6 +19,7 @@ const initialState: LayoutState = {
 	newsletterDrawerOpen: false,
 	cookiesDrawerOpen: false,
 	cookiesSavedDrawerOpen: false,
+	searchDrawerOpen: false,
 	inStockNotifierDrawer: {
 		open: false,
 		productId: null,
@@ -40,6 +42,12 @@ export const layoutSlice = createSlice({
 		},
 		openCookiesSavedDrawer: (state) => {
 			state.cookiesSavedDrawerOpen = true
+		},
+		openSearchDrawer: (state) => {
+			state.searchDrawerOpen = true
+		},
+		closeSearchDrawer: (state) => {
+			state.searchDrawerOpen = false
 		},
 		closeCookiesSavedDrawer: (state) => {
 			state.cookiesSavedDrawerOpen = false
@@ -79,6 +87,8 @@ export const {
 	closeNewsletterDrawer,
 	openInStockNotifierDrawer,
 	closeInStockNotifierDrawer,
+	openSearchDrawer,
+	closeSearchDrawer
 } = layoutSlice.actions
 
 export default layoutSlice.reducer
