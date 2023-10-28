@@ -1,5 +1,5 @@
 import {Category, Color, ProductTag} from "../types/woocommerce";
-import {Avatar, Chip as MuiChip} from "@mui/material";
+import {Avatar, Chip as MuiChip, SxProps, Theme} from "@mui/material";
 import React from "react";
 
 type FilterChipProps = {
@@ -9,8 +9,9 @@ type FilterChipProps = {
 	color?: string
 	avatar?: string
 	size?: 'small' | 'medium'
+	sxMobile?: SxProps<Theme> | undefined
 }
-const Chip = ({onClick, tag, isActive, color, avatar, size = 'small'}: FilterChipProps) => (
+const Chip = ({onClick, tag, isActive, color, avatar, size = 'small', sxMobile}: FilterChipProps) => (
 	<MuiChip
 		label={<span dangerouslySetInnerHTML={{__html: tag.name}} />}
 		color="primary"
@@ -18,13 +19,14 @@ const Chip = ({onClick, tag, isActive, color, avatar, size = 'small'}: FilterChi
 		clickable
 		size={size}
 		variant={isActive ? "filled" : "outlined"}
-		sx={{
+		sx={(theme) => ({
 			borderRadius: 0,
 			paddingLeft: color ? '5px' : 0,
 			'&.MuiChip-filled': {
 				backgroundColor: 'primary',
-			}
-		}}
+			},
+			[theme.breakpoints.down('sm')]: sxMobile
+		})}
 		avatar={avatar ? (
 			<Avatar alt="Natacha" src={avatar} />
 			) : (

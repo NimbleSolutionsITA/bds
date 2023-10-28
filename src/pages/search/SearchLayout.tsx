@@ -157,6 +157,13 @@ const SearchLayout = ({designers, profumum, liquides}: Props) => {
 												tag={{name: `<b>${product.name}</b><br />${product.categories[0].name}`}}
 												onClick={() => handleClick(`/${PRODUCT_SUB_PATH}/${product.slug}`)}
 												size="medium"
+												sxMobile={{
+													margin: '0 auto',
+													'& .MuiChip-avatar': {
+														width: '100px',
+														height: '50px'
+													}
+												}}
 											/>
 										)))}
 									</Box>
@@ -209,6 +216,13 @@ const SearchLayout = ({designers, profumum, liquides}: Props) => {
 												tag={{name: `<b>${product.name}</b><br />${product.categories[0].name}`}}
 												onClick={() => handleClick(`/${PRODUCT_SUB_PATH}/${product.slug}`)}
 												size="medium"
+												sxMobile={{
+													margin: '0 auto',
+													'& .MuiChip-avatar': {
+														width: '100px',
+														height: '50px'
+													}
+												}}
 											/>
 										)))}
 									</Box>
