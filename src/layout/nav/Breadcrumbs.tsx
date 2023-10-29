@@ -1,6 +1,7 @@
 import Link from "../../components/Link";
 import {BreadCrumb} from "../../types/settings";
 import {Breadcrumbs as MuiBreadcrumbs, Link as MuiLink, Typography} from "@mui/material";
+import HtmlBlock from "../../components/HtmlBlock";
 
 type BreadcrumbsProps = {
 	breadcrumbs: BreadCrumb[]
@@ -17,7 +18,7 @@ const Breadcrumbs = ({breadcrumbs}: BreadcrumbsProps) => (
 					component={index === breadcrumbs.length - 1 ? 'span' : Link}
 					noWrap
 				>
-					{name}
+					<HtmlBlock html={name} component="span" />
 				</MuiLink>
 			))}
 		</MuiBreadcrumbs>
