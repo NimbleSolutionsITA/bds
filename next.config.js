@@ -25,6 +25,12 @@ module.exports =  {
     async redirects() {
         return [
             {
+                source: '/:path*',
+                has: [{ type: 'host', value: 'www.bottegadisguardi.com' }],
+                destination: 'https://bottegadisguardi.com/:path*',
+                permanent: true
+            },
+            {
                 source: '/shop/:mainCategory/:brand/:slug',
                 destination: '/products/:slug',
                 permanent: true,
