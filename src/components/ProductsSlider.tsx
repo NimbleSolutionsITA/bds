@@ -9,7 +9,6 @@ type ProductsSliderProps = {
 	title?: string
 }
 const ProductsSlider = ({products, title}: ProductsSliderProps) => {
-	console.log({products})
 	return (
 		<Container maxWidth="xl" sx={{margin: '40px auto', textAlign: 'center'}}>
 			{title && (

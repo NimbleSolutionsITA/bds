@@ -125,10 +125,6 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 				// execution. Set up a webhook or plugin to listen for the
 				// payment_intent.succeeded event that handles any business critical
 				// post-payment actions.
-				console.log(`Payment ${paymentIntent.status}: ${paymentIntent.id}`);
-
-				console.log(e)
-				console.log(paymentIntent)
 
 				const { order } = await fetch(NEXT_API_ENDPOINT + '/orders', {
 					method: 'POST',
@@ -197,7 +193,6 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 					return;
 				}
 				const shippingOptions = getShippingOptions(ev.shippingAddress.country);
-				console.log(shippingOptions, ev.shippingAddress.country);
 				if (shippingOptions.length === 0) {
 					ev.updateWith({status: 'invalid_shipping_address'});
 				} else {

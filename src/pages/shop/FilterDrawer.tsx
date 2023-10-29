@@ -29,7 +29,6 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 	const isDesktop = useMediaQuery(theme.breakpoints.up('md'), {
 		defaultMatches: false // assume mobile by default
 	});
-	console.log({isMan, isWoman, isSunglasses, isOptical})
 	const drawerVariant = isDesktop ? 'persistent' : 'temporary';
 	const colori = colors.filter(color => color.type === 'colore')
 	const lenti = colors.filter(color => color.type === 'lente')

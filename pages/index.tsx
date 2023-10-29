@@ -74,7 +74,6 @@ export type HomeProps = PageBaseProps & {
 }
 
 export default function Home({page, layout}: HomeProps) {
-    console.log(page.designers)
     return (
       <Layout layout={layout}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />

@@ -6,8 +6,8 @@ type BreadcrumbsProps = {
 	breadcrumbs: BreadCrumb[]
 }
 const Breadcrumbs = ({breadcrumbs}: BreadcrumbsProps) => (
-	<div>
-		<MuiBreadcrumbs separator=">" aria-label="breadcrumb">
+	<div style={{overflow: 'hidden'}}>
+		<MuiBreadcrumbs separator=">" aria-label="breadcrumb" >
 			{breadcrumbs.map(({name, href}, index) => (
 				<MuiLink
 					underline={index === breadcrumbs.length - 1 ? 'none' : "hover"}
@@ -15,6 +15,7 @@ const Breadcrumbs = ({breadcrumbs}: BreadcrumbsProps) => (
 					href={index === breadcrumbs.length - 1 ? undefined : href}
 					color={index === breadcrumbs.length - 1 ? 'text.primary' : 'inherit'}
 					component={index === breadcrumbs.length - 1 ? 'span' : Link}
+					noWrap
 				>
 					{name}
 				</MuiLink>

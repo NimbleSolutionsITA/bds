@@ -1,7 +1,13 @@
 import {PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
-import {Dispatch, SetStateAction, useEffect} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {WooOrder} from "../../types/woocommerce";
 import {useRouter} from "next/router";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import {Button} from "@mui/material";
 
 type StripePaymentProps = {
 	isReadyToPay: boolean,
@@ -12,6 +18,7 @@ type StripePaymentProps = {
 const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProps) => {
 	const stripe = useStripe();
 	const elements = useElements();
+	const [error, setError] = useState<string>();
 	const router = useRouter();
 
 	useEffect(() => {
@@ -24,21 +31,19 @@ const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProp
 
 			setCheckoutStep(4.5);
 
-			await stripe.confirmPayment({
+			const result = await stripe.confirmPayment({
 				elements,
 				confirmParams: {
-					// Make sure to change this to your payment completion page
 					return_url: `${window.location.href}/${order.id}`,
 					receipt_email: order.billing.email,
 				},
 			});
 
-			// This point will only be reached if there is an immediate error when
-			// confirming the payment. Otherwise, your customer will be redirected to
-			// your `return_url`. For some payment methods like iDEAL, your customer will
-			// be redirected to an intermediate site first to authorize the payment, then
-			// redirected to the `return_url`.
-			setCheckoutStep(4);
+			if (result.error) {
+				setError(result.error.message);
+			} else {
+				// await router.push(`/checkout/${order.id}`);
+			}
 		}
 		handlePay().then(r => r);
 	}, [isReadyToPay, stripe, elements, order, setCheckoutStep]);
@@ -71,6 +76,28 @@ const StripePayment = ({order, isReadyToPay, setCheckoutStep}: StripePaymentProp
 					},
 				}}
 			/>
+			<Dialog
+				open={!!error}
+				onClose={() => setError(undefined)}
+				aria-labelledby="stripe-payment-error"
+			>
+				<DialogTitle id="alert-dialog-title">
+					{"Payment error"}
+				</DialogTitle>
+				<DialogContent>
+					<DialogContentText id="alert-dialog-description">
+						{error}
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => {
+						setError(undefined);
+						setCheckoutStep(3);
+					}}>
+						Close
+					</Button>
+				</DialogActions>
+			</Dialog>
 		</div>
 	)
 }

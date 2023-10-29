@@ -24,7 +24,6 @@ export default function ShopSunglassesMan({ layout, products, colors, tags, desi
 }
 
 export async function getStaticProps({ locale, params: {gender} }: { locale: 'it' | 'en', params: {gender: 'uomo' | 'donna'} }) {
-	console.log('PDPDPD')
 	const man = gender === 'uomo'
 	const woman = gender === 'donna'
 	const props = await getShopPageProps(locale, {sunglasses: true, woman, man}, gender, SHOP_CATEGORIES.sunglasses[locale])

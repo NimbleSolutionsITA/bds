@@ -5,6 +5,7 @@ import {useEffect, useState} from "react";
 import {NEXT_API_ENDPOINT} from "../../src/utils/endpoints";
 import {useDispatch} from "react-redux";
 import {destroyCart} from "../../src/redux/cartSlice";
+import {getLayoutProps} from "../../src/utils/wordpress_api";
 
 
 export type CheckoutResultProps = {
@@ -30,8 +31,8 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 
 	useEffect(() => {
 		if (paid === 'true') {
-			setResult('succeeded')
 			dispatch(destroyCart())
+			setResult('succeeded')
 		}
 		if (!stripePromise || !payment_intent || !payment_intent_client_secret || !redirect_status)
 			return;
@@ -58,7 +59,6 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 		stripePromise.then(async (stripe) => {
 			if (stripe) {
 				stripe.retrievePaymentIntent(payment_intent_client_secret as string).then(({ paymentIntent }) => {
-					console.log('paymentIntent', paymentIntent)
 					if (paymentIntent?.status === 'succeeded') {
 						updateOrder().then(() => {
 							setResult('succeeded')
@@ -74,13 +74,16 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 
 	return <PaymentResult isLoading={result === 'pending'} isSuccess={result === 'succeeded'} />
 }
-export async function getStaticProps({ params: {id} }: { locales: string[], locale: 'it' | 'en', params: {id: string}}) {
+export async function getStaticProps({ params: {id}, locale }: { locale: 'it' | 'en', params: {id: string}}) {
 	const [
+		{ssrTranslations}
 	] = await Promise.all([
+		getLayoutProps(locale),
 	]);
 	return {
 		props: {
-			orderId: id
+			orderId: id,
+			...ssrTranslations
 		},
 		revalidate: 10
 	}

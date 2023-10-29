@@ -154,13 +154,14 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
 	)
 		.then(response => response.json()))[0]
-
 	const seo = await getSeo(page.link)
 	return { page: mapPage(page), seo }
 }
 
 export const getSeo = async (link: string) => {
-	const seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${link}`).then(response => response.json())
+	console.log(link)
+	let normalizedLink = link.replace('/en/categoria-prodotto/', '/categoria-prodotto/')
+	const seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${normalizedLink}`).then(response => response.json())
 	return seo.head ?? null
 }
 

@@ -70,8 +70,6 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 	}));
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 
-	console.log(page.acf)
-
 	return page ? {
 		props: {
 			headerGallery: page.acf.headerGallery.map(mapAcfImage),

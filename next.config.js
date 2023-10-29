@@ -13,8 +13,8 @@ module.exports =  {
     swcMinify: true,
     images: {
         domains: [
-            'www.wpbds.nimble-lab.com',
-            'wpbds.nimble-lab.com',
+            'www.wp.bottegadisguardi.com',
+            'wp.bottegadisguardi.com',
         ],
         loader: 'default',
     },
