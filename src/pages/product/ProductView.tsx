@@ -199,10 +199,12 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 							<PriceFormat value={cartItem.price} decimalScale={0} />
 						</Typography>
 					)}
-					<HtmlBlock
-						sx={{margin: '20px 0', paddingBottom: '20px', borderBottom: '1px solid'}}
-						html={product.short_description}
-					/>
+					{product.short_description && (
+						<HtmlBlock
+							sx={{margin: '20px 0', paddingBottom: '20px', borderBottom: '1px solid'}}
+							html={product.short_description}
+						/>
+					)}
 					<AttributeCheckboxes
 						product={product}
 						currentAttributes={currentAttributes}

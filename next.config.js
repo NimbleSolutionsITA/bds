@@ -138,6 +138,17 @@ module.exports =  {
                 permanent: true,
             },
             {
+                source: '/category/profumum-roma/:slug',
+                destination: '/profumum-roma/:slug',
+                permanent: true,
+            },
+            {
+                source: '/category/profumum-roma/:slug',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en/profumum-roma/:slug',
+                permanent: true,
+            },
+            {
                 source: '/category/liquides-imaginaires',
                 destination: '/liquides-imaginaires',
                 permanent: true,
@@ -146,6 +157,17 @@ module.exports =  {
                 source: '/category/liquides-imaginaires',
                 has: [{ type: 'query', key: 'lang', value: 'en' }],
                 destination: '/en/liquides-imaginaires',
+                permanent: true,
+            },
+            {
+                source: '/category/liquides-imaginaires/:slug',
+                destination: '/liquides-imaginaires/:slug',
+                permanent: true,
+            },
+            {
+                source: '/category/liquides-imaginaires/:slug',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en/liquides-imaginaires/:slug',
                 permanent: true,
             },
             {
