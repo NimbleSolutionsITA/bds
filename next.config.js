@@ -138,6 +138,17 @@ module.exports =  {
                 permanent: true,
             },
             {
+                source: '/category/profumum-roma/Profumi',
+                destination: '/profumum-roma/profumi',
+                permanent: true,
+            },
+            {
+                source: '/category/profumum-roma/Profumi',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en/profumum-roma/profumi',
+                permanent: true,
+            },
+            {
                 source: '/category/profumum-roma/:slug',
                 destination: '/profumum-roma/:slug',
                 permanent: true,
