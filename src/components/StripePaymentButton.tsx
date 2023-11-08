@@ -1,6 +1,5 @@
 import {useState, useEffect} from "react";
 import {PaymentRequestButtonElement, useStripe} from '@stripe/react-stripe-js';
-import {CartItem} from "../redux/cartSlice";
 import {PaymentRequest} from "@stripe/stripe-js/types/stripe-js/payment-request";
 import {ShippingClass} from "../types/woocommerce";
 import {NEXT_API_ENDPOINT} from "../utils/endpoints";
@@ -20,6 +19,13 @@ type ShippingOption = {
 	amount: number
 }
 
+type CartItem = {
+	product_id: number
+	variation_id?: number
+	name: string
+	price: number
+	qty: number
+}
 const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 	const stripe = useStripe();
 	const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);

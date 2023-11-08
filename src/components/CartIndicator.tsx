@@ -1,4 +1,4 @@
-import {Badge, IconButton} from "@mui/material";
+import {Badge, CircularProgress, IconButton} from "@mui/material";
 import CartIcon from "../icons/CartIcon";
 import {IconButtonProps} from "@mui/material/IconButton/IconButton";
 import {SvgIconProps} from "@mui/material/SvgIcon/SvgIcon";
@@ -11,12 +11,12 @@ type CartIndicatorProps = {
 	iconProps?: SvgIconProps
 }
 const CartIndicator = ({buttonProps, iconProps}: CartIndicatorProps) => {
-	const { items } = useSelector((state: RootState) => state.cart);
+	const { cart, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch()
 	return (
 		<IconButton {...buttonProps} onClick={() => dispatch(toggleCartDrawer())}>
 			<Badge
-				badgeContent={items.length}
+				badgeContent={cart?.items?.length ?? 0}
 				overlap="circular"
 				color="primary"
 				sx={{
@@ -28,7 +28,10 @@ const CartIndicator = ({buttonProps, iconProps}: CartIndicatorProps) => {
 					}
 				}}
 			>
-				<CartIcon {...iconProps} />
+				{loading ?
+					<CircularProgress size={20} color="inherit" /> :
+					<CartIcon {...iconProps} />
+				}
 			</Badge>
 		</IconButton>
 	)

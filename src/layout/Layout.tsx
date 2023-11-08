@@ -4,7 +4,8 @@ import NavBarMobile from "./nav/mobile/NavBarMobile";
 import {BaseLayoutProps} from "../types/settings";
 import Footer from "./footer/Footer";
 import {useDispatch} from "react-redux";
-import {initCart} from "../redux/cartSlice";
+
+import {fetchCartData} from "../redux/cartSlice";
 import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {Hidden} from "@mui/material";
@@ -20,6 +21,7 @@ import {useRouter} from "next/router";
 import Script from 'next/script'
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
 import SearchModal from "./drawers/SearchModal";
+import {AppDispatch} from "../redux/store";
 
 const googleTagManagerId = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
@@ -32,13 +34,13 @@ export default function Layout({children, layout: {
     seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping, categories
 }}: LayoutProps) {
     const {locale} = useRouter()
-    const dispatch = useDispatch()
+    const dispatch = useDispatch<AppDispatch>()
     const isAnalyticsEnabled = Cookies.get("analytics") === "true";
     /*const isProfilingEnabled = Cookies.get("profiling") === "true";*/
     /*const isUsageEnabled = Cookies.get("usage") === "true";*/
 
     useEffect(() => {
-        dispatch(initCart())
+        dispatch(fetchCartData());
         const firstAccess = Cookies.get('firstAccess');
         if (!firstAccess) {
             // 'firstAccess' cookie doesn't exist. Setting the cookie and opening the CookiesDrawer.
@@ -52,7 +54,6 @@ export default function Layout({children, layout: {
         process.env.NEXT_PUBLIC_STRIPE_PUBLIC_SANDBOX;
 
     const stripePromise = loadStripe(stripePublicKey ?? '');
-
 
     return (
         <Elements stripe={stripePromise}>

@@ -1,4 +1,3 @@
-import {CartItem} from "../../redux/cartSlice";
 import Image from "next/image";
 import {
 	Box,
@@ -11,52 +10,124 @@ import {
 	Hidden,
 	InputLabel,
 	MenuItem,
-	Select,
+	Select, SelectChangeEvent,
 	TextField,
-	Typography,
+	Typography, useMediaQuery, useTheme,
 } from "@mui/material";
-import {Control, Controller, FieldErrors} from "react-hook-form";
-import {ShippingMethod} from "../../types/woocommerce";
-import {CheckoutCartItem, Inputs} from "./CheckoutGrid";
+import {useFormContext} from "react-hook-form";
+import {Step as StepType, Step} from "./CheckoutGrid";
 import Link from "next/link";
 import PriceFormat from "../../components/PriceFormat";
 import {LocalShippingSharp, StorefrontSharp} from "@mui/icons-material";
 import Payments from "../../components/Payments";
 import PriceRecap from "./PriceRecap";
-import HelperText from "../../components/HelperText";
 import Minus from "../../layout/cart/Minus";
 import Plus from "../../layout/cart/Plus";
 import {useTranslation} from "next-i18next";
+import {BaseSyntheticEvent, Dispatch, SetStateAction, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {AppDispatch, RootState} from "../../redux/store";
+import {selectShipping, setCoupon} from "../../redux/cartSlice";
+import {useElements, useStripe} from "@stripe/react-stripe-js";
+import {PaymentErrorDialog} from "./Payment";
+import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
 
 type RecapProps = {
-	control: Control<Inputs>
-	setCoupon: () => void
-	shippingMethods?: ShippingMethod[]
-	shippingMethod?: ShippingMethod
-	subtotal: number
-	prices: {
-		total: number
-		totalTax: number
-		shipping: number
-		shippingTax: number
-		discount: number
-		discountTax: number
-		cartTax: number
-	}
-	items: (CheckoutCartItem | CartItem)[]
 	isLoading: boolean
-	errors: FieldErrors<Inputs>
-	recapAction: () => void
-	checkoutStep: number
+	checkoutStep: Step
+	setCheckoutStep: Dispatch<SetStateAction<StepType>>
+	updateOrder: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
 }
-const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, items, prices, isLoading, errors, recapAction, checkoutStep}: RecapProps) => {
+const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapProps) => {
+	const { formState: { errors } } = useFormContext();
 	const { t } = useTranslation('common');
-	console.log(t('shipping.line1'))
+	const { cart, customer, stripe: { intentId } = { intentId: null } } = useSelector((state: RootState) => state.cart);
+	const dispatch = useDispatch<AppDispatch>()
+	const canEditData = !isLoading && ['RECAP','ADDRESS', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
+	const theme = useTheme();
+	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+	const shipping = cart?.shipping?.packages.default
+	const shippingRates = shipping?.rates ?? {}
+	const hasFreeShipping = Object.values(shippingRates).find(r => r.method_id === 'free_shipping')
+	const selectedRate = shipping?.chosen_method
+	const [stripeLoading, setStripeLoading] = useState(false);
+	const [couponCode, setCouponCode] = useState('');
+	const [paymentError, setPaymentError] = useState<string>();
+
+	const stripe = useStripe();
+	const elements = useElements();
+
+	const payWithStripe = async () => {
+		setStripeLoading(true);
+		console.log('paying with stripe')
+		if (!stripe || !elements || !intentId) {
+			console.log('stripe or elements not ready')
+			setStripeLoading(false);
+			return;
+		}
+		const updateIntent = await fetch(NEXT_API_ENDPOINT + '/order/checkout', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				cartKey: cart?.cart_key,
+				intentId,
+				customer
+			})
+		})
+		const updateIntentResult = await updateIntent.json()
+
+		if (!updateIntentResult.success) {
+			setPaymentError('Error while updating intent')
+		}
+		else {
+			const { error } = await stripe!.confirmPayment({
+				elements: elements!,
+				confirmParams: {
+					return_url: `${window.location.origin}/checkout/completed`,
+				}
+			});
+
+			if (error) {
+				console.error(error.message ?? 'An unknown error occured')
+				setPaymentError(error.message ?? 'An unknown error occured')
+			}
+		}
+		setStripeLoading(false);
+	}
+	const handleContinue = async () => {
+		switch (checkoutStep) {
+			case 'ADDRESS':
+				await updateOrder()
+				if (isMobile)
+					setCheckoutStep('RECAP')
+				break
+			case 'RECAP':
+				setCheckoutStep('PAYMENT_STRIPE')
+				break;
+			case 'PAYMENT_STRIPE':
+				await payWithStripe()
+
+		}
+	}
+
+	const handleSetCoupon = () => {
+		dispatch(setCoupon({
+			code: couponCode
+		}))
+	}
+	const handleSelectShipping = (e: SelectChangeEvent<string>) => {
+		dispatch(selectShipping({
+			key: e.target.value
+		}))
+	}
+
 	return (
 		<Box sx={{padding: {xs: '0 0 20px', md: '30px 0 20px'}, width: '100%', display: 'flex', flexDirection: 'column'}}>
 			<div style={{padding: '30px 0 20px', width: '100%', display: 'flex', flexDirection: 'column', gap: '15px'}}>
-				{items.map((item) => (
-					<Box key={(item.variation_id ?? 0) + item.product_id} sx={{
+				{cart?.items?.map((item) => (
+					<Box key={item.item_key} sx={{
 						display: 'flex',
 						height: '100%',
 						minHeight: '90px'
@@ -71,7 +142,7 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 							backgroundColor: '#fff'
 						}}>
 							<Image
-								src={item.image}
+								src={item.featured_image}
 								alt={item.name}
 								fill
 								style={{objectFit: 'contain'}}
@@ -83,21 +154,21 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 								<Link href={'/products/'+item.slug}>{item.name}</Link>
 							</Typography>
 							<Typography sx={{fontSize: '12px', lineHeight: '16px', marginBottom: '8px'}}>
-								{item.category}
+								{item.cart_item_data.category}
 							</Typography>
 							<div style={{flexGrow: 1}} />
-							{item.attributes.map((attribute) => (
-								<Typography sx={{fontSize: '12px', lineHeight: '16px'}} key={attribute.id}>
-									{t('attributes.'+attribute.id).toUpperCase()}: {attribute.name}
+							{Object.keys(item.meta.variation).filter(v => v !== 'parent_id').map((v) => (
+								<Typography sx={{fontSize: '12px', lineHeight: '16px', textWrap: 'nowrap'}} key={v}>
+									{v.toUpperCase()}: {item.meta.variation[v]}
 								</Typography>
 							))}
 							<Typography sx={{fontSize: '12px', lineHeight: '16px'}}>
 								{/* eslint-disable-next-line react/jsx-no-undef */}
-								{t('quantity').toUpperCase()}: <Minus item={item} disabled={isLoading || checkoutStep > 2} />{item.qty}<Plus disabled={isLoading || checkoutStep > 2} item={item} />
+								{t('quantity').toUpperCase()}: <Minus item={item} disabled={!canEditData} />{item.quantity.value}<Plus disabled={!canEditData} item={item} />
 							</Typography>
 						</div>
 						<Typography component="div" sx={{width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', fontWeight: 500}}>
-							<PriceFormat value={Number(item.price) * item.qty} />
+							<PriceFormat value={Number(item.totals.total) + Number(item.totals.tax)} />
 						</Typography>
 					</Box>
 				))}
@@ -105,26 +176,20 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 			<Divider sx={{margin: '5px 0'}} />
 			<Grid container spacing={1} sx={{padding: '20px 0', alignItems: 'center', marginBottom: errors.coupon_code ? '7px' : 0}}>
 				<Grid item xs={7}>
-					<Controller
-						control={control}
-						name="coupon_code"
-						render={({ field }) => (
-							<TextField
-								{...field}
-								disabled={isLoading || checkoutStep > 2}
-								fullWidth
-								variant="outlined"
-								label={t('checkout.coupon-code')}
-								helperText={<HelperText message={errors.coupon_code?.message} absolute />}
-							/>
-						)}
+					<TextField
+						disabled={!canEditData}
+						value={couponCode}
+						onChange={(e) => setCouponCode(e.target.value)}
+						fullWidth
+						variant="outlined"
+						label={t('checkout.coupon-code')}
 					/>
 				</Grid>
 				<Grid item xs={5}>
 					<Button
 						fullWidth
-						onClick={setCoupon}
-						disabled={isLoading || checkoutStep > 2}
+						onClick={handleSetCoupon}
+						disabled={!canEditData}
 						endIcon={isLoading && <CircularProgress size={16} />}
 					>
 						{t('checkout.apply').toUpperCase()}
@@ -132,64 +197,52 @@ const Recap = ({shippingMethods, control, setCoupon, shippingMethod, subtotal, i
 				</Grid>
 			</Grid>
 			<Divider sx={{margin: '5px 0'}} />
-			<Controller
-				control={control}
-				name="shipping_method"
-				render={({ field }) => (
-					<FormControl fullWidth sx={{margin: '20px 0'}}>
-						<InputLabel>{t('checkout.shipping')}</InputLabel>
-						<Select
-							{...field}
-							onChange={(e) => field.onChange(e.target.value)}
-							disabled={isLoading || checkoutStep > 2}
-							variant="outlined"
-							label={t('checkout.shipping')}
-							sx={{
-								'& .MuiSelect-select': {
-									paddingLeft: '8px'
-								}
-							}}
-							startAdornment={isLoading ? <CircularProgress size={16} /> : <SelectStartAdornment methodId={shippingMethod?.methodId} />}
+			{shippingRates && (
+				<FormControl fullWidth sx={{margin: '20px 0'}}>
+					<InputLabel>{t('checkout.shipping')}</InputLabel>
+					<Select
+						value={selectedRate}
+						onChange={handleSelectShipping}
+						disabled={!canEditData}
+						variant="outlined"
+						label={t('checkout.shipping')}
+						sx={{
+							'& .MuiSelect-select': {
+								paddingLeft: '8px'
+							}
+						}}
 
-						>
-							{shippingMethods?.map((method) => (
-								<MenuItem key={method.methodId} value={method.methodId}>
-									{method.title}
-									{parseFloat(method.cost) > 0 && (
-										<> (<PriceFormat value={parseFloat(method.cost)} />)</>
-									)}
-								</MenuItem>
-							))}
-						</Select>
-						<FormHelperText>
-							{errors?.shipping_method?.message ?? ''}
-						</FormHelperText>
-					</FormControl>
-				)}
-			/>
+						startAdornment={isLoading ? <CircularProgress size={16} /> : <SelectStartAdornment methodId={selectedRate} />}
+					>
+						{Object.values(shippingRates).filter(r => !hasFreeShipping || r.cost === '0').map((method) => (
+							<MenuItem key={method.key} value={method.key}>
+								{method.label}
+								{Number(method.cost) > 0 && (
+									<> (<PriceFormat value={Number(method.cost) / 100} />)</>
+								)}
+							</MenuItem>
+						))}
+					</Select>
+					<FormHelperText>
+						{errors?.shipping_method?.message as string ?? ''}
+					</FormHelperText>
+				</FormControl>
+			)}
 			<Hidden smDown>
 				<Divider sx={{margin: '5px 0'}} />
-				<PriceRecap
-					subtotal={subtotal}
-					cartTax={prices.cartTax}
-					shipping={prices.shipping}
-					discount={prices.discount}
-					discountTax={prices.discountTax}
-					total={prices.total}
-					totalTax={prices.totalTax}
-					isLoading={isLoading}
-				/>
+				<PriceRecap isLoading={isLoading} />
 				<Divider sx={{margin: '10px 0 20px'}} />
 				<Button
 					fullWidth
-					onClick={recapAction}
-					disabled={isLoading || checkoutStep > 4}
-					startIcon={(isLoading || checkoutStep === 4.5) && <CircularProgress size={16} />}
+					onClick={handleContinue}
+					disabled={isLoading || stripeLoading || !['RECAP','ADDRESS', 'PAYMENT_STRIPE'].includes(checkoutStep)}
+					startIcon={(isLoading || stripeLoading) && <CircularProgress size={16} />}
 				>
-					{(checkoutStep === 3 || checkoutStep === 4.5) ? t('checkout.pay-now') : t('checkout.go-to-payment')}
+					{checkoutStep !== 'ADDRESS' ? t('checkout.pay-now') : t('checkout.go-to-payment')}
 				</Button>
 				<Payments />
 			</Hidden>
+			<PaymentErrorDialog error={paymentError} setError={setPaymentError} />
 		</Box>
 	)
 }

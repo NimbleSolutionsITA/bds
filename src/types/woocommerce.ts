@@ -213,30 +213,8 @@ export type WooOrder = {
 	shipping_tax: string;
 	cart_tax: string;
 	total_tax: string;
-	billing: {
-		first_name: string;
-		last_name: string;
-		address_1: string;
-		address_2: string;
-		company: string;
-		city: string;
-		state: string;
-		postcode: string;
-		country: string;
-		email: string;
-		phone: string;
-	}
-	shipping: {
-		first_name: string;
-		last_name: string;
-		company: string;
-		address_1: string;
-		address_2: string;
-		city: string;
-		state: string;
-		postcode: string;
-		country: string;
-	}
+	billing: BillingData
+	shipping: ShippingData
 	payment_method: string;
 	payment_method_title: string;
 	status: string;
@@ -246,6 +224,32 @@ export type WooOrder = {
 		code: string;
 	}[]
 	shipping_lines: WooSippingLine[]
+}
+
+export type BillingData = {
+	first_name: string;
+	last_name: string;
+	address_1: string;
+	address_2: string;
+	company?: string;
+	city: string;
+	state: string;
+	postcode: string;
+	country: string;
+	email: string;
+	phone: string;
+}
+
+export type ShippingData = {
+	first_name: string;
+	last_name: string;
+	company?: string;
+	address_1: string;
+	address_2: string;
+	city: string;
+	state: string;
+	postcode: string;
+	country: string;
 }
 
 export type WooSippingLine = {

@@ -27,10 +27,10 @@ type CartDrawerProps = {
 }
 
 const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
-	const { cartDrawerOpen, items } = useSelector((state: RootState) => state.cart);{}
+	const { cartDrawerOpen, cart, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch()
-	const totalItems = items.reduce((previousValue, currentValue) => previousValue + currentValue.qty, 0)
-	const subtotal = items.reduce((previousValue, currentValue) => previousValue + (currentValue.price * currentValue.qty), 0)
+	const totalItems = cart?.item_count ?? 0
+	const subtotal = (Number(cart?.totals?.subtotal ?? 0) + Number(cart?.totals?.subtotal_tax ?? 0)) / 100
 	const { t } = useTranslation('common')
 	return (
 		<SwipeableDrawer
@@ -64,10 +64,10 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 						<CloseOutlined fontSize="small" />
 					</IconButton>
 				</div>
-				{items.length > 0 ? (
+				{cart && cart.items && cart.items.length > 0 ? (
 					<>
-						{items.map((item) => (
-							<CartItem key={item.variation_id??''+item.product_id} item={item} />
+						{cart.items.map((item) => (
+							<CartItem key={item.item_key} item={item} loading={loading} />
 						))}
 						<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px'}}>
 							<Typography variant="h6" sx={{textTransform: 'capitalize'}}>{t('subtotal')}</Typography>
@@ -75,10 +75,21 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 								<PriceFormat value={subtotal} decimalScale={0} />
 							</Typography>
 						</div>
-						<Button component={Link} href={`/${CHECKOUT_SUB_PATH}`}>{t('cart.cta')}</Button>
+						<Button component={Link} href={`/${CHECKOUT_SUB_PATH}`} disabled={loading}>
+							{t('cart.cta')}
+						</Button>
 						{cartDrawerOpen && (
-							<div style={{marginTop: '10px'}}>
-								<StripePaymentButton  items={items} shipping={shipping} />
+							<div style={{marginTop: '10px', pointerEvents: loading ? 'none' : 'auto'}}>
+								<StripePaymentButton
+									items={cart.items.map(item => ({
+										product_id: item.meta.product_type === 'variation' ? item.meta.variation.parent_id : item.id,
+										variation_id: item.meta.product_type === 'variation' ? item.id : undefined,
+										name: item.name,
+										price: Number(item.price),
+										qty: item.quantity.value
+									}))}
+									shipping={shipping}
+								/>
 							</div>
 						)}
 					</>

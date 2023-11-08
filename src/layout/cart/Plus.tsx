@@ -1,24 +1,22 @@
-import {CartItem as CartItemType, updateCartItem} from "../../redux/cartSlice";
+import {updateCartItem} from "../../redux/cartSlice";
 import {useDispatch} from "react-redux";
 import {IconButton} from "@mui/material";
 import {AddCircleOutlineSharp} from "@mui/icons-material";
+import {Item} from "../../types/cart-type";
+import {AppDispatch} from "../../redux/store";
 
 type CartButtonProps = {
-	item: CartItemType
+	item: Item
 	disabled?: boolean
 }
 
 const Plus = ({item, disabled}:CartButtonProps) => {
-	const dispatch = useDispatch()
+	const dispatch = useDispatch<AppDispatch>()
 	return (
 		<IconButton
-			disabled={item.stock_quantity <= item.qty || disabled}
+			disabled={item.quantity.value >= item.quantity.max_purchase || disabled}
 			size="small"
-			onClick={() => dispatch(updateCartItem({
-				product_id: item.product_id,
-				variation_id: item.variation_id,
-				qty: item.qty + 1
-			}))}
+			onClick={() => dispatch(updateCartItem({key: item.item_key, quantity: item.quantity.value + 1}))}
 		>
 			<AddCircleOutlineSharp sx={{fontSize: '16px'}} />
 		</IconButton>

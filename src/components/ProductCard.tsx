@@ -4,7 +4,7 @@ import {
     BaseProduct,
     BaseVariation,
 } from "../types/woocommerce";
-import {Box, Button, Card, CardContent, IconButton, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, CircularProgress, IconButton, Typography} from "@mui/material";
 import {
     EYEWEAR_CATEGORIES,
     EYEWEAR_CATEGORY,
@@ -14,7 +14,7 @@ import {
     sanitize, SUNGLASSES_CATEGORY
 } from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {addCartItem} from "../redux/cartSlice";
 import Image from "next/image";
 import Link from "./Link";
@@ -25,6 +25,7 @@ import PriceFormat from "./PriceFormat";
 import {openInStockNotifierDrawer} from "../redux/layout";
 import {DESIGNERS_SUB_PATH, PRODUCT_SUB_PATH} from "../utils/endpoints";
 import {useTranslation} from "next-i18next";
+import {AppDispatch, RootState} from "../redux/store";
 
 
 type ProductCardProps = {
@@ -32,6 +33,7 @@ type ProductCardProps = {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+    const { loading } = useSelector((state: RootState) => state.cart);
     const isEyewear = product.categories.find(({id, parent }) =>
         EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
     ) !== undefined;
@@ -45,7 +47,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     const [currentProduct, setCurrentProduct] = useState(defaultProduct);
     const [currentImage, setCurrentImage] = useState<string>(currentProduct.image);
 
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const { t } = useTranslation();
     const category = getProductMainCategory(product);
 
@@ -60,17 +62,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
     const handleAddToCart = () => {
         if (currentProduct.stock_status === 'instock') {
             dispatch(addCartItem({
-                product_id: product.id,
-                variation_id: product.id !== currentProduct.id ? currentProduct.id : undefined,
-                name: product.name,
-                image: currentProduct.image ?? product.image,
-                price: Number(currentProduct.price),
-                qty: 1,
-                stock_quantity: Number(currentProduct.stock_quantity),
-                attributes: currentProduct.attributes ?? [],
-                category: category.name,
-                slug: product.slug,
-            }));
+	            id: currentProduct.id.toString(),
+	            quantity: '1',
+	            variation: currentProduct.attributes?.reduce(
+                    (result:  { [key: string]: string }, item) => {
+                        result['attribute_' + item.id] = item.option;
+                        return result;
+                    },
+                    {}
+                ),
+                item_data: {
+                    category: category.name
+                }
+            }))
         }
     }
 
@@ -142,8 +146,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
                             <IconButton
                                 size="small"
                                 onClick={handleAddToCart}
+                                disabled={loading}
                             >
-                                <CartIcon />
+                                {loading ?
+                                    <CircularProgress size={20} color="inherit" /> :
+                                    <CartIcon />
+                                }
                             </IconButton>
                         ) : (
                             <Button

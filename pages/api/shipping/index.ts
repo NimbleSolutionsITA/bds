@@ -55,6 +55,7 @@ export const getShippingInfo = async (lang: string) => {
 	const classes = await Promise.all(await data.map(async (zone: ShippingZone) => {
 		const { data: methods } = await api.get(`shipping/zones/${zone.id}/methods`)
 		const { data: locations } = await api.get(`shipping/zones/${zone.id}/locations`)
+
 		return {
 			id: zone.id,
 			name: zone.name,

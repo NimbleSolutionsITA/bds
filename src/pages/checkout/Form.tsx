@@ -7,22 +7,29 @@ import {
 	Select,
 	TextField
 } from "@mui/material";
-import {Control, Controller, DeepRequired, ErrorOption, FieldErrorsImpl, FieldPath, GlobalError} from "react-hook-form";
+import {
+	Control,
+	Controller,
+	DeepRequired,
+	ErrorOption,
+	FieldErrorsImpl,
+	FieldPath,
+	GlobalError, useFormContext,
+	useWatch
+} from "react-hook-form";
 import {Country} from "../../types/woocommerce";
 import {Inputs} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
 import {useTranslation} from "next-i18next";
 
 type FormProps = {
-	control: Control<Inputs, any>
-	errors: Partial<FieldErrorsImpl<DeepRequired<Inputs>>> & {root?: Record<string, GlobalError> & GlobalError}
 	isShipping?: boolean
 	countries: Country[]
-	country: string
-	setError: (name: (FieldPath<Inputs> | `root.${string}` | "root"), error: ErrorOption, options?: {shouldFocus: boolean}) => void
 }
-const Form = ({control, errors, isShipping, countries, country, setError}: FormProps) => {
+const Form = ({isShipping, countries}: FormProps) => {
+	const { control, formState: { errors }, setError } = useFormContext<Inputs>();
 	const type: 'billing' | 'shipping' = isShipping ? 'shipping' : 'billing';
+	const country = useWatch({name: `${type}.country`, control})
 	const hideState = country === '' || countries.find(c => c.code === country)?.states?.length === 0
 	const { t } = useTranslation('common')
 	return (

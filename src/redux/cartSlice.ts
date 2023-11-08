@@ -1,69 +1,135 @@
-import {createSlice, PayloadAction} from '@reduxjs/toolkit'
-import { DefaultAttribute} from "../types/woocommerce";
-
-export type CartItem = {
-	product_id: number
-	variation_id?: number
-	name: string
-	image: string
-	price: number
-	qty: number
-	attributes: DefaultAttribute[]
-	stock_quantity: number
-	category: string
-	slug: string
-}
+import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
+import { Cart, Totals} from "../types/cart-type";
+import {NEXT_API_ENDPOINT} from "../utils/endpoints";
+import {RootState} from "./store";
+import {BillingData, ShippingData} from "../types/woocommerce";
 
 type CartState = {
-	cartDrawerOpen?: boolean
-	items: CartItem[]
+	nonce?: string
+	cart: Partial<Cart>
+	cartDrawerOpen: boolean
+	loading: boolean
+	stripe?: {
+		intentId: string
+		clientSecret: string
+	}
+	customer?:{
+		billing: BillingData
+		shipping?: ShippingData
+	}
 }
 
 const initialState: CartState = {
-	items: [],
-	cartDrawerOpen: false
+	loading: false,
+	cartDrawerOpen: false,
+	cart: {
+		items: [],
+		totals: {
+			subtotal: '0',
+			subtotal_tax: '0',
+		} as Totals
+	},
 }
+
+export const fetchCartData = createAsyncThunk('cart/fetchData', async (params, thunkAPI) => {
+	return await callCartData('/v2/cart', {}, "GET")
+});
+
+
+export type AddItemToCartPayload = {
+	id: string
+	quantity: string
+	variation?: { [key: string]: string }
+	item_data?: object
+}
+
+export const addCartItem = createAsyncThunk('cart/addItem', async (payload: AddItemToCartPayload, thunkAPI) => {
+	return await callCartData('/v2/cart/add-item', payload, "POST");
+});
+
+type UpdateItemInCartPayload = {
+	key: string
+	quantity: number
+}
+
+export const updateCartItem = createAsyncThunk('cart/updateItem', async (payload: UpdateItemInCartPayload, thunkAPI) => {
+	return await callCartData('/v2/cart/item/' + payload.key , {
+		item_key: payload.key,
+		quantity: payload.quantity
+	}, "POST");
+});
+
+type DeleteItemFromCartPayload = {
+	key: string
+}
+
+export const deleteCartItem = createAsyncThunk('cart/deleteItem', async (payload: DeleteItemFromCartPayload, thunkAPI) => {
+	return await callCartData('/v2/cart/item/' + payload.key, {}, "DELETE");
+});
+
+type UpdateShippingCountry = {
+	country: string
+	state?: string
+	city?: string
+	postcode?: string
+}
+
+export const updateShippingCountry = createAsyncThunk('cart/updateCustomer', async (payload: UpdateShippingCountry, thunkAPI) => {
+	await callCartData('/v1/calculate/shipping', payload, "POST");
+	return await callCartData('/v2/cart', {}, "GET")
+});
+
+type SelectShippingPayload = {
+	key: string
+}
+
+export const selectShipping = createAsyncThunk('cart/selectShipping', async (payload: SelectShippingPayload, thunkAPI) => {
+	await callCartData('/v1/shipping-methods', payload, "POST");
+	return await callCartData('/v2/cart', {}, "GET")
+});
+
+type SetCouponPayload = {
+	code: string
+	oldCode?: string
+}
+
+export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
+	await callCartData('/v1/cart/coupon', {coupon: payload.code}, "POST")
+	return await callCartData('/v2/cart', {}, "GET")
+});
+
+type RemoveCouponPayload = {
+	code: string
+}
+
+export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload: RemoveCouponPayload, thunkAPI) => {
+	await callCartData('/v1/cart/coupon', {coupon: payload.code}, "DELETE");
+	return await callCartData('/v2/cart', {}, "GET")
+});
+
+export const createIntent = createAsyncThunk('cart/createIntent', async (arg, thunkAPI) => {
+	const { cart } = thunkAPI.getState() as RootState;
+	const total = cart?.cart?.totals?.total;
+	if (!total) {
+		throw new Error('Cart not found');
+	}
+	const paymentIntent = await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ amount: total }),
+	}).then((r) => r.json());
+	if (paymentIntent.error) {
+		throw new Error(paymentIntent.error);
+	}
+	return paymentIntent;
+});
 
 export const cartSlice = createSlice({
 	name: 'cart',
 	initialState,
 	reducers: {
-		initCart: (state) => {
-			try {
-				if(state.items.length === 0)
-					state.items = JSON.parse(localStorage.getItem( 'bdg-cart' ) ?? '[]' )
-			}
-			catch {
-				state.items = []
-			}
-			return state
-		},
-		addCartItem: (state, { payload }: PayloadAction<CartItem>) => {
-			const i = state.items.findIndex((_element: CartItem) => _element.product_id === payload.product_id && _element.variation_id === payload.variation_id)
-			if (i > -1) state.items[i].qty = state.items[i].qty + 1
-			else state.items.push(payload)
-			state.cartDrawerOpen = true
-			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
-		},
-		updateCartItem: (state, { payload }: PayloadAction<{ product_id: number, variation_id?: number, qty: number }>) => {
-			const i = state.items.findIndex((_element: CartItem) => _element.product_id === payload.product_id && _element.variation_id === payload.variation_id)
-			if (i > -1) {
-				if (payload.qty === 0) {
-					state.items = state.items.filter((item: CartItem) => item.product_id !== payload.product_id && item.variation_id !== payload.variation_id)
-				} else {
-					state.items[i].qty = payload.qty
-				}
-			}
-			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
-		},
-		deleteCartItem: (state, { payload }: PayloadAction<{ product_id: number, variation_id?: number }>) => {
-			state.items = state.items.filter((item: CartItem) => item.product_id !== payload.product_id && item.variation_id !== payload.variation_id)
-			localStorage.setItem('bdg-cart', JSON.stringify(state.items))
-		},
-		destroyCart: () => {
-			localStorage.setItem('bdg-cart', JSON.stringify([]))
-			return initialState
-		},
 		toggleCartDrawer: (state) => {
 			state.cartDrawerOpen = !state.cartDrawerOpen
 		},
@@ -73,19 +139,139 @@ export const cartSlice = createSlice({
 		closeCartDrawer: (state) => {
 			state.cartDrawerOpen = false
 		},
+		setCustomerData: (state, action) => {
+			state.customer = action.payload
+		},
+		destroyIntent: (state) => {
+			state.stripe = undefined
+		}
+	},
+	extraReducers: (builder) => {
+		builder.addCase(fetchCartData.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(fetchCartData.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(fetchCartData.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(addCartItem.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(addCartItem.fulfilled, (state, action) => {
+			state.cartDrawerOpen = true
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(addCartItem.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(updateCartItem.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(updateCartItem.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(updateCartItem.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(deleteCartItem.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(deleteCartItem.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(deleteCartItem.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(updateShippingCountry.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(updateShippingCountry.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(updateShippingCountry.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(selectShipping.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(selectShipping.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(selectShipping.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(setCoupon.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(setCoupon.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(setCoupon.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(removeCoupon.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(removeCoupon.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(removeCoupon.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(createIntent.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(createIntent.fulfilled, (state, action) => {
+			state.stripe = {
+				intentId: action.payload.paymentIntentId,
+				clientSecret: action.payload.clientSecret
+			}
+			state.loading = false;
+		});
+		builder.addCase(createIntent.rejected, (state) => {
+			state.loading = false;
+		});
 	},
 })
 
 // Action creators are generated for each case reducer function
 export const {
-	initCart,
-	addCartItem,
-	updateCartItem,
-	deleteCartItem,
-	destroyCart,
 	toggleCartDrawer,
 	openCartDrawer,
 	closeCartDrawer,
+	setCustomerData,
+	destroyIntent
 } = cartSlice.actions
 
 export default cartSlice.reducer
+
+export const callCartData = async (url: string, payload = {}, method: 'GET'|'POST'|'DELETE'): Promise<Cart> => {
+	try {
+		const response = await fetch(process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart' + url, {
+			method: method,
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+				'Cookie': ''
+			},
+			...(method === "POST" && {body: JSON.stringify(payload)})
+		});
+		if (!response.ok) {
+			throw new Error('Failed to add cart item');
+		}
+		return await response.json();
+	} catch (error) {
+		console.log(error)
+		throw error;
+	}
+}

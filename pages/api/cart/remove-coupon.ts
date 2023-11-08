@@ -1,19 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import {WooOrder} from "../../../src/types/woocommerce";
+import {Cart} from "../../../src/types/cart-type";
+import {fetchStoreApi} from "../../../src/utils/store-api";
 
 export type CreateOrderResponse = {
 	success: boolean
-	order?: WooOrder
+	cart?: Cart
 	error?: string
 }
-
-const api = new WooCommerceRestApi({
-	url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? '',
-	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
-	version: "wc/v3"
-});
 
 export default async function handler(
 	req: NextApiRequest,
@@ -24,10 +17,8 @@ export default async function handler(
 	}
 	if (req.method === 'POST') {
 		try {
-			const {data} = await api.post('orders', req.body)
-
+			responseData.cart = await fetchStoreApi<Cart>(req, res, 'cart/remove-coupon', 'POST', req.body.code)
 			responseData.success = true
-			responseData.order = data
 		}
 		catch ( error ) {
 			if (typeof error === "string") {

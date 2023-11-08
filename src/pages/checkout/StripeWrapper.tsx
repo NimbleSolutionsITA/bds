@@ -48,7 +48,6 @@ const StripeWrapper = ({order, children}: StripeCheckoutProps) => {
 	return clientSecret ? (
 		<Elements
 			options={{
-				clientSecret,
 				appearance: stripeTheme,
 			}}
 			stripe={stripePromise}

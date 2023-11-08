@@ -4,7 +4,6 @@ import {loadStripe} from "@stripe/stripe-js";
 import {useEffect, useState} from "react";
 import {NEXT_API_ENDPOINT} from "../../src/utils/endpoints";
 import {useDispatch} from "react-redux";
-import {destroyCart} from "../../src/redux/cartSlice";
 import {getLayoutProps} from "../../src/utils/wordpress_api";
 
 
@@ -31,11 +30,12 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 
 	useEffect(() => {
 		if (paid === 'true') {
-			dispatch(destroyCart())
 			setResult('succeeded')
 		}
 		if (!stripePromise || !payment_intent || !payment_intent_client_secret || !redirect_status)
 			return;
+
+
 
 		const updateOrder = async () => {
 			console.log('update order')
@@ -62,7 +62,6 @@ export default function CheckoutResult({ orderId }: CheckoutResultProps) {
 					if (paymentIntent?.status === 'succeeded') {
 						updateOrder().then(() => {
 							setResult('succeeded')
-							dispatch(destroyCart())
 						})
 					}
 					else

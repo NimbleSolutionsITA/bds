@@ -31,13 +31,16 @@ export default async function handler(
   try {
     switch (req.method) {
       case 'PUT':
+      case 'POST':
         resp = await api.post(
             endpoint,
             req.body
         )
         break;
       case 'DELETE':
-        resp = await api.delete(endpoint)
+        console.log('delete', endpoint)
+        resp = await api.delete(endpoint, { force: true })
+        console.log(resp)
         break;
     }
     responseData.order = resp.data

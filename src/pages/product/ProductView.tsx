@@ -20,7 +20,7 @@ import InStock from "../../icons/InStock";
 import Image from "next/image";
 import {ArrowForwardIosSharp, ArrowBackIosSharp} from "@mui/icons-material";
 import placeholder from "../../images/placeholder.jpg";
-import {RootState} from "../../redux/store";
+import {AppDispatch, RootState} from "../../redux/store";
 import PriceFormat from "../../components/PriceFormat";
 import StripePaymentButton from "../../components/StripePaymentButton";
 import {openInStockNotifierDrawer} from "../../redux/layout";
@@ -55,7 +55,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const isEyewear = product.categories.find(({id, parent }) =>
 		EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
 	) !== undefined;
-	const { items, cartDrawerOpen } = useSelector((state: RootState) => state.cart);
+	const { cart, cartDrawerOpen } = useSelector((state: RootState) => state.cart);
 	const defaultProduct = init.defaultProduct as Variation;
 	const {defaultAttributes} = init;
 	const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
@@ -65,12 +65,9 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 
 
 	const [galleryIndex, setGalleryIndex] = useState(galleryImages.findIndex(v => v.url === defaultProduct.image.url) ?? 0);
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
 	const { t } = useTranslation('common');
-    const cartQuantity = items.find(v =>
-	    v.product_id === product.id &&
-	    v.variation_id === (product.type === 'variable' ? currentProduct.id : undefined)
-    )?.qty ?? 0;
+    const cartQuantity = cart?.items?.find(v => [product.id, currentProduct.id].includes(v.id))?.quantity ?? 0;
 	const categoryLink = (category && ([LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH].includes(category.slug) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
 
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
@@ -96,7 +93,14 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 
 	const handleAddToCart = () => {
 		if (currentProduct.stock_status === 'instock') {
-			dispatch(addCartItem(cartItem));
+			dispatch(addCartItem({
+				id: currentProduct.id.toString(),
+				quantity: 1,
+				variation: currentProduct.attributes?.map((attribute) => ({
+					attribute: attribute.name,
+					value: attribute.option
+				}))
+			}))
 		}
 	}
 
@@ -250,7 +254,10 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 					)}
 					{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
 						<div style={{marginTop: '20px'}}>
-							<StripePaymentButton  items={[cartItem]} shipping={shipping} />
+							<StripePaymentButton
+								shipping={shipping}
+								items={[cartItem]}
+							/>
 						</div>
 					)}
 					<div style={{marginTop: '40px', lineHeight: 1}}>

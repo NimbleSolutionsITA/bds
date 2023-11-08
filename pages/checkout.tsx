@@ -1,12 +1,15 @@
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {getCheckoutPageProps} from "../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {Country, ShippingClass} from "../src/types/woocommerce";
 import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import { initCart} from "../src/redux/cartSlice";
-import {RootState} from "../src/redux/store";
+import {createIntent, updateShippingCountry} from "../src/redux/cartSlice";
+import {AppDispatch, RootState} from "../src/redux/store";
 import {PayPalScriptProvider} from "@paypal/react-paypal-js";
+import {stripeTheme} from "../src/theme/theme";
+import getStripe from "../src/utils/stripe-utils";
+import {Elements} from "@stripe/react-stripe-js";
 
 const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
 
@@ -18,28 +21,38 @@ export type CheckoutProps = {
 }
 
 const CLIENT_ID = (process.env.NODE_ENV === "production" ?
-	process.env.NEXT_PUBLIC_PAYPAL_PRODUCTION :
-	process.env.NEXT_PUBLIC_PAYPAL_SANDBOX) as string;
+	process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID :
+	process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID_SANDBOX) as string;
 
 export default function Checkout({
      shipping
 }: CheckoutProps) {
-	const { items } = useSelector((state: RootState) => state.cart);
-	const dispatch = useDispatch()
-	const [cartReady, setCartReady] = useState<boolean>(false)
+	const { cart, stripe } = useSelector((state: RootState) => state.cart);
+	const dispatch = useDispatch<AppDispatch>()
+	const isShippingReady = cart?.shipping?.packages?.default
 
 	useEffect(() => {
-		// Dispatch initCart to load cart from localStorage
-		dispatch(initCart());
-	}, [dispatch]);
+		if (!isShippingReady) {
+			console.log('fetching cart data')
+			dispatch(updateShippingCountry({ country: 'IT' }))
+		}
+		if (isShippingReady && !stripe?.clientSecret) {
+			console.log('creating intent')
+			dispatch(createIntent());
+		}
+	}, [dispatch, isShippingReady, stripe?.clientSecret])
 
-	if (items.length > 0 && !cartReady && !!CLIENT_ID) {
-		setCartReady(true)
-	}
-
-	return cartReady ? (
-		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons' }}>
-			<CheckoutGrid shipping={shipping} items={items} />
+	return (isShippingReady && stripe?.clientSecret)  ? (
+		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons', intent: 'capture' }}>
+			<Elements
+				options={{
+					clientSecret: stripe.clientSecret,
+					appearance: stripeTheme,
+				}}
+				stripe={getStripe()}
+			>
+				<CheckoutGrid shipping={shipping} />
+			</Elements>
 		</PayPalScriptProvider>
 	) : (
 		<Backdrop
@@ -60,7 +73,6 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 		props: {
 			shipping,
 			...ssrTranslations
-
 		},
 		revalidate: 10
 	}

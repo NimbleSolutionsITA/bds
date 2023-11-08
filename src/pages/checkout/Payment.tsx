@@ -1,4 +1,3 @@
-import {WooOrder} from "../../types/woocommerce";
 import {
 	TableContainer,
 	Button,
@@ -10,28 +9,108 @@ import {
 	Switch,
 	FormControlLabel
 } from "@mui/material";
-import {Dispatch, SetStateAction} from "react";
-import PaypalButton from "./PaypalButton";
+import {Dispatch, SetStateAction, useState} from "react";
 import Loading from "../../components/Loading";
 import PayPal from "../../icons/PayPal2";
 import MotionPanel from "../../components/MotionPanel";
-import StripePayment from "./StripePayment";
-import {OrderResponseBody} from "@paypal/paypal-js";
 import {useTranslation} from "next-i18next";
+import {PaymentControllers, Step as StepType} from "./CheckoutGrid";
+import {PaymentElement} from "@stripe/react-stripe-js";
+import {PayPalButtons} from "@paypal/react-paypal-js";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../../redux/store";
+import {useRouter} from "next/router";
+import {destroyIntent} from "../../redux/cartSlice";
 
 type PaymentProps = {
-	order?: WooOrder
 	isLoading: boolean
 	editAddress: (tab: number) => void
-	setPaid: (payPal: OrderResponseBody) => void
-	checkoutStep: number
-	setCheckoutStep: Dispatch<SetStateAction<number>>
+	checkoutStep: StepType
+	setCheckoutStep: Dispatch<SetStateAction<StepType>>
 }
 
-const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheckoutStep}: PaymentProps) => {
-	const shippingAddress = order?.shipping.first_name ? `${order.shipping.address_1}, ${order.shipping.postcode}, ${order.shipping.city} ${order.shipping.state}, ${order.shipping.country}` : null;
-	const billingAddress = `${order?.billing.address_1}, ${order?.billing.postcode}, ${order?.billing.city} ${order?.billing.state}, ${order?.billing.country}`;
+const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: PaymentProps) => {
+	const {
+		cart: { cart_key: cartKey },
+		stripe: { clientSecret, intentId } = { clientSecret: null },
+		customer
+	} = useSelector((state: RootState) => state.cart);
+	const shippingAddress = customer?.shipping ? `${customer.shipping.address_1}, ${customer.shipping.postcode}, ${customer.shipping.city} ${customer.shipping.state}, ${customer.shipping.country}` : null;
+	const billingAddress = `${customer?.billing.address_1}, ${customer?.billing.postcode}, ${customer?.billing.city} ${customer?.billing.state}, ${customer?.billing.country}`;
 	const { t } = useTranslation('common')
+	const [paymentError, setPaymentError] = useState<string>();
+	const [orderId, setOrderId] = useState<string>();
+	const router = useRouter();
+	const dispatch = useDispatch();
+	const payWithPayPal: PaymentControllers['payWithPayPal'] = async () => {
+		try {
+			const orderResponse = await fetch('/api/order/checkout', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ cartKey})
+			})
+			const order = await orderResponse.json()
+
+			if (!order.success || order.amount === 0) {
+				throw new Error('Order creation failed')
+			}
+
+			if (order.paypalOrderId) {
+				setOrderId(order.orderId)
+				return order.paypalOrderId
+			} else {
+				throw new Error( order?.error);
+			}
+		}
+		catch (error) {
+			console.error(error);
+			setPaymentError('Paypal payment error');
+		}
+	}
+
+	const onPayPalApprove: PaymentControllers['onPayPalApprove'] = async (data, actions) => {
+			try {
+				const response = await fetch(`/api/order/checkout`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						paypalOrderId: data.orderID,
+						intentId,
+						cartKey,
+						orderId,
+						customer
+					}),
+				});
+
+				const orderData = await response.json();
+
+				if (orderData.success) {
+					dispatch(destroyIntent())
+					await router.push({
+						pathname: '/checkout/completed',
+						query: {
+							paid: true
+						}
+					});
+				} else {
+					throw new Error(orderData.error);
+				}
+
+			} catch (error) {
+				setPaymentError(error instanceof Error ? error?.message : 'Paypal payment error')
+			}
+	}
+
+	const onPayPalError = (err: any) => setPaymentError(err.message ?? 'Paypal payment error')
 
 	return (
 		<div style={{width: '100%', position: 'relative'}}>
@@ -43,7 +122,7 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 					}}>
 						<RecapRow
 							label={t('checkout.contact')}
-							value={`${order?.billing.email}`}
+							value={`${customer?.billing.email}`}
 							isLoading={isLoading}
 							edit={() => editAddress(0)}
 						/>
@@ -55,7 +134,7 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 						/>
 						{shippingAddress && (
 							<RecapRow
-								label={t('common.bill-to')}
+								label={t('checkout.bill-to')}
 								value={billingAddress}
 								isLoading={isLoading}
 								edit={() => editAddress(0)}
@@ -68,8 +147,8 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 			<Typography sx={{marginBottom: '20px'}}>{t('checkout.secured')}</Typography>
 			<FormControlLabel labelPlacement="start" control={(
 				<Switch
-					checked={checkoutStep === 5}
-					onChange={(e) => setCheckoutStep(e.target.checked ? 5 : 3)}
+					checked={checkoutStep === 'PAYMENT_PAYPAL'}
+					onChange={(e) => setCheckoutStep(e.target.checked ? 'PAYMENT_PAYPAL' : 'PAYMENT_STRIPE')}
 
 				/>
 			)} label={(
@@ -77,23 +156,76 @@ const Payment = ({order, isLoading, editAddress, setPaid, checkoutStep, setCheck
 					{t('checkout.pay-with')}&nbsp;&nbsp;&nbsp;&nbsp;<PayPal sx={{fontSize: '80px'}} />&nbsp;&nbsp;
 				</div>
 			)} />
-			<MotionPanel key="stripe" active={checkoutStep !== 5}>
-				<StripePayment
-					order={order}
-					isReadyToPay={checkoutStep === 4}
-					setCheckoutStep={setCheckoutStep}
-				/>
+			<MotionPanel key="stripe" active={checkoutStep === 'PAYMENT_STRIPE'}>
+				{clientSecret && (
+					<PaymentElement
+						id="payment-element"
+						options={{
+							layout: {
+								type: 'accordion',
+								radios: true,
+								spacedAccordionItems: true,
+								defaultCollapsed: false,
+							},
+							defaultValues: {
+								billingDetails: {
+									name: `${customer?.billing.first_name} ${customer?.billing.last_name}`,
+									email: customer?.billing.email,
+									phone: customer?.billing.phone,
+									address: {
+										line1: customer?.billing.address_1,
+										city: customer?.billing.city,
+										state: customer?.billing.state,
+										postal_code: customer?.billing.postcode,
+										country: customer?.billing.country,
+									},
+								}
+							},
+						}}
+					/>
+				)}
 			</MotionPanel>
-			<MotionPanel key="paypal" active={checkoutStep === 5}>
-				<PaypalButton
-					orderTotal={order?.total}
-					setPaid={setPaid}
-					setError={() => setCheckoutStep(7)}
-				/>
+			<MotionPanel key="payPal" active={checkoutStep === 'PAYMENT_PAYPAL'}>
+				<div style={{padding: '20px', border: '1px solid rgba(0,0,0,0.1)'}}>
+					<PayPalButtons
+						createOrder={payWithPayPal}
+						onApprove={onPayPalApprove}
+						onError={onPayPalError}
+					/>
+				</div>
 			</MotionPanel>
+			<PaymentErrorDialog error={paymentError} setError={setPaymentError} />
 		</div>
 	)
 }
+
+export const PaymentErrorDialog = ({ error, setError}: {error?: string, setError: Dispatch<SetStateAction<string|undefined>>}) => {
+	const { t } = useTranslation('common')
+	return (
+		<Dialog
+			open={!!error}
+			onClose={() => setError(undefined)}
+			aria-labelledby="stripe-payment-error"
+		>
+			<DialogTitle id="alert-dialog-title">
+				{"Payment error"}
+			</DialogTitle>
+			<DialogContent>
+				<DialogContentText id="alert-dialog-description">
+					{error}
+				</DialogContentText>
+			</DialogContent>
+			<DialogActions>
+				<Button onClick={() => {
+					setError(undefined);
+				}}>
+					{t('close')}
+				</Button>
+			</DialogActions>
+		</Dialog>
+	)
+}
+
 
 const EditButton = ({onClick}: {onClick: () => void}) => {
 	const { t } = useTranslation('common')

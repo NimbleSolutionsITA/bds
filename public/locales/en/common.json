@@ -1,4 +1,4 @@
-{
+  {
   "liquides-imaginaires":"Liquides Imaginaries",
   "profumum-roma":"Profumum Roma",
   "buy-now":"Buy now",
@@ -43,6 +43,7 @@
   "eyewear": "Eyewear",
   "designers": "Designers",
   "related-products": "Related products",
+  "close": "close",
   "cart":{
     "title":"Your shopping bag",
     "cta":"Go to checkout",

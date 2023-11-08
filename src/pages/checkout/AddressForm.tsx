@@ -1,5 +1,5 @@
 import {SyntheticEvent, Dispatch, SetStateAction} from "react";
-import {Control, Controller, ErrorOption, FieldErrors, FieldPath} from "react-hook-form";
+import {Controller, useFormContext, useWatch} from "react-hook-form";
 import {Tabs, Tab, TextField, Switch, FormControlLabel} from "@mui/material";
 import Form from "./Form";
 import {Country} from "../../types/woocommerce";
@@ -9,22 +9,18 @@ import MotionPanel from "../../components/MotionPanel";
 import {useTranslation} from "next-i18next";
 
 type AddressFormProps = {
-	control: Control<Inputs>
-	errors: FieldErrors<Inputs>
 	countries: Country[]
-	billingCountry: string
-	shippingCountry: string
-	hasShipping: boolean
 	isLoading: boolean
-	setError: (name: (FieldPath<Inputs> | `root.${string}` | "root"), error: ErrorOption, options?: {shouldFocus: boolean}) => void
 	tab: number
 	setTab: Dispatch<SetStateAction<number>>
 }
-const AddressForm = ({isLoading, control, errors, countries, shippingCountry, billingCountry, hasShipping, setError, tab, setTab}: AddressFormProps) => {
+const AddressForm = ({isLoading, countries, tab, setTab}: AddressFormProps) => {
+	const { control, formState: { errors }, setError } = useFormContext<Inputs>();
 	const handleChange = (event: SyntheticEvent, newValue: number) => {
 		setTab(newValue);
 	};
 	const { t } = useTranslation('common');
+	const hasShipping = useWatch({name: 'has_shipping', control});
 	return (
 		<div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
 			<Controller
@@ -70,22 +66,14 @@ const AddressForm = ({isLoading, control, errors, countries, shippingCountry, bi
 			<div style={{position: 'relative'}}>
 				<MotionPanel active={!hasShipping || tab === 0}>
 					<Form
-						control={control}
-						errors={errors}
 						countries={countries}
-						country={billingCountry}
-						setError={setError}
 					/>
 				</MotionPanel>
 				{hasShipping && (
 					<MotionPanel active={tab === 1}>
 						<Form
 							isShipping
-							control={control}
-							errors={errors}
 							countries={countries}
-							country={shippingCountry}
-							setError={setError}
 						/>
 					</MotionPanel>
 				)}
