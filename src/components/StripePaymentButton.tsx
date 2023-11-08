@@ -33,8 +33,6 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 	const router = useRouter();
 	const { t } = useTranslation();
 
-	console.log('Total: ' + total);
-
 	const getShippingOptions = (country: string): ShippingOption[] => {
 		const methods = shipping.find(s => s.locations.includes(country))?.methods
 			.filter(m => m.enabled && m.requires === 'min_amount' ? parseFloat(m.minAmount) <= total : true)
@@ -64,7 +62,6 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 
 	useEffect(() => {
 		if (stripe) {
-			console.log('total: ' + total);
 			const pr = stripe.paymentRequest({
 				country: 'IT',
 				currency: 'eur',
