@@ -11,8 +11,6 @@ import {
 import {CheckboxProps} from "@mui/material/Checkbox/Checkbox";
 import {Box, Checkbox, Typography} from "@mui/material";
 import Image from "next/image";
-import {Property} from "csstype";
-import FlexWrap = Property.FlexWrap;
 type AttributeCheckboxesProps = {
 	product: Product | BaseProduct
 	currentAttributes: {  [key in AttributeType]?: string }
@@ -20,7 +18,7 @@ type AttributeCheckboxesProps = {
 	extended?: boolean
 }
 export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAttribute, extended }: AttributeCheckboxesProps) => {
-	const boxStyle = {display: 'flex', gap: '5px', flexWrap: 'wrap' as FlexWrap, marginBottom: extended ? '20px' : 0}
+	const boxStyle = {display: 'flex', gap: '5px', flexWrap: 'wrap' as const, marginBottom: extended ? '20px' : 0}
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 40px)'}}>
 			{['colore', 'lente', 'modello', 'montatura'].map((attribute) => {
