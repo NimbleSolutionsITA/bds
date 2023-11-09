@@ -10,11 +10,9 @@ import {
 import {
 	Control,
 	Controller,
-	DeepRequired,
 	ErrorOption,
-	FieldErrorsImpl,
 	FieldPath,
-	GlobalError, useFormContext,
+	useFormContext,
 	useWatch
 } from "react-hook-form";
 import {Country} from "../../types/woocommerce";
@@ -191,7 +189,7 @@ const TextInput = ({control, error, type, name, label, optional, md = 6, setErro
 					<TextField
 						{...field}
 						onChange={(e) => {
-							field.onChange(e.target.value)
+							field.onChange(e)
 							setError(field.name, {})
 						}}
 						fullWidth
