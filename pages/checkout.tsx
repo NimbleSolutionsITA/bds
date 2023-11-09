@@ -33,11 +33,9 @@ export default function Checkout({
 
 	useEffect(() => {
 		if (!isShippingReady) {
-			console.log('fetching cart data')
 			dispatch(updateShippingCountry({ country: 'IT' }))
 		}
 		if (isShippingReady && !stripe?.clientSecret) {
-			console.log('creating intent')
 			dispatch(createIntent());
 		}
 	}, [dispatch, isShippingReady, stripe?.clientSecret])

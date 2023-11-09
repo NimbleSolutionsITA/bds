@@ -62,7 +62,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 				}))
 			})
 		}
-	}, [total, paymentRequest]);
+	}, [total, paymentRequest, t, items]);
 
 
 	useEffect(() => {
@@ -95,7 +95,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 
 			pr.on('paymentmethod', async (e) => {
 
-				const {error: backendError, paymentIntentId,  clientSecret} = await fetch(NEXT_API_ENDPOINT + '/orders/stripe-payment-intent',
+				const {error: backendError, paymentIntentId,  clientSecret} = await fetch(NEXT_API_ENDPOINT + '/order/stripe-payment-intent',
 					{
 						method: 'POST',
 						headers: {
@@ -129,13 +129,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 					return;
 				}
 
-				// Show a success message to your customer
-				// There's a risk of the customer closing the window before callback
-				// execution. Set up a webhook or plugin to listen for the
-				// payment_intent.succeeded event that handles any business critical
-				// post-payment actions.
-
-				const { order } = await fetch(NEXT_API_ENDPOINT + '/orders', {
+				await fetch(NEXT_API_ENDPOINT + '/order', {
 					method: 'POST',
 					headers: [["Content-Type", 'application/json']],
 					body: JSON.stringify({
@@ -187,11 +181,11 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 				})
 					.then(response => response.json());
 
-				e.complete('success');
-
 				if (isCart) {
 					await dispatch(destroyCart());
 				}
+
+				e.complete('success');
 
 				await router.push({
 					pathname: '/checkout/completed',

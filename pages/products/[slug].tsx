@@ -44,7 +44,14 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
-	const seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${product.link}`).then(response => response.json())
+	let seo = { head: '' }
+	console.log('pd', product.link)
+	try {
+		seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${product.link}`).then(response => response.json())
+	}
+	catch (e) {
+		console.log(e)
+	}
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
@@ -56,7 +63,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			layout: {
 				...layoutProps,
 				breadcrumbs,
-				seo: seo.head ?? null,
+				seo: seo?.head ?? null,
 			},
 			product,
 			...ssrTranslations
