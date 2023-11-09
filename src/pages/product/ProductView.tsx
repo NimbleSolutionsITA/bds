@@ -67,7 +67,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const [galleryIndex, setGalleryIndex] = useState(galleryImages.findIndex(v => v.url === defaultProduct.image.url) ?? 0);
 	const dispatch = useDispatch<AppDispatch>();
 	const { t } = useTranslation('common');
-    const cartQuantity = cart?.items?.find(v => [product.id, currentProduct.id].includes(v.id))?.quantity ?? 0;
+    const cartQuantity = cart?.items?.find(v => [product.id, currentProduct.id].includes(v.id))?.quantity.value ?? 0;
 	const categoryLink = (category && ([LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH].includes(category.slug) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
 
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
@@ -95,11 +95,11 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 		if (currentProduct.stock_status === 'instock') {
 			dispatch(addCartItem({
 				id: currentProduct.id.toString(),
-				quantity: 1,
-				variation: currentProduct.attributes?.map((attribute) => ({
-					attribute: attribute.name,
-					value: attribute.option
-				}))
+				quantity: '1',
+				variation: currentProduct.attributes?.reduce((result: { [key: string]: string }, attribute) => {
+					result[`attribute_${attribute.name}`] = attribute.option;
+					return result;
+				}, {})
 			}))
 		}
 	}
