@@ -47,6 +47,7 @@ export default async function handler(
 			const { cartKey, intentId = null, customer = null } = req.body
 			const response = await fetch(process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
+			console.log(cart.totals)
 			if (responseData.amount === 0) {
 				throw new Error('Amount is 0')
 			}
@@ -80,7 +81,7 @@ export default async function handler(
 						shipping_phone: customer.shipping.phone,
 					}
 				});
-				console.log(paymentIntent)
+				console.log(paymentIntent.status)
 			}
 			// PAYPAL CHECKOUT
 			else {

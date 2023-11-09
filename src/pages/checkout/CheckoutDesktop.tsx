@@ -12,13 +12,13 @@ import Logo from "./Logo";
 import AddressForm from "./AddressForm";
 import Recap from "./Recap";
 import Payment from "./Payment";
-import {Step as StepType, Inputs, OrderIntent} from "./CheckoutGrid";
+import {Step as StepType} from "./CheckoutGrid";
 import {Check} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
 import {Country} from "../../types/woocommerce";
 import {BaseSyntheticEvent, Dispatch, SetStateAction} from "react";
 
-export type CheckoutDesktop = {
+export type CheckoutDesktopProps = {
 	countries: Country[]
 	updateOrder: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
 	isLoading: boolean
@@ -26,6 +26,7 @@ export type CheckoutDesktop = {
 	setTab: Dispatch<SetStateAction<number>>
 	checkoutStep: StepType
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
+	payWithStripe: () => Promise<void>
 }
 
 const CheckoutDesktop = ({
@@ -36,7 +37,8 @@ const CheckoutDesktop = ({
 	setTab,
 	checkoutStep,
 	setCheckoutStep,
-}: CheckoutDesktop) => {
+    payWithStripe
+}: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
 	return (
 		<Grid container sx={{height: '100vh', position: 'relative'}}>
@@ -120,6 +122,7 @@ const CheckoutDesktop = ({
 						checkoutStep={checkoutStep}
 						setCheckoutStep={setCheckoutStep}
 						updateOrder={updateOrder}
+						payWithStripe={payWithStripe}
 					/>
 				</div>
 			</Grid>

@@ -25,7 +25,7 @@ const getProductTotal = async (lineItem: WooLineItem) => {
 	const {data: product} = await api.get(
 		`products/${lineItem.variation_id ?? lineItem.product_id}`
 	);
-	return lineItem.quantity * (parseFloat(product.price!) * 100);
+	return lineItem.quantity * parseFloat(product.price);
 };
 
 // map through lineItems and get the total for each lineItem and return sum of totals

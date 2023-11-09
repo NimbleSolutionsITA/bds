@@ -28,17 +28,15 @@ import {BaseSyntheticEvent, Dispatch, SetStateAction, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {selectShipping, setCoupon} from "../../redux/cartSlice";
-import {useElements, useStripe} from "@stripe/react-stripe-js";
-import {PaymentErrorDialog} from "./Payment";
-import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
 
 type RecapProps = {
 	isLoading: boolean
 	checkoutStep: Step
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
 	updateOrder: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+	payWithStripe: () => Promise<void>
 }
-const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapProps) => {
+const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithStripe}: RecapProps) => {
 	const { formState: { errors } } = useFormContext();
 	const { t } = useTranslation('common');
 	const { cart, customer, stripe: { intentId } = { intentId: null } } = useSelector((state: RootState) => state.cart);
@@ -50,52 +48,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 	const shippingRates = shipping?.rates ?? {}
 	const hasFreeShipping = Object.values(shippingRates).find(r => r.method_id === 'free_shipping')
 	const selectedRate = shipping?.chosen_method
-	const [stripeLoading, setStripeLoading] = useState(false);
 	const [couponCode, setCouponCode] = useState('');
-	const [paymentError, setPaymentError] = useState<string>();
-
-	const stripe = useStripe();
-	const elements = useElements();
-
-	const payWithStripe = async () => {
-		setStripeLoading(true);
-		console.log('paying with stripe')
-		if (!stripe || !elements || !intentId) {
-			console.log('stripe or elements not ready')
-			setStripeLoading(false);
-			return;
-		}
-		const updateIntent = await fetch(NEXT_API_ENDPOINT + '/order/checkout', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				cartKey: cart?.cart_key,
-				intentId,
-				customer
-			})
-		})
-		const updateIntentResult = await updateIntent.json()
-
-		if (!updateIntentResult.success) {
-			setPaymentError('Error while updating intent')
-		}
-		else {
-			const { error } = await stripe!.confirmPayment({
-				elements: elements!,
-				confirmParams: {
-					return_url: `${window.location.origin}/checkout/completed`,
-				}
-			});
-
-			if (error) {
-				console.error(error.message ?? 'An unknown error occured')
-				setPaymentError(error.message ?? 'An unknown error occured')
-			}
-		}
-		setStripeLoading(false);
-	}
 	const handleContinue = async () => {
 		switch (checkoutStep) {
 			case 'ADDRESS':
@@ -235,14 +188,13 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 				<Button
 					fullWidth
 					onClick={handleContinue}
-					disabled={isLoading || stripeLoading || !['RECAP','ADDRESS', 'PAYMENT_STRIPE'].includes(checkoutStep)}
-					startIcon={(isLoading || stripeLoading) && <CircularProgress size={16} />}
+					disabled={isLoading || !['RECAP','ADDRESS', 'PAYMENT_STRIPE'].includes(checkoutStep)}
+					startIcon={(isLoading) && <CircularProgress size={16} />}
 				>
 					{checkoutStep !== 'ADDRESS' ? t('checkout.pay-now') : t('checkout.go-to-payment')}
 				</Button>
 				<Payments />
 			</Hidden>
-			<PaymentErrorDialog error={paymentError} setError={setPaymentError} />
 		</Box>
 	)
 }

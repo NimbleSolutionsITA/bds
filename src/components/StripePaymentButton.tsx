@@ -6,10 +6,14 @@ import {NEXT_API_ENDPOINT} from "../utils/endpoints";
 import {useRouter} from "next/router";
 import {getName} from "../utils/utils";
 import {useTranslation} from "next-i18next";
+import {AppDispatch} from "../redux/store";
+import {useDispatch} from "react-redux";
+import {destroyCart} from "../redux/cartSlice";
 
 type StripePaymentButtonProps = {
 	items: CartItem[]
 	shipping: ShippingClass[]
+	isCart?: boolean
 }
 
 type ShippingOption = {
@@ -26,13 +30,13 @@ type CartItem = {
 	price: number
 	qty: number
 }
-const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
+const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps) => {
 	const stripe = useStripe();
 	const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
-	const total = items.reduce((acc, item) => acc + item.price * item.qty, 0) * 100;
+	const total = items.reduce((acc, item) => acc + item.price * item.qty, 0);
 	const router = useRouter();
 	const { t } = useTranslation();
-
+	const dispatch = useDispatch<AppDispatch>()
 	const getShippingOptions = (country: string): ShippingOption[] => {
 		const methods = shipping.find(s => s.locations.includes(country))?.methods
 			.filter(m => m.enabled && m.requires === 'min_amount' ? parseFloat(m.minAmount) <= total : true)
@@ -46,6 +50,7 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 
 	useEffect(() => {
 		if (paymentRequest) {
+			console.log('update')
 			paymentRequest.update({
 				total: {
 					label: t('total'),
@@ -68,6 +73,7 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 				total: {
 					label: t('total'),
 					amount: total,
+					pending: true
 				},
 				requestPayerName: true,
 				requestPayerEmail: true,
@@ -150,7 +156,8 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 						shipping_lines: [
 							{
 								method_id: e.shippingOption?.id,
-								total: e.shippingOption?.amount.toString()
+								total: (e.shippingOption?.amount ?? 0 / 100) + '',
+								method_title: e.shippingOption?.label
 							}
 						],
 						shipping: {
@@ -182,8 +189,12 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 
 				e.complete('success');
 
+				if (isCart) {
+					await dispatch(destroyCart());
+				}
+
 				await router.push({
-					pathname: '/checkout/' + order.id,
+					pathname: '/checkout/completed',
 					query: {
 						paid: true
 					}
@@ -205,6 +216,16 @@ const StripePaymentButton = ({items, shipping}: StripePaymentButtonProps) => {
 					});
 				}
 			});
+
+			pr.on('shippingoptionchange', function(event) {
+				event.updateWith({
+					status: 'success',
+					total: {
+						label: t('total'),
+						amount: total + event.shippingOption.amount,
+					}
+				});
+			})
 		}
 	}, [stripe]);
 

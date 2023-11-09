@@ -126,6 +126,11 @@ export const createIntent = createAsyncThunk('cart/createIntent', async (arg, th
 	return paymentIntent;
 });
 
+export const destroyCart = createAsyncThunk('cart/destroy', async (arg, thunkAPI) => {
+	await callCartData('/v2/cart/clear', {}, "DELETE");
+	return await callCartData('/v2/cart', {}, "GET")
+});
+
 export const cartSlice = createSlice({
 	name: 'cart',
 	initialState,
@@ -239,6 +244,16 @@ export const cartSlice = createSlice({
 			state.loading = false;
 		});
 		builder.addCase(createIntent.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(destroyCart.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(destroyCart.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(destroyCart.rejected, (state) => {
 			state.loading = false;
 		});
 	},

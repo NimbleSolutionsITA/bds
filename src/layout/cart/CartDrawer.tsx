@@ -89,6 +89,7 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 										qty: item.quantity.value
 									}))}
 									shipping={shipping}
+									isCart
 								/>
 							</div>
 						)}
