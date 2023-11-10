@@ -154,7 +154,7 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
 	)
 		.then(response => response.json()))[0]
-	const seo = await getSeo(page.link)
+	const seo = page.link ? await getSeo(page.link) : null
 	return { page: mapPage(page), seo }
 }
 
