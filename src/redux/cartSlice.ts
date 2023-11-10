@@ -277,7 +277,6 @@ export const callCartData = async (url: string, payload = {}, method: 'GET'|'POS
 			credentials: 'include',
 			headers: {
 				'Content-Type': 'application/json',
-				'Cookie': ''
 			},
 			...(method === "POST" && {body: JSON.stringify(payload)})
 		});
