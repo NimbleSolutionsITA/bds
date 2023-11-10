@@ -278,9 +278,13 @@ export const callCartData = async (url: string, payload = {}, method: 'GET' | 'P
 			url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart' + url,
 			withCredentials: true,
 			headers: {
-				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				...(payload && method === 'POST' ? {'Content-Type': 'application/json'} : {})
 			},
-			data: method === 'POST' ? payload : undefined,
+			...(payload && method === 'POST' ? {data: payload} : {}),
+			responseEncoding: 'utf8',
+			responseType: 'json',
+
 		});
 
 		if (response.status !== 200) {
