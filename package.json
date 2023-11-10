@@ -27,6 +27,7 @@
     "@types/woocommerce__woocommerce-rest-api": "^1.0.2",
     "@woocommerce/woocommerce-rest-api": "^1.0.1",
     "@wordpress/block-library": "^8.18.0",
+    "axios": "^1.6.1",
     "cookie": "^0.5.0",
     "date-fns": "^2.30.0",
     "form-data": "^4.0.0",

@@ -3,6 +3,7 @@ import { Cart, Totals} from "../types/cart-type";
 import {NEXT_API_ENDPOINT} from "../utils/endpoints";
 import {RootState} from "./store";
 import {BillingData, ShippingData} from "../types/woocommerce";
+import axios, {AxiosResponse} from "axios";
 
 type CartState = {
 	nonce?: string
@@ -270,22 +271,25 @@ export const {
 
 export default cartSlice.reducer
 
-export const callCartData = async (url: string, payload = {}, method: 'GET'|'POST'|'DELETE'): Promise<Cart> => {
+export const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 'DELETE'): Promise<Cart> => {
 	try {
-		const response = await fetch(process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart' + url, {
+		const response: AxiosResponse<Cart> = await axios({
 			method: method,
-			credentials: 'include',
+			url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart' + url,
+			withCredentials: true,
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			...(method === "POST" && {body: JSON.stringify(payload)})
+			data: method === 'POST' ? payload : undefined,
 		});
-		if (!response.ok) {
+
+		if (response.status !== 200) {
 			throw new Error('Failed to add cart item');
 		}
-		return await response.json();
+
+		return response.data;
 	} catch (error) {
-		console.log(error)
+		console.log(error);
 		throw error;
 	}
-}
+};
