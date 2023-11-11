@@ -1,7 +1,6 @@
 const { i18n } = require('./next-i18next.config')
 const path = require('path')
 const WORDPRESS_HOSTNAME = process.env.NEXT_PUBLIC_WP_SUBDOMAIN + '.' + process.env.NEXT_PUBLIC_DOMAIN
-const NEXT_SITE_URL = (process.env.NEXT_PUBLIC_SITE_PROTOCOL + '://' + process.env.NEXT_PUBLIC_SITE_SUBDOMAIN ? process.env.NEXT_PUBLIC_SITE_SUBDOMAIN + '.' : '') + process.env.NEXT_PUBLIC_DOMAIN
 
 if (!process.env.NEXT_PUBLIC_WP_SUBDOMAIN || !process.env.NEXT_PUBLIC_SITE_PROTOCOL || !process.env.NEXT_PUBLIC_DOMAIN) {
     throw new Error(`
@@ -26,12 +25,6 @@ module.exports =  {
     i18n,
     async redirects() {
         return [
-            {
-                source: '/:path*',
-                has: [{ type: 'host', value: 'www.' }],
-                destination: NEXT_SITE_URL + '/:path*',
-                permanent: true
-            },
             {
                 source: '/shop/:mainCategory/:brand/:slug',
                 destination: '/products/:slug',

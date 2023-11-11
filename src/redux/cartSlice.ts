@@ -283,8 +283,7 @@ export const callCartData = async (url: string, payload = {}, method: 'GET' | 'P
 			},
 			...(payload && method === 'POST' ? {data: payload} : {}),
 			responseEncoding: 'utf8',
-			responseType: 'json',
-
+			responseType: 'json'
 		});
 
 		if (response.status !== 200) {

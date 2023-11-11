@@ -99,7 +99,10 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 				variation: currentProduct.attributes?.reduce((result: { [key: string]: string }, attribute) => {
 					result[`attribute_${attribute.name}`] = attribute.option;
 					return result;
-				}, {})
+				}, {}),
+				item_data: {
+					category: category?.name ?? ''
+				}
 			}))
 		}
 	}

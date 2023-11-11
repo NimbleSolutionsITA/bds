@@ -100,7 +100,7 @@ const CheckoutMobile = ({
 				</AnimatePresence>
 			</Container>
 			<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 101}}>
-				<PriceRecap isLoading={isLoading} />
+				{checkoutStep !== 'ADDRESS' && <PriceRecap isLoading={isLoading}/>}
 				<Grid container sx={{marginTop: '5px'}} spacing={2}>
 					{checkoutStep === 'RECAP' && (
 						<Grid item xs={6}>

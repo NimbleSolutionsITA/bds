@@ -48,8 +48,10 @@ const CartItem = ({item, loading}: CartItemProps) => {
 			<div style={{width: '75%', padding: '10px', position: 'relative'}}>
 				<Typography sx={{fontWeight: 500, lineHeight: '16px', marginBottom: '8px'}}>
 					<Link onClick={() => dispatch(closeCartDrawer())} href={'/products/'+item.slug}>
-						{item.cart_item_data.category} - {item.name}
+						{item.name}
 					</Link>
+					<br />
+					<span style={{fontSize: '12px', marginBottom: '5px'}}>{item.cart_item_data.category}</span>
 					<br />
 					<PriceFormat value={Number(item.price) / 100} decimalScale={0} />
 				</Typography>
