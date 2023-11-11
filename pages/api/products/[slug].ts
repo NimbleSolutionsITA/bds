@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {Product} from "../../../src/types/woocommerce";
+import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 type Data = {
 	success: boolean
@@ -40,6 +41,6 @@ export default async function handler(
 
 export const getProduct = async (slug: string, lang: string): Promise<Product | string> => {
 	const params = new URLSearchParams({slug, lang})
-	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/product?${params.toString()}`)
+	return await fetch(`${WORDPRESS_SITE_URL}/wp-json/nimble/v1/product?${params.toString()}`)
 		.then(res => res.json())
 }

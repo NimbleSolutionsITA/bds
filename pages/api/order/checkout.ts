@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
+import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 const base = process.env.NODE_ENV === 'production' ?
 	process.env.PAYPAL_API_URL :
@@ -29,7 +30,7 @@ export type CreateOrderResponse = {
 }
 
 const api = new WooCommerceRestApi({
-	url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? '',
+	url: WORDPRESS_SITE_URL ?? '',
 	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
 	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
 	version: "wc/v3"
@@ -45,7 +46,7 @@ export default async function handler(
 	if (req.method === 'POST') {
 		try {
 			const { cartKey, intentId = null, customer = null } = req.body
-			const response = await fetch(process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
+			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
 			console.log(cart.totals)
 			if (responseData.amount === 0) {
@@ -105,7 +106,7 @@ export default async function handler(
 		try {
 			const { cartKey = null, intentId = null, paypalOrderId = null, customer = null } = req.body
 			let customerData = customer
-			const response = await fetch(process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
+			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
 			const selectedShipping = cart.shipping.packages.default.rates[cart.shipping.packages.default.chosen_method]
 			// PAYPAL CHECKOUT
@@ -180,7 +181,7 @@ export default async function handler(
 
 				if (cartKey) {
 					await fetch(
-						process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart/clear?cart_key=' + cartKey,
+						WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart/clear?cart_key=' + cartKey,
 						{ method: 'POST'}
 					)
 				}

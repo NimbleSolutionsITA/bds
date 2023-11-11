@@ -1,7 +1,9 @@
 const { i18n } = require('./next-i18next.config')
 const path = require('path')
+const WORDPRESS_HOSTNAME = process.env.NEXT_PUBLIC_WP_SUBDOMAIN + '.' + process.env.NEXT_PUBLIC_DOMAIN
+const NEXT_SITE_URL = (process.env.NEXT_PUBLIC_SITE_PROTOCOL + '://' + process.env.NEXT_PUBLIC_SITE_SUBDOMAIN ? process.env.NEXT_PUBLIC_SITE_SUBDOMAIN + '.' : '') + process.env.NEXT_PUBLIC_DOMAIN
 
-if (!process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL) {
+if (!process.env.NEXT_PUBLIC_WP_SUBDOMAIN || !process.env.NEXT_PUBLIC_SITE_PROTOCOL || !process.env.NEXT_PUBLIC_DOMAIN) {
     throw new Error(`
         Please provide a valid WordPress instance URL.
         Add to your environment variables WORDPRESS_API_URL.
@@ -13,8 +15,8 @@ module.exports =  {
     swcMinify: true,
     images: {
         domains: [
-            'www.wp.bottegadisguardi.com',
-            'wp.bottegadisguardi.com',
+            'www.' + WORDPRESS_HOSTNAME,
+            WORDPRESS_HOSTNAME,
         ],
         loader: 'default',
     },
@@ -26,8 +28,8 @@ module.exports =  {
         return [
             {
                 source: '/:path*',
-                has: [{ type: 'host', value: 'www.bottegadisguardi.com' }],
-                destination: 'https://bottegadisguardi.com/:path*',
+                has: [{ type: 'host', value: 'www.' }],
+                destination: NEXT_SITE_URL + '/:path*',
                 permanent: true
             },
             {

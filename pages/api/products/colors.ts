@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {Attribute, Color} from "../../../src/types/woocommerce";
+import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 type Data = {
 	success: boolean
@@ -38,6 +39,6 @@ export const getAttributes = async (lang: string): Promise<{
 	colors: Color[]
 	attributes: Attribute[]
 }> => {
-	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/attributes?lang=${lang}`)
+	return await fetch(`${WORDPRESS_SITE_URL}/wp-json/nimble/v1/attributes?lang=${lang}`)
 		.then(res => res.json())
 }

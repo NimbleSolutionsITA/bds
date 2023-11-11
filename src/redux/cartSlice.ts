@@ -1,6 +1,6 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import { Cart, Totals} from "../types/cart-type";
-import {NEXT_API_ENDPOINT} from "../utils/endpoints";
+import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../utils/endpoints";
 import {RootState} from "./store";
 import {BillingData, ShippingData} from "../types/woocommerce";
 import axios, {AxiosResponse} from "axios";
@@ -275,7 +275,7 @@ export const callCartData = async (url: string, payload = {}, method: 'GET' | 'P
 	try {
 		const response: AxiosResponse<Cart> = await axios({
 			method: method,
-			url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL + '/wp-json/cocart' + url,
+			url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url,
 			withCredentials: true,
 			headers: {
 				Accept: 'application/json',

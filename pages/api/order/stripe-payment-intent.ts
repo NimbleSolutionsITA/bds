@@ -1,6 +1,7 @@
 import type {NextApiRequest, NextApiResponse} from "next";
 import {WooLineItem} from "../../../src/types/woocommerce";
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
+import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 const stripeSecretKey = process.env.NODE_ENV === 'production' ?
 	process.env.STRIPE_SECRET_PRODUCTION :
@@ -9,7 +10,7 @@ const stripeSecretKey = process.env.NODE_ENV === 'production' ?
 const stripe = require("stripe")(stripeSecretKey);
 
 const api = new WooCommerceRestApi({
-	url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? '',
+	url: WORDPRESS_SITE_URL ?? '',
 	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
 	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
 	version: "wc/v3"

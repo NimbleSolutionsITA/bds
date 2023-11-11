@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {ShippingMethod, SippingZoneLocation} from "../../../../../src/types/woocommerce";
+import {WORDPRESS_SITE_URL} from "../../../../../src/utils/endpoints";
 
 type Data = {
 	success: boolean
@@ -9,7 +10,7 @@ type Data = {
 }
 
 const api = new WooCommerceRestApi({
-	url: process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL ?? '',
+	url: WORDPRESS_SITE_URL ?? '',
 	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
 	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
 	version: "wc/v3"

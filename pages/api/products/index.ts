@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import {BaseProduct} from "../../../src/types/woocommerce";
+import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 type Data = {
 	success: boolean
@@ -151,6 +152,6 @@ export const getProducts = async ({
 		...(sort && { sort: sort.toString() }),
 		...(fragrances && { fragrances: 'true' }),
 	});
-	return await fetch(`${ process.env.NEXT_PUBLIC_WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
+	return await fetch(`${WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
 		.then(res => res.json())
 }

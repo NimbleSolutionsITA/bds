@@ -8,6 +8,7 @@ import {useTranslation} from "react-i18next";
 import {ReactNode} from "react";
 import SocialShare from "../product/SocialShare";
 import {useRouter} from "next/router";
+import {NEXT_SITE_URL} from "../../utils/endpoints";
 
 type ArticleSideBarProps = {
 	postsByCategory: {
@@ -49,11 +50,11 @@ const ArticleSidebar = ({postsByCategory, tags}: ArticleSideBarProps) => {
 			)}
 			<Section title={"Share"}>
 				<SocialShare
-					facebookUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
-					emailUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
-					twitterUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
-					telegramUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
-					whatsappUrl={`${process.env.NEXT_PUBLIC_SITE_URL}/${router.asPath}`}
+					facebookUrl={`${NEXT_SITE_URL}/${router.asPath}`}
+					emailUrl={`${NEXT_SITE_URL}/${router.asPath}`}
+					twitterUrl={`${NEXT_SITE_URL}/${router.asPath}`}
+					telegramUrl={`${NEXT_SITE_URL}/${router.asPath}`}
+					whatsappUrl={`${NEXT_SITE_URL}/${router.asPath}`}
 				/>
 			</Section>
 			<Section title={'Newsletter'}>
