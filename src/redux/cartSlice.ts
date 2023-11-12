@@ -91,11 +91,10 @@ export const selectShipping = createAsyncThunk('cart/selectShipping', async (pay
 
 type SetCouponPayload = {
 	code: string
-	oldCode?: string
 }
 
 export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
-	await callCartData('/v1/cart/coupon', {coupon: payload.code}, "POST")
+	await callCartData('/v1/coupon', {coupon: payload.code}, "POST")
 	return await callCartData('/v2/cart', {}, "GET")
 });
 
@@ -104,7 +103,7 @@ type RemoveCouponPayload = {
 }
 
 export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload: RemoveCouponPayload, thunkAPI) => {
-	await callCartData('/v1/cart/coupon', {coupon: payload.code}, "DELETE");
+	await callCartData('/v1/coupon?coupon=' + payload.code, {}, "DELETE");
 	return await callCartData('/v2/cart', {}, "GET")
 });
 

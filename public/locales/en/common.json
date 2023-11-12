@@ -147,7 +147,8 @@
     "vat-included":"Includes <0></0> VAT",
     "coupon-code":"Coupon code",
     "apply":"Apply",
-    "go-to-payment":"Proceed to Payment"
+    "go-to-payment":"Proceed to Payment",
+    "remove": "Remove"
   },
   "form":{
     "name":"First Name",

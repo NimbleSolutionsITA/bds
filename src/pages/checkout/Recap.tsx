@@ -24,10 +24,10 @@ import PriceRecap from "./PriceRecap";
 import Minus from "../../layout/cart/Minus";
 import Plus from "../../layout/cart/Plus";
 import {useTranslation} from "next-i18next";
-import {BaseSyntheticEvent, Dispatch, SetStateAction, useState} from "react";
+import {BaseSyntheticEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
-import {selectShipping, setCoupon} from "../../redux/cartSlice";
+import {removeCoupon, selectShipping, setCoupon} from "../../redux/cartSlice";
 
 type RecapProps = {
 	isLoading: boolean
@@ -39,7 +39,7 @@ type RecapProps = {
 const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithStripe}: RecapProps) => {
 	const { formState: { errors } } = useFormContext();
 	const { t } = useTranslation('common');
-	const { cart, customer, stripe: { intentId } = { intentId: null } } = useSelector((state: RootState) => state.cart);
+	const { cart, stripe: { intentId } = { intentId: null }, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
 	const canEditData = !isLoading && ['RECAP','ADDRESS', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
 	const theme = useTheme();
@@ -48,7 +48,9 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 	const shippingRates = shipping?.rates ?? {}
 	const hasFreeShipping = Object.values(shippingRates).find(r => r.method_id === 'free_shipping')
 	const selectedRate = shipping?.chosen_method
-	const [couponCode, setCouponCode] = useState('');
+	const hasCoupons = cart.coupons && cart.coupons.length > 0;
+	const [couponCode, setCouponCode] = useState(cart.coupons && cart.coupons.length > 0 ? cart.coupons[0].coupon : '');
+
 	const handleContinue = async () => {
 		switch (checkoutStep) {
 			case 'ADDRESS':
@@ -66,9 +68,15 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 	}
 
 	const handleSetCoupon = () => {
-		dispatch(setCoupon({
-			code: couponCode
-		}))
+		console.log(hasCoupons, couponCode)
+		hasCoupons ?
+			dispatch(removeCoupon({
+				code: couponCode
+			})) :
+			dispatch(setCoupon({
+				code: couponCode
+			}))
+
 	}
 	const handleSelectShipping = (e: SelectChangeEvent<string>) => {
 		dispatch(selectShipping({
@@ -130,7 +138,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 			<Grid container spacing={1} sx={{padding: '20px 0', alignItems: 'center', marginBottom: errors.coupon_code ? '7px' : 0}}>
 				<Grid item xs={7}>
 					<TextField
-						disabled={!canEditData}
+						disabled={!canEditData || hasCoupons}
 						value={couponCode}
 						onChange={(e) => setCouponCode(e.target.value)}
 						fullWidth
@@ -142,10 +150,10 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 					<Button
 						fullWidth
 						onClick={handleSetCoupon}
-						disabled={!canEditData}
-						endIcon={isLoading && <CircularProgress size={16} />}
+						disabled={!canEditData || isLoading || loading}
+						endIcon={(isLoading || loading) && <CircularProgress size={16} />}
 					>
-						{t('checkout.apply').toUpperCase()}
+						{t(hasCoupons ? 'checkout.remove' : 'checkout.apply').toUpperCase()}
 					</Button>
 				</Grid>
 			</Grid>

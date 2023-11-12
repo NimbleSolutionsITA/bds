@@ -150,7 +150,8 @@
     "vat-included":"Inclusi <0></0> IVA",
     "coupon-code":"Codice coupon",
     "apply":"Applica",
-    "go-to-payment":"Vai al pagamento"
+    "go-to-payment":"Vai al pagamento",
+    "remove": "Rimuovi"
   },
   "form":{
     "name":"Nome",
