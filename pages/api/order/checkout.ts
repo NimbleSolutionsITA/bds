@@ -3,14 +3,9 @@ import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 const base = process.env.PAYPAL_API_URL;
-
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET
-
-
 const stripeSecretKey = process.env.STRIPE_SECRET;
-
 const stripe = require("stripe")(stripeSecretKey);
 
 export type CreateOrderResponse = {
@@ -40,7 +35,7 @@ export default async function handler(
 			const { cartKey, intentId = null, customer = null } = req.body
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
-			console.log(cart.totals)
+			console.log(cart)
 			if (responseData.amount === 0) {
 				throw new Error('Amount is 0')
 			}
@@ -74,7 +69,7 @@ export default async function handler(
 						shipping_phone: customer.shipping.phone,
 					}
 				});
-				console.log(paymentIntent.status)
+				console.log('Payment Intent status', paymentIntent.status)
 			}
 			// PAYPAL CHECKOUT
 			else {
@@ -85,6 +80,8 @@ export default async function handler(
 			responseData.success = true
 		}
 		catch ( error ) {
+			console.log(error)
+			responseData.success = false
 			if (typeof error === "string") {
 				responseData.error = error
 			} else if (error instanceof Error) {
@@ -100,10 +97,12 @@ export default async function handler(
 			let customerData = customer
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
+			console.log(cart)
 			const selectedShipping = cart.shipping.packages.default.rates[cart.shipping.packages.default.chosen_method]
 			// PAYPAL CHECKOUT
 			if (paypalOrderId) {
 				const capture = await captureOrder(paypalOrderId)
+				console.log('paypal', capture)
 				responseData.success = capture.status === 'COMPLETED'
 				if (intentId) {
 					await stripe.paymentIntents.cancel(intentId)
@@ -112,6 +111,7 @@ export default async function handler(
 			// STRIPE CHECKOUT
 			else if (intentId) {
 				const paymentIntent = await stripe.paymentIntents.retrieve(intentId)
+				console.log('stripe', paymentIntent)
 				responseData.success = paymentIntent.status === 'succeeded'
 				// add customer data to order from meta
 				if (customerData === null) {
@@ -146,7 +146,7 @@ export default async function handler(
 			}
 
 			if (responseData.success) {
-				const { data: order} = await api.post("orders",  {
+				const orderPayload = {
 					payment_method: intentId ? 'stripe' : 'paypal',
 					payment_method_title: intentId ? 'Stripe' : 'Paypal',
 					payment_method_reference: intentId ? intentId : paypalOrderId,
@@ -167,7 +167,9 @@ export default async function handler(
 						}
 					],
 					coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].code }] : []
-				})
+				}
+				console.log(orderPayload)
+				const { data: order} = await api.post("orders", orderPayload)
 
 				responseData.orderId = order.id
 
@@ -180,6 +182,8 @@ export default async function handler(
 			}
 		}
 		catch ( error ) {
+			console.log(error)
+			responseData.success = false
 			if (typeof error === "string") {
 				responseData.error = error
 			} else if (error instanceof Error) {
