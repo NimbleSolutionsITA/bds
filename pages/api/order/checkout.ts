@@ -73,7 +73,7 @@ export default async function handler(
 			}
 			// PAYPAL CHECKOUT
 			else {
-				const paypalOrder = await createOrder(responseData.amount)
+				const paypalOrder = await createOrder(responseData.amount / 100)
 				console.log(paypalOrder)
 				responseData.paypalOrderId = paypalOrder.id
 			}
