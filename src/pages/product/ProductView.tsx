@@ -12,7 +12,7 @@ import ZoomableImage from "../../components/ZoomableImage";
 import {EYEWEAR_CATEGORIES, findVariationFromAttributes, getDefaultProduct, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {addCartItem} from "../../redux/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {AttributeCheckboxes} from "../../components/AttributeCheckboxes";
@@ -106,6 +106,13 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 			}))
 		}
 	}
+
+	useEffect(() => {
+		console.log('page changed')
+		setCurrentAttributes(defaultAttributes)
+		setCurrentProduct(defaultProduct)
+	}, [product.id]);
+
 
 	return (
 		<Container key={product.id}>
