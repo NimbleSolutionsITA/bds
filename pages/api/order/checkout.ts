@@ -117,29 +117,29 @@ export default async function handler(
 				if (customerData === null) {
 					customerData = {
 						billing: {
-							first_name: paymentIntent.metadata.billing_first_name,
-							last_name: paymentIntent.metadata.billing_last_name,
-							email: paymentIntent.metadata.billing_email,
-							phone: paymentIntent.metadata.billing_phone,
-							address_1: paymentIntent.metadata.billing_address_1,
-							address_2: paymentIntent.metadata.billing_address_2,
-							city: paymentIntent.metadata.billing_city,
-							state: paymentIntent.metadata.billing_state,
-							postcode: paymentIntent.metadata.billing_postcode,
-							country: paymentIntent.metadata.billing_country,
-							company: paymentIntent.metadata.billing_company,
+							first_name: paymentIntent.metadata.billing_first_name ?? '',
+							last_name: paymentIntent.metadata.billing_last_name ?? '',
+							email: paymentIntent.metadata.billing_email ?? '',
+							phone: paymentIntent.metadata.billing_phone ?? '',
+							address_1: paymentIntent.metadata.billing_address_1 ?? '',
+							address_2: paymentIntent.metadata.billing_address_2 ?? '',
+							city: paymentIntent.metadata.billing_city ?? '',
+							state: paymentIntent.metadata.billing_state ?? '',
+							postcode: paymentIntent.metadata.billing_postcode ?? '',
+							country: paymentIntent.metadata.billing_country ?? '',
+							company: paymentIntent.metadata.billing_company ?? '',
 						},
 						shipping: {
-							first_name: paymentIntent.metadata.shipping_first_name,
-							last_name: paymentIntent.metadata.shipping_last_name,
-							address_1: paymentIntent.metadata.shipping_address_1,
-							address_2: paymentIntent.metadata.shipping_address_2,
-							city: paymentIntent.metadata.shipping_city,
-							state: paymentIntent.metadata.shipping_state,
-							postcode: paymentIntent.metadata.shipping_postcode,
-							country: paymentIntent.metadata.shipping_country,
-							company: paymentIntent.metadata.shipping_company,
-							phone: paymentIntent.metadata.shipping_phone
+							first_name: paymentIntent.metadata.shipping_first_name ?? '',
+							last_name: paymentIntent.metadata.shipping_last_name ?? '',
+							address_1: paymentIntent.metadata.shipping_address_1 ?? '',
+							address_2: paymentIntent.metadata.shipping_address_2 ?? '',
+							city: paymentIntent.metadata.shipping_city ?? '',
+							state: paymentIntent.metadata.shipping_state ?? '',
+							postcode: paymentIntent.metadata.shipping_postcode ?? '',
+							country: paymentIntent.metadata.shipping_country ?? '',
+							company: paymentIntent.metadata.shipping_company ?? '',
+							phone: paymentIntent.metadata.shipping_phone ?? ''
 						}
 					}
 				}
@@ -166,7 +166,7 @@ export default async function handler(
 							total: (Number(selectedShipping?.cost) / 100) + '',
 						}
 					],
-					coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].code }] : []
+					coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : []
 				}
 				console.log(orderPayload)
 				const { data: order} = await api.post("orders", orderPayload)
