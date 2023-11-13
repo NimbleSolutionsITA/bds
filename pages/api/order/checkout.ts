@@ -35,7 +35,6 @@ export default async function handler(
 			const { cartKey, intentId = null, customer = null } = req.body
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
-			console.log(cart)
 			if (responseData.amount === 0) {
 				throw new Error('Amount is 0')
 			}
@@ -97,7 +96,6 @@ export default async function handler(
 			let customerData = customer
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
-			console.log(cart)
 			const selectedShipping = cart.shipping.packages.default.rates[cart.shipping.packages.default.chosen_method]
 			// PAYPAL CHECKOUT
 			if (paypalOrderId) {
@@ -147,9 +145,9 @@ export default async function handler(
 
 			if (responseData.success) {
 				const orderPayload = {
-					payment_method: intentId ? 'stripe' : 'paypal',
-					payment_method_title: intentId ? 'Stripe' : 'Paypal',
-					payment_method_reference: intentId ? intentId : paypalOrderId,
+					payment_method: paypalOrderId ? 'paypal' : 'stripe',
+					payment_method_title: paypalOrderId ? 'Paypal' : 'Stripe',
+					payment_method_reference: paypalOrderId ? paypalOrderId: intentId,
 					set_paid: true,
 					...customerData,
 					line_items: cart.items.map((item: any) => {
