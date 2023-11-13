@@ -6,7 +6,7 @@ import { Stripe, loadStripe } from '@stripe/stripe-js';
 let stripePromise: Promise<Stripe | null>;
 const getStripe = () => {
 	if (!stripePromise) {
-		stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_SANDBOX!);
+		stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC!);
 	}
 	return stripePromise;
 };

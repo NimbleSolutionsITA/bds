@@ -3,9 +3,7 @@ import {WooLineItem} from "../../../src/types/woocommerce";
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
-const stripeSecretKey = process.env.NODE_ENV === 'production' ?
-	process.env.STRIPE_SECRET_PRODUCTION :
-	process.env.STRIPE_SECRET_SANDBOX;
+const stripeSecretKey = process.env.STRIPE_SECRET;
 
 const stripe = require("stripe")(stripeSecretKey);
 

@@ -20,9 +20,7 @@ export type CheckoutProps = {
 	}
 }
 
-const CLIENT_ID = (process.env.NODE_ENV === "production" ?
-	process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID :
-	process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID_SANDBOX) as string;
+const CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
 export default function Checkout({
      shipping
@@ -40,7 +38,7 @@ export default function Checkout({
 		}
 	}, [dispatch, isShippingReady, stripe?.clientSecret])
 
-	return (isShippingReady && stripe?.clientSecret)  ? (
+	return (isShippingReady && stripe?.clientSecret && CLIENT_ID)  ? (
 		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons', intent: 'capture' }}>
 			<Elements
 				options={{

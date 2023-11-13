@@ -2,9 +2,7 @@ import {NextApiRequest, NextApiResponse} from "next";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 const WooCommerceRestApi = require("@woocommerce/woocommerce-rest-api").default;
 
-const stripeSecretKey = process.env.NODE_ENV === 'production' ?
-	process.env.STRIPE_SECRET_PRODUCTION :
-	process.env.STRIPE_SECRET_SANDBOX;
+const stripeSecretKey = process.env.STRIPE_SECRET;
 
 const stripe = require("stripe")(stripeSecretKey);
 const webhookSecret = process.env.STRIPE_WEBHOOK_ENDPOINT_SECRET;

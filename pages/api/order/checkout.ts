@@ -2,22 +2,14 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
-const base = process.env.NODE_ENV === 'production' ?
-	process.env.PAYPAL_API_URL :
-	process.env.PAYPAL_API_URL_SANDBOX;
+const base = process.env.PAYPAL_API_URL;
 
-const PAYPAL_CLIENT_ID = process.env.NODE_ENV === 'production' ?
-	process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID :
-	process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID_SANDBOX;
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
-const PAYPAL_CLIENT_SECRET = process.env.NODE_ENV === 'production' ?
-	process.env.PAYPAL_CLIENT_SECRET :
-	process.env.PAYPAL_CLIENT_SECRET_SANDBOX;
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET
 
 
-const stripeSecretKey = process.env.NODE_ENV === 'production' ?
-	process.env.STRIPE_SECRET_PRODUCTION :
-	process.env.STRIPE_SECRET_SANDBOX;
+const stripeSecretKey = process.env.STRIPE_SECRET;
 
 const stripe = require("stripe")(stripeSecretKey);
 

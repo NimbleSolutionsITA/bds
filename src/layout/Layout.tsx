@@ -49,9 +49,7 @@ export default function Layout({children, layout: {
         }
     })
 
-    const stripePublicKey = process.env.NODE_ENV === 'production' ?
-        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_PRODUCTION :
-        process.env.NEXT_PUBLIC_STRIPE_PUBLIC_SANDBOX;
+    const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC;
 
     const stripePromise = loadStripe(stripePublicKey ?? '');
 
