@@ -45,7 +45,7 @@ export default async function handler(
 				throw new Error('Amount is 0')
 			}
 
-			responseData.amount = Number(cart.totals.total) / 100
+			responseData.amount = Number(cart.totals.total)
 			// STRIPE CHECKOUT
 			if (intentId) {
 				const paymentIntent = await stripe.paymentIntents.update(intentId, {
