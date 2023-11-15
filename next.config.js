@@ -26,6 +26,34 @@ module.exports =  {
     async redirects() {
         return [
             {
+                source: '/home',
+                destination: '/',
+                permanent: true,
+            },
+            {
+                source: '/home',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en',
+                permanent: true,
+            },
+            {
+                source: '/sunglasses',
+                destination: '/occhiali-da-sole',
+                permanent: true,
+            },
+            {
+                source: '/sunglasses',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en/occhiali-da-sole',
+                permanent: true,
+            },
+            {
+                source: '/home',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en',
+                permanent: true,
+            },
+            {
                 source: '/shop/:mainCategory/:brand/:slug',
                 destination: '/products/:slug',
                 permanent: true,
@@ -174,6 +202,28 @@ module.exports =  {
                 source: '/category/liquides-imaginaires/:slug',
                 has: [{ type: 'query', key: 'lang', value: 'en' }],
                 destination: '/en/liquides-imaginaires/:slug',
+                permanent: true,
+            },
+            {
+                source: '/category/senza-categoria/liquides-imaginaires',
+                destination: '/liquides-imaginaires',
+                permanent: true,
+            },
+            {
+                source: '/category/senza-categoria/liquides-imaginaires',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en/liquides-imaginaires',
+                permanent: true,
+            },
+            {
+                source: '/category/bottega-di-sguardi-horn-collection',
+                destination: '/nostra-produzione/bottega-di-sguardi-horn-collection',
+                permanent: true,
+            },
+            {
+                source: '/category/bottega-di-sguardi-horn-collection',
+                has: [{ type: 'query', key: 'lang', value: 'en' }],
+                destination: '/en/nostra-produzione/bottega-di-sguardi-horn-collection',
                 permanent: true,
             },
             {
