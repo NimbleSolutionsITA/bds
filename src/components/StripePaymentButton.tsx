@@ -57,7 +57,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 			paymentRequest.update({
 				total: {
 					label: t('total'),
-					amount: total,
+					amount: total * 100,
 				},
 				displayItems: [
 					...items.map(item => ({
@@ -81,7 +81,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 				currency: 'eur',
 				total: {
 					label: t('total'),
-					amount: total,
+					amount: total * 100,
 					pending: true
 				},
 				requestPayerName: true,
