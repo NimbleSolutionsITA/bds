@@ -85,7 +85,8 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 										product_id: item.meta.product_type === 'variation' ? item.meta.variation.parent_id : item.id,
 										variation_id: item.meta.product_type === 'variation' ? item.id : undefined,
 										name: item.name,
-										price: Number(item.price),
+										price: Number(item.price) / 100,
+										priceEU: Number(item.cart_item_data.priceEU ?? '0'),
 										qty: item.quantity.value
 									}))}
 									shipping={shipping}

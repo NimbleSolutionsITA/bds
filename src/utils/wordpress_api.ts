@@ -159,7 +159,6 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 }
 
 export const getSeo = async (link: string) => {
-	console.log(link)
 	let normalizedLink = link.replace('/en/categoria-prodotto/', '/categoria-prodotto/')
 	const seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${normalizedLink}`).then(response => response.json())
 	return seo.head ?? null
@@ -309,7 +308,6 @@ export const getAllProductsIds = async () => {
 
 	while (true) {
 		const response = await fetch(`${WORDPRESS_API_ENDPOINT}/product?per_page=100&page=${page}`);
-
 		if (!response.ok) {
 			if (response.status === 400) {
 				break;
@@ -349,10 +347,8 @@ export const getAllPostIds = async () => {
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 		}
-
 		const postData: Article[] = await response.json();
 		posts = posts.concat(postData);
-
 		if (postData.length === 0) {
 			break;
 		}

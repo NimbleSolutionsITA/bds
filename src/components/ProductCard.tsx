@@ -72,7 +72,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     {}
                 ),
                 item_data: {
-                    category: category.name
+                    category: category.name,
+                    priceEU: currentProduct.price_eu ?? ''
                 }
             }))
         }

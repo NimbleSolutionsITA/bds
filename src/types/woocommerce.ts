@@ -141,6 +141,8 @@ export type BaseProduct = {
 	slug: string;
 	image: string;
 	price: string;
+	price_eu: string;
+	price_it: string;
 	categories: BaseCategory[];
 	attributes: BaseAttributes
 	stock_status: 'instock' | 'outofstock' | 'onbackorder';
@@ -152,6 +154,8 @@ export type BaseProduct = {
 export type BaseVariation = {
 	id: number;
 	price: string | number;
+	price_eu: string;
+	price_it: string;
 	image: string;
 	stock_status: 'instock' | 'outofstock' | 'onbackorder';
 	stock_quantity?: number | null;

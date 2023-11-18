@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
+import {getCartItemPrice, getCartItemPriceWithoutTax, getCartTotals, getIsEU} from "../../../src/utils/utils";
+import {Item} from "../../../src/types/cart-type";
 
 const base = process.env.PAYPAL_API_URL;
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
@@ -39,7 +41,10 @@ export default async function handler(
 				throw new Error('Amount is 0')
 			}
 
-			responseData.amount = Number(cart.totals.total)
+			const { total } = getCartTotals(cart)
+
+			responseData.amount = total * 100
+
 			// STRIPE CHECKOUT
 			if (intentId) {
 				const paymentIntent = await stripe.paymentIntents.update(intentId, {
@@ -150,18 +155,19 @@ export default async function handler(
 					payment_method_reference: paypalOrderId ? paypalOrderId: intentId,
 					set_paid: true,
 					...customerData,
-					line_items: cart.items.map((item: any) => {
+					line_items: cart.items.map((item: Item) => {
 						return {
 							product_id: item.meta.product_type === 'variation' ? item.meta.variation.parent_id : item.id,
 							variation_id: item.meta.product_type === 'variation' ? item.id : undefined,
 							quantity: item.quantity.value,
+							total: getCartItemPriceWithoutTax(item, getIsEU(cart.customer)) + '',
 						}
 					}),
 					shipping_lines: [
 						{
 							method_id: selectedShipping?.method_id,
 							method_title: selectedShipping?.label,
-							total: (Number(selectedShipping?.cost) / 100) + '',
+							total: (Number(selectedShipping?.cost) / 1.22 / 100) + '',
 						}
 					],
 					coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : []

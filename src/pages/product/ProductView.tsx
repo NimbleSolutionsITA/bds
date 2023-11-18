@@ -84,6 +84,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 		name: product.name,
 		image: currentProduct.image.url ?? product.image.url,
 		price: parseFloat(currentProduct.price as string),
+		priceEU: currentProduct.price_eu ? parseFloat(currentProduct.price_eu) : undefined,
 		qty: 1,
 		stock_quantity: Number(currentProduct.stock_quantity),
 		attributes: currentProduct.attributes ?? [],
@@ -101,14 +102,14 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 					return result;
 				}, {}),
 				item_data: {
-					category: category?.name ?? ''
+					category: category?.name ?? '',
+					priceEU: currentProduct.price_eu ?? '',
 				}
 			}))
 		}
 	}
 
 	useEffect(() => {
-		console.log('page changed')
 		setCurrentAttributes(defaultAttributes)
 		setCurrentProduct(defaultProduct)
 	}, [product.id]);

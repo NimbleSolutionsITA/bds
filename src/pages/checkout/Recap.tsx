@@ -28,6 +28,7 @@ import {BaseSyntheticEvent, Dispatch, SetStateAction, useEffect, useState} from 
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {removeCoupon, selectShipping, setCoupon} from "../../redux/cartSlice";
+import {getCartItemPrice, getIsEU} from "../../utils/utils";
 
 type RecapProps = {
 	isLoading: boolean
@@ -44,6 +45,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 	const canEditData = !isLoading && ['RECAP','ADDRESS', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+	const isEU = getIsEU(cart?.customer)
 	const shipping = cart?.shipping?.packages.default
 	const shippingRates = shipping?.rates ?? {}
 	const hasFreeShipping = Object.values(shippingRates).find(r => r.method_id === 'free_shipping')
@@ -129,7 +131,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 							</Typography>
 						</div>
 						<Typography component="div" sx={{width: '25%', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', fontWeight: 500}}>
-							<PriceFormat value={Number(item.totals.total) + Number(item.totals.tax)} />
+							<PriceFormat value={getCartItemPrice(item, isEU)} />
 						</Typography>
 					</Box>
 				))}

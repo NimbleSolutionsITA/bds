@@ -11,6 +11,7 @@ import {
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "./endpoints";
+import {Cart, Item} from "../types/cart-type";
 
 
 export const sanitize = (html: string) => {
@@ -264,4 +265,37 @@ export function calculateImageDarkness(imageUrl: string, callback: Function) {
             callback(averageLuminance);
         }
     };
+}
+
+export const getCartItemPriceWithoutTax = (item: Item, isEU: boolean) => (isEU && item.cart_item_data.priceEU) ?
+    (Number(item.cart_item_data.priceEU) * Number(item.quantity.value) / 1.22) :
+    Number(item.totals.total)
+
+export const getCartItemPrice = (item: Item, isEU: boolean) => (isEU && item.cart_item_data.priceEU) ?
+    Number(item.cart_item_data.priceEU) * Number(item.quantity.value) :
+    (Number(item.totals.total) + Number(item.totals.tax))
+
+export const getIsEU = (customer?: Cart['customer']) => (customer?.shipping_address?.shipping_country ?? customer?.billing_address?.billing_country ) !== 'IT'
+
+export const getCartTotals = (cart?: Cart) => {
+    const isEU = getIsEU(cart?.customer)
+
+    const subtotal = isEU ?
+        cart?.items?.reduce((acc: number, item: any) => {
+            return acc + getCartItemPrice(item, isEU)
+        }, 0) ?? 0 :
+        (Number(cart?.totals?.subtotal) + Number(cart?.totals?.subtotal_tax)) / 100
+
+    const shipping = (Number(cart?.totals?.shipping_total) + Number(cart?.totals?.shipping_tax)) / 100
+    const discount = (Number(cart?.totals?.discount_total) + Number(cart?.totals?.discount_tax)) / 100
+    const total = isEU ? (subtotal + shipping - discount) : (Number(cart?.totals?.total) / 100);
+    const taxRate = (Number(cart?.totals?.total_tax) / Number(cart?.totals?.total)) ;
+    const totalTax =  isEU ? (total * taxRate) : (Number(cart?.totals?.total_tax) / 100);
+    return {
+        subtotal,
+        shipping,
+        discount,
+        total,
+        totalTax
+    }
 }

@@ -51,10 +51,10 @@ export default async function handler(
 
 export const getGooglePlaces = async (lang: string) => {
 	const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${apiKey}&language=${lang}`;
-	const details = await fetch(url);
+	const details = await fetch(url, { cache: "force-cache", next: { revalidate: 24 * 60 * 60 } });
 	const { result } = await details.json();
 	const url2 = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId2}&key=${apiKey}&language=${lang}`;
-	const details2 = await fetch(url2);
+	const details2 = await fetch(url2, { cache: "force-cache", next: { revalidate: 24 * 60 * 60 } });
 	const { result: result2 } = await details2.json();
 	return {
 		main: mapResult(result),
