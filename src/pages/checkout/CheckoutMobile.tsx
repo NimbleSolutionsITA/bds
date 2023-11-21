@@ -26,6 +26,7 @@ const CheckoutMobile = ({
 	const { t } = useTranslation('common')
 	const { cart } = useSelector((state: RootState) => state.cart);
 	const mobileStep = checkoutStep === 'ADDRESS' ? 0 : checkoutStep === 'RECAP' ? 1 : 2
+	const [focus, setFocus] = React.useState(false)
 	const editAddress = (tab: number) => {
 		setCheckoutStep('ADDRESS')
 		setTab(tab)
@@ -38,6 +39,7 @@ const CheckoutMobile = ({
 			isLoading={isLoading}
 			tab={tab}
 			setTab={setTab}
+			setFocus={setFocus}
 		/>,
 		<Recap
 			key="recap"
@@ -99,32 +101,34 @@ const CheckoutMobile = ({
 					</motion.div>
 				</AnimatePresence>
 			</Container>
-			<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 101}}>
-				{checkoutStep !== 'ADDRESS' && <PriceRecap isLoading={isLoading}/>}
-				<Grid container sx={{marginTop: '5px'}} spacing={2}>
-					{checkoutStep === 'RECAP' && (
-						<Grid item xs={6}>
-							<Button fullWidth onClick={() => setCheckoutStep('ADDRESS')}>
-								{t('checkout.address')}
-							</Button>
-						</Grid>
-					)}
-					{['ADDRESS', 'RECAP'].includes(checkoutStep) && (
-						<Grid item xs={checkoutStep === 'ADDRESS' ? 12 : 6}>
-							<Button fullWidth onClick={() => checkoutStep === 'ADDRESS' ? updateOrder() : setCheckoutStep('PAYMENT_STRIPE')}>
-								{checkoutStep === 'ADDRESS' ? t('checkout.go-to-payment') : t('checkout.payment')}
-							</Button>
-						</Grid>
-					)}
-					{checkoutStep === 'PAYMENT_STRIPE' && (
-						<Grid item xs={12}>
-							<Button fullWidth onClick={() => payWithStripe()}>
-								{t('checkout.pay-now')}
-							</Button>
-						</Grid>
-					)}
-				</Grid>
-			</Container>
+			{!focus && (
+				<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 101}}>
+					<PriceRecap isLoading={isLoading}/>
+					<Grid container sx={{marginTop: '5px'}} spacing={2}>
+						{checkoutStep === 'RECAP' && (
+							<Grid item xs={6}>
+								<Button fullWidth onClick={() => setCheckoutStep('ADDRESS')}>
+									{t('checkout.address')}
+								</Button>
+							</Grid>
+						)}
+						{['ADDRESS', 'RECAP'].includes(checkoutStep) && (
+							<Grid item xs={checkoutStep === 'ADDRESS' ? 12 : 6}>
+								<Button fullWidth onClick={() => checkoutStep === 'ADDRESS' ? updateOrder() : setCheckoutStep('PAYMENT_STRIPE')}>
+									{checkoutStep === 'ADDRESS' ? t('checkout.go-to-payment') : t('checkout.payment')}
+								</Button>
+							</Grid>
+						)}
+						{checkoutStep === 'PAYMENT_STRIPE' && (
+							<Grid item xs={12}>
+								<Button fullWidth onClick={() => payWithStripe()}>
+									{t('checkout.pay-now')}
+								</Button>
+							</Grid>
+						)}
+					</Grid>
+				</Container>
+			)}
 		</div>
 	)
 }

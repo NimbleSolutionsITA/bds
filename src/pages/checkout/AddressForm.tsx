@@ -13,14 +13,21 @@ type AddressFormProps = {
 	isLoading: boolean
 	tab: number
 	setTab: Dispatch<SetStateAction<number>>
+	setFocus?: Dispatch<SetStateAction<boolean>>
 }
-const AddressForm = ({isLoading, countries, tab, setTab}: AddressFormProps) => {
+const AddressForm = ({isLoading, countries, tab, setTab, setFocus}: AddressFormProps) => {
 	const { control, formState: { errors }, setError } = useFormContext<Inputs>();
 	const handleChange = (event: SyntheticEvent, newValue: number) => {
 		setTab(newValue);
 	};
 	const { t } = useTranslation('common');
 	const hasShipping = useWatch({name: 'has_shipping', control});
+
+	const focusProps = {
+		onBlur: () => setFocus?.(false),
+		onFocus: () => setFocus?.(true)
+	}
+
 	return (
 		<div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
 			<Controller
@@ -42,6 +49,7 @@ const AddressForm = ({isLoading, countries, tab, setTab}: AddressFormProps) => {
 						variant="outlined"
 						label="Email"
 						helperText={<HelperText message={errors.billing?.email?.message} />}
+						{...focusProps}
 					/>
 				)}
 			/>
@@ -65,15 +73,14 @@ const AddressForm = ({isLoading, countries, tab, setTab}: AddressFormProps) => {
 			</Tabs>
 			<div style={{position: 'relative'}}>
 				<MotionPanel active={!hasShipping || tab === 0}>
-					<Form
-						countries={countries}
-					/>
+					<Form countries={countries} focusProps={focusProps} />
 				</MotionPanel>
 				{hasShipping && (
 					<MotionPanel active={tab === 1}>
 						<Form
 							isShipping
 							countries={countries}
+							focusProps={focusProps}
 						/>
 					</MotionPanel>
 				)}
