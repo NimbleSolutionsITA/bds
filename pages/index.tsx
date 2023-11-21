@@ -93,21 +93,30 @@ export default function Home({page, layout}: HomeProps) {
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
     const [
         {ssrTranslations, ...layoutProps},
-        { seo, page: { acf: {
-            sliderWithText,
-            ourSelection,
-            newsletter,
-            shipping,
-            designers,
-            bannerTop: { imageLeft, body, imageRight },
-            bannerBottom: { leftColumn, imageCenter, rightColumn },
-            bannerBottom2,
-            bannerContact
-        } } }
+        { seo, page }
     ] = await Promise.all([
         getLayoutProps(locale),
         getPageProps('home', locale)
     ]);
+
+    if (!page) {
+        return {
+            notFound: true
+        }
+    }
+
+    const { acf: {
+        sliderWithText,
+        ourSelection,
+        newsletter,
+        shipping,
+        designers,
+        bannerTop: { imageLeft, body, imageRight },
+        bannerBottom: { leftColumn, imageCenter, rightColumn },
+        bannerBottom2,
+        bannerContact
+    } } = page;
+
     return {
         props: {
             page: {

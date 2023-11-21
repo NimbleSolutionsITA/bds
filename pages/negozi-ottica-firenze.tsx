@@ -38,12 +38,21 @@ export default function StorePage({acf, layout}: StorePageProps) {
 export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
 	const [
 		{ ssrTranslations, ...layoutProps},
-		{ seo, page: { acf } }
+		{ seo, page }
 	] = await Promise.all([
 		getLayoutProps(locale),
 		getPageProps('negozi-ottica-firenze', locale)
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
+
+	if (!page) {
+		return {
+			notFound: true
+		}
+	}
+
+	const { acf } = page;
+
 	return {
 		props: {
 			acf,
