@@ -298,7 +298,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 			style: {
 				paymentRequestButton: {
 					type: 'buy',
-					height: '55px',
+					height: '48px',
 				}
 			}
 		}} />

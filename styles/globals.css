@@ -178,7 +178,7 @@ strong, b {
   margin-bottom: 20px;
 }
 
-.blog-subtitle h2 {
+.blog-subtitle h2, .html-block h2 {
   font-weight: 300;
   font-family: "Apercu", serif;
   font-size: 2rem;

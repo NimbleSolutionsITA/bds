@@ -16,7 +16,6 @@ import {useTranslation} from "next-i18next";
 import {
 	CHECKOUT_SUB_PATH,
 	DESIGNERS_SUB_PATH,
-	FRAGRANCES_SUB_PATH,
 	LIQUIDES_IMAGINAIRES_SUB_PATH,
 	PROFUMUM_ROMA_SUB_PATH
 } from "../../utils/endpoints";

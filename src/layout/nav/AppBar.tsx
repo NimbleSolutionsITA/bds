@@ -58,7 +58,7 @@ export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
                     display="flex"
                     alignItems="center"
                 >
-                    {rightMenu.map(item => <NavButton key={item.id} item={item} />)}
+                    {rightMenu.map(item => <NavButton key={item.id} item={item} isRight />)}
                 </Box>
             </Container>
         </MuiAppBar>
@@ -73,7 +73,7 @@ const itemVariants: Variants = {
     },
     closed: { opacity: 0, y: 20, transition: { duration: 0.2 } }
 };
-const NavButton = ({item}: {item: MenuItem}) => {
+const NavButton = ({item, isRight = false}: {item: MenuItem, isRight?: boolean}) => {
     const [isOpen, setIsOpen] = useState(false);
     const EndIcon = item.child_items  ? (
         <motion.div
@@ -88,7 +88,7 @@ const NavButton = ({item}: {item: MenuItem}) => {
         </motion.div>
     ) : undefined
 
-
+    const buttonLinkProps = isRight ? { } : { component: Link, href: getRelativePath(item.url) }
 
     return (
         <motion.div
@@ -110,9 +110,8 @@ const NavButton = ({item}: {item: MenuItem}) => {
                             marginLeft: 0
                         }
                     }}
-                    component={Link}
-                    href={getRelativePath(item.url)}
                     endIcon={EndIcon}
+                    {...buttonLinkProps}
                 >
                     {item.title}
                 </Button>

@@ -20,7 +20,7 @@ type AttributeCheckboxesProps = {
 export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAttribute, extended }: AttributeCheckboxesProps) => {
 	const boxStyle = {display: 'flex', gap: '5px', flexWrap: 'wrap' as const, marginBottom: extended ? '20px' : 0}
 	return (
-		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 40px)'}}>
+		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 70px)'}}>
 			{['colore', 'lente', 'modello', 'montatura'].map((attribute) => {
 				const attributes = product.attributes[attribute as ColorAttribute];
 				return Array.isArray(attributes) ? (
@@ -56,7 +56,7 @@ export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAtt
 					))}
 				</div>
 			) : null}
-			{['calibro', 'formato'].map((attributeName) => {
+			{['calibro', 'formato', 'calibro-ponte'].map((attributeName) => {
 				const attributes = product.attributes[attributeName as BaseAttribute];
 				return Array.isArray(attributes) ? (
 					<div key={attributeName} style={boxStyle}>

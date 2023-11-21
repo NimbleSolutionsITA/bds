@@ -13,7 +13,6 @@ import { it } from 'date-fns/locale';
 import {LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "./endpoints";
 import {Cart, Item} from "../types/cart-type";
 
-
 export const sanitize = (html: string) => {
   return sanitizeHtml(html, {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat([ 'img' ]),
@@ -183,7 +182,6 @@ export function findVariationFromAttributes(product: BaseProduct | Product, attr
         }
     )
 }
-
 export function shippingMethodApplies(method: ShippingMethod, totalOrderAmount: number, totalDiscounts: number) {
     if(!method.enabled) {
         return false;
@@ -298,4 +296,17 @@ export const getCartTotals = (cart?: Cart) => {
         total,
         totalTax
     }
+}
+
+export const pageview = (GA_MEASUREMENT_ID : string, url : string) => {
+    window.gtag("config", GA_MEASUREMENT_ID, {
+        page_path: url,
+    });
+};
+
+export const gtagConsent = (grantend: boolean) => {
+    const newValue = grantend ? 'granted' : 'denied'
+    window.gtag("consent", 'update', {
+        'analytics_storage': newValue
+    });
 }

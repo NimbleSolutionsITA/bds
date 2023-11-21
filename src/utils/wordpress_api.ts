@@ -121,13 +121,13 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 		].includes(cat.id))
 	}
 	const menus = {
-		leftMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-left${locale !== 'it' ? '-'+locale : ''}`)
+		leftMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-left${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
 			.then(response => response.json())).items.map(mapMenuItem(categories)),
-		rightMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-right${locale !== 'it' ? '-'+locale : ''}`)
+		rightMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-right${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
 			.then(response => response.json())).items.map(mapMenuItem(categories)),
-		mobileMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-mobile${locale !== 'it' ? '-'+locale : ''}`)
+		mobileMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-mobile${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
 			.then(response => response.json())).items.map(mapMenuItem()),
-		privacyMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/policy${locale !== 'it' ? '-'+locale : ''}`)
+		privacyMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/policy${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
 			.then(response => response.json())).items.map(mapMenuItem())
 	}
 	const googlePlaces = await getGooglePlaces(locale)
@@ -154,7 +154,10 @@ export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: n
 		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
 	)
 		.then(response => response.json()))[0]
-	const seo = page.link ? await getSeo(page.link) : null
+	if (!page) {
+		return {page: false as const, seo: null}
+	}
+	const seo = page?.link ? await getSeo(page.link) : null
 	return { page: mapPage(page), seo }
 }
 

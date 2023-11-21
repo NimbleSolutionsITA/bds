@@ -1,32 +1,54 @@
 import React, {useRef, useState} from "react";
-import {AppBar, Button, IconButton, SwipeableDrawer, Toolbar, Container, Typography, Box} from "@mui/material";
+import {
+    AppBar,
+    Button,
+    IconButton,
+    SwipeableDrawer,
+    Toolbar,
+    Container,
+    Typography,
+    Box,
+    Accordion, AccordionSummary, AccordionDetails
+} from "@mui/material";
 import {MenuToggle} from "./MenuToggle";
 import Image from "next/image";
 import logo from "../../../images/bottega-di-sguardi-logo.png";
-import {BreadCrumb, MenuItem, Menus} from "../../../types/settings";
+import {BaseLayoutProps, BreadCrumb, MenuItem, Menus} from "../../../types/settings";
 import CartIndicator from "../../../components/CartIndicator";
 import LanguageButton from "../../../components/LanguageButton";
 import {Facebook, Instagram, PhoneEnabledSharp} from "@mui/icons-material";
 import {useRouter} from "next/router";
 import {IconButtonProps} from "@mui/material/IconButton/IconButton";
 import Link from "../../../components/Link";
-import {getRelativePath} from "../../../utils/utils";
-import ShippingBanner from "../ShippingBanner";
+import {getRelativePath, LIQUIDES_IMAGINAIRES_CATEGORY, OUR_PRODUCTION_CATEGORIES} from "../../../utils/utils";
 import {useTranslation} from "next-i18next";
 import BottomBar from "../BottomBar";
 import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layout";
 import SearchIcon from "@mui/icons-material/Search";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
+import {
+    DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH,
+    NEXT_SITE_URL,
+    OUR_PRODUCTION_SUB_PATH,
+    PROFUMUM_ROMA_SUB_PATH
+} from "../../../utils/endpoints";
+import {WooProductCategory} from "../../../types/woocommerce";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HtmlBlock from "../../../components/HtmlBlock";
+import NavButton from "../../../components/NavButton";
+import AccordionNavButton from "../../../components/AccordionNavButton";
+
 
 type NavBarMobileProps = {
     mobileMenu: Menus['mobileMenu']
     breadcrumbs?: BreadCrumb[]
+    categories: BaseLayoutProps['categories']
 }
 
 const drawerBleeding = 56;
 export default function NavBarMobile({
-    mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, ...mobileMenu], breadcrumbs
+    mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, designers, ourProduction, fragrances, ...mobileMenu], breadcrumbs, categories
 }: NavBarMobileProps) {
     const ref = useRef<HTMLElement>(null);
     const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
@@ -37,8 +59,8 @@ export default function NavBarMobile({
     function handleClick() {
         setOpen(false)
     }
-
     const appbarHeight = ref.current ? ref.current.clientHeight : 0 + 'px'
+    const ourProductionCategories = categories.designers.filter(c => [...OUR_PRODUCTION_CATEGORIES.it, ...OUR_PRODUCTION_CATEGORIES.en].includes(c.id))
 
     return (
         <>
@@ -101,10 +123,29 @@ export default function NavBarMobile({
                     paddingBottom: '10px',
                     alignItems: 'start'
                 }}>
-                    <div style={{display: 'flex', marginBottom: '20px', gap: '20px'}}>
+                    <div style={{display: 'flex', gap: '20px'}}>
                         <TopNavButtons title={t('man').toUpperCase()} nav1={opticalMan} nav2={sunglassesMan} handleClick={handleClick} />
                         <TopNavButtons title={t('woman').toUpperCase()} nav1={opticalWoman} nav2={sunglassesWoman} handleClick={handleClick} />
                     </div>
+                    <AccordionNavButton
+                        title={designers.title}
+                        items={categories.designers}
+                        handleClick={handleClick}
+                        path={DESIGNERS_SUB_PATH}
+                    />
+                    <AccordionNavButton
+                        title={ourProduction.title}
+                        items={ourProductionCategories}
+                        handleClick={handleClick}
+                        path={OUR_PRODUCTION_SUB_PATH}
+                    />
+                    <AccordionNavButton
+                        title={fragrances.title}
+                        items={[...categories.fragrances.liquides, ...categories.fragrances.profumum]}
+                        handleClick={handleClick}
+                        path={PROFUMUM_ROMA_SUB_PATH}
+                    />
+
                     {mobileMenu.map(nav => (
                         <NavButton key={nav.id} nav={nav} handleClick={handleClick} />
                     ))}
@@ -160,19 +201,6 @@ const LogoButton = (props: IconButtonProps) => (
             style={{ width: '60px', height: 'auto' }}
         />
     </IconButton>
-)
-
-const NavButton = ({nav , handleClick}: {nav: MenuItem, handleClick: (nav: MenuItem) => void}) => (
-    <Button
-        key={nav.id}
-        variant="text"
-        sx={{color: 'black', minWidth: 0}}
-        onClick={() => handleClick(nav)}
-        component={Link}
-        href={getRelativePath(nav.url)}
-    >
-        {nav.title}
-    </Button>
 )
 
 const TopNavButtons = ({nav1, nav2, title, handleClick}: {title: string, nav1: MenuItem, nav2: MenuItem, handleClick: (nav: MenuItem) => void}) => (

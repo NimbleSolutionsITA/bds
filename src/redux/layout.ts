@@ -3,7 +3,6 @@ import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 type LayoutState = {
 	newsletterDrawerOpen: boolean
 	cookiesDrawerOpen: boolean
-	cookiesSavedDrawerOpen: boolean
 	searchDrawerOpen: boolean
 	inStockNotifierDrawer: {
 		open: boolean
@@ -18,7 +17,6 @@ type LayoutState = {
 const initialState: LayoutState = {
 	newsletterDrawerOpen: false,
 	cookiesDrawerOpen: false,
-	cookiesSavedDrawerOpen: false,
 	searchDrawerOpen: false,
 	inStockNotifierDrawer: {
 		open: false,
@@ -40,17 +38,11 @@ export const layoutSlice = createSlice({
 		closeCookiesDrawer: (state) => {
 			state.cookiesDrawerOpen = false
 		},
-		openCookiesSavedDrawer: (state) => {
-			state.cookiesSavedDrawerOpen = true
-		},
 		openSearchDrawer: (state) => {
 			state.searchDrawerOpen = true
 		},
 		closeSearchDrawer: (state) => {
 			state.searchDrawerOpen = false
-		},
-		closeCookiesSavedDrawer: (state) => {
-			state.cookiesSavedDrawerOpen = false
 		},
 		openNewsletterDrawer: (state) => {
 			state.newsletterDrawerOpen = true
@@ -81,8 +73,6 @@ export const layoutSlice = createSlice({
 export const {
 	openCookiesDrawer,
 	closeCookiesDrawer,
-	openCookiesSavedDrawer,
-	closeCookiesSavedDrawer,
 	openNewsletterDrawer,
 	closeNewsletterDrawer,
 	openInStockNotifierDrawer,

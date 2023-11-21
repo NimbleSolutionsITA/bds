@@ -22,6 +22,8 @@ import Script from 'next/script'
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
 import SearchModal from "./drawers/SearchModal";
 import {AppDispatch} from "../redux/store";
+import GoogleAnalytics from "../components/GoogleAnalytics";
+import getStripe from "../utils/stripe-utils";
 
 const googleTagManagerId = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
@@ -30,14 +32,13 @@ type LayoutProps = {
     layout: BaseLayoutProps
 }
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
+
 export default function Layout({children, layout: {
     seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping, categories
 }}: LayoutProps) {
     const {locale} = useRouter()
     const dispatch = useDispatch<AppDispatch>()
-    const isAnalyticsEnabled = Cookies.get("analytics") === "true";
-    /*const isProfilingEnabled = Cookies.get("profiling") === "true";*/
-    /*const isUsageEnabled = Cookies.get("usage") === "true";*/
 
     useEffect(() => {
         dispatch(fetchCartData());
@@ -48,10 +49,7 @@ export default function Layout({children, layout: {
             dispatch(openCookiesDrawer());
         }
     })
-
-    const stripePublicKey = process.env.NEXT_PUBLIC_STRIPE_PUBLIC;
-
-    const stripePromise = loadStripe(stripePublicKey ?? '');
+    const stripePromise = getStripe();
 
     return (
         <Elements stripe={stripePromise}>
@@ -61,17 +59,9 @@ export default function Layout({children, layout: {
                 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
                 {seo && parse(seo)}
             </Head>
-            {/* Google Tag Manager code */}
-            {isAnalyticsEnabled && googleTagManagerId && (<>
-                <Script id="google-analytics">
-                    {`
-                            window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-                            ga('create', '${googleTagManagerId}', 'auto');
-                            ga('send', 'pageview');
-                        `}
-                </Script>
-                <Script src="https://www.google-analytics.com/analytics.js" />
-            </>)}
+
+            {GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+
             <Script id="twak" type="text/javascript">
                 {`
                         var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
@@ -86,7 +76,7 @@ export default function Layout({children, layout: {
                     `}
             </Script>
             <Hidden mdUp>
-                <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} />
+                <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} categories={categories} />
                 <ShippingBannerMobile />
             </Hidden>
             <Hidden mdDown>

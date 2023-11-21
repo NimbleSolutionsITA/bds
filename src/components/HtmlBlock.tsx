@@ -14,6 +14,7 @@ const HtmlBlock = ({ html, sx, component }: HtmlBlockProps) => {
 	return (
 		<Box
 			component={Component}
+			className="html-block"
 			dangerouslySetInnerHTML={{ __html: sanitize(html) }}
 			sx={sx}
 		/>

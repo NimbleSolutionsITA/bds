@@ -28,6 +28,7 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
         getLayoutProps(locale),
         getPageProps(slug, locale)
     ]);
+
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     return page ? {
         props: {

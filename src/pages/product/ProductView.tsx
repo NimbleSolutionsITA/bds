@@ -236,7 +236,6 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 								{t('notifier.title')}
 							</Typography>
 							<Button
-								fullWidth
 								onClick={() => dispatch(openInStockNotifierDrawer({
 									productId: product.id,
 									variationId: product.type === 'variable' ? currentProduct.id : undefined,
@@ -245,32 +244,34 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 									attributes: currentProduct.attributes?.map((attribute) => attribute.option).join(', ')
 
 								}))}
-								sx={{marginTop: '20px'}}
+								sx={{marginTop: '20px', width: '250px', height: '48px'}}
 							>
 								{t('notifier.cta')}
 							</Button>
 						</>
 					)}
-					{currentProduct.stock_status === 'instock'  && (
-						<Button
-							onClick={handleAddToCart}
-							fullWidth
-							disabled={cartQuantity >= (currentProduct.stock_quantity ?? 0)}
-							sx={{
-								marginTop: '20px',
-							}}
-						>
-							{t('cart.add')}
-						</Button>
-					)}
-					{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
-						<div style={{marginTop: '20px'}}>
-							<StripePaymentButton
-								shipping={shipping}
-								items={[cartItem]}
-							/>
-						</div>
-					)}
+					<div style={{display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap'}}>
+						{currentProduct.stock_status === 'instock'  && (
+							<Button
+								onClick={handleAddToCart}
+								disabled={cartQuantity >= (currentProduct.stock_quantity ?? 0)}
+								sx={{
+									width: '250px',
+									height: '48px'
+								}}
+							>
+								{t('cart.add')}
+							</Button>
+						)}
+						{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
+							<div style={{width: '250px', height: '48px'}}>
+								<StripePaymentButton
+									shipping={shipping}
+									items={[cartItem]}
+								/>
+							</div>
+						)}
+					</div>
 					<div style={{marginTop: '40px', lineHeight: 1}}>
 						<div>
 							<DHL sx={{fontSize: '40px', marginRight: '10px'}} />
