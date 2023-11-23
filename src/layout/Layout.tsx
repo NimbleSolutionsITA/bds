@@ -42,10 +42,10 @@ export default function Layout({children, layout: {
 
     useEffect(() => {
         dispatch(fetchCartData());
-        const firstAccess = Cookies.get('firstAccess');
+        const firstAccess = Cookies.get('isFirstAccess');
         if (!firstAccess) {
             // 'firstAccess' cookie doesn't exist. Setting the cookie and opening the CookiesDrawer.
-            Cookies.set('firstAccess', 'false');
+            Cookies.set('isFirstAccess', 'false');
             dispatch(openCookiesDrawer());
         }
     })

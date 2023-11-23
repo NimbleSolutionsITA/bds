@@ -304,8 +304,8 @@ export const pageview = (GA_MEASUREMENT_ID : string, url : string) => {
     });
 };
 
-export const gtagConsent = (grantend: boolean) => {
-    const newValue = grantend ? 'granted' : 'denied'
+export const gtagConsent = (granted: boolean) => {
+    const newValue = granted ? 'granted' : 'denied'
     window.gtag("consent", 'update', {
         'analytics_storage': newValue
     });

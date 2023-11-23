@@ -4,8 +4,7 @@ import {closeCookiesDrawer} from "../../redux/layout";
 import {RootState} from "../../redux/store";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
-import {useEffect} from "react";
-import {getLocalStorage, setLocalStorage} from "../../utils/storage-helper";
+import {setLocalStorage} from "../../utils/storage-helper";
 import {gtagConsent} from "../../utils/utils";
 
 const CookiesDrawer = () => {

@@ -57,7 +57,11 @@ const CookieSettings = () => {
 	}, [saved]);
 
 	useEffect (() => {
-		const cookieSettings = getLocalStorage("cookie_consent", defaultCookieSettings)
+		let cookieSettings = getLocalStorage("cookie_consent", defaultCookieSettings)
+		if (!cookieSettings.analytics && !cookieSettings.profiling && !cookieSettings.usage) {
+			cookieSettings = defaultCookieSettings
+			setLocalStorage('cookie_consent', cookieSettings)
+		}
 		setAnalytics(cookieSettings.analytics)
 		setProfiling(cookieSettings.profiling)
 		setUsage(cookieSettings.usage)
