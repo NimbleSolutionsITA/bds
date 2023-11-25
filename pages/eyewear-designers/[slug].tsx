@@ -6,7 +6,7 @@ import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
-import {getProducts} from "../api/products";
+import {getAllProducts} from "../api/products";
 import {EYEWEAR_CATEGORY} from "../../src/utils/utils";
 import {DESIGNERS_SUB_PATH} from "../../src/utils/endpoints";
 
@@ -45,10 +45,9 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
-	const products = await getProducts({
+	const products = await getAllProducts({
 		categories: slug,
 		lang: locale,
-		per_page: '24'
 	})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [

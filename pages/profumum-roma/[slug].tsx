@@ -6,8 +6,8 @@ import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
-import {getProducts} from "../api/products";
-import {LIQUIDES_IMAGINAIRES_CATEGORY, PROFUMUM_ROMA_CATEGORY} from "../../src/utils/utils";
+import {getAllProducts} from "../api/products";
+import {PROFUMUM_ROMA_CATEGORY} from "../../src/utils/utils";
 import {FRAGRANCES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../src/utils/endpoints";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
@@ -43,7 +43,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
-	const products = await getProducts({
+	const products = await getAllProducts({
 		categories: slug,
 		lang: locale,
 		per_page: '99',

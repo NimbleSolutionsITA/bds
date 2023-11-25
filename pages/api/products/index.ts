@@ -155,3 +155,20 @@ export const getProducts = async ({
 	return await fetch(`${WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
 		.then(res => res.json())
 }
+
+export const getAllProducts = async (params: ProductsRequestQuery): Promise<BaseProduct[]> => {
+	const products: BaseProduct[] = []
+	let page = 1
+	let total = 99
+	while (total === 99) {
+		const response = await getProducts({
+			...params,
+			per_page: '99',
+			page: page.toString()
+		})
+		products.push(...response)
+		page++
+		total = response.length
+	}
+	return products
+}
