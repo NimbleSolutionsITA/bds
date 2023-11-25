@@ -18,7 +18,6 @@ type CartItemProps = {
 const CartItem = ({item, loading}: CartItemProps) => {
 	const dispatch = useDispatch<AppDispatch>()
 	const { t } = useTranslation('common')
-	console.log(item)
 	return (
 		<Box sx={{
 			border: '1px solid #fff',
