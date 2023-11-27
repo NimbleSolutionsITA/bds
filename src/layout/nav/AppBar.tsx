@@ -1,6 +1,5 @@
 import Container from "@mui/material/Container";
 import {AppBar as MuiAppBar, Button, IconButton} from "@mui/material";
-import {closeSearchDrawer, openSearchDrawer} from "../../redux/layout";
 import React, {useState} from "react";
 import Box from "@mui/material/Box";
 import logo from '../../images/bottega-di-sguardi-logo.png'

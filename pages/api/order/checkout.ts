@@ -37,13 +37,15 @@ export default async function handler(
 			const { cartKey, intentId = null, customer = null } = req.body
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
+			if (!cart || !cart.items || cart?.items?.length === 0) {
+				throw new Error('Cart is empty')
+			}
+			const { total } = getCartTotals(cart)
+			responseData.amount = total * 100
+			console.log('Order amount', responseData.amount)
 			if (responseData.amount === 0) {
 				throw new Error('Amount is 0')
 			}
-
-			const { total } = getCartTotals(cart)
-
-			responseData.amount = total * 100
 
 			// STRIPE CHECKOUT
 			if (intentId) {
@@ -73,12 +75,11 @@ export default async function handler(
 						shipping_phone: customer.shipping.phone,
 					}
 				});
-				console.log('Payment Intent status', paymentIntent.status)
+				console.log('Stripe Payment Intent status', paymentIntent.status)
 			}
 			// PAYPAL CHECKOUT
 			else {
 				const paypalOrder = await createOrder(responseData.amount / 100)
-				console.log(paypalOrder)
 				responseData.paypalOrderId = paypalOrder.id
 			}
 			responseData.success = true
@@ -105,7 +106,6 @@ export default async function handler(
 			// PAYPAL CHECKOUT
 			if (paypalOrderId) {
 				const capture = await captureOrder(paypalOrderId)
-				console.log('paypal', capture)
 				responseData.success = capture.status === 'COMPLETED'
 				if (intentId) {
 					await stripe.paymentIntents.cancel(intentId)
@@ -114,7 +114,6 @@ export default async function handler(
 			// STRIPE CHECKOUT
 			else if (intentId) {
 				const paymentIntent = await stripe.paymentIntents.retrieve(intentId)
-				console.log('stripe', paymentIntent)
 				responseData.success = paymentIntent.status === 'succeeded'
 				// add customer data to order from meta
 				if (customerData === null) {
@@ -172,7 +171,6 @@ export default async function handler(
 					],
 					coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : []
 				}
-				console.log(orderPayload)
 				const { data: order} = await api.post("orders", orderPayload)
 
 				responseData.orderId = order.id

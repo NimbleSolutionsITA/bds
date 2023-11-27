@@ -54,8 +54,8 @@ function mapMenuItem(categories?: MenuCategories) {
 		else if (item.slug === FRAGRANCES_SUB_PATH && categories?.fragrances) {
 			groups = [PROFUMUM_ROMA_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH]
 			child_items = [
-				...categories.fragrances.profumum.map(categoryToMenu(PROFUMUM_ROMA_SUB_PATH)),
-				...categories.fragrances.liquides.map(categoryToMenu(LIQUIDES_IMAGINAIRES_SUB_PATH))
+				...categories.fragrances.profumum.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(PROFUMUM_ROMA_SUB_PATH)),
+				...categories.fragrances.liquides.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(LIQUIDES_IMAGINAIRES_SUB_PATH))
 			]
 		}
 		else if (item.slug === OUR_PRODUCTION_SUB_PATH) {

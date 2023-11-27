@@ -7,8 +7,6 @@ import {
     Toolbar,
     Container,
     Typography,
-    Box,
-    Accordion, AccordionSummary, AccordionDetails
 } from "@mui/material";
 import {MenuToggle} from "./MenuToggle";
 import Image from "next/image";
@@ -19,8 +17,7 @@ import LanguageButton from "../../../components/LanguageButton";
 import {Facebook, Instagram, PhoneEnabledSharp} from "@mui/icons-material";
 import {useRouter} from "next/router";
 import {IconButtonProps} from "@mui/material/IconButton/IconButton";
-import Link from "../../../components/Link";
-import {getRelativePath, LIQUIDES_IMAGINAIRES_CATEGORY, OUR_PRODUCTION_CATEGORIES} from "../../../utils/utils";
+import {OUR_PRODUCTION_CATEGORIES} from "../../../utils/utils";
 import {useTranslation} from "next-i18next";
 import BottomBar from "../BottomBar";
 import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layout";
@@ -29,13 +26,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
 import {
     DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH,
-    NEXT_SITE_URL,
     OUR_PRODUCTION_SUB_PATH,
     PROFUMUM_ROMA_SUB_PATH
 } from "../../../utils/endpoints";
-import {WooProductCategory} from "../../../types/woocommerce";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import HtmlBlock from "../../../components/HtmlBlock";
 import NavButton from "../../../components/NavButton";
 import AccordionNavButton from "../../../components/AccordionNavButton";
 
@@ -140,10 +133,16 @@ export default function NavBarMobile({
                         path={OUR_PRODUCTION_SUB_PATH}
                     />
                     <AccordionNavButton
-                        title={fragrances.title}
-                        items={[...categories.fragrances.liquides, ...categories.fragrances.profumum]}
+                        title={categories.fragrances.profumumMain[0].name}
+                        items={categories.fragrances.profumum}
                         handleClick={handleClick}
                         path={PROFUMUM_ROMA_SUB_PATH}
+                    />
+                    <AccordionNavButton
+                        title={categories.fragrances.liquidesMain[0].name}
+                        items={categories.fragrances.liquides}
+                        handleClick={handleClick}
+                        path={LIQUIDES_IMAGINAIRES_SUB_PATH}
                     />
 
                     {mobileMenu.map(nav => (
