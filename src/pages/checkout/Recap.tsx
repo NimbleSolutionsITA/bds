@@ -42,7 +42,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 	const { t } = useTranslation('common');
 	const { cart, stripe: { intentId } = { intentId: null }, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
-	const canEditData = !isLoading && ['RECAP','ADDRESS', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
+	const canEditData = !isLoading && ['RECAP', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 	const isEU = getIsEU(cart?.customer)

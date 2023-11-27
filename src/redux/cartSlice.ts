@@ -94,6 +94,16 @@ type SetCouponPayload = {
 }
 
 export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
+	const { cart: { cart: { customer }}} = thunkAPI?.getState() as RootState
+	const email = customer?.billing_address.billing_email
+	if (!email) {
+		throw new Error('Email required')
+	}
+	const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/nimble/v1/check-coupon-usage?code=' + payload.code + '&email=' + customer?.billing_address.billing_email)
+	const { check } = await response.json()
+	if (!check) {
+		throw new Error('Coupon not valid for email')
+	}
 	await callCartData('/v1/coupon', {coupon: payload.code}, "POST")
 	return await callCartData('/v2/cart', {}, "GET")
 });
