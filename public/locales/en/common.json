@@ -74,6 +74,7 @@
   },
   "attributes":{
     "pa_colore":"color",
+    "pa_color":"color",
     "pa_calibro":"frame size",
     "pa_calibro-ponte":"frame and bridge",
     "pa_formato":"shape",

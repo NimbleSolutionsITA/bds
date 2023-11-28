@@ -80,6 +80,7 @@
   },
   "attributes":{
     "pa_colore":"colore",
+    "pa_color":"colore",
     "pa_calibro":"calibro",
     "pa_calibro-ponte":"calibro ponte",
     "pa_formato":"formato",

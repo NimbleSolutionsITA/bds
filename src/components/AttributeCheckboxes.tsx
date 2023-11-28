@@ -21,7 +21,7 @@ export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAtt
 	const boxStyle = {display: 'flex', gap: '5px', flexWrap: 'wrap' as const, marginBottom: extended ? '20px' : 0}
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 70px)'}}>
-			{['colore', 'lente', 'modello', 'montatura'].map((attribute) => {
+			{['colore', 'color', 'lente', 'modello', 'montatura'].map((attribute) => {
 				const attributes = product.attributes[attribute as ColorAttribute];
 				return Array.isArray(attributes) ? (
 					<div key={attribute} style={boxStyle}>
