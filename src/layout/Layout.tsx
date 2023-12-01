@@ -5,7 +5,7 @@ import {BaseLayoutProps} from "../types/settings";
 import Footer from "./footer/Footer";
 import {useDispatch} from "react-redux";
 
-import {fetchCartData} from "../redux/cartSlice";
+import {fetchCartData, initCart} from "../redux/cartSlice";
 import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {Hidden} from "@mui/material";
@@ -41,14 +41,14 @@ export default function Layout({children, layout: {
     const dispatch = useDispatch<AppDispatch>()
 
     useEffect(() => {
-        dispatch(fetchCartData());
+        dispatch(initCart());
         const firstAccess = Cookies.get('isFirstAccess');
         if (!firstAccess) {
             // 'firstAccess' cookie doesn't exist. Setting the cookie and opening the CookiesDrawer.
             Cookies.set('isFirstAccess', 'false');
             dispatch(openCookiesDrawer());
         }
-    })
+    }, [])
     const stripePromise = getStripe();
 
     return (

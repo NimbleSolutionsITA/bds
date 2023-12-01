@@ -16,7 +16,6 @@ export default function CheckoutResult() {
 		payment_intent,
 		paid
 	} = router.query
-	console.log(router.query)
 
 	useEffect(() => {
 		if (paid === 'true') {

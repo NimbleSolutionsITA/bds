@@ -90,7 +90,7 @@ strong, b {
   font-weight: 500;
 }
 
-.title {
+.title, .html-block h2.title {
   border-top: 1px solid;
   border-bottom: 1px solid;
   padding-top: 30px;

@@ -70,7 +70,6 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 	}
 
 	const handleSetCoupon = () => {
-		console.log(hasCoupons, couponCode)
 		hasCoupons ?
 			dispatch(removeCoupon({
 				code: couponCode

@@ -48,11 +48,9 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 	const dispatch = useDispatch<AppDispatch>()
 
 	const shippingOptions = getShippingOptions(shippingCountry.current, shipping, getTotalByCountry(items, shippingCountry.current) / 100)
-	console.log({shippingCountry: shippingCountry.current})
 
 	useEffect(() => {
 		if (paymentRequest) {
-			console.log('update')
 			const shippingLine = shippingOptions[0]
 			paymentRequest.update({
 				total: {
@@ -109,7 +107,6 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 			});
 
 			pr.on('paymentmethod', async (e) => {
-				console.log('paymentmethod', e)
 				const {error: backendError, paymentIntentId,  clientSecret, success} = await fetch(NEXT_API_ENDPOINT + '/order/stripe-payment-intent',
 					{
 						method: 'POST',
@@ -197,8 +194,6 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 					}
 				}
 
-				console.log(orderBody)
-
 				await fetch(NEXT_API_ENDPOINT + '/order', {
 					method: 'POST',
 					headers: [["Content-Type", 'application/json']],
@@ -254,16 +249,13 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 						]
 					} as  PaymentRequestUpdateDetails
 					shippingCountry.current = ev.shippingAddress.country
-					console.log(payload)
 					ev.updateWith(payload);
 				}
 			});
 
 			pr.on('shippingoptionchange', function(event) {
-				console.log({shippingCountry: shippingCountry.current})
 				const shippingAmount = event.shippingOption.amount / 100
 				const newTotal = getTotalByCountry(items, shippingCountry.current) + shippingAmount
-				console.log('shippingoptionchange', newTotal, shippingCountry.current)
 				shippingLine.current = {
 					method_id: event.shippingOption?.id,
 					total: shippingAmount + '',
@@ -286,7 +278,6 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 						}
 					]
 				} as  PaymentRequestUpdateDetails
-				console.log(payload)
 				event.updateWith(payload);
 			})
 		}
@@ -308,7 +299,6 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 	return <span />;
 }
 const getShippingOptions = (country: string, shipping: ShippingClass[], total: number): ShippingOption[] => {
-	console.log(total)
 	const methods = shipping.find(s => s.locations.includes(country))?.methods
 		.filter(m => m.enabled && m.requires === 'min_amount' ? parseFloat(m.minAmount) <= total : true)
 	return methods?.map(m => ({

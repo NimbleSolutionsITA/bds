@@ -65,6 +65,19 @@ const Form = ({isShipping, countries, focusProps}: FormProps) => {
 				setError={setError}
 				focusProps={focusProps}
 			/>
+			{type === 'billing' && (
+				<TextInput
+					control={control}
+					error={errors.billing?.vat?.message ?? ''}
+					type={type}
+					name="vat"
+					label={t('form.vat')}
+					md={12}
+					setError={setError}
+					focusProps={focusProps}
+					optional
+				/>
+			)}
 			<Grid item xs={12} md={hideState ? 12 : 6}>
 				<Controller
 					control={control}

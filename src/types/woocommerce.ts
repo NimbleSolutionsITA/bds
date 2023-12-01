@@ -242,6 +242,7 @@ export type BillingData = {
 	country: string;
 	email: string;
 	phone: string;
+	vat?: string;
 }
 
 export type ShippingData = {

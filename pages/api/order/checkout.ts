@@ -63,6 +63,7 @@ export default async function handler(
 						billing_postcode: customer.billing.postcode,
 						billing_country: customer.billing.country,
 						billing_company: customer.billing.company,
+						billing_vat: customer.billing.vat,
 						shipping_first_name: customer.shipping.first_name,
 						shipping_last_name: customer.shipping.last_name,
 						shipping_address_1: customer.shipping.address_1,
@@ -130,6 +131,7 @@ export default async function handler(
 							postcode: paymentIntent.metadata.billing_postcode ?? '',
 							country: paymentIntent.metadata.billing_country ?? '',
 							company: paymentIntent.metadata.billing_company ?? '',
+							vat: paymentIntent.metadata.billing_vat ?? ''
 						},
 						shipping: {
 							first_name: paymentIntent.metadata.shipping_first_name ?? '',
@@ -169,7 +171,13 @@ export default async function handler(
 							total: (Number(selectedShipping?.cost) / 1.22 / 100) + '',
 						}
 					],
-					coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : []
+					coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : [],
+					meta_data: [
+						{
+							key: 'vat',
+							value: customerData.billing.vat ?? ''
+						}
+					]
 				}
 				const { data: order} = await api.post("orders", orderPayload)
 

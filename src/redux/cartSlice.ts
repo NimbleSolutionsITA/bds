@@ -94,12 +94,13 @@ type SetCouponPayload = {
 }
 
 export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
-	const { cart: { cart: { customer }}} = thunkAPI?.getState() as RootState
-	const email = customer?.billing_address.billing_email
+	const { cart: { customer }} = thunkAPI?.getState() as RootState
+	const email = customer?.billing.email
+	console.log(customer)
 	if (!email) {
 		throw new Error('Email required')
 	}
-	const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/nimble/v1/check-coupon-usage?code=' + payload.code + '&email=' + customer?.billing_address.billing_email)
+	const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/nimble/v1/check-coupon-usage?code=' + payload.code + '&email=' + customer?.billing.email)
 	const { check } = await response.json()
 	if (!check) {
 		throw new Error('Coupon not valid for email')
@@ -117,23 +118,36 @@ export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload
 	return await callCartData('/v2/cart', {}, "GET")
 });
 
-export const createIntent = createAsyncThunk('cart/createIntent', async (arg, thunkAPI) => {
-	const { cart } = thunkAPI.getState() as RootState;
-	const total = cart?.cart?.totals?.total;
+export const initCheckout = createAsyncThunk('cart/initCheckout', async (payload, thunkAPI) => {
+	const cart = await initCartData()
+	const total = cart.totals?.total;
 	if (!total) {
 		throw new Error('Cart not found');
 	}
-	const paymentIntent = await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify({ amount: total }),
-	}).then((r) => r.json());
-	if (paymentIntent.error) {
-		throw new Error(paymentIntent.error);
+	const { cart: { stripe }} = thunkAPI?.getState() as RootState
+	let paymentIntent = {
+		paymentIntentId: stripe?.intentId,
+		clientSecret: stripe?.clientSecret,
+		error: null
 	}
-	return paymentIntent;
+	if (!paymentIntent.paymentIntentId || !paymentIntent.clientSecret) {
+		paymentIntent = await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ amount: total }),
+		}).then((r) => r.json());
+		if (paymentIntent.error) {
+			throw new Error(paymentIntent.error);
+		}
+	}
+	return { cart, paymentIntent}
+});
+
+export const initCart = createAsyncThunk('cart/initCart', async (payload, thunkAPI) => {
+	console.log('initCart')
+	return await initCartData()
 });
 
 export const destroyCart = createAsyncThunk('cart/destroy', async (arg, thunkAPI) => {
@@ -243,17 +257,28 @@ export const cartSlice = createSlice({
 		builder.addCase(removeCoupon.rejected, (state) => {
 			state.loading = false;
 		});
-		builder.addCase(createIntent.pending, (state) => {
+		builder.addCase(initCheckout.pending, (state) => {
 			state.loading = true;
 		});
-		builder.addCase(createIntent.fulfilled, (state, action) => {
+		builder.addCase(initCheckout.fulfilled, (state, action) => {
+			state.cart = action.payload.cart
 			state.stripe = {
-				intentId: action.payload.paymentIntentId,
-				clientSecret: action.payload.clientSecret
+				intentId: action.payload.paymentIntent.paymentIntentId ?? '',
+				clientSecret: action.payload.paymentIntent.clientSecret ?? ''
 			}
 			state.loading = false;
 		});
-		builder.addCase(createIntent.rejected, (state) => {
+		builder.addCase(initCheckout.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(initCart.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(initCart.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(initCart.rejected, (state) => {
 			state.loading = false;
 		});
 		builder.addCase(destroyCart.pending, (state) => {
@@ -305,3 +330,23 @@ export const callCartData = async (url: string, payload = {}, method: 'GET' | 'P
 		throw error;
 	}
 };
+
+const initCartData = async () => {
+	let cart = await callCartData('/v2/cart', {}, "GET")
+	if (cart.items.length === 0) {
+		throw new Error('Cart empty')
+	}
+	let cartChanged = false
+	if (!(cart.customer?.billing_address?.billing_country === 'IT')) {
+		await callCartData('/v1/calculate/shipping', { country: 'IT' }, "POST");
+		cartChanged = true
+	}
+	if (cart.coupons?.length && cart.coupons.length > 0) {
+		await callCartData('/v1/coupon?coupon=' + cart.coupons[0].coupon, {}, "DELETE");
+		cartChanged = true
+	}
+	if (cartChanged) {
+		cart = await callCartData('/v2/cart', {}, "GET")
+	}
+	return cart
+}

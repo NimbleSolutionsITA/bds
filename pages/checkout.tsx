@@ -1,10 +1,10 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 import {getCheckoutPageProps} from "../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {Country, ShippingClass} from "../src/types/woocommerce";
 import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {createIntent, updateShippingCountry} from "../src/redux/cartSlice";
+import {initCheckout} from "../src/redux/cartSlice";
 import {AppDispatch, RootState} from "../src/redux/store";
 import {PayPalScriptProvider} from "@paypal/react-paypal-js";
 import {stripeTheme} from "../src/theme/theme";
@@ -27,18 +27,13 @@ export default function Checkout({
 }: CheckoutProps) {
 	const { cart, stripe } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
-	const isShippingReady = cart?.shipping?.packages?.default
+
 
 	useEffect(() => {
-		if (!isShippingReady) {
-			dispatch(updateShippingCountry({ country: 'IT' }))
-		}
-		if (isShippingReady && !stripe?.clientSecret) {
-			dispatch(createIntent());
-		}
-	}, [dispatch, isShippingReady, stripe?.clientSecret])
+		dispatch(initCheckout());
+	}, [])
 
-	return (isShippingReady && stripe?.clientSecret && CLIENT_ID)  ? (
+	return (cart && cart.items && cart.items.length > 0 && stripe?.clientSecret && CLIENT_ID)  ? (
 		<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons', intent: 'capture' }}>
 			<Elements
 				options={{

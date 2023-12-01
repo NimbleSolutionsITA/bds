@@ -75,6 +75,7 @@ const initalData = {
 	billing: {
 		email: '',
 		phone: '',
+		vat: '',
 		country: 'IT',
 		...defaultAddressValues
 	},
