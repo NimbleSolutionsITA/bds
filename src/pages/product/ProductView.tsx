@@ -98,7 +98,8 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 				id: currentProduct.id.toString(),
 				quantity: '1',
 				variation: currentProduct.attributes?.reduce((result: { [key: string]: string }, attribute) => {
-					result[`attribute_${attribute.name}`] = attribute.option;
+					console.log(attribute)
+					result[`attribute_${attribute.id}`] = attribute.option;
 					return result;
 				}, {}),
 				item_data: {
