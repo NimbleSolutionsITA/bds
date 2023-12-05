@@ -150,17 +150,19 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 	}
 
 	const onValid: SubmitHandler<Inputs> = (data) => {
-		const deliveryCountry = (data.has_shipping && data.shipping) ? data.shipping.country : data.billing.country;
-		const orderDeliveryCountry = customer?.shipping ? customer.shipping.country : customer?.billing.country ?? 'IT';
-		if (deliveryCountry !== orderDeliveryCountry) {
-			dispatch(updateShippingCountry({ country: deliveryCountry }))
-		}
-		dispatch(setCustomerData({
-			billing: data.billing,
-			shipping: data.has_shipping ? data.shipping : data.billing
-		}))
+		if (data && data.shipping && data.billing) {
+			const deliveryCountry = data.has_shipping ? data.shipping.country : data.billing.country;
+			const orderDeliveryCountry = cart.customer?.shipping_address.shipping_country
+			if (deliveryCountry !== orderDeliveryCountry) {
+				dispatch(updateShippingCountry({ country: deliveryCountry }))
+			}
+			dispatch(setCustomerData({
+				billing: data.billing,
+				shipping: data.has_shipping ? data.shipping : data.billing
+			}))
 
-		setStep((step === 'ADDRESS' && isMobile) ? 'RECAP' : 'PAYMENT_STRIPE')
+			setStep((step === 'ADDRESS' && isMobile) ? 'RECAP' : 'PAYMENT_STRIPE')
+		}
 	}
 
 	const onInvalid: SubmitErrorHandler<Inputs> = (data) => {
