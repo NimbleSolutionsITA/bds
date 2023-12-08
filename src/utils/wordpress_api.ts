@@ -19,7 +19,7 @@ import {
 	WooProductCategory,
 	WPPage
 } from "../types/woocommerce";
-import {getGooglePlaces} from "../../pages/api/google-places";
+import {googlePlaces} from "../../pages/api/google-places";
 import {getProductCategories} from "../../pages/api/products/categories";
 import {
 	EYEWEAR_CATEGORY,
@@ -104,7 +104,7 @@ const getSSRTranslations = async (locale: 'it' | 'en') => {
 	])
 }
 
-export const getLayoutProps = async (locale: 'it' | 'en') => {
+export const getLayoutProps = async (locale: 'it' | 'en') => {1
 	const ssrTranslations = await getSSRTranslations(locale)
 	const productCategories = (await getProductCategories(locale))
 	const categories = {
@@ -130,7 +130,7 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {
 		privacyMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/policy${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
 			.then(response => response.json())).items.map(mapMenuItem())
 	}
-	const googlePlaces = await getGooglePlaces(locale)
+	// const googlePlaces = await getGooglePlaces(locale)
 
 	const { classes: shipping} = await getShippingInfo(locale)
 	return {

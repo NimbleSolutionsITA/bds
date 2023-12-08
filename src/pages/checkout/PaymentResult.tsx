@@ -5,6 +5,11 @@ import Image from "next/image";
 import logo from "../../images/bottega-di-sguardi-logo.png";
 import React from "react";
 import {useTranslation} from "next-i18next";
+import Head from "next/head";
+import parse from "html-react-parser";
+import {useRouter} from "next/router";
+import GoogleAnalytics from "../../components/GoogleAnalytics";
+import Script from "next/script";
 
 
 type SuccessProps = {
@@ -12,10 +17,21 @@ type SuccessProps = {
 	isLoading?: boolean
 }
 
+const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
+
 const PaymentResult = ({isLoading, isSuccess}: SuccessProps) => {
 	const { t } = useTranslation('common')
+	const {locale} = useRouter()
 	return (
 		<div style={{backgroundColor: 'rgba(0,0,0,0.1)'}}>
+			<Head>
+				{/* Set HTML language attribute */}
+				<meta httpEquiv="content-language" content={locale} />
+				<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+				<title>Bottega di Sguardi - Pagamento completato</title>
+			</Head>
+			{GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+
 			<IconButton
 				component={Link}
 				href="/"
