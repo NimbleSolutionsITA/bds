@@ -9,7 +9,7 @@ import {
 	Switch,
 	FormControlLabel
 } from "@mui/material";
-import {Dispatch, SetStateAction, useState} from "react";
+import {Dispatch, SetStateAction, useEffect, useState} from "react";
 import Loading from "../../components/Loading";
 import PayPal from "../../icons/PayPal2";
 import MotionPanel from "../../components/MotionPanel";
@@ -26,6 +26,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {useRouter} from "next/router";
 import {destroyIntent} from "../../redux/cartSlice";
+import {OnApproveData} from "@paypal/paypal-js";
 
 type PaymentProps = {
 	isLoading: boolean
@@ -38,13 +39,15 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 	const {
 		cart: { cart_key: cartKey },
 		stripe: { clientSecret, intentId } = { clientSecret: null },
-		customer
+		customer,
+		customerNote
 	} = useSelector((state: RootState) => state.cart);
 	const shippingAddress = customer?.shipping ? `${customer.shipping.address_1}, ${customer.shipping.postcode}, ${customer.shipping.city} ${customer.shipping.state}, ${customer.shipping.country}` : null;
 	const billingAddress = `${customer?.billing.address_1}, ${customer?.billing.postcode}, ${customer?.billing.city} ${customer?.billing.state}, ${customer?.billing.country}`;
 	const { t } = useTranslation('common')
 	const [paymentError, setPaymentError] = useState<string>();
 	const [orderId, setOrderId] = useState<string>();
+	const [payPalApproved, setPayPalApproved] = useState<false|OnApproveData>(false);
 	const router = useRouter();
 	const dispatch = useDispatch();
 	const payWithPayPal: PaymentControllers['payWithPayPal'] = async () => {
@@ -75,7 +78,14 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 		}
 	}
 
-	const onPayPalApprove: PaymentControllers['onPayPalApprove'] = async (data, actions) => {
+
+	const onApprove: PaymentControllers['onPayPalApprove'] = async (data) =>
+		setPayPalApproved(data)
+
+	const onPayPalError = (err: any) => setPaymentError(err.message ?? 'Paypal payment error')
+
+	useEffect(() => {
+		const onPayPalApprove = async (data: OnApproveData) => {
 			try {
 				const response = await fetch(`/api/order/checkout`, {
 					method: "PUT",
@@ -87,7 +97,8 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 						intentId,
 						cartKey,
 						orderId,
-						customer
+						customer,
+						customerNote
 					}),
 				});
 
@@ -98,7 +109,8 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 					await router.push({
 						pathname: '/checkout/completed',
 						query: {
-							paid: true
+							paid: true,
+							cart_key: cartKey
 						}
 					});
 				} else {
@@ -108,9 +120,10 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 			} catch (error) {
 				setPaymentError(error instanceof Error ? error?.message : 'Paypal payment error')
 			}
-	}
-
-	const onPayPalError = (err: any) => setPaymentError(err.message ?? 'Paypal payment error')
+		}
+		if(payPalApproved)
+			onPayPalApprove(payPalApproved)
+	}, [cartKey, customer, customerNote, dispatch, intentId, orderId, payPalApproved, router]);
 
 	return (
 		<div style={{width: '100%', position: 'relative'}}>
@@ -189,7 +202,7 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 				<div style={{padding: '20px', border: '1px solid rgba(0,0,0,0.1)'}}>
 					<PayPalButtons
 						createOrder={payWithPayPal}
-						onApprove={onPayPalApprove}
+						onApprove={onApprove}
 						onError={onPayPalError}
 					/>
 				</div>

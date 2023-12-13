@@ -215,13 +215,12 @@ const FilterDrawer =({drawerWidth, open, setOpen, setSearchParams, searchParams,
 				<FilterTextPanel
 					title={t('price')}
 					list={[
-						{name: t('up-to')+' 200€', slug: '0,200'},
-						{name: '200€ - 300€', slug: '200,300'},
-						{name: '300€ - 400€', slug: '300,400'},
-						{name: '400€ - 500€', slug: '400,500'},
-						{name: '500€ - 750€', slug: '500,750'},
-						{name: '750€ - 1000€', slug: '750,1000'},
-						{name: t('over')+' 1000€', slug: '1000,5000'},
+						{name: t('up-to')+' 100€', slug: '0,100'},
+						{name: '100€ - 400€', slug: '100,400'},
+						{name: '400€ - 1000€', slug: '400,1000'},
+						{name: '1000€ - 2000€', slug: '1000,2000'},
+						{name: '2000€ - 3000€', slug: '2000,3000'},
+						{name: t('over')+' 3000€', slug: '3000,9000'},
 					]}
 					isActive={(slug) => searchParams.price_range?.toString() === slug}
 					onClick={(slug) => setSearchParams(params => ({

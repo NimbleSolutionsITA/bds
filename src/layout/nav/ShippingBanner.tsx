@@ -2,6 +2,7 @@ import {AnimatePresence, motion} from "framer-motion";
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 import {Trans} from "react-i18next";
+import Box from "@mui/material/Box";
 
 const ShippingBanner = () => {
 	const shippingPromos = [
@@ -19,7 +20,7 @@ const ShippingBanner = () => {
 	}, [shippingPromos.length]);
 
 	return (
-		<div style={{position: 'relative'}}>
+		<div style={{position: 'relative', textAlign: 'center'}}>
 			<AnimatePresence mode="wait">
 				<motion.div
 					key={index}
@@ -31,6 +32,9 @@ const ShippingBanner = () => {
 					{shippingPromos[index]}
 				</motion.div>
 			</AnimatePresence>
+			<Box sx={{fontSize: '16px', marginTop: '5px'}}>
+				<Trans i18nKey="newsletter.promo-banner" components={[<b key={0} />]} />
+			</Box>
 		</div>
 	);
 }

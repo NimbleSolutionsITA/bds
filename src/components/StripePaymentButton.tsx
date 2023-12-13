@@ -6,8 +6,8 @@ import {NEXT_API_ENDPOINT} from "../utils/endpoints";
 import {useRouter} from "next/router";
 import {getCartItemPriceWithoutTax, getIsEU, getName} from "../utils/utils";
 import {useTranslation} from "next-i18next";
-import {AppDispatch} from "../redux/store";
-import {useDispatch} from "react-redux";
+import {AppDispatch, RootState} from "../redux/store";
+import {useDispatch, useSelector} from "react-redux";
 import {destroyCart} from "../redux/cartSlice";
 
 type StripePaymentButtonProps = {
@@ -46,6 +46,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 	const router = useRouter();
 	const { t } = useTranslation();
 	const dispatch = useDispatch<AppDispatch>()
+	const { cart: { cart_key: cartKey } } = useSelector((state: RootState) => state.cart);
 
 	const shippingOptions = getShippingOptions(shippingCountry.current, shipping, getTotalByCountry(items, shippingCountry.current) / 100)
 
@@ -201,16 +202,13 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 				})
 					.then(response => response.json());
 
-				if (isCart) {
-					await dispatch(destroyCart());
-				}
-
 				e.complete('success');
 
 				await router.push({
 					pathname: '/checkout/completed',
 					query: {
-						paid: true
+						paid: true,
+						...(isCart ? {cart_key: cartKey} : {})
 					}
 				});
 			});

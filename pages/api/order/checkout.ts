@@ -34,7 +34,7 @@ export default async function handler(
 	}
 	if (req.method === 'POST') {
 		try {
-			const { cartKey, intentId = null, customer = null } = req.body
+			const { cartKey, intentId = null, customer = null, customerNote = null } = req.body
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
 			if (!cart || !cart.items || cart?.items?.length === 0) {
@@ -74,6 +74,7 @@ export default async function handler(
 						shipping_country: customer.shipping.country,
 						shipping_company: customer.shipping.company,
 						shipping_phone: customer.shipping.phone,
+						customer_note: customerNote
 					}
 				});
 				console.log('Stripe Payment Intent status', paymentIntent.status)
@@ -99,7 +100,8 @@ export default async function handler(
 	}
 	if (req.method === 'PUT') {
 		try {
-			const { cartKey = null, intentId = null, paypalOrderId = null, customer = null } = req.body
+			const { cartKey = null, intentId = null, paypalOrderId = null, customer = null, customerNote = null } = req.body
+			let customer_note = customerNote ?? ''
 			let customerData = customer
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
@@ -146,6 +148,7 @@ export default async function handler(
 							phone: paymentIntent.metadata.shipping_phone ?? ''
 						}
 					}
+					customer_note = paymentIntent.metadata.customer_note ?? customer_note
 				}
 			}
 
@@ -156,6 +159,7 @@ export default async function handler(
 					payment_method_reference: paypalOrderId ? paypalOrderId: intentId,
 					set_paid: true,
 					...customerData,
+					customer_note,
 					line_items: cart.items.map((item: Item) => {
 						return {
 							product_id: item.meta.product_type === 'variation' ? item.meta.variation.parent_id : item.id,
@@ -183,12 +187,6 @@ export default async function handler(
 
 				responseData.orderId = order.id
 
-				if (cartKey) {
-					await fetch(
-						WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart/clear?cart_key=' + cartKey,
-						{ method: 'POST'}
-					)
-				}
 			}
 		}
 		catch ( error ) {

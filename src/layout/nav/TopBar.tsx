@@ -20,7 +20,8 @@ export default function TopBar() {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 position: 'relative',
-                zIndex: (theme) => theme.zIndex.appBar
+                zIndex: (theme) => theme.zIndex.appBar,
+                minHeight: '60px'
             }}>
                 <div>
                     <LanguageButton color="#FFF" />

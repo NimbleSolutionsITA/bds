@@ -27,7 +27,7 @@ import {useTranslation} from "next-i18next";
 import {BaseSyntheticEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
-import {removeCoupon, selectShipping, setCoupon} from "../../redux/cartSlice";
+import {removeCoupon, selectShipping, setCoupon, setCustomerNote} from "../../redux/cartSlice";
 import {getCartItemPrice, getIsEU} from "../../utils/utils";
 
 type RecapProps = {
@@ -40,7 +40,7 @@ type RecapProps = {
 const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithStripe}: RecapProps) => {
 	const { formState: { errors } } = useFormContext();
 	const { t } = useTranslation('common');
-	const { cart, stripe: { intentId } = { intentId: null }, loading } = useSelector((state: RootState) => state.cart);
+	const { cart, customerNote, stripe: { intentId } = { intentId: null }, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
 	const canEditData = !isLoading && ['RECAP', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
 	const theme = useTheme();
@@ -190,6 +190,19 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 					</FormHelperText>
 				</FormControl>
 			)}
+			<Divider sx={{margin: '5px 0'}} />
+			<FormControl fullWidth sx={{margin: '20px 0'}}>
+				<TextField
+					variant="outlined"
+					label={t('checkout.customer-notes')}
+					fullWidth
+					multiline
+					rows={4}
+					value={customerNote}
+					onChange={(e) => dispatch(setCustomerNote(e.target.value))}
+					disabled={!canEditData}
+				/>
+			</FormControl>
 			<Hidden smDown>
 				<Divider sx={{margin: '5px 0'}} />
 				<PriceRecap isLoading={isLoading} />

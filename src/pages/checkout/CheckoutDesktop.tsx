@@ -37,7 +37,7 @@ const CheckoutDesktop = ({
 	setTab,
 	checkoutStep,
 	setCheckoutStep,
-    payWithStripe
+    payWithStripe,
 }: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
 	return (

@@ -88,7 +88,7 @@ const initalData = {
 
 
 const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
-	const { cart, customer, stripe: { intentId } = { intentId: null } } = useSelector((state: RootState) => state.cart);
+	const { cart, customer, customerNote, stripe: { intentId } = { intentId: null } } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
 	const [step, setStep] = useState<Step>('ADDRESS');
 	const [addressTab, setAddressTab] = useState<number>(0);
@@ -125,7 +125,8 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 			body: JSON.stringify({
 				cartKey: cart?.cart_key,
 				intentId,
-				customer
+				customer,
+				customerNote
 			})
 		})
 		const updateIntentResult = await updateIntent.json()
@@ -137,13 +138,13 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 			const { error } = await stripe!.confirmPayment({
 				elements: elements!,
 				confirmParams: {
-					return_url: `${window.location.origin}/checkout/completed`,
+					return_url: `${window.location.origin}/checkout/completed?cart_key=${cart.cart_key}`,
 				}
 			});
 
 			if (error) {
-				console.error(error.message ?? 'An unknown error occured')
-				setPaymentError(error.message ?? 'An unknown error occured')
+				console.error(error.message ?? 'An unknown error occurred')
+				setPaymentError(error.message ?? 'An unknown error occurred')
 			}
 		}
 		setIsLoading(false);
@@ -179,7 +180,7 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 		checkoutStep: step,
 		setCheckoutStep: setStep,
 		updateOrder,
-		payWithStripe
+		payWithStripe,
 	}
 
 	return (

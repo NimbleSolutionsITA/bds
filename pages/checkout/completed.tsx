@@ -1,20 +1,19 @@
 import {useRouter} from "next/router";
 import PaymentResult from "../../src/pages/checkout/PaymentResult";
 import {useEffect, useState} from "react";
-import {NEXT_API_ENDPOINT} from "../../src/utils/endpoints";
+import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../../src/utils/endpoints";
 import {useDispatch, useSelector} from "react-redux";
 import {getLayoutProps} from "../../src/utils/wordpress_api";
 import {AppDispatch, RootState} from "../../src/redux/store";
-import {fetchCartData} from "../../src/redux/cartSlice";
 
 export default function CheckoutResult() {
-	const cartKey = useSelector((state: RootState) => state.cart.cart.cart_key);
     const [result, setResult] = useState<string>('pending')
 	const dispatch = useDispatch<AppDispatch>()
 	const router = useRouter()
 	const {
 		payment_intent,
-		paid
+		paid,
+		cart_key
 	} = router.query
 
 	useEffect(() => {
@@ -22,11 +21,7 @@ export default function CheckoutResult() {
 			setResult('succeeded')
 			return;
 		}
-		if (payment_intent && !cartKey) {
-			dispatch(fetchCartData());
-			return
-		}
-		if (!payment_intent && !cartKey)
+		if (!payment_intent)
 			return;
 
 		const confirmOrder = async () => {
@@ -35,7 +30,7 @@ export default function CheckoutResult() {
 				headers: [["Content-Type", 'application/json']],
 				body: JSON.stringify({
 					intentId: payment_intent,
-					cartKey,
+					cartKey: cart_key,
 				})
 			})
 			const result = await response.json()
@@ -46,7 +41,20 @@ export default function CheckoutResult() {
 
 		confirmOrder()
 
-	}, [cartKey, dispatch, paid, payment_intent]);
+	}, [cart_key, dispatch, paid, payment_intent]);
+
+	useEffect(() => {
+		const destroyCart = async () => {
+			await fetch(
+				WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart/clear?cart_key=' + cart_key,
+				{ method: 'POST'}
+			)
+		}
+		if (result === 'succeeded') {
+			destroyCart()
+		}
+	}, [cart_key, result]);
+
 
 	return <PaymentResult isLoading={result === 'pending'} isSuccess={result === 'succeeded'} />
 }

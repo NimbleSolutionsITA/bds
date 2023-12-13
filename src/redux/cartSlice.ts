@@ -17,7 +17,8 @@ type CartState = {
 	customer?:{
 		billing: BillingData
 		shipping?: ShippingData
-	}
+	},
+	customerNote: string
 }
 
 const initialState: CartState = {
@@ -30,6 +31,7 @@ const initialState: CartState = {
 			subtotal_tax: '0',
 		} as Totals
 	},
+	customerNote: ''
 }
 
 export const fetchCartData = createAsyncThunk('cart/fetchData', async (params, thunkAPI) => {
@@ -96,7 +98,6 @@ type SetCouponPayload = {
 export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
 	const { cart: { customer }} = thunkAPI?.getState() as RootState
 	const email = customer?.billing.email
-	console.log(customer)
 	if (!email) {
 		throw new Error('Email required')
 	}
@@ -151,7 +152,7 @@ export const initCart = createAsyncThunk('cart/initCart', async (payload, thunkA
 });
 
 export const destroyCart = createAsyncThunk('cart/destroy', async (arg, thunkAPI) => {
-	await callCartData('/v2/cart/clear', {}, "DELETE");
+	await callCartData('/v2/cart/clear', {}, "POST");
 	return await callCartData('/v2/cart', {}, "GET")
 });
 
@@ -170,6 +171,9 @@ export const cartSlice = createSlice({
 		},
 		setCustomerData: (state, action) => {
 			state.customer = action.payload
+		},
+		setCustomerNote: (state, action) => {
+			state.customerNote = action.payload
 		},
 		destroyIntent: (state) => {
 			state.stripe = undefined
@@ -286,6 +290,9 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(destroyCart.fulfilled, (state, action) => {
 			state.cart = action.payload
+			state.customer = undefined
+			state.stripe = undefined
+			state.customerNote = ''
 			state.loading = false;
 		});
 		builder.addCase(destroyCart.rejected, (state) => {
@@ -300,6 +307,7 @@ export const {
 	openCartDrawer,
 	closeCartDrawer,
 	setCustomerData,
+	setCustomerNote,
 	destroyIntent
 } = cartSlice.actions
 

@@ -21,7 +21,7 @@ const CheckoutMobile = ({
 	setTab,
 	checkoutStep,
     setCheckoutStep,
-	payWithStripe
+	payWithStripe,
 }: CheckoutMobile) => {
 	const { t } = useTranslation('common')
 	const { cart } = useSelector((state: RootState) => state.cart);
