@@ -8,11 +8,12 @@ import {pageview} from "../utils/utils";
 export default function GoogleAnalytics({GA_MEASUREMENT_ID} : {GA_MEASUREMENT_ID : string}){
 	const pathname = usePathname()
 	const searchParams = useSearchParams()
+	const params = searchParams.toString()
 
 	useEffect(() => {
-		const url = pathname + searchParams.toString()
+		const url = pathname + (params ? ('?' + params) : '');
 		pageview(GA_MEASUREMENT_ID, url);
-	}, [pathname, searchParams, GA_MEASUREMENT_ID]);
+	}, [pathname, params, GA_MEASUREMENT_ID]);
 
 	return (
 		<>

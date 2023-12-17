@@ -1,17 +1,7 @@
-import {NextApiRequest, NextApiResponse} from "next";
+import Stripe from 'stripe';
+import {NextApiRequest, NextApiResponse} from 'next';
+import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
-const WooCommerceRestApi = require("@woocommerce/woocommerce-rest-api").default;
-
-const stripeSecretKey = process.env.STRIPE_SECRET;
-
-const stripe = require("stripe")(stripeSecretKey);
-const webhookSecret = process.env.STRIPE_WEBHOOK_ENDPOINT_SECRET;
-
-export const config = {
-	api: {
-		bodyParser: false,
-	},
-};
 
 const api = new WooCommerceRestApi({
 	url: WORDPRESS_SITE_URL ?? '',
@@ -20,82 +10,74 @@ const api = new WooCommerceRestApi({
 	version: "wc/v3"
 });
 
-/**
- * Update Order.
- *
- * Once payment is successful or failed,
- * Update Order Status to 'Processing' or 'Failed' and set the transaction id.
- *
- * @param {String} newStatus Order Status to be updated.
- * @param {String} orderId Order id
- * @param {String} transactionId Transaction id.
- *
- * @returns {Promise<void>}
- */
-const updateOrder = async (newStatus: string, orderId: string, transactionId: string = ''): Promise<void> => {
-
-	let newOrderData: {status: string, transaction_id?: string} = {
-		status: newStatus
-	}
-
-	if ( transactionId ) {
-		newOrderData.transaction_id = transactionId
-	}
-
-	try {
-		console.log(newStatus, orderId, transactionId);
-		// const {data} = await api.put( `orders/${ orderId }`, newOrderData );
-		// console.log( '✅ Order updated data', data );
-	} catch (ex) {
-		console.error('Order creation error', ex);
-		throw ex;
-	}
-}
-
-export default async function handler(
+const handler = async (
 	req: NextApiRequest,
-	// NOTE: not necessary to define at the moment because the response has an <any> type //
 	res: NextApiResponse
-) {
-	if (req.method === "POST") {
-		 console.log('pd')
-		const buf = [];
-		for await (const chunk of req) {
-			buf.push(chunk);
-		}
-		const body = Buffer.concat(buf).toString();
-		const sig = req.headers["stripe-signature"] as string
+): Promise<void> => {
+	const stripe = new Stripe(process.env.STRIPE_SECRET as string, { apiVersion: '2022-11-15' });
 
-		let stripeEvent;
+	const webhookSecret = process.env.STRIPE_WEBHOOK_ENDPOINT_SECRET as string;
+
+	if (req.method === 'POST') {
+		const sig = req.headers['stripe-signature'] as string
+
+		let event: Stripe.Event;
 
 		try {
-			stripeEvent = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-			console.log( 'stripeEvent', stripeEvent );
+			const body = await buffer(req);
+			event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
 		} catch (err) {
-			if (typeof err === "string") {
-				res.status(400).send(`Webhook Error: ${err}`);
-			} else if (err instanceof Error) {
+			if (err instanceof Stripe.errors.StripeSignatureVerificationError) {
+				console.log(`❌ Error message: ${err.message}`);
 				res.status(400).send(`Webhook Error: ${err.message}`);
 			}
 			return;
 		}
 
-		if ( 'payment_intent.succeeded' === stripeEvent.type ) {
-			const session = stripeEvent.data.object;
-			console.log( 'sessionsession', session );
-			console.log( '✅ session.metadata.orderId', session.metadata.orderId, session.id );
-			// Payment Success.
-			try {
-				await updateOrder( 'processing', session.metadata.orderId, session.id );
-			} catch (error) {
-				await updateOrder( 'failed', session.metadata.orderId );
-				console.error('Update order error', error);
+		// Cast event data to Stripe object
+		if (event.type === 'payment_intent.succeeded') {
+			const stripeObject: Stripe.PaymentIntent = event.data.object as Stripe.PaymentIntent;
+			console.log(stripeObject.status);
+		} else if (event.type === 'charge.succeeded') {
+			const charge = event.data.object as Stripe.Charge;
+			const order_id = charge.metadata.order_id;
+			if (order_id) {
+				await api.put(`orders/${order_id}`, {
+					set_paid: true
+				})
 			}
+		} else {
+			console.warn(`🤷‍♀️ Unhandled event type: ${event.type}`);
 		}
 
-		res.json({ received: true });
+		// Return a response to acknowledge receipt of the event
+		res.json({received: true});
 	} else {
-		res.setHeader("Allow", "POST");
-		res.status(405).end("Method Not Allowed");
+		res.setHeader('Allow', 'POST');
+		res.status(405).end('Method Not Allowed');
 	}
 };
+
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
+
+const buffer = (req: NextApiRequest) => {
+	return new Promise<Buffer>((resolve, reject) => {
+		const chunks: Buffer[] = [];
+
+		req.on('data', (chunk: Buffer) => {
+			chunks.push(chunk);
+		});
+
+		req.on('end', () => {
+			resolve(Buffer.concat(chunks));
+		});
+
+		req.on('error', reject);
+	});
+};
+
+export default handler;

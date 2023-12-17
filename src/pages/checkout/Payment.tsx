@@ -57,7 +57,11 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ cartKey })
+				body: JSON.stringify({
+					cartKey,
+					customer,
+					customerNote,
+				})
 			})
 			const order = await orderResponse.json()
 
