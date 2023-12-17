@@ -37,7 +37,7 @@ const handler = async (
 		// Cast event data to Stripe object
 		if (event.type === 'payment_intent.succeeded') {
 			const stripeObject: Stripe.PaymentIntent = event.data.object as Stripe.PaymentIntent;
-			console.log(stripeObject.status);
+			console.log('webhook', stripeObject.status);
 		} else if (event.type === 'charge.succeeded') {
 			const charge = event.data.object as Stripe.Charge;
 			const order_id = charge.metadata.order_id;
