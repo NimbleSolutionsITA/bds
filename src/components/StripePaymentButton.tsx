@@ -208,6 +208,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 					pathname: '/checkout/completed',
 					query: {
 						paid: true,
+						email: e.payerEmail,
 						...(isCart ? {cart_key: cartKey} : {})
 					}
 				});

@@ -138,7 +138,7 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 			const { error } = await stripe!.confirmPayment({
 				elements: elements!,
 				confirmParams: {
-					return_url: `${window.location.origin}/checkout/completed?cart_key=${cart.cart_key}`,
+					return_url: `${window.location.origin}/checkout/completed?cart_key=${cart.cart_key}&email=${customer?.billing?.email}`,
 				}
 			});
 

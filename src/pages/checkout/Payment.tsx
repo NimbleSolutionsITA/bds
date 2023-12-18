@@ -114,7 +114,8 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 						pathname: '/checkout/completed',
 						query: {
 							paid: true,
-							cart_key: cartKey
+							cart_key: cartKey,
+							email: customer?.billing?.email
 						}
 					});
 				} else {
