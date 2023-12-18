@@ -48,7 +48,7 @@ export default async function handler(
 				throw new Error('Amount is 0')
 			}
 			// CREATE ORDER
-			const orderPayload = prepareOrderPayload(cart, customer, customerNote, null, intentId, selectedShipping)
+			const orderPayload = prepareOrderPayload(cart, customer, customerNote, intentId, selectedShipping)
 			const { data: order} = await api.post("orders", orderPayload)
 			responseData.orderId = order.id
 			// STRIPE CHECKOUT
@@ -117,10 +117,10 @@ export default async function handler(
 	return res.json(responseData)
 }
 
-const prepareOrderPayload = (cart: any, customerData: any, customer_note: string, paypalOrderId: string|null, intentId: string|null, selectedShipping: any) => ({
-	payment_method: paypalOrderId ? 'paypal' : 'stripe',
-	payment_method_title: paypalOrderId ? 'Paypal' : 'Stripe',
-	payment_method_reference: paypalOrderId ? paypalOrderId: intentId,
+const prepareOrderPayload = (cart: any, customerData: any, customer_note: string, intentId: string|null, selectedShipping: any) => ({
+	payment_method: intentId ? 'stripe' : 'paypal',
+	payment_method_title: intentId ? 'Stripe' : 'PayPal',
+	payment_method_reference: intentId ? intentId : 'paypal',
 	...customerData,
 	customer_note,
 	line_items: cart.items.map((item: Item) => {

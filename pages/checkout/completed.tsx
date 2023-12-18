@@ -2,9 +2,9 @@ import {useRouter} from "next/router";
 import PaymentResult from "../../src/pages/checkout/PaymentResult";
 import {useEffect, useState} from "react";
 import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../../src/utils/endpoints";
-import {useDispatch, useSelector} from "react-redux";
+import {useDispatch} from "react-redux";
 import {getLayoutProps} from "../../src/utils/wordpress_api";
-import {AppDispatch, RootState} from "../../src/redux/store";
+import {AppDispatch} from "../../src/redux/store";
 
 export default function CheckoutResult() {
     const [result, setResult] = useState<string>('pending')
@@ -21,8 +21,9 @@ export default function CheckoutResult() {
 			setResult('succeeded')
 			return;
 		}
-		if (!payment_intent)
+		if (!payment_intent) {
 			return;
+		}
 
 		const confirmOrder = async () => {
 			const response = await fetch(NEXT_API_ENDPOINT + '/order/checkout', {
