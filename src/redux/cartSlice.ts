@@ -341,20 +341,10 @@ export const callCartData = async (url: string, payload = {}, method: 'GET' | 'P
 
 const initCartData = async () => {
 	let cart = await callCartData('/v2/cart', {}, "GET")
-	if (cart.items.length === 0) {
-		throw new Error('Cart empty')
-	}
-	let cartChanged = false
-	if (!(cart.customer?.billing_address?.billing_country === 'IT')) {
-		await callCartData('/v1/calculate/shipping', { country: 'IT' }, "POST");
-		cartChanged = true
-	}
+	await callCartData('/v1/calculate/shipping', { country: 'IT' }, "POST");
 	if (cart.coupons?.length && cart.coupons.length > 0) {
 		await callCartData('/v1/coupon?coupon=' + cart.coupons[0].coupon, {}, "DELETE");
-		cartChanged = true
 	}
-	if (cartChanged) {
-		cart = await callCartData('/v2/cart', {}, "GET")
-	}
+	cart = await callCartData('/v2/cart', {}, "GET")
 	return cart
 }

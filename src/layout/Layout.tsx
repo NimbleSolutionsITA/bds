@@ -5,7 +5,7 @@ import {BaseLayoutProps} from "../types/settings";
 import Footer from "./footer/Footer";
 import {useDispatch} from "react-redux";
 
-import {fetchCartData, initCart} from "../redux/cartSlice";
+import {initCart} from "../redux/cartSlice";
 import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {Hidden} from "@mui/material";
