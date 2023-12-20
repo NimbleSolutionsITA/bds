@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://bottegadiaguardi.com
-
-# Sitemaps
-Sitemap: https://bottegadiaguardi.com/sitemap.xml
