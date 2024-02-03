@@ -68,7 +68,7 @@ export default async function handler(
 
 	try {
 		const paymentIntent = await stripe.paymentIntents.create({
-			amount: await calculateTotalAmount(data),
+			amount: await calculateTotalAmount(data) * 100,
 			currency: "eur",
 		});
 		res.json({
