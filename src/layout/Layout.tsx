@@ -92,7 +92,7 @@ export default function Layout({children, layout: {
                 liquides={categories.fragrances.liquides}
             />
             {children}
-            <Footer googlePlaces={googlePlaces} />
+            <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={mobileMenu} />
         </Elements>
     )
 }
