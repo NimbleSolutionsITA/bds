@@ -77,7 +77,7 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 						<Button component={Link} href={`/${CHECKOUT_SUB_PATH}`} disabled={loading}>
 							{t('cart.cta')}
 						</Button>
-						{cartDrawerOpen && (
+						{/*{cartDrawerOpen && (
 							<div style={{marginTop: '10px', pointerEvents: loading ? 'none' : 'auto'}}>
 								<StripePaymentButton
 									items={cart.items.map(item => ({
@@ -92,7 +92,7 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 									isCart
 								/>
 							</div>
-						)}
+						)}*/}
 					</>
 				) : (
 					<>

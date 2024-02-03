@@ -264,14 +264,14 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 								{t('cart.add')}
 							</Button>
 						)}
-						{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
+						{/*{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
 							<div style={{width: '250px', height: '48px'}}>
 								<StripePaymentButton
 									shipping={shipping}
 									items={[cartItem]}
 								/>
 							</div>
-						)}
+						)}*/}
 					</div>
 					<div style={{marginTop: '40px', lineHeight: 1}}>
 						<div>
