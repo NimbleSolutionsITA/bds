@@ -111,7 +111,6 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 
 	const payWithStripe = async () => {
 		setIsLoading(true);
-		console.log('paying with stripe')
 		if (!stripe || !elements || !intentId) {
 			console.log('stripe or elements not ready')
 			setIsLoading(false);

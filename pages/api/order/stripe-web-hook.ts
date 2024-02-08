@@ -46,6 +46,12 @@ const handler = async (
 					set_paid: true
 				})
 			}
+		} else if (event.type === 'payment_intent.payment_failed') {
+			const charge = event.data.object as Stripe.Charge;
+			const order_id = charge.metadata.order_id;
+			if (order_id) {
+				await api.delete(`orders/${order_id}`)
+			}
 		} else {
 			console.warn(`🤷‍♀️ Unhandled event type: ${event.type}`);
 		}
