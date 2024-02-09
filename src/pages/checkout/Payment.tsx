@@ -27,6 +27,7 @@ import {RootState} from "../../redux/store";
 import {useRouter} from "next/router";
 import {destroyIntent} from "../../redux/cartSlice";
 import {OnApproveData} from "@paypal/paypal-js";
+import {gtagPurchase} from "../../utils/utils";
 
 type PaymentProps = {
 	isLoading: boolean
@@ -109,6 +110,7 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 				const orderData = await response.json();
 
 				if (orderData.success) {
+					gtagPurchase(orderData.order)
 					dispatch(destroyIntent())
 					await router.push({
 						pathname: '/checkout/completed',

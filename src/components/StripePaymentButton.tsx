@@ -4,7 +4,7 @@ import {PaymentRequest, PaymentRequestUpdateDetails} from "@stripe/stripe-js/typ
 import {ShippingClass} from "../types/woocommerce";
 import {NEXT_API_ENDPOINT} from "../utils/endpoints";
 import {useRouter} from "next/router";
-import {getCartItemPriceWithoutTax, getIsEU, getName} from "../utils/utils";
+import {getCartItemPriceWithoutTax, getIsEU, getName, gtagPurchase} from "../utils/utils";
 import {useTranslation} from "next-i18next";
 import {AppDispatch, RootState} from "../redux/store";
 import {useDispatch, useSelector} from "react-redux";
@@ -195,7 +195,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 					}
 				}
 
-				await fetch(NEXT_API_ENDPOINT + '/order', {
+				const response = await fetch(NEXT_API_ENDPOINT + '/order', {
 					method: 'POST',
 					headers: [["Content-Type", 'application/json']],
 					body: JSON.stringify(orderBody),
@@ -203,6 +203,10 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 					.then(response => response.json());
 
 				e.complete('success');
+
+				if (response.order) {
+					gtagPurchase(response.order)
+				}
 
 				await router.push({
 					pathname: '/checkout/completed',

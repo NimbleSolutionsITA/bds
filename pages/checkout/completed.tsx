@@ -5,6 +5,7 @@ import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../../src/utils/endpoints";
 import {useDispatch} from "react-redux";
 import {getLayoutProps} from "../../src/utils/wordpress_api";
 import {AppDispatch} from "../../src/redux/store";
+import {gtagPurchase} from "../../src/utils/utils";
 
 export default function CheckoutResult() {
     const [result, setResult] = useState<string>('pending')
@@ -36,6 +37,7 @@ export default function CheckoutResult() {
 			})
 			const result = await response.json()
 			if (result.success) {
+				gtagPurchase(result.order)
 				setResult('succeeded')
 			}
 		}

@@ -6,7 +6,7 @@ import {
     Color,
     Product, ProductCategory,
     ShippingMethod,
-    Variation
+    Variation, WooOrder
 } from "../types/woocommerce";
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
@@ -301,6 +301,46 @@ export const getCartTotals = (cart?: Cart) => {
 export const pageview = (GA_MEASUREMENT_ID : string, url : string) => {
     window.gtag("config", GA_MEASUREMENT_ID, {
         page_path: url,
+    });
+};
+
+export interface PurchaseEvent {
+    transaction_id: string
+    value: number
+    tax?: number
+    shipping?: number
+    items: PurchaseItem[]
+}
+
+export interface PurchaseItem {
+    item_id: string
+    item_name: string
+    item_brand?: string
+    item_category?: string
+    item_variant?: string
+    price?: number
+    quantity?: number
+}
+
+export const gtagPurchase = (order: WooOrder) => {
+    const params: PurchaseEvent = {
+        transaction_id: order.id.toString(),
+        value: Number(order.total) / 100,
+        tax: Number(order.total_tax) / 100,
+        shipping: Number(order.shipping_total) / 100,
+        items: order.line_items.map((item) => {
+            return {
+                item_id: item.product_id.toString(),
+                item_name: item.name,
+                item_variant: item.variation_id?.toString(),
+                price: Number(item.total) / 100,
+                quantity: item.quantity
+            }
+        })
+    }
+    window.gtag("event", 'purchase', {
+        currency: 'EUR',
+        ...params
     });
 };
 

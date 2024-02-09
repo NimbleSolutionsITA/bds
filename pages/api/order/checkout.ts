@@ -16,6 +16,7 @@ export type CreateOrderResponse = {
 	paypalOrderId?: string
 	amount?: number
 	error?: string
+	data?: any
 }
 
 const api = new WooCommerceRestApi({
@@ -100,7 +101,8 @@ export default async function handler(
 			}
 
 			if (responseData.success && orderId) {
-				await api.put(`orders/${orderId}`, { set_paid: true })
+				const { data: order} = await api.put(`orders/${orderId}`, { set_paid: true })
+				responseData.data = order
 			}
 		}
 		catch ( error ) {
