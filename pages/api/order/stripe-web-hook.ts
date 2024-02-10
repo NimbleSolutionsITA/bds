@@ -37,20 +37,19 @@ const handler = async (
 		// Cast event data to Stripe object
 		if (event.type === 'payment_intent.succeeded') {
 			const stripeObject: Stripe.PaymentIntent = event.data.object as Stripe.PaymentIntent;
-			console.log('webhook', stripeObject.status);
-		} else if (event.type === 'charge.succeeded') {
-			const charge = event.data.object as Stripe.Charge;
-			const order_id = charge.metadata.order_id;
+			const { order_id = null } = stripeObject.metadata;
 			if (order_id) {
 				await api.put(`orders/${order_id}`, {
 					set_paid: true
 				})
+				console.log('webhook payment_intent.succeeded order updated');
 			}
 		} else if (event.type === 'payment_intent.payment_failed') {
-			const charge = event.data.object as Stripe.Charge;
-			const order_id = charge.metadata.order_id;
+			const stripeObject = event.data.object as Stripe.PaymentIntent;
+			const { order_id = null } = stripeObject.metadata;
 			if (order_id) {
 				await api.delete(`orders/${order_id}`)
+				console.log('webhook payment_intent.payment_failed order deleted');
 			}
 		} else {
 			console.warn(`🤷‍♀️ Unhandled event type: ${event.type}`);
