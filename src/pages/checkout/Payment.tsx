@@ -163,9 +163,9 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.payment')}</Typography>
+			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.payment')} Stripe</Typography>
 			<Typography sx={{marginBottom: '20px'}}>{t('checkout.secured')}</Typography>
-			<FormControlLabel labelPlacement="start" control={(
+			{/*<FormControlLabel labelPlacement="start" control={(
 				<Switch
 					checked={checkoutStep === 'PAYMENT_PAYPAL'}
 					onChange={(e) => setCheckoutStep(e.target.checked ? 'PAYMENT_PAYPAL' : 'PAYMENT_STRIPE')}
@@ -175,7 +175,7 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 				<div style={{display: 'flex', alignItems: 'center'}}>
 					{t('checkout.pay-with')}&nbsp;&nbsp;&nbsp;&nbsp;<PayPal sx={{fontSize: '80px'}} />&nbsp;&nbsp;
 				</div>
-			)} />
+			)} />*/}
 			<MotionPanel key="stripe" active={checkoutStep === 'PAYMENT_STRIPE'}>
 				{clientSecret && (
 					<PaymentElement
