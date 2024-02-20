@@ -11,6 +11,7 @@
     "https": "node server.js"
   },
   "dependencies": {
+    "@apollo/client": "^3.9.4",
     "@emotion/cache": "latest",
     "@emotion/react": "latest",
     "@emotion/server": "latest",
@@ -33,6 +34,7 @@
     "date-fns": "^2.30.0",
     "form-data": "^4.0.0",
     "framer-motion": "^10.10.0",
+    "graphql": "^16.8.1",
     "html-react-parser": "^4.0.0",
     "i18next": "^23.2.6",
     "js-cookie": "^3.0.5",
@@ -66,7 +68,6 @@
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/react-mailchimp-subscribe": "^2.1.1",
     "@wordpress/base-styles": "^4.32.0",
     "eslint": "latest",
     "eslint-config-next": "latest",

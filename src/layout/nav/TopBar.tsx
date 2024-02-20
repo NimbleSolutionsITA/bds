@@ -1,14 +1,18 @@
 import Container from "@mui/material/Container";
-import {IconButton, Box} from "@mui/material";
+import {IconButton, Box, Menu, MenuItem} from "@mui/material";
 import {Facebook, Instagram} from "@mui/icons-material";
 import CartIndicator from "../../components/CartIndicator";
 import LanguageButton from "../../components/LanguageButton";
 import ShippingBanner from "./ShippingBanner";
 import {FACEBOOK_LINK, INSTAGRAM_LINK} from "../../utils/endpoints";
 import SearchIcon from '@mui/icons-material/Search';
-import {closeSearchDrawer, openSearchDrawer} from "../../redux/layout";
+import {closeSearchDrawer, openSearchDrawer} from "../../redux/layoutSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
+import UserIcon from "../../icons/UserIcon";
+import useAuth from "../../utils/useAuth";
+import {useState} from "react";
+import {useRouter} from "next/router";
 
 export default function TopBar() {
     const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
@@ -43,6 +47,7 @@ export default function TopBar() {
                     <ShippingBanner />
                 </div>
                 <div>
+                    <UserMenu />
                     <IconButton onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}>
                         <SearchIcon sx={{color: '#FFF'}} />
                     </IconButton>
@@ -51,4 +56,58 @@ export default function TopBar() {
             </Container>
         </Box>
     )
+}
+
+function UserMenu() {
+    const { logOut, loggedIn, user } = useAuth();
+    const router = useRouter();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const loggedMenu = [
+        { label: 'Profile', onClick: () => router.push('/my-area/profile') },
+        { label: 'Addresses', onClick: () => router.push('/my-area/addresses') },
+        { label: 'Orders', onClick: () => router.push('/my-area/orders') },
+        { label: 'Logout', onClick: logOut },
+    ]
+
+    const guestMenu = [
+        { label: 'Login', onClick: () => router.push('/my-area') },
+        { label: 'Register', onClick: () => router.push('/my-area/sign-up') },
+    ]
+    const menuItemns = loggedIn ? loggedMenu : guestMenu;
+    return (
+        <>
+            <IconButton
+                id="user-button"
+                aria-controls={open ? 'user-menu' : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? 'true' : undefined}
+                onClick={handleClick}
+                sx={{color: '#fff', fontSize: '12px'}}
+            >
+                <UserIcon sx={{padding: '3px', marginRight: loggedMenu && user?.firstName ? '5px' : 0}} />
+                {loggedMenu && user?.firstName && user.firstName}
+            </IconButton>
+            <Menu
+                id="user-menu"
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                MenuListProps={{
+                    'aria-labelledby': 'user-button',
+                }}
+            >
+                {menuItemns.map(({onClick, label}) => (
+                    <MenuItem sx={{textTransform: 'uppercase'}} key={label} onClick={onClick}>{label}</MenuItem>
+                ))}
+            </Menu>
+        </>
+    );
 }

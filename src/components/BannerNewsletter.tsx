@@ -2,7 +2,7 @@ import HtmlBlock from "./HtmlBlock";
 import {Button, Box} from "@mui/material";
 import {CUSTOM_COLOR} from "../theme/theme";
 import {useDispatch} from "react-redux";
-import {openNewsletterDrawer} from "../redux/layout";
+import {openNewsletterDrawer} from "../redux/layoutSlice";
 
 type BannerNewsletterProps = {
 	body: string

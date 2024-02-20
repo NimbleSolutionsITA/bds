@@ -20,7 +20,7 @@ import placeholder from "../images/placeholder.jpg";
 import blur from "../images/blur.jpg";
 import {AttributeCheckboxes} from "./AttributeCheckboxes";
 import PriceFormat from "./PriceFormat";
-import {openInStockNotifierDrawer} from "../redux/layout";
+import {openInStockNotifierDrawer} from "../redux/layoutSlice";
 import {DESIGNERS_SUB_PATH, PRODUCT_SUB_PATH} from "../utils/endpoints";
 import {useTranslation} from "next-i18next";
 import {AppDispatch, RootState} from "../redux/store";

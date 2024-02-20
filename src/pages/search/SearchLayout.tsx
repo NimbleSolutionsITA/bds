@@ -15,7 +15,7 @@ import {useTranslation} from "next-i18next";
 import Chip from "../../components/Chip";
 import Box from "@mui/material/Box";
 import {useDispatch} from "react-redux";
-import {closeSearchDrawer} from "../../redux/layout";
+import {closeSearchDrawer} from "../../redux/layoutSlice";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 type Props = {

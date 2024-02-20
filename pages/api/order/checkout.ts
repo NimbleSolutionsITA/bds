@@ -18,11 +18,13 @@ export type CreateOrderResponse = {
 	error?: string
 	data?: any
 }
+const consumerKey = process.env.WC_CONSUMER_KEY ?? ''
+const consumerSecret = process.env.WC_CONSUMER_SECRET ?? ''
 
 const api = new WooCommerceRestApi({
 	url: WORDPRESS_SITE_URL ?? '',
-	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
+	consumerKey,
+	consumerSecret,
 	version: "wc/v3"
 });
 
@@ -36,8 +38,11 @@ export default async function handler(
 	if (req.method === 'POST') {
 		try {
 			const { cartKey, intentId = null, customer = null, customerNote = null } = req.body
+			const headers = new Headers();
+			headers.append('Authorization', 'Basic ' + btoa(`${consumerKey}:${consumerSecret}`));
 			const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/cocart/v2/cart?cart_key=' + cartKey)
 			const cart = await response.json()
+			console.log(cart)
 			if (!cart || !cart.items || cart?.items?.length === 0) {
 				throw new Error('Cart is empty')
 			}

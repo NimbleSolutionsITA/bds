@@ -15,7 +15,7 @@ import {Elements} from '@stripe/react-stripe-js';
 import parse from "html-react-parser";
 import InStockNotifierDrawer from "./drawers/InStockNotifierDrawer";
 import CookiesDrawer from "./drawers/CookiesDrawer";
-import {openCookiesDrawer} from "../redux/layout";
+import {openCookiesDrawer} from "../redux/layoutSlice";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import Script from 'next/script'

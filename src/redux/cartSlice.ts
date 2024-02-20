@@ -346,5 +346,6 @@ const initCartData = async () => {
 		await callCartData('/v1/coupon?coupon=' + cart.coupons[0].coupon, {}, "DELETE");
 	}
 	cart = await callCartData('/v2/cart', {}, "GET")
+	console.log(cart)
 	return cart
 }

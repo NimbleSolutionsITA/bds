@@ -1,5 +1,5 @@
 import {Button, Container, Typography} from "@mui/material";
-import {openNewsletterDrawer} from "../../redux/layout";
+import {openNewsletterDrawer} from "../../redux/layoutSlice";
 import {useDispatch} from "react-redux";
 import {useTranslation, Trans} from "next-i18next";
 

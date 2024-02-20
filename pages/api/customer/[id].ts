@@ -5,8 +5,7 @@ import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 export type CreateOrderResponse = {
 	success: boolean
-	orders?: WooOrder[]
-	order?: WooOrder
+	customer?: any
 	error?: string
 }
 
@@ -24,12 +23,13 @@ export default async function handler(
 	const responseData: CreateOrderResponse = {
 		success: false,
 	}
-	if (req.method === 'POST') {
+	if (req.method === 'GET') {
 		try {
-			const {data} = await api.post('orders', req.body)
+			const id = req.query.id as string;
+			const {data} = await api.get(`customers/${id}`, req.query)
 
 			responseData.success = true
-			responseData.order = data
+			responseData.customer = data
 		}
 		catch ( error ) {
 			if (typeof error === "string") {
@@ -41,12 +41,13 @@ export default async function handler(
 		}
 		return res.json(responseData)
 	}
-	if (req.method === 'GET') {
+	if (req.method === 'PUT') {
 		try {
-			const {data} = await api.get('orders', req.query)
+			const id = req.query.id as string;
+			const {data} = await api.put(`customers/${id}`, req.body)
 
 			responseData.success = true
-			responseData.orders = data
+			responseData.customer = data
 		}
 		catch ( error ) {
 			if (typeof error === "string") {

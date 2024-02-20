@@ -20,7 +20,7 @@ import {IconButtonProps} from "@mui/material/IconButton/IconButton";
 import {OUR_PRODUCTION_CATEGORIES} from "../../../utils/utils";
 import {useTranslation} from "next-i18next";
 import BottomBar from "../BottomBar";
-import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layout";
+import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layoutSlice";
 import SearchIcon from "@mui/icons-material/Search";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";

@@ -1,7 +1,7 @@
 import {Container, Modal} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
-import {closeSearchDrawer, openSearchDrawer} from "../../redux/layout";
+import {closeSearchDrawer, openSearchDrawer} from "../../redux/layoutSlice";
 import React from "react";
 import {useTranslation} from "next-i18next";
 import {WooProductCategory} from "../../types/woocommerce";

@@ -9,7 +9,7 @@ import {
 	Typography
 } from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {closeInStockNotifierDrawer} from "../../redux/layout";
+import {closeInStockNotifierDrawer} from "../../redux/layoutSlice";
 import {RootState} from "../../redux/store";
 import Link from "../../components/Link";
 import {CloseSharp} from "@mui/icons-material";

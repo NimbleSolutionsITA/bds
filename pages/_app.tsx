@@ -12,7 +12,9 @@ import {store} from "../src/redux/store";
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import { appWithTranslation } from 'next-i18next'
 import NextNProgress from 'nextjs-progressbar';
-
+import {ApolloProvider} from "@apollo/client";
+import {client} from "../src/utils/apolloClient";
+import {AuthProvider} from "../src/utils/useAuth";
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
@@ -26,21 +28,25 @@ const queryClient = new QueryClient()
 function MyApp(props: BDGAppProps) {
     const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
     return (
-        <Provider store={store}>
-            <CacheProvider value={emotionCache}>
-                <Head>
-                    <meta name="viewport" content="initial-scale=1, width=device-width" />
-                </Head>
-                <ThemeProvider theme={theme}>
-                    <QueryClientProvider client={queryClient}>
-                        {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
-                        <CssBaseline />
-                        <NextNProgress color="#000" />
-                        <Component {...pageProps} />
-                    </QueryClientProvider>
-                </ThemeProvider>
-            </CacheProvider>
-        </Provider>
+        <ApolloProvider client={client}>
+            <AuthProvider>
+                <Provider store={store}>
+                    <CacheProvider value={emotionCache}>
+                        <Head>
+                            <meta name="viewport" content="initial-scale=1, width=device-width" />
+                        </Head>
+                        <ThemeProvider theme={theme}>
+                            <QueryClientProvider client={queryClient}>
+                                {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
+                                <CssBaseline />
+                                <NextNProgress color="#000" />
+                                <Component {...pageProps} />
+                            </QueryClientProvider>
+                        </ThemeProvider>
+                    </CacheProvider>
+                </Provider>
+            </AuthProvider>
+        </ApolloProvider>
     );
 }
 

@@ -23,7 +23,7 @@ import placeholder from "../../images/placeholder.jpg";
 import {AppDispatch, RootState} from "../../redux/store";
 import PriceFormat from "../../components/PriceFormat";
 import StripePaymentButton from "../../components/StripePaymentButton";
-import {openInStockNotifierDrawer} from "../../redux/layout";
+import {openInStockNotifierDrawer} from "../../redux/layoutSlice";
 import DHL from "../../icons/DHL";
 import GLS from "../../icons/GLS";
 import {useTranslation} from "next-i18next";

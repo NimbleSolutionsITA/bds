@@ -1,6 +1,6 @@
 import {Button, Container, Grid, Drawer, Typography} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {closeCookiesDrawer} from "../../redux/layout";
+import {closeCookiesDrawer} from "../../redux/layoutSlice";
 import {RootState} from "../../redux/store";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";

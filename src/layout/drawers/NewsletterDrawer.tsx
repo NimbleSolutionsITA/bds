@@ -1,6 +1,6 @@
 import {Container, IconButton, SwipeableDrawer, Typography} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {closeNewsletterDrawer, openNewsletterDrawer} from "../../redux/layout";
+import {closeNewsletterDrawer, openNewsletterDrawer} from "../../redux/layoutSlice";
 import {RootState} from "../../redux/store";
 import {CloseSharp} from "@mui/icons-material";
 import {useTranslation} from "react-i18next";

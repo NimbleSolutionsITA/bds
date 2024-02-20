@@ -1,12 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import {WooOrder} from "../../../src/types/woocommerce";
-import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
+import {WORDPRESS_SITE_URL} from "../../../../src/utils/endpoints";
 
 export type CreateOrderResponse = {
 	success: boolean
-	orders?: WooOrder[]
-	order?: WooOrder
+	orders?: any
 	error?: string
 }
 
@@ -24,26 +22,12 @@ export default async function handler(
 	const responseData: CreateOrderResponse = {
 		success: false,
 	}
-	if (req.method === 'POST') {
-		try {
-			const {data} = await api.post('orders', req.body)
-
-			responseData.success = true
-			responseData.order = data
-		}
-		catch ( error ) {
-			if (typeof error === "string") {
-				responseData.error = error
-			} else if (error instanceof Error) {
-				responseData.error = error.message
-			}
-			res.status(500)
-		}
-		return res.json(responseData)
-	}
 	if (req.method === 'GET') {
 		try {
-			const {data} = await api.get('orders', req.query)
+			const id = req.query.id as string;
+			const {data} = await api.get(`orders`, {
+				customer: id
+			})
 
 			responseData.success = true
 			responseData.orders = data

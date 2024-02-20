@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import {cartSlice} from "./cartSlice";
-import {layoutSlice} from "./layout";
+import {layoutSlice} from "./layoutSlice";
 
 export const store = configureStore({
     reducer: {
