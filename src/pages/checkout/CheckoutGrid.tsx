@@ -1,14 +1,8 @@
 import {useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
-import {BillingData, Country, ShippingClass, ShippingData, ShippingMethod, WooOrder} from "../../types/woocommerce";
+import {BillingData, Country, ShippingClass, ShippingData} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
 import CheckoutDesktop from "./CheckoutDesktop";
-import {
-	CreateOrderActions,
-	CreateOrderData,
-	OnApproveActions,
-	OnApproveData,
-} from "@paypal/paypal-js";
 import {useMediaQuery, useTheme} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
@@ -30,31 +24,6 @@ export type Inputs = {
 };
 
 export type Step = 'ADDRESS'|'RECAP'|'PAYMENT_STRIPE'|'PAYMENT_PAYPAL'|'COMPLETED'
-
-export type OrderIntent = {
-	paymentMethod?: 'stripe'|'paypal'
-	billing: BillingData
-	shipping?: ShippingData
-	line_items: {
-		product_id: number,
-		variation_id?: number,
-		quantity: number
-	}[]
-	shipping_lines: {
-		method_id: string,
-		total: string
-	}[],
-	coupon_lines: {
-		code: string
-	}[],
-}
-
-export type PaymentControllers = {
-	payWithStripe: () => Promise<void>
-	payWithPayPal: (data: CreateOrderData, actions: CreateOrderActions) => Promise<string>
-	onPayPalApprove:  (data: OnApproveData, actions: OnApproveActions) => Promise<void>
-	onPayPalError: (err: any) => void
-}
 
 const defaultAddressValues = {
 	first_name: '',

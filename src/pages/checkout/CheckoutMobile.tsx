@@ -121,7 +121,7 @@ const CheckoutMobile = ({
 						)}
 						{['PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep) && (
 							<Grid item xs={12}>
-								<Button fullWidth onClick={() => router.push('/checkout/' + checkoutStep === 'PAYMENT_STRIPE' ? 'stripe' : 'paypal')}>
+								<Button fullWidth onClick={() => router.push('/checkout/' + (checkoutStep === 'PAYMENT_STRIPE' ? 'stripe' : 'paypal'))}>
 									{t('checkout.pay-now')}
 								</Button>
 							</Grid>

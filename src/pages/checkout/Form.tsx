@@ -96,7 +96,6 @@ const Form = ({isShipping, countries, focusProps}: FormProps) => {
 								}}
 								variant="outlined"
 								label={t('form.country')}
-								{...focusProps}
 							>
 								{countries.map((country) => (
 									<MenuItem key={country.code} value={country.code}>
@@ -130,7 +129,6 @@ const Form = ({isShipping, countries, focusProps}: FormProps) => {
 									}}
 									variant="outlined"
 									label={t('form.state')}
-									{...focusProps}
 								>
 									{countries.find(c => c.code === country)?.states?.map((state) => (
 										<MenuItem key={state.code} value={state.code}>
