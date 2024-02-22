@@ -1,7 +1,7 @@
 import type {NextApiRequest, NextApiResponse} from "next";
-import {WooLineItem} from "../../../src/types/woocommerce";
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
+import {prepareOrderPayload} from "../../../src/utils/utils";
 
 const stripeSecretKey = process.env.STRIPE_SECRET;
 
@@ -16,6 +16,7 @@ const api = new WooCommerceRestApi({
 export interface PaymentIntent {
 	paymentIntentId?: string;
 	clientSecret?: string;
+	orderId?: string;
 	success: boolean;
 	error?: string;
 }
@@ -25,19 +26,78 @@ export default async function handler(
 	// NOTE: not necessary to define at the moment because the response has an <any> type //
 	res: NextApiResponse<PaymentIntent>
 ) {
-	const data = req.body;
-
+	if (!['POST', 'PUT', 'PATCH'].includes(req.method ?? '')) {
+		return res.status(405).json({error: "Method not allowed", success: false});
+	}
 	try {
-		const paymentIntent = await stripe.paymentIntents.create({
-			amount: data.amount,
-			currency: "eur",
-		});
-		res.json({
-			paymentIntentId: paymentIntent.id,
-			clientSecret: paymentIntent.client_secret,
-			success: true
-		});
+		const { cart, customer, customerNote, paymentIntentId } = req.body
+		if (!cart) {
+			throw new Error('Cart or customer data is missing')
+		}
+		const amount = Number(cart.totals.total)
+		if (amount === 0) {
+			throw new Error('Cart amount is 0')
+		}
+		if (['POST', 'PUT'].includes(req.method ?? '')) {
+			if (req.method === 'POST') {
+				const paymentIntent = await stripe.paymentIntents.create({
+				    amount,
+					currency: "eur",
+				});
+				res.json({
+					paymentIntentId: paymentIntent.id,
+					clientSecret: paymentIntent.client_secret,
+					success: true
+				});
+			}
+			if (req.method === "PUT") {
+				if (!req.body.paymentIntentId) {
+					throw new Error('Payment intent ID is missing')
+				}
+				const { paymentIntentId } = req.body
+				await stripe.paymentIntents.update(paymentIntentId, { amount });
+				res.json({
+					success: true
+				});
+			}
+		}
+		if (req.method === 'PATCH') {
+			if (!customer) {
+				throw new Error('Customer data is missing')
+			}
+			if (!paymentIntentId) {
+				throw new Error('Payment intent ID is missing')
+			}
+			console.log('vat', customer.billing.vat)
+			const orderPayload = await prepareOrderPayload(cart, customer, api)
+			const { data: order } = await api.post("orders", {
+				payment_method: 'stripe',
+				payment_method_title: 'Stripe',
+				payment_method_reference: paymentIntentId,
+				...orderPayload,
+				meta_data: [
+					{
+						key: 'vat',
+						value: customer.billing.vat ?? ''
+					}
+				],
+				customer_note: customerNote
+			})
+			const amount = order.total * 100
+			if (amount === 0) {
+				await api.delete(`orders/${order.id}`, { force: true })
+				throw new Error('Order amount is 0')
+			}
+			await stripe.paymentIntents.update(paymentIntentId, {
+				amount: order.total * 100,
+				metadata: {
+					orderId: order.id
+				}
+			});
+			res.json({ success: true });
+		}
 	} catch (error) {
+		console.log(error)
 		let responseData = {
 			success: false,
 			error: "",
@@ -49,4 +109,5 @@ export default async function handler(
 		}
 		res.status(500).json(responseData)
 	}
+	return res
 }

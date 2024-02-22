@@ -10,6 +10,7 @@ import Logo from "./Logo";
 import  {CheckoutDesktopProps} from "./CheckoutDesktop";
 import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
+import {useRouter} from "next/router";
 
 export type CheckoutMobile = CheckoutDesktopProps
 
@@ -21,12 +22,12 @@ const CheckoutMobile = ({
 	setTab,
 	checkoutStep,
     setCheckoutStep,
-	payWithStripe,
 }: CheckoutMobile) => {
 	const { t } = useTranslation('common')
 	const { cart } = useSelector((state: RootState) => state.cart);
 	const mobileStep = checkoutStep === 'ADDRESS' ? 0 : checkoutStep === 'RECAP' ? 1 : 2
 	const [focus, setFocus] = React.useState(false)
+	const router = useRouter()
 	const editAddress = (tab: number) => {
 		setCheckoutStep('ADDRESS')
 		setTab(tab)
@@ -47,7 +48,6 @@ const CheckoutMobile = ({
 			checkoutStep={checkoutStep}
 			setCheckoutStep={setCheckoutStep}
 			updateOrder={updateOrder}
-			payWithStripe={payWithStripe}
 		/>,
 		<Payment
 			key="payment"
@@ -119,9 +119,9 @@ const CheckoutMobile = ({
 								</Button>
 							</Grid>
 						)}
-						{checkoutStep === 'PAYMENT_STRIPE' && (
+						{['PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep) && (
 							<Grid item xs={12}>
-								<Button fullWidth onClick={() => payWithStripe()}>
+								<Button fullWidth onClick={() => router.push('/checkout/' + checkoutStep === 'PAYMENT_STRIPE' ? 'stripe' : 'paypal')}>
 									{t('checkout.pay-now')}
 								</Button>
 							</Grid>
