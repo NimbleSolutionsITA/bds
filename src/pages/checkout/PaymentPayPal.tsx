@@ -87,7 +87,7 @@ const PaymentPayPal = () => {
 	}
 
 	return (
-		<div style={{padding: '20px', border: '1px solid rgba(0,0,0,0.1)'}}>
+		<div style={{padding: '20px'}}>
 			<PayPalButtons
 				createOrder={payWithPayPal}
 				onApprove={onPayPalApprove}

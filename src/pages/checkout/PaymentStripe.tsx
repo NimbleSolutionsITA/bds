@@ -4,12 +4,14 @@ import {Button, CircularProgress} from "@mui/material";
 import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
+import {useTranslation} from "next-i18next";
 
 const PaymentStripe = () => {
 	const [loading, setLoading] = React.useState(false);
 	const { customer, customerNote, cart, stripe: stripeIntent } = useSelector((state: RootState) => state.cart);
 	const stripe = useStripe();
 	const elements = useElements();
+	const { t } = useTranslation('common')
 
 	const handleSubmit = async (event: any) => {
 		// We don't want to let default form submission happen here,
@@ -89,9 +91,9 @@ const PaymentStripe = () => {
 				variant="contained"
 				color="primary"
 				fullWidth
-				sx={{marginTop: 2}}
+				sx={{marginTop: 2, marginBottom: 2}}
 			>
-				Pay
+				{t('checkout.pay-now')}
 			</Button>
 		</form>
 	)

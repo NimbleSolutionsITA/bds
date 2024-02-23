@@ -66,7 +66,7 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.payment')}</Typography>
+			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.select-payment')}</Typography>
 			<Typography sx={{marginBottom: '20px'}}>{t('checkout.secured')}</Typography>
 			<RadioGroup
 				aria-labelledby="demo-controlled-radio-buttons-group"
