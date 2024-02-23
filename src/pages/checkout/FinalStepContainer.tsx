@@ -20,7 +20,7 @@ type PROPS = {
 
 }
 const FinalStepContainer = ({ children }: PROPS) => (
-	<Grid container sx={{height: '100vh', position: 'relative', flexDirection: { xs: 'column-reverse' }}}>
+	<Grid container sx={{height: '100vh', position: 'relative', flexDirection: { xs: 'column-reverse', md: 'row' }}}>
 		<Grid item xs={12} md={7} sx={{display: 'flex', alignItems: {xs: 'center', md: 'flex-end'}, flexDirection: 'column'}}>
 			<div
 				style={{
