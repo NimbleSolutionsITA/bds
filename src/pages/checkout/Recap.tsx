@@ -29,18 +29,18 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {removeCoupon, selectShipping, setCoupon, setCustomerNote} from "../../redux/cartSlice";
 import {getCartItemPrice, getIsEU} from "../../utils/utils";
+import {useRouter} from "next/router";
 
 type RecapProps = {
 	isLoading: boolean
 	checkoutStep: Step
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
 	updateOrder: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
-	payWithStripe: () => Promise<void>
 }
-const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithStripe}: RecapProps) => {
+const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapProps) => {
 	const { formState: { errors } } = useFormContext();
 	const { t } = useTranslation('common');
-	const { cart, customerNote, stripe: { intentId } = { intentId: null }, loading } = useSelector((state: RootState) => state.cart);
+	const { cart, customerNote, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
 	const canEditData = !isLoading && ['RECAP', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
 	const theme = useTheme();
@@ -52,6 +52,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 	const selectedRate = shipping?.chosen_method
 	const hasCoupons = cart.coupons && cart.coupons.length > 0;
 	const [couponCode, setCouponCode] = useState(cart.coupons && cart.coupons.length > 0 ? cart.coupons[0].coupon : '');
+	const router = useRouter()
 
 	const handleContinue = async () => {
 		switch (checkoutStep) {
@@ -64,7 +65,11 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 				setCheckoutStep('PAYMENT_STRIPE')
 				break;
 			case 'PAYMENT_STRIPE':
-				await payWithStripe()
+				await router.push('/checkout/stripe')
+				break;
+			case 'PAYMENT_PAYPAL':
+				await router.push('/checkout/paypal')
+				break;
 
 		}
 	}
@@ -210,7 +215,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder, payWithSt
 				<Button
 					fullWidth
 					onClick={handleContinue}
-					disabled={isLoading || !['RECAP','ADDRESS', 'PAYMENT_STRIPE'].includes(checkoutStep)}
+					disabled={isLoading}
 					startIcon={(isLoading) && <CircularProgress size={16} />}
 				>
 					{checkoutStep !== 'ADDRESS' ? t('checkout.pay-now') : t('checkout.go-to-payment')}

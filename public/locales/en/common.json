@@ -136,6 +136,7 @@
     "shipping":"Shipping",
     "address":"Address",
     "payment":"Payment",
+    "select-payment":"Select a payment method",
     "pay-now":"Pay now",
     "ship-to":"Ship to",
     "contact":"Contact",
