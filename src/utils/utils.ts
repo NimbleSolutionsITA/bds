@@ -350,3 +350,35 @@ export const gtagConsent = (granted: boolean) => {
         'analytics_storage': newValue
     });
 }
+
+export const prepareOrderPayload = async (cart: any, customerData: any, api: any) => {
+    const selectedShipping = cart.shipping.packages.default.rates[cart.shipping.packages.default.chosen_method]
+    const isEu = (customerData?.shipping?.country ?? customerData?.billing?.country ) !== 'IT'
+    const line_items = await Promise.all(cart.items.map(prepareOrderLineItem(api, isEu)))
+    return ({
+        ...customerData,
+        line_items,
+        shipping_lines: [
+            {
+                method_id: selectedShipping?.method_id,
+                method_title: selectedShipping?.label,
+                total: (Number(selectedShipping?.cost) / 1.22 / 100) + '',
+            }
+        ],
+        coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : [],
+    })
+}
+
+export const prepareOrderLineItem = (api: any, isEu: boolean) => async (item: Item) => {
+    const {data: product} = await api.get("products/" + item.id)
+    const itemPrice = isEu ?
+        product.meta_data.find((m: {key: string, value: string}) => m.key === '_europa_price')?.value ?? product.price :
+        product.price
+    const total = ((Number(itemPrice) * item.quantity.value) / 1.22) + ''
+    return {
+        product_id: item.meta.product_type === 'variation' ? item.meta.variation.parent_id : item.id,
+        variation_id: item.meta.product_type === 'variation' ? item.id : undefined,
+        quantity: item.quantity.value,
+        total,
+    }
+}

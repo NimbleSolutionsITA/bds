@@ -26,7 +26,6 @@ export type CheckoutDesktopProps = {
 	setTab: Dispatch<SetStateAction<number>>
 	checkoutStep: StepType
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
-	payWithStripe: () => Promise<void>
 }
 
 const CheckoutDesktop = ({
@@ -37,7 +36,6 @@ const CheckoutDesktop = ({
 	setTab,
 	checkoutStep,
 	setCheckoutStep,
-    payWithStripe,
 }: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
 	return (
@@ -122,7 +120,6 @@ const CheckoutDesktop = ({
 						checkoutStep={checkoutStep}
 						setCheckoutStep={setCheckoutStep}
 						updateOrder={updateOrder}
-						payWithStripe={payWithStripe}
 					/>
 				</div>
 			</Grid>

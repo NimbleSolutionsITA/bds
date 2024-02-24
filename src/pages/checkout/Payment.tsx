@@ -6,28 +6,21 @@ import {
 	TableRow,
 	TableBody,
 	Typography,
-	Switch,
-	FormControlLabel
+	FormControlLabel, RadioGroup, Radio
 } from "@mui/material";
-import {Dispatch, SetStateAction, useEffect, useState} from "react";
+import {Dispatch, SetStateAction} from "react";
 import Loading from "../../components/Loading";
 import PayPal from "../../icons/PayPal2";
-import MotionPanel from "../../components/MotionPanel";
 import {useTranslation} from "next-i18next";
-import {PaymentControllers, Step as StepType} from "./CheckoutGrid";
-import {PaymentElement} from "@stripe/react-stripe-js";
-import {PayPalButtons} from "@paypal/react-paypal-js";
+import {Step, Step as StepType} from "./CheckoutGrid";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
-import {useDispatch, useSelector} from "react-redux";
+import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
-import {useRouter} from "next/router";
-import {destroyIntent} from "../../redux/cartSlice";
-import {OnApproveData} from "@paypal/paypal-js";
-import {gtagPurchase} from "../../utils/utils";
+import Stripe from "../../icons/Stripe";
 
 type PaymentProps = {
 	isLoading: boolean
@@ -37,100 +30,10 @@ type PaymentProps = {
 }
 
 const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: PaymentProps) => {
-	const {
-		cart: { cart_key: cartKey },
-		stripe: { clientSecret, intentId } = { clientSecret: null },
-		customer,
-		customerNote
-	} = useSelector((state: RootState) => state.cart);
+	const {customer} = useSelector((state: RootState) => state.cart);
 	const shippingAddress = customer?.shipping ? `${customer.shipping.address_1}, ${customer.shipping.postcode}, ${customer.shipping.city} ${customer.shipping.state}, ${customer.shipping.country}` : null;
 	const billingAddress = `${customer?.billing.address_1}, ${customer?.billing.postcode}, ${customer?.billing.city} ${customer?.billing.state}, ${customer?.billing.country}`;
 	const { t } = useTranslation('common')
-	const [paymentError, setPaymentError] = useState<string>();
-	const [orderId, setOrderId] = useState<string>();
-	const [payPalApproved, setPayPalApproved] = useState<false|OnApproveData>(false);
-	const router = useRouter();
-	const dispatch = useDispatch();
-	const payWithPayPal: PaymentControllers['payWithPayPal'] = async () => {
-		try {
-			const orderResponse = await fetch('/api/order/checkout', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					cartKey,
-					customer,
-					customerNote,
-				})
-			})
-			const order = await orderResponse.json()
-
-			if (!order.success || order.amount === 0) {
-				throw new Error('Order creation failed')
-			}
-
-			if (order.paypalOrderId) {
-				setOrderId(order.orderId)
-				return order.paypalOrderId
-			} else {
-				throw new Error( order?.error);
-			}
-		}
-		catch (error) {
-			console.error(error);
-			setPaymentError('Paypal payment error');
-		}
-	}
-
-
-	const onApprove: PaymentControllers['onPayPalApprove'] = async (data) =>
-		setPayPalApproved(data)
-
-	const onPayPalError = (err: any) => setPaymentError(err.message ?? 'Paypal payment error')
-
-	useEffect(() => {
-		const onPayPalApprove = async (data: OnApproveData) => {
-			try {
-				const response = await fetch(`/api/order/checkout`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({
-						paypalOrderId: data.orderID,
-						intentId,
-						cartKey,
-						orderId,
-						customer,
-						customerNote
-					}),
-				});
-
-				const orderData = await response.json();
-
-				if (orderData.success) {
-					gtagPurchase(orderData.order)
-					dispatch(destroyIntent())
-					await router.push({
-						pathname: '/checkout/completed',
-						query: {
-							paid: true,
-							cart_key: cartKey,
-							email: customer?.billing?.email
-						}
-					});
-				} else {
-					throw new Error(orderData.error);
-				}
-
-			} catch (error) {
-				setPaymentError(error instanceof Error ? error?.message : 'Paypal payment error')
-			}
-		}
-		if(payPalApproved)
-			onPayPalApprove(payPalApproved)
-	}, [cartKey, customer, customerNote, dispatch, intentId, orderId, payPalApproved, router]);
 
 	return (
 		<div style={{width: '100%', position: 'relative'}}>
@@ -163,58 +66,33 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 					</TableBody>
 				</Table>
 			</TableContainer>
-			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.payment')}</Typography>
+			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.select-payment')}</Typography>
 			<Typography sx={{marginBottom: '20px'}}>{t('checkout.secured')}</Typography>
-			<FormControlLabel labelPlacement="start" control={(
-				<Switch
-					checked={checkoutStep === 'PAYMENT_PAYPAL'}
-					onChange={(e) => setCheckoutStep(e.target.checked ? 'PAYMENT_PAYPAL' : 'PAYMENT_STRIPE')}
-
+			<RadioGroup
+				aria-labelledby="demo-controlled-radio-buttons-group"
+				name="controlled-radio-buttons-group"
+				value={checkoutStep}
+				onChange={(e,v) => setCheckoutStep(v as Step)}
+			>
+				<FormControlLabel
+					value="PAYMENT_STRIPE"
+					control={<Radio />}
+					label={(
+						<div style={{display: 'flex', alignItems: 'center'}}>
+							<Stripe sx={{fontSize: '50px'}} />
+						</div>
+					)}
 				/>
-			)} label={(
-				<div style={{display: 'flex', alignItems: 'center'}}>
-					{t('checkout.pay-with')}&nbsp;&nbsp;&nbsp;&nbsp;<PayPal sx={{fontSize: '80px'}} />&nbsp;&nbsp;
-				</div>
-			)} />
-			<MotionPanel key="stripe" active={checkoutStep === 'PAYMENT_STRIPE'}>
-				{clientSecret && (
-					<PaymentElement
-						id="payment-element"
-						options={{
-							layout: {
-								type: 'accordion',
-								radios: true,
-								spacedAccordionItems: true,
-								defaultCollapsed: false,
-							},
-							defaultValues: {
-								billingDetails: {
-									name: `${customer?.billing.first_name} ${customer?.billing.last_name}`,
-									email: customer?.billing.email,
-									phone: customer?.billing.phone,
-									address: {
-										line1: customer?.billing.address_1,
-										city: customer?.billing.city,
-										state: customer?.billing.state,
-										postal_code: customer?.billing.postcode,
-										country: customer?.billing.country,
-									},
-								}
-							},
-						}}
-					/>
-				)}
-			</MotionPanel>
-			<MotionPanel key="payPal" active={checkoutStep === 'PAYMENT_PAYPAL'}>
-				<div style={{padding: '20px', border: '1px solid rgba(0,0,0,0.1)'}}>
-					<PayPalButtons
-						createOrder={payWithPayPal}
-						onApprove={onApprove}
-						onError={onPayPalError}
-					/>
-				</div>
-			</MotionPanel>
-			<PaymentErrorDialog error={paymentError} setError={setPaymentError} />
+				<FormControlLabel
+					value="PAYMENT_PAYPAL"
+					control={<Radio />}
+					label={(
+						<div style={{display: 'flex', alignItems: 'center'}}>
+							<PayPal sx={{fontSize: '80px'}} />
+						</div>
+					)}
+				/>
+			</RadioGroup>
 		</div>
 	)
 }

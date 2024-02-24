@@ -97,7 +97,7 @@ type SetCouponPayload = {
 
 export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
 	const { cart: { customer }} = thunkAPI?.getState() as RootState
-	const email = customer?.billing.email
+	/*const email = customer?.billing.email
 	if (!email) {
 		throw new Error('Email required')
 	}
@@ -105,7 +105,7 @@ export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetC
 	const { check } = await response.json()
 	if (!check) {
 		throw new Error('Coupon not valid for email')
-	}
+	}*/
 	await callCartData('/v1/coupon', {coupon: payload.code}, "POST")
 	return await callCartData('/v2/cart', {}, "GET")
 });
@@ -125,19 +125,36 @@ export const initCheckout = createAsyncThunk('cart/initCheckout', async (payload
 	if (!total) {
 		throw new Error('Cart not found');
 	}
-	const { cart: { stripe }} = thunkAPI?.getState() as RootState
+	return { cart }
+});
+
+export const initStripePayment = createAsyncThunk('cart/initStripePayment', async (payload, thunkAPI) => {
+	const { cart: { stripe, cart, customer, customerNote }} = thunkAPI?.getState() as RootState
+	const total = cart.totals?.total;
+	if (!total) {
+		throw new Error('Cart not found');
+	}
 	let paymentIntent = {
 		paymentIntentId: stripe?.intentId,
 		clientSecret: stripe?.clientSecret,
 		error: null
 	}
-	if (!paymentIntent.paymentIntentId || !paymentIntent.clientSecret) {
+	if (paymentIntent.paymentIntentId || paymentIntent.clientSecret) {
+		await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ cart, paymentIntentId: paymentIntent.paymentIntentId })
+		}).then((r) => r.json());
+	}
+	else {
 		paymentIntent = await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ amount: total }),
+			body: JSON.stringify({ cart })
 		}).then((r) => r.json());
 		if (paymentIntent.error) {
 			throw new Error(paymentIntent.error);
@@ -147,7 +164,6 @@ export const initCheckout = createAsyncThunk('cart/initCheckout', async (payload
 });
 
 export const initCart = createAsyncThunk('cart/initCart', async (payload, thunkAPI) => {
-	console.log('initCart')
 	return await initCartData()
 });
 
@@ -266,13 +282,23 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(initCheckout.fulfilled, (state, action) => {
 			state.cart = action.payload.cart
+			state.loading = false;
+		});
+		builder.addCase(initCheckout.rejected, (state) => {
+			state.loading = false;
+		});
+		builder.addCase(initStripePayment.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(initStripePayment.fulfilled, (state, action) => {
+			state.cart = action.payload.cart
 			state.stripe = {
 				intentId: action.payload.paymentIntent.paymentIntentId ?? '',
 				clientSecret: action.payload.paymentIntent.clientSecret ?? ''
 			}
 			state.loading = false;
 		});
-		builder.addCase(initCheckout.rejected, (state) => {
+		builder.addCase(initStripePayment.rejected, (state) => {
 			state.loading = false;
 		});
 		builder.addCase(initCart.pending, (state) => {

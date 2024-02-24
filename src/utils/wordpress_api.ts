@@ -98,7 +98,7 @@ function categoryToMenu(path: string) {
 	}
 }
 
-const getSSRTranslations = async (locale: 'it' | 'en') => {
+export const getSSRTranslations = async (locale: 'it' | 'en') => {
 	return await serverSideTranslations(locale, [
 		'common',
 	])
