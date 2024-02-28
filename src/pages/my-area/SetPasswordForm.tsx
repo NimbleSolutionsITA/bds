@@ -73,7 +73,7 @@ export default function SetPasswordForm({ resetKey: key, login }: Props) {
 		return (
 			<>
 				<p>Your new password has been set.</p>
-				<Link href="/log-in">
+				<Link href="/my-area">
 					<a>Log in</a>
 				</Link>
 			</>

@@ -15,9 +15,9 @@ import {
 	useFormContext,
 	useWatch
 } from "react-hook-form";
-import {Country} from "../../types/woocommerce";
-import {Inputs} from "./CheckoutGrid";
-import HelperText from "../../components/HelperText";
+import {Country} from "../types/woocommerce";
+import {Inputs} from "../pages/checkout/CheckoutGrid";
+import HelperText from "../components/HelperText";
 import {useTranslation} from "next-i18next";
 
 type FormProps = {
@@ -28,7 +28,7 @@ type FormProps = {
 		onFocus: () => void
 	}
 }
-const Form = ({isShipping, countries, focusProps}: FormProps) => {
+const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => {
 	const { control, formState: { errors }, setError } = useFormContext<Inputs>();
 	const type: 'billing' | 'shipping' = isShipping ? 'shipping' : 'billing';
 	const country = useWatch({name: `${type}.country`, control})
@@ -233,4 +233,4 @@ const TextInput = ({control, error, type, name, label, optional, md = 6, setErro
 }
 
 
-export default Form
+export default CustomerAddressForm

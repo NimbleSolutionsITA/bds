@@ -4,6 +4,8 @@ type LayoutState = {
 	newsletterDrawerOpen: boolean
 	cookiesDrawerOpen: boolean
 	searchDrawerOpen: boolean
+	logInDrawerOpen: boolean
+	signUphDrawerOpen: boolean
 	inStockNotifierDrawer: {
 		open: boolean
 		productId: number | null
@@ -18,6 +20,8 @@ const initialState: LayoutState = {
 	newsletterDrawerOpen: false,
 	cookiesDrawerOpen: false,
 	searchDrawerOpen: false,
+	logInDrawerOpen: false,
+	signUphDrawerOpen: false,
 	inStockNotifierDrawer: {
 		open: false,
 		productId: null,
@@ -41,6 +45,12 @@ export const layoutSlice = createSlice({
 		openSearchDrawer: (state) => {
 			state.searchDrawerOpen = true
 		},
+		openLogInDrawer: (state) => {
+			state.logInDrawerOpen = true
+		},
+		openSignUpDrawer: (state) => {
+			state.signUphDrawerOpen = true
+		},
 		closeSearchDrawer: (state) => {
 			state.searchDrawerOpen = false
 		},
@@ -49,6 +59,12 @@ export const layoutSlice = createSlice({
 		},
 		closeNewsletterDrawer: (state) => {
 			state.newsletterDrawerOpen = false
+		},
+		closeLogInDrawer: (state) => {
+			state.logInDrawerOpen = false
+		},
+		closeSignUpDrawer: (state) => {
+			state.signUphDrawerOpen = false
 		},
 		openInStockNotifierDrawer: (state, { payload }: PayloadAction<{ name: string, productId: number, category?: string, attributes?: string, variationId?: number }>) => {
 			state.inStockNotifierDrawer = {
@@ -78,7 +94,11 @@ export const {
 	openInStockNotifierDrawer,
 	closeInStockNotifierDrawer,
 	openSearchDrawer,
-	closeSearchDrawer
+	closeSearchDrawer,
+	openLogInDrawer,
+	closeLogInDrawer,
+	openSignUpDrawer,
+	closeSignUpDrawer
 } = layoutSlice.actions
 
 export default layoutSlice.reducer

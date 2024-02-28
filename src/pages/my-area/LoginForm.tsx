@@ -4,6 +4,9 @@ import { useMutation, gql } from "@apollo/client";
 import { GET_USER } from "../../utils/useAuth";
 import HelperText from "../../components/HelperText";
 import {TextField, Typography, Button, CircularProgress} from "@mui/material";
+import {useRouter} from "next/router";
+import {useDispatch} from "react-redux";
+import {closeLogInDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
 
 const LOG_IN = gql`
     mutation logIn($login: String!, $password: String!) {
@@ -45,7 +48,7 @@ export default function LogInForm() {
 			console.error(error);
 		});
 	}
-
+	const dispatch = useDispatch();
 	return (
 		<form method="post" onSubmit={handleSubmit} style={{padding: '40px 0'}}>
 			<Typography textAlign="center" variant="h2" sx={{mt: '20px', fontWeight: 'bold'}}>Accedi</Typography>
@@ -85,9 +88,12 @@ export default function LogInForm() {
 			</fieldset>
 			<p className="account-sign-up-message">
 				Don&#39;t have an account yet?{' '}
-				<Link href="/my-area/sign-up">
+				<Button variant="text" onClick={() => {
+					dispatch(closeLogInDrawer())
+					dispatch(openSignUpDrawer())
+				}}>
 					Sign up
-				</Link>
+				</Button>
 			</p>
 		</form>
 	);

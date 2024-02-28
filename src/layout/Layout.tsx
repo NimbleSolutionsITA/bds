@@ -24,6 +24,8 @@ import SearchModal from "./drawers/SearchModal";
 import {AppDispatch} from "../redux/store";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import getStripe from "../utils/stripe-utils";
+import SignUpDrawer from "./drawers/SignUpDrawer";
+import LogInDrawer from "./drawers/LogInDrawer";
 
 const googleTagManagerId = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
@@ -85,6 +87,8 @@ export default function Layout({children, layout: {
             <CookiesDrawer />
             <InStockNotifierDrawer />
             <NewsletterDrawer />
+            <LogInDrawer />
+            <SignUpDrawer />
             <CartDrawer shipping={shipping} categories={categories} />
             <SearchModal
                 designers={categories.designers}

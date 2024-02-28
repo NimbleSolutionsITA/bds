@@ -2,6 +2,8 @@ import { useMutation, gql } from "@apollo/client";
 import Link from "next/link";
 import {TextField, Typography, Button, CircularProgress} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
+import {closeSignUpDrawer, openLogInDrawer} from "../../redux/layoutSlice";
+import {useDispatch} from "react-redux";
 
 const REGISTER_USER = gql`
     mutation registerUser(
@@ -46,7 +48,7 @@ export default function SignUpForm() {
 			</p>
 		)
 	}
-
+	const dispatch = useDispatch();
 	return (
 		<form method="post" onSubmit={handleSubmit} style={{padding: '40px 0'}}>
 			<Typography textAlign="center" variant="h2" sx={{mt: '20px', fontWeight: 'bold'}}>Registrati</Typography>
@@ -100,7 +102,10 @@ export default function SignUpForm() {
 				</Button>
 			</fieldset>
 			<p>
-				Already have an account? <Link href="/my-area">Log in</Link>
+				Already have an account? <Button variant="text" onClick={() => {
+					dispatch(closeSignUpDrawer())
+					dispatch(openLogInDrawer())
+			}}>Log in</Button>
 			</p>
 		</form>
 	);

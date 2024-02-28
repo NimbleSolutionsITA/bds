@@ -1,9 +1,10 @@
 import useAuth from "../../utils/useAuth";
 import {useMutation, useQuery} from "@tanstack/react-query";
+import {LoggedCustomer} from "../../types/woocommerce";
 
 const useMyArea = () => {
 	const { user } = useAuth();
-	const getCustomerQuery = useQuery(
+	const getCustomerQuery = useQuery<{ customer: LoggedCustomer|null }>(
 		['get-customer', user?.databaseId],
 		async () => {
 			const response = await fetch(`/api/customer/${user?.databaseId}`);

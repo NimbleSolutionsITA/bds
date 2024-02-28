@@ -6,7 +6,7 @@ import LanguageButton from "../../components/LanguageButton";
 import ShippingBanner from "./ShippingBanner";
 import {FACEBOOK_LINK, INSTAGRAM_LINK} from "../../utils/endpoints";
 import SearchIcon from '@mui/icons-material/Search';
-import {closeSearchDrawer, openSearchDrawer} from "../../redux/layoutSlice";
+import {closeSearchDrawer, openLogInDrawer, openSearchDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import UserIcon from "../../icons/UserIcon";
@@ -63,6 +63,7 @@ function UserMenu() {
     const router = useRouter();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
+    const dispatch = useDispatch()
     const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget);
     };
@@ -71,15 +72,16 @@ function UserMenu() {
     };
 
     const loggedMenu = [
-        { label: 'Profile', onClick: () => router.push('/my-area/profile') },
-        { label: 'Addresses', onClick: () => router.push('/my-area/addresses') },
-        { label: 'Orders', onClick: () => router.push('/my-area/orders') },
+        { label: 'Profile', onClick: () => router.push('/my-area', { query: { tab : 0 } }) },
+        { label: 'Billing', onClick: () => router.push('/my-area', { query: { tab : 1 } }) },
+        { label: 'Shipping', onClick: () => router.push('/my-area', { query: { tab : 2 } }) },
+        { label: 'Orders', onClick: () => router.push('/my-area', { query: { tab : 3 } }) },
         { label: 'Logout', onClick: logOut },
     ]
 
     const guestMenu = [
-        { label: 'Login', onClick: () => router.push('/my-area') },
-        { label: 'Register', onClick: () => router.push('/my-area/sign-up') },
+        { label: 'Login', onClick: () => dispatch(openLogInDrawer()) },
+        { label: 'Register', onClick: () => dispatch(openSignUpDrawer()) },
     ]
     const menuItemns = loggedIn ? loggedMenu : guestMenu;
     return (
@@ -105,7 +107,10 @@ function UserMenu() {
                 }}
             >
                 {menuItemns.map(({onClick, label}) => (
-                    <MenuItem sx={{textTransform: 'uppercase'}} key={label} onClick={onClick}>{label}</MenuItem>
+                    <MenuItem sx={{textTransform: 'uppercase'}} key={label} onClick={() => {
+                        handleClose();
+                        onClick();
+                    }}>{label}</MenuItem>
                 ))}
             </Menu>
         </>

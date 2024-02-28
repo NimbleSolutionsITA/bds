@@ -1,12 +1,12 @@
 import {SyntheticEvent, Dispatch, SetStateAction} from "react";
-import {Controller, useFormContext, useWatch} from "react-hook-form";
+import {Controller, Form, useFormContext, useWatch} from "react-hook-form";
 import {Tabs, Tab, TextField, Switch, FormControlLabel} from "@mui/material";
-import Form from "./Form";
 import {Country} from "../../types/woocommerce";
 import {Inputs} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
 import MotionPanel from "../../components/MotionPanel";
 import {useTranslation} from "next-i18next";
+import CustomerAddressForm from "../../components/CustomerAddressForm";
 
 type AddressFormProps = {
 	countries: Country[]
@@ -73,11 +73,11 @@ const AddressForm = ({isLoading, countries, tab, setTab, setFocus}: AddressFormP
 			</Tabs>
 			<div style={{position: 'relative'}}>
 				<MotionPanel active={!hasShipping || tab === 0}>
-					<Form countries={countries} focusProps={focusProps} />
+					<CustomerAddressForm countries={countries} focusProps={focusProps} />
 				</MotionPanel>
 				{hasShipping && (
 					<MotionPanel active={tab === 1}>
-						<Form
+						<CustomerAddressForm
 							isShipping
 							countries={countries}
 							focusProps={focusProps}
