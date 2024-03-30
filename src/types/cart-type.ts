@@ -1,22 +1,22 @@
 
 export interface Cart {
-	cart_hash: string
-	cart_key: string
-	currency: Currency
+	cart_hash?: string
+	cart_key?: string
+	currency?: Currency
 	customer: Customer
 	items: Item[]
-	item_count: number
-	items_weight: number
-	coupons: any[]
-	needs_payment: boolean
-	needs_shipping: boolean
-	shipping: Shipping
-	fees: any[]
-	taxes: any[]
+	item_count?: number
+	items_weight?: number
+	coupons?: any[]
+	needs_payment?: boolean
+	needs_shipping?: boolean
+	shipping?: Shipping
+	fees?: any[]
+	taxes?: any[]
 	totals: Totals
-	removed_items: any[]
-	cross_sells: any[]
-	notices: any[],
+	removed_items?: any[]
+	cross_sells?: any[]
+	notices?: any[],
 }
 
 export type Item = {

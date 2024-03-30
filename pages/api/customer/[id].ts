@@ -26,7 +26,7 @@ export default async function handler(
 	if (req.method === 'GET') {
 		try {
 			const id = req.query.id as string;
-			const {data} = await api.get(`customers/${id}`, req.query)
+			const {data} = await api.get(`customers/${id}`)
 
 			responseData.success = true
 			responseData.customer = data
@@ -50,10 +50,15 @@ export default async function handler(
 			responseData.customer = data
 		}
 		catch ( error ) {
+			console.log('PATCH CUSTOMER', req.query.id, req.body, error)
 			if (typeof error === "string") {
 				responseData.error = error
 			} else if (error instanceof Error) {
 				responseData.error = error.message
+			}
+			const errorData = error as any
+			if (errorData?.response?.data?.message) {
+				responseData.error = errorData.response.data.message
 			}
 			res.status(500)
 		}

@@ -29,23 +29,23 @@ function MyApp(props: BDGAppProps) {
     const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
     return (
         <ApolloProvider client={client}>
-            <AuthProvider>
+            <QueryClientProvider client={queryClient}>
                 <Provider store={store}>
-                    <CacheProvider value={emotionCache}>
-                        <Head>
-                            <meta name="viewport" content="initial-scale=1, width=device-width" />
-                        </Head>
-                        <ThemeProvider theme={theme}>
-                            <QueryClientProvider client={queryClient}>
+                    <AuthProvider>
+                        <CacheProvider value={emotionCache}>
+                            <Head>
+                                <meta name="viewport" content="initial-scale=1, width=device-width" />
+                            </Head>
+                            <ThemeProvider theme={theme}>
                                 {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
                                 <CssBaseline />
                                 <NextNProgress color="#000" />
                                 <Component {...pageProps} />
-                            </QueryClientProvider>
-                        </ThemeProvider>
-                    </CacheProvider>
+                            </ThemeProvider>
+                        </CacheProvider>
+                    </AuthProvider>
                 </Provider>
-            </AuthProvider>
+            </QueryClientProvider>
         </ApolloProvider>
     );
 }

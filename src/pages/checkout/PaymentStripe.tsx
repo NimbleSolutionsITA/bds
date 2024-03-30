@@ -8,7 +8,7 @@ import {useTranslation} from "next-i18next";
 
 const PaymentStripe = () => {
 	const [loading, setLoading] = React.useState(false);
-	const { customer, customerNote, cart, stripe: stripeIntent } = useSelector((state: RootState) => state.cart);
+	const { customer, cart, stripe: stripeIntent } = useSelector((state: RootState) => state.cart);
 	const stripe = useStripe();
 	const elements = useElements();
 	const { t } = useTranslation('common')
@@ -29,7 +29,7 @@ const PaymentStripe = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ cart, customer, customerNote, paymentIntentId: stripeIntent.intentId })
+			body: JSON.stringify({ cart, customer, paymentIntentId: stripeIntent.intentId })
 		}).then((r) => r.json())
 
 		if (!response.success) {

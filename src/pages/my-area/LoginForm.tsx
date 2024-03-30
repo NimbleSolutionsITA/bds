@@ -19,7 +19,7 @@ const LOG_IN = gql`
     }
 `;
 
-export default function LogInForm() {
+export default function LogInForm({ isCheckout = false }: { isCheckout?: boolean }) {
 	const [logIn, { loading, error }] = useMutation(LOG_IN, {
 		refetchQueries: [
 			{ query: GET_USER }

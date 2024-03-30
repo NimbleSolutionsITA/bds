@@ -44,8 +44,27 @@ export default async function handler(
 		}
 		if (req.method === 'PUT') {
 			if (paymentIntent.status === 'succeeded') {
+				console.log(paymentIntent)
 				const { data: order } = await api.put(`orders/${orderId}`, {
-					set_paid: true
+					set_paid: true,
+					meta_data: [
+						{
+							key: '_stripe_customer_id',
+							value: paymentIntent.customer?.id
+						},
+						{
+							key: '_stripe_source_id',
+							value: paymentIntent.payment_method
+						},
+						{
+							key: '_stripe_intent_id',
+							value: paymentIntent.id
+						},
+						{
+							key: '_stripe_charge_captured',
+							value: true
+						}
+					]
 				})
 				res.json({ success: true, order })
 			}

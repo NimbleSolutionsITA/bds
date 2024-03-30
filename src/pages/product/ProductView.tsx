@@ -51,6 +51,8 @@ const removeDuplicates = (array: ImageDetailed[]) => {
 }
 
 const ProductView = ({product, category, shipping}: ProductViewProps) => {
+	const { cart: { customer: { shipping_address: { shipping_country }} } } = useSelector((state: RootState) => state.cart);
+	const isEU = shipping_country !== 'IT'
 	const init = getDefaultProduct(product);
 	const isEyewear = product.categories.find(({id, parent }) =>
 		EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
@@ -212,7 +214,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 					)}
 					{cartItem.price > 0 && (
 						<Typography variant="h3" sx={{fontFamily: 'Apercu', fontSize: '25px', fontWeight: 300, marginTop: '10px'}} component="div">
-							<PriceFormat value={cartItem.price} decimalScale={0} />
+							<PriceFormat value={isEU ? (cartItem.priceEU ?? cartItem.price) : cartItem.price} decimalScale={0} />
 						</Typography>
 					)}
 					{product.short_description && (

@@ -30,7 +30,7 @@ export default async function handler(
 	}
 	try {
 		if (req.method === 'POST') {
-			const { cart, customer, customerNote } = req.body
+			const { cart, customer } = req.body
 			if (!customer) {
 				throw new Error('Customer data is missing')
 			}
@@ -46,13 +46,6 @@ export default async function handler(
 				payment_method_title: 'PayPal',
 				payment_method_reference: 'paypal',
 				...orderPayload,
-				meta_data: [
-					{
-						key: 'vat',
-						value: customer.billing.vat ?? ''
-					}
-				],
-				customer_note: customerNote
 			})
 			const amount = Number(order.total)
 			if (amount === 0) {

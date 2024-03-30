@@ -352,11 +352,12 @@ export const gtagConsent = (granted: boolean) => {
 }
 
 export const prepareOrderPayload = async (cart: any, customerData: any, api: any) => {
+    const { invoice, customerNote, ...addresses} = customerData
     const selectedShipping = cart.shipping.packages.default.rates[cart.shipping.packages.default.chosen_method]
     const isEu = (customerData?.shipping?.country ?? customerData?.billing?.country ) !== 'IT'
     const line_items = await Promise.all(cart.items.map(prepareOrderLineItem(api, isEu)))
     return ({
-        ...customerData,
+        ...addresses,
         line_items,
         shipping_lines: [
             {
@@ -366,6 +367,14 @@ export const prepareOrderPayload = async (cart: any, customerData: any, api: any
             }
         ],
         coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : [],
+        customer_note: customerNote,
+        meta_data: [
+            { key: '_billing_choice_type', value: invoice.billingChoice },
+            { key: '_billing_invoice_type', value: invoice.invoiceType },
+            { key: '_billing_sdi_type', value: invoice.sdi },
+            { key: '_billing_vat_number', value: invoice.vat },
+            { key: '_billing_tax_code', value: invoice.tax },
+        ]
     })
 }
 

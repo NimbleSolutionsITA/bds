@@ -19,6 +19,7 @@ import {
 	LIQUIDES_IMAGINAIRES_SUB_PATH,
 	PROFUMUM_ROMA_SUB_PATH
 } from "../../utils/endpoints";
+import {Item} from "../../types/cart-type";
 
 type CartDrawerProps = {
 	shipping: ShippingClass[]
@@ -27,9 +28,9 @@ type CartDrawerProps = {
 
 const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 	const { cartDrawerOpen, cart, loading } = useSelector((state: RootState) => state.cart);
+	const isEU = cart?.customer?.shipping_address?.shipping_country !== 'IT'
 	const dispatch = useDispatch()
 	const totalItems = cart?.item_count ?? 0
-	const subtotal = (Number(cart?.totals?.subtotal ?? 0) + Number(cart?.totals?.subtotal_tax ?? 0)) / 100
 	const { t } = useTranslation('common')
 	return (
 		<SwipeableDrawer
@@ -66,12 +67,19 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 				{cart && cart.items && cart.items.length > 0 ? (
 					<>
 						{cart.items.map((item) => (
-							<CartItem key={item.item_key} item={item} loading={loading} />
+							<CartItem
+								key={item.item_key}
+								item={{
+									...item,
+									price: (isEU && item.cart_item_data.priceEU) ? (item.cart_item_data.priceEU + '00') : item.price}
+							}
+								loading={loading}
+							/>
 						))}
 						<div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '30px'}}>
 							<Typography variant="h6" sx={{textTransform: 'capitalize'}}>{t('subtotal')}</Typography>
 							<Typography variant="h6">
-								<PriceFormat value={subtotal} decimalScale={0} />
+								<PriceFormat value={getSubtotal(cart.items, isEU)} decimalScale={0} />
 							</Typography>
 						</div>
 						<Button component={Link} href={`/${CHECKOUT_SUB_PATH}`} disabled={loading}>
@@ -110,6 +118,20 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 			</Container>
 		</SwipeableDrawer>
     )
+}
+
+const getItemPrice = (item: any, isEU: boolean) => {
+	return isEU && item.cart_item_data.priceEU ?
+		item.cart_item_data.priceEU + '00' :
+		item.price
+}
+
+const getSubtotal = (items: Item[], isEU: boolean) => {
+	return  items.reduce((acc, item) => {
+		const price = getItemPrice(item, isEU)
+		return (Number(price) * item.quantity.value) / 100
+
+	}, 0)
 }
 
 type CategoryChipsProps = {

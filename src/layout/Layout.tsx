@@ -27,8 +27,6 @@ import getStripe from "../utils/stripe-utils";
 import SignUpDrawer from "./drawers/SignUpDrawer";
 import LogInDrawer from "./drawers/LogInDrawer";
 
-const googleTagManagerId = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
-
 type LayoutProps = {
     children: React.ReactNode,
     layout: BaseLayoutProps

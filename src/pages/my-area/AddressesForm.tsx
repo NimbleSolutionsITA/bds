@@ -1,29 +1,33 @@
 
-import useMyArea from "./useMyArea";
 import {Controller, FormProvider, useForm} from "react-hook-form";
-import {Button, Container, TextField} from "@mui/material";
+import {Button, CircularProgress, Container, TextField} from "@mui/material";
 import Loading from "../../components/Loading";
 import {useTranslation} from "next-i18next";
 import React from "react";
 import {Country, LoggedCustomer} from "../../types/woocommerce";
 import HelperText from "../../components/HelperText";
 import CustomerAddressForm from "../../components/CustomerAddressForm";
+import useAuth from "../../utils/useAuth";
+import loading from "../../components/Loading";
 
 type FormProps = { countries: Country[]}
 type AddressesFormProps = FormProps & {type: 'billing'|'shipping'}
-type FormContainerProps<T extends LoggedCustomer['billing']|LoggedCustomer['shipping']> = AddressesFormProps & {address: T, onValid: any}
+type FormContainerProps<T extends LoggedCustomer['billing']|LoggedCustomer['shipping']> = AddressesFormProps & {address: T, onValid: any, loading: boolean}
 function AddressesForm({type, countries}: AddressesFormProps) {
-	const { customer, updateCustomer } = useMyArea();
+	const { customer, updateCustomer, isUpdating: loading } = useAuth();
 	const onValid = (data: any) => {
-		const { ...customerData } = data
+		let { ...customerData } = data
+		if (type === 'billing') {
+			customerData.billing.email = customer?.email
+		}
 		updateCustomer(customerData)
 	}
 	return customer ?
-		<FormContainer address={customer[type]} type={type} onValid={onValid} countries={countries} /> :
+		<FormContainer loading={loading} address={customer[type]} type={type} onValid={onValid} countries={countries} /> :
 		<Loading />
 }
 
-function FormContainer<T extends LoggedCustomer['billing']|LoggedCustomer['shipping']>({address, countries, type, onValid}: FormContainerProps<T>) {
+function FormContainer<T extends LoggedCustomer['billing']|LoggedCustomer['shipping']>({address, countries, type, onValid, loading}: FormContainerProps<T>) {
 	const { t } = useTranslation('common')
 	const defaultValues = {
 		[type]: address
@@ -33,36 +37,19 @@ function FormContainer<T extends LoggedCustomer['billing']|LoggedCustomer['shipp
 	)
 	return (
 		<Container maxWidth="sm" sx={{paddingBottom: '40px'}}>
-			{type === 'billing' && (
-				<Controller
-					control={methods.control}
-					name="billing.email"
-					rules={{
-						required: t('validation.emailRequired'),
-						pattern: {value: /\S+@\S+\.\S+/, message: t('validation.emailValid')}
-					}}
-					render={({ field }) => (
-						<TextField
-							{...field}
-							onChange={(e) => {
-								field.onChange(e)
-								methods.setError(field.name, {})
-							}}
-							fullWidth
-							variant="outlined"
-							label="Email"
-							helperText={<HelperText message={methods.formState.errors.billing?.email?.message} />}
-						/>
-					)}
-				/>
-			)}
 			<FormProvider {...methods}>
 				<CustomerAddressForm
 					isShipping={type === 'shipping'}
 					countries={countries}
 				/>
 			</FormProvider>
-			<Button fullWidth onClick={methods.handleSubmit(onValid)}>Save</Button>
+			<Button
+				endIcon={loading ? <CircularProgress size="20px" /> : undefined}
+				sx={{mt: '20px'}} fullWidth type="submit" disabled={loading}
+				onClick={methods.handleSubmit(onValid)}
+			>
+				{t('save')}
+			</Button>
 		</Container>
 	);
 }

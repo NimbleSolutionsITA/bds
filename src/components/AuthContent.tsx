@@ -8,14 +8,14 @@ import {RootState} from "../redux/store";
 
 export default function AuthContent({ children }: { children: ReactNode }) {
 	const { loggedIn, loading } = useAuth();
-	const { logInDrawerOpen, signUphDrawerOpen } = useSelector((state: RootState) => state.layout);
+	const { logInDrawerOpen, signUpDrawerOpen } = useSelector((state: RootState) => state.layout);
 	const dispatch = useDispatch();
 	// Navigate unauthenticated users to Log In page.
 	useEffect(() => {
 		if (!loading && !loggedIn) {
 			dispatch(openLogInDrawer())
 		}
-	}, [loggedIn, loading]);
+	}, [loggedIn, loading, dispatch]);
 
 	if (loggedIn) {
 		return <>{children}</>;
@@ -23,7 +23,7 @@ export default function AuthContent({ children }: { children: ReactNode }) {
 
 	return (
 		<Box sx={{width: '100%', height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-			{(signUphDrawerOpen || logInDrawerOpen) ? <Loading /> : (
+			{(signUpDrawerOpen || logInDrawerOpen || loading) ? <Loading /> : (
 				<div style={{textAlign: 'center'}}>
 					<Box sx={{fontSize: '100px', fontWeight: 700}}>
 						401

@@ -10,12 +10,12 @@ import CustomerAddressForm from "../../components/CustomerAddressForm";
 
 type AddressFormProps = {
 	countries: Country[]
-	isLoading: boolean
+	isLoading?: boolean
 	tab: number
 	setTab: Dispatch<SetStateAction<number>>
 	setFocus?: Dispatch<SetStateAction<boolean>>
 }
-const AddressForm = ({isLoading, countries, tab, setTab, setFocus}: AddressFormProps) => {
+const AddressForm = ({isLoading = false, countries, tab, setTab, setFocus}: AddressFormProps) => {
 	const { control, formState: { errors }, setError } = useFormContext<Inputs>();
 	const handleChange = (event: SyntheticEvent, newValue: number) => {
 		setTab(newValue);

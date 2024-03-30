@@ -6,7 +6,7 @@ import {CloseSharp} from "@mui/icons-material";
 import SignUpForm from "../../pages/my-area/SignUpForm";
 
 const SignUpDrawer = () => {
-	const { signUphDrawerOpen } = useSelector((state: RootState) => state.layout);
+	const { signUpDrawerOpen } = useSelector((state: RootState) => state.layout);
 	const dispatch = useDispatch()
 	return (
 		<SwipeableDrawer
@@ -25,7 +25,7 @@ const SignUpDrawer = () => {
 					backgroundColor: '#f1f1f1',
 				}
 			}}
-			open={signUphDrawerOpen}
+			open={signUpDrawerOpen}
 			onClose={() => dispatch(closeSignUpDrawer())}
 			onOpen={() => dispatch(openSignUpDrawer())}
 		>

@@ -12,7 +12,7 @@ import {
 	MenuItem,
 	Select, SelectChangeEvent,
 	TextField,
-	Typography, useMediaQuery, useTheme,
+	Typography,
 } from "@mui/material";
 import {useFormContext} from "react-hook-form";
 import {Step as StepType, Step} from "./CheckoutGrid";
@@ -24,7 +24,7 @@ import PriceRecap from "./PriceRecap";
 import Minus from "../../layout/cart/Minus";
 import Plus from "../../layout/cart/Plus";
 import {useTranslation} from "next-i18next";
-import {BaseSyntheticEvent, Dispatch, SetStateAction, useEffect, useState} from "react";
+import {BaseSyntheticEvent, Dispatch, SetStateAction, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {removeCoupon, selectShipping, setCoupon, setCustomerNote} from "../../redux/cartSlice";
@@ -35,16 +35,21 @@ type RecapProps = {
 	isLoading: boolean
 	checkoutStep: Step
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
-	updateOrder: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+	updateOrder: (step: Step) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+}
+
+const buttonLabel = {
+	ADDRESS: 'checkout.go-to-invoice',
+	INVOICE: 'checkout.go-to-payment',
+	PAYMENT_STRIPE: 'checkout.pay-now',
+	PAYMENT_PAYPAL: 'checkout.pay-now',
 }
 const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapProps) => {
 	const { formState: { errors } } = useFormContext();
 	const { t } = useTranslation('common');
-	const { cart, customerNote, loading } = useSelector((state: RootState) => state.cart);
+	const { cart, customer: { customerNote }, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
-	const canEditData = !isLoading && ['RECAP', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
-	const theme = useTheme();
-	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+	const canEditData = !isLoading && ['INVOICE', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
 	const isEU = getIsEU(cart?.customer)
 	const shipping = cart?.shipping?.packages.default
 	const shippingRates = shipping?.rates ?? {}
@@ -57,12 +62,10 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 	const handleContinue = async () => {
 		switch (checkoutStep) {
 			case 'ADDRESS':
-				await updateOrder()
-				if (isMobile)
-					setCheckoutStep('RECAP')
+				await updateOrder('INVOICE')()
 				break
-			case 'RECAP':
-				setCheckoutStep('PAYMENT_STRIPE')
+			case 'INVOICE':
+				await updateOrder('PAYMENT_STRIPE')()
 				break;
 			case 'PAYMENT_STRIPE':
 				await router.push('/checkout/stripe')
@@ -205,7 +208,6 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 					rows={4}
 					value={customerNote}
 					onChange={(e) => dispatch(setCustomerNote(e.target.value))}
-					disabled={!canEditData}
 				/>
 			</FormControl>
 			<Hidden smDown>
@@ -218,7 +220,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 					disabled={isLoading}
 					startIcon={(isLoading) && <CircularProgress size={16} />}
 				>
-					{checkoutStep !== 'ADDRESS' ? t('checkout.pay-now') : t('checkout.go-to-payment')}
+					{t(buttonLabel[checkoutStep])}
 				</Button>
 				<Payments />
 			</Hidden>

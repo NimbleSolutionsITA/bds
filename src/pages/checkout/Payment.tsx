@@ -29,10 +29,15 @@ type PaymentProps = {
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
 }
 
+const getAddressString = (address: any) => {
+	return `${address.address_1}, ${address.postcode}, ${address.city} ${address.state}, ${address.country}`
+}
+
 const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: PaymentProps) => {
 	const {customer} = useSelector((state: RootState) => state.cart);
-	const shippingAddress = customer?.shipping ? `${customer.shipping.address_1}, ${customer.shipping.postcode}, ${customer.shipping.city} ${customer.shipping.state}, ${customer.shipping.country}` : null;
-	const billingAddress = `${customer?.billing.address_1}, ${customer?.billing.postcode}, ${customer?.billing.city} ${customer?.billing.state}, ${customer?.billing.country}`;
+
+	const shippingAddress = getAddressString(customer.shipping.first_name ? customer.shipping : customer.billing);
+	const billingAddress = getAddressString(customer.billing);
 	const { t } = useTranslation('common')
 
 	return (
@@ -47,20 +52,29 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 							label={t('checkout.contact')}
 							value={`${customer?.billing.email}`}
 							isLoading={isLoading}
-							edit={() => editAddress(0)}
+							edit={() => {
+								editAddress(0)
+								setCheckoutStep('ADDRESS')
+							}}
 						/>
 						<RecapRow
 							label={t('checkout.ship-to')}
 							value={shippingAddress ?? billingAddress}
 							isLoading={isLoading}
-							edit={() => editAddress(shippingAddress ? 1 : 0)}
+							edit={() => {
+								editAddress(shippingAddress ? 1 : 0)
+								setCheckoutStep('ADDRESS')
+							}}
 						/>
 						{shippingAddress && (
 							<RecapRow
 								label={t('checkout.bill-to')}
 								value={billingAddress}
 								isLoading={isLoading}
-								edit={() => editAddress(0)}
+								edit={() => {
+									editAddress(0)
+									setCheckoutStep('ADDRESS')
+								}}
 							/>
 						)}
 					</TableBody>

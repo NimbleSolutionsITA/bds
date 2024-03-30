@@ -217,6 +217,8 @@ export type WooOrder = {
 	shipping_tax: string;
 	cart_tax: string;
 	total_tax: string;
+	subtotal: string;
+	subtotal_tax: string;
 	billing: BillingData
 	shipping: ShippingData
 	payment_method: string;
@@ -228,6 +230,15 @@ export type WooOrder = {
 		code: string;
 	}[]
 	shipping_lines: WooSippingLine[]
+	meta_data: {
+		id: number;
+		key: string;
+		value: string;
+	}[]
+	date_completed: string;
+	date_paid: string;
+	date_created: string;
+	customer_note: string;
 }
 
 export type BillingData = {
@@ -257,6 +268,14 @@ export type ShippingData = {
 	country: string;
 }
 
+export type InvoiceData = {
+	vat: string,
+	tax: string,
+	sdi: string,
+	billingChoice: 'invoice' | 'receipt',
+	invoiceType: 'private' | 'company' | 'freelance'
+}
+
 export type WooSippingLine = {
 	id: number;
 	method_title: string;
@@ -273,10 +292,17 @@ export type WooLineItem = {
 	subtotal_tax: string;
 	total: string;
 	total_tax: string;
+	image: {
+		id: number;
+		src: string;
+	}
+	parent_name: string;
 	meta_data: {
 		id: number;
 		key: string;
 		value: string;
+		display_key: string;
+		display_value: string;
 	}[]
 }
 

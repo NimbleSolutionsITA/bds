@@ -1,10 +1,11 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Box, Container, Tab, Tabs, Typography} from "@mui/material";
 import {TabPanelProps} from "@mui/base";
 import ProfileForm from "./ProfileForm";
 import {ShippingForm, BillingForm} from "./AddressesForm";
 import OrderList from "./OrderList";
-import {useRouter} from "next/router";
+import { useSearchParams } from 'next/navigation';
+
 import {Country} from "../../types/woocommerce";
 
 const MyArea = ({countries}: {countries: Country[]}) => {
@@ -14,8 +15,10 @@ const MyArea = ({countries}: {countries: Country[]}) => {
 		{ label: 'Shipping', component: <ShippingForm countries={countries} /> },
 		{ label: 'Orders', component: <OrderList /> },
 	]
-	const { query: { tab = '0' }} = useRouter();
+	const params = useSearchParams()
+	const tab = params.get('tab') ?? '0'
 	const [value, setValue] = React.useState(Number(tab))
+
 	function a11yProps(index: number) {
 		return {
 			id: `simple-tab-${index}`,
@@ -25,6 +28,11 @@ const MyArea = ({countries}: {countries: Country[]}) => {
 	const handleChange = (event: React.SyntheticEvent, newValue: number) => {
 		setValue(newValue);
 	};
+
+	useEffect(() => {
+		setValue(Number(tab))
+	}, [tab]);
+
 
 	return (
 		<React.Fragment>

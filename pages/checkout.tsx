@@ -9,6 +9,9 @@ import {AppDispatch, RootState} from "../src/redux/store";
 import Head from "next/head";
 import GoogleAnalytics from "../src/components/GoogleAnalytics";
 import {useRouter} from "next/router";
+import LogInDrawer from "../src/layout/drawers/LogInDrawer";
+import useAuth from "../src/utils/useAuth";
+import {openLogInDrawer} from "../src/redux/layoutSlice";
 
 const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
 
@@ -19,18 +22,46 @@ export type CheckoutProps = {
 	}
 }
 
+type InitStep = 'check-login'|'ask-login'|'init-customer-data'|'completed'
+
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
 
 export default function Checkout({
      shipping
 }: CheckoutProps) {
-	const { cart, stripe } = useSelector((state: RootState) => state.cart);
+	const [ initStep, setInitStep ] = useState<InitStep>('check-login')
+	const { loginChecked, loggedIn } = useAuth()
+	const { cart: { cart, customer }, layout: { logInDrawerOpen } } = useSelector((state: RootState) => state);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
 
 	useEffect(() => {
-		dispatch(initCheckout());
-	}, [])
+		if (loginChecked && !loggedIn) {
+			dispatch(openLogInDrawer())
+			setInitStep('ask-login')
+		}
+		if (loginChecked && loggedIn) {
+			setInitStep('init-customer-data')
+		}
+	}, [loginChecked, loggedIn, dispatch])
+
+	useEffect(() => {
+		if (initStep === 'ask-login' && !logInDrawerOpen) {
+			dispatch(initCheckout());
+			setInitStep('completed')
+		}
+		if (
+			initStep === 'init-customer-data' &&
+			customer && customer.billing && customer.billing.first_name &&
+			cart && cart.items && cart.items.length > 0
+		) {
+			dispatch(initCheckout());
+			setInitStep('completed')
+		}
+	}, [cart, customer, dispatch, initStep, logInDrawerOpen]);
+
+
+	console.log({initStep})
 
 	return <Fragment>
 		<Head>
@@ -42,8 +73,10 @@ export default function Checkout({
 
 		{GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
 
-		{(cart && cart.items && cart.items.length > 0)  ? (
-			<CheckoutGrid shipping={shipping} />
+		<LogInDrawer />
+
+		{initStep === 'completed'  ? (
+			<CheckoutGrid shipping={shipping}  />
 		) : (
 			<Backdrop
 				sx={{ backgroundColor: 'rgba(255,255,255,0.75)', zIndex: (theme) => theme.zIndex.appBar - 2 }}

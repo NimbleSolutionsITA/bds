@@ -17,15 +17,38 @@ import {Check} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
 import {Country} from "../../types/woocommerce";
 import {BaseSyntheticEvent, Dispatch, SetStateAction} from "react";
+import InvoiceForm from "../../components/InvoiceForm";
 
 export type CheckoutDesktopProps = {
 	countries: Country[]
-	updateOrder: (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
 	isLoading: boolean
 	tab: number
 	setTab: Dispatch<SetStateAction<number>>
 	checkoutStep: StepType
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
+}
+
+const getStep = (checkoutStep: StepType) => {
+	switch (checkoutStep) {
+		case 'ADDRESS':
+			return 0
+		case 'INVOICE':
+			return 1
+		default:
+			return 2
+	}
+}
+
+const getCheckoutStep = (index: number): StepType => {
+	switch (index) {
+		case 0:
+			return 'ADDRESS'
+		case 1:
+			return 'INVOICE'
+		default:
+			return 'PAYMENT_STRIPE'
+	}
 }
 
 const CheckoutDesktop = ({
@@ -38,6 +61,21 @@ const CheckoutDesktop = ({
 	setCheckoutStep,
 }: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
+	const handleStepClick = (index: number) => async () => {
+		const step = getStep(checkoutStep)
+		const destinationStep = getCheckoutStep(index)
+		if (index === step)
+			return
+		if (step === 0) {
+			await updateOrder(destinationStep)()
+			return
+		}
+		if (step === 1 && index !== 0) {
+			await updateOrder(destinationStep)()
+			return
+		}
+		setCheckoutStep(destinationStep)
+	}
 	return (
 		<Grid container sx={{height: '100vh', position: 'relative'}}>
 			<Grid item xs={12} md={7} sx={{display: 'flex', alignItems: 'flex-end', flexDirection: 'column'}}>
@@ -54,11 +92,11 @@ const CheckoutDesktop = ({
 					<Logo sx={{margin: '10px'}} />
 					<Stepper
 						alternativeLabel
-						activeStep={checkoutStep === 'ADDRESS' ? 0 : 1}
+						activeStep={getStep(checkoutStep)}
 						connector={<CheckoutStepConnector />}
 						sx={{width: '100%', marginBottom: '20px'}}
 					>
-						{[t('checkout.address'), t('checkout.payment')].map((label, index) => (
+						{[t('checkout.address'), t('checkout.invoice'), t('checkout.payment')].map((label, index) => (
 							<Step key={label}>
 								<StepLabel
 									StepIconComponent={CheckoutStepIcon}
@@ -73,14 +111,9 @@ const CheckoutDesktop = ({
 										sx={{
 											fontSize: '16px',
 											textTransform: 'none',
-											fontWeight: (checkoutStep === 'ADDRESS' && index === 0) || (checkoutStep !== 'ADDRESS' && index === 1) ? 500 : 300
+											fontWeight: getStep(checkoutStep) === index ? 500 : 300
 										}}
-										onClick={async () => {
-											if (checkoutStep !== 'ADDRESS' && index === 0)
-												setCheckoutStep('ADDRESS')
-											if (checkoutStep === 'ADDRESS' && index === 1)
-												await updateOrder()
-										}}
+										onClick={handleStepClick(index)}
 									>
 										{label}
 									</Button>
@@ -88,17 +121,21 @@ const CheckoutDesktop = ({
 							</Step>
 						))}
 					</Stepper>
-					{checkoutStep === 'ADDRESS' ? (
+					{checkoutStep === 'ADDRESS' && (
 						<AddressForm
 							countries={countries}
 							isLoading={isLoading}
 							tab={tab}
 							setTab={setTab}
 						/>
-					) : (
+					)}
+					{checkoutStep === 'INVOICE' && (
+						<InvoiceForm />
+					)}
+					{['PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep) && (
 						<Payment
 							isLoading={isLoading}
-							editAddress={() => setCheckoutStep('ADDRESS')}
+							editAddress={setTab}
 							checkoutStep={checkoutStep}
 							setCheckoutStep={setCheckoutStep}
 						/>

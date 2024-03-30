@@ -1,20 +1,24 @@
-import {useQuery} from "@tanstack/react-query";
 import useAuth from "../../utils/useAuth";
-import useMyArea from "./useMyArea";
 import {useForm} from "react-hook-form";
-import {Button, Container, FormControlLabel, Switch, TextField} from "@mui/material";
+import {Button, CircularProgress, Container, FormControlLabel, Switch, TextField} from "@mui/material";
 import Loading from "../../components/Loading";
+import React from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileForm() {
-	const { customer, updateCustomer } = useMyArea();
+	const { customer, updateCustomer, isUpdating: loading } = useAuth();
 	const onValid = (data: any) => {
-		const { editPassword, passwordConfirm, ...customerData } = data
+		let { editPassword, passwordConfirm, password, ...customerData } = data
+		if (editPassword && password && password === passwordConfirm) {
+			customerData.password = password
+		}
 		updateCustomer(customerData)
 	}
-	return customer ? <Form customer={customer} onValid={onValid} /> : <Loading />
+	return customer ? <Form customer={customer} onValid={onValid} loading={loading} /> : <Loading />
 }
 
-function Form({customer, onValid}: {customer: any, onValid: any}) {
+function Form({customer, onValid, loading}: {customer: any, onValid: any, loading: boolean}) {
+	const { t } = useTranslation('common')
 	const profileForm = useForm(
 		{
 			defaultValues: {
@@ -93,7 +97,15 @@ function Form({customer, onValid}: {customer: any, onValid: any}) {
 						/>
 					</>
 				)}
-				<Button type="submit">Save</Button>
+				<Button
+					endIcon={loading ? <CircularProgress size="20px" /> : undefined}
+					sx={{mt: '20px'}}
+					fullWidth
+					type="submit"
+					disabled={loading}
+				>
+					{t('save')}
+				</Button>
 			</form>
 		</Container>
 	);

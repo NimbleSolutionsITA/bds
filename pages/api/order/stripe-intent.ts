@@ -30,7 +30,7 @@ export default async function handler(
 		return res.status(405).json({error: "Method not allowed", success: false});
 	}
 	try {
-		const { cart, customer, customerNote, paymentIntentId } = req.body
+		const { cart, customer, paymentIntentId } = req.body
 		if (!cart) {
 			throw new Error('Cart or customer data is missing')
 		}
@@ -68,20 +68,12 @@ export default async function handler(
 			if (!paymentIntentId) {
 				throw new Error('Payment intent ID is missing')
 			}
-			console.log('vat', customer.billing.vat)
 			const orderPayload = await prepareOrderPayload(cart, customer, api)
 			const { data: order } = await api.post("orders", {
 				payment_method: 'stripe',
 				payment_method_title: 'Stripe',
 				payment_method_reference: paymentIntentId,
 				...orderPayload,
-				meta_data: [
-					{
-						key: 'vat',
-						value: customer.billing.vat ?? ''
-					}
-				],
-				customer_note: customerNote
 			})
 			const amount = order.total * 100
 			if (amount === 0) {

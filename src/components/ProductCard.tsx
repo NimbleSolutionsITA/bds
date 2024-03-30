@@ -31,6 +31,8 @@ type ProductCardProps = {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+    const { cart: { customer: { shipping_address: { shipping_country }} } } = useSelector((state: RootState) => state.cart);
+    const isEU = shipping_country !== 'IT'
     const isEyewear = product.categories.find(({id, parent }) =>
         EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
     ) !== undefined;
@@ -51,7 +53,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
         setCurrentProduct(newProduct)
         setCurrentImage(newProduct.image ?? product.image ?? placeholder)
     }
-
     const hasAttributes = Object.keys(product.attributes).length > 0
 
     return (
@@ -119,7 +120,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     )}
                     <Typography fontSize="20px">
                         {currentProduct.price ?
-                            <PriceFormat value={parseFloat(currentProduct.price as string)} decimalScale={0} /> : '-'
+                            <PriceFormat
+                                value={parseFloat(isEU ? (currentProduct.price_eu ?? currentProduct.price) : currentProduct.price as string)}
+                                decimalScale={0}
+                            /> : '-'
                         }
                     </Typography>
                 </div>

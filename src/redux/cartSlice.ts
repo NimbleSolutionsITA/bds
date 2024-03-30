@@ -2,23 +2,35 @@ import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import { Cart, Totals} from "../types/cart-type";
 import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../utils/endpoints";
 import {RootState} from "./store";
-import {BillingData, ShippingData} from "../types/woocommerce";
+import {BillingData, InvoiceData, ShippingData} from "../types/woocommerce";
 import axios, {AxiosResponse} from "axios";
 
 type CartState = {
 	nonce?: string
-	cart: Partial<Cart>
+	cart: Cart
 	cartDrawerOpen: boolean
 	loading: boolean
 	stripe?: {
 		intentId: string
 		clientSecret: string
 	}
-	customer?:{
+	customer:{
 		billing: BillingData
-		shipping?: ShippingData
-	},
-	customerNote: string
+		shipping: ShippingData
+		invoice: InvoiceData,
+		customerNote: string
+	}
+}
+
+const defaultAddressValues = {
+	first_name: '',
+	last_name: '',
+	address_1: '',
+	address_2: '',
+	company: '',
+	city: '',
+	state: '',
+	postcode: ''
 }
 
 const initialState: CartState = {
@@ -29,9 +41,54 @@ const initialState: CartState = {
 		totals: {
 			subtotal: '0',
 			subtotal_tax: '0',
-		} as Totals
+		} as Totals,
+		customer: {
+			shipping_address: {
+				shipping_first_name: "",
+				shipping_last_name: "",
+				shipping_company: "",
+				shipping_country: "IT",
+				shipping_address_1: "",
+				shipping_address_2: "",
+				shipping_postcode: "",
+				shipping_city: "",
+				shipping_state: ""
+			},
+			billing_address: {
+				billing_first_name: "",
+				billing_last_name: "",
+				billing_company: "",
+				billing_country: "IT",
+				billing_address_1: "",
+				billing_address_2: "",
+				billing_postcode: "",
+				billing_city: "",
+				billing_state: "",
+				billing_phone: "",
+				billing_email: "",
+			}
+		}
 	},
-	customerNote: ''
+	customer: {
+		customerNote: '',
+		billing: {
+			email: '',
+			phone: '',
+			country: 'IT',
+			...defaultAddressValues
+		},
+		shipping: {
+			country: 'IT',
+			...defaultAddressValues
+		},
+		invoice: {
+			vat: '',
+			tax: '',
+			sdi: '',
+			billingChoice: 'invoice' as const,
+			invoiceType: 'private' as const
+		},
+	}
 }
 
 export const fetchCartData = createAsyncThunk('cart/fetchData', async (params, thunkAPI) => {
@@ -129,7 +186,7 @@ export const initCheckout = createAsyncThunk('cart/initCheckout', async (payload
 });
 
 export const initStripePayment = createAsyncThunk('cart/initStripePayment', async (payload, thunkAPI) => {
-	const { cart: { stripe, cart, customer, customerNote }} = thunkAPI?.getState() as RootState
+	const { cart: { stripe, cart }} = thunkAPI?.getState() as RootState
 	const total = cart.totals?.total;
 	if (!total) {
 		throw new Error('Cart not found');
@@ -186,10 +243,10 @@ export const cartSlice = createSlice({
 			state.cartDrawerOpen = false
 		},
 		setCustomerData: (state, action) => {
-			state.customer = action.payload
+			state.customer = { ...state.customer, ...action.payload}
 		},
 		setCustomerNote: (state, action) => {
-			state.customerNote = action.payload
+			state.customer.customerNote = action.payload
 		},
 		destroyIntent: (state) => {
 			state.stripe = undefined
@@ -316,9 +373,8 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(destroyCart.fulfilled, (state, action) => {
 			state.cart = action.payload
-			state.customer = undefined
+			state.customer = initialState.customer
 			state.stripe = undefined
-			state.customerNote = ''
 			state.loading = false;
 		});
 		builder.addCase(destroyCart.rejected, (state) => {
@@ -367,11 +423,9 @@ export const callCartData = async (url: string, payload = {}, method: 'GET' | 'P
 
 const initCartData = async () => {
 	let cart = await callCartData('/v2/cart', {}, "GET")
-	await callCartData('/v1/calculate/shipping', { country: 'IT' }, "POST");
 	if (cart.coupons?.length && cart.coupons.length > 0) {
 		await callCartData('/v1/coupon?coupon=' + cart.coupons[0].coupon, {}, "DELETE");
+		cart = await callCartData('/v2/cart', {}, "GET")
 	}
-	cart = await callCartData('/v2/cart', {}, "GET")
-	console.log(cart)
 	return cart
 }
