@@ -9,6 +9,12 @@ import {useTranslation} from "next-i18next";
 import {AppDispatch, RootState} from "../redux/store";
 import {useDispatch, useSelector} from "react-redux";
 import {destroyCart} from "../redux/cartSlice";
+import {Button} from "@mui/material";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
 
 type StripePaymentButtonProps = {
 	items: CartItem[]
@@ -149,7 +155,6 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 				const orderBody = {
 					payment_method: "stripe",
 					payment_method_title: e.walletName,
-					set_paid: true,
 					meta_data: [
 						{
 							key: "_stripe_intent_id",
@@ -198,7 +203,7 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 				const response = await fetch(NEXT_API_ENDPOINT + '/order', {
 					method: 'POST',
 					headers: [["Content-Type", 'application/json']],
-					body: JSON.stringify(orderBody),
+					body: JSON.stringify({orderBody, paymentIntentId}),
 				})
 					.then(response => response.json());
 
@@ -208,14 +213,19 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 					gtagPurchase(response.order)
 				}
 
-				await router.push({
-					pathname: '/checkout/completed',
-					query: {
-						paid: true,
-						email: e.payerEmail,
-						...(isCart ? {cart_key: cartKey} : {})
-					}
-				});
+				if (response.success) {
+					await router.push({
+						pathname: '/checkout/completed',
+						query: {
+							paid: true,
+							email: e.payerEmail,
+							...(isCart ? {cart_key: cartKey} : {})
+						}
+					});
+				}
+				else {
+					setError(response.error)
+				}
 			});
 
 			pr.on('shippingaddresschange', async (ev) => {
@@ -286,16 +296,43 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 		}
 	}, [stripe]);
 
+	const [error, setError] = useState<string>();
+	const handleClose = () => setError(undefined)
+
 	if (paymentRequest) {
-		return <PaymentRequestButtonElement options={{
-			paymentRequest,
-			style: {
-				paymentRequestButton: {
-					type: 'buy',
-					height: '48px',
-				}
-			}
-		}} />
+		return (
+			<>
+				<PaymentRequestButtonElement
+					options={{
+						paymentRequest,
+						style: {
+							paymentRequestButton: {
+								type: 'buy',
+								height: '48px',
+							}
+						}
+					}}
+				/>
+				<Dialog
+					open={!!error}
+					onClose={handleClose}
+					aria-labelledby="alert-dialog-title"
+					aria-describedby="alert-dialog-description"
+				>
+					<DialogTitle id="alert-dialog-title">
+						{"Payment Error"}
+					</DialogTitle>
+					<DialogContent>
+						<DialogContentText id="alert-dialog-description">
+							{error && t(error)}
+						</DialogContentText>
+					</DialogContent>
+					<DialogActions>
+						<Button onClick={handleClose}>{t('close')}</Button>
+					</DialogActions>
+				</Dialog>
+			</>
+		)
 	}
 
 	// Use a traditional checkout form.
