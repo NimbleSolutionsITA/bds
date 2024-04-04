@@ -7,18 +7,21 @@ import OrderList from "./OrderList";
 import { useSearchParams } from 'next/navigation';
 
 import {Country} from "../../types/woocommerce";
+import {useTranslation} from "next-i18next";
+import InvoiceForm from "./InvoiceForm";
 
 const MyArea = ({countries}: {countries: Country[]}) => {
 	const panels = [
-		{ label: 'Profile', component: <ProfileForm /> },
-		{ label: 'Billing', component: <BillingForm countries={countries} /> },
-		{ label: 'Shipping', component: <ShippingForm countries={countries} /> },
-		{ label: 'Orders', component: <OrderList /> },
+		{ label: 'profile', component: <ProfileForm /> },
+		{ label: 'billing', component: <BillingForm countries={countries} /> },
+		{ label: 'shipping', component: <ShippingForm countries={countries} /> },
+		{ label: 'invoice', component: <InvoiceForm /> },
+		{ label: 'orders', component: <OrderList /> },
 	]
 	const params = useSearchParams()
 	const tab = params.get('tab') ?? '0'
 	const [value, setValue] = React.useState(Number(tab))
-
+	const { t } = useTranslation()
 	function a11yProps(index: number) {
 		return {
 			id: `simple-tab-${index}`,
@@ -39,7 +42,7 @@ const MyArea = ({countries}: {countries: Country[]}) => {
 			<Container sx={{ borderBottom: 1, borderColor: 'divider', backgroundColor: 'divider', display: 'flex', justifyContent: 'center' }}>
 				<Tabs value={value} onChange={handleChange} aria-label="member tabs">
 					{panels.map((panel, index) => (
-						<Tab key={panel.label} label={panel.label} {...a11yProps(index)} />
+						<Tab key={panel.label} label={t(`my-area.${panel.label}`)} {...a11yProps(index)} />
 					))}
 				</Tabs>
 			</Container>

@@ -6,7 +6,8 @@ import HelperText from "../../components/HelperText";
 import {TextField, Typography, Button, CircularProgress} from "@mui/material";
 import {useRouter} from "next/router";
 import {useDispatch} from "react-redux";
-import {closeLogInDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
+import {closeLogInDrawer, openForgotPasswordDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
+import {useTranslation} from "next-i18next";
 
 const LOG_IN = gql`
     mutation logIn($login: String!, $password: String!) {
@@ -20,6 +21,7 @@ const LOG_IN = gql`
 `;
 
 export default function LogInForm({ isCheckout = false }: { isCheckout?: boolean }) {
+	const { t } = useTranslation();
 	const [logIn, { loading, error }] = useMutation(LOG_IN, {
 		refetchQueries: [
 			{ query: GET_USER }
@@ -51,7 +53,7 @@ export default function LogInForm({ isCheckout = false }: { isCheckout?: boolean
 	const dispatch = useDispatch();
 	return (
 		<form method="post" onSubmit={handleSubmit} style={{padding: '40px 0'}}>
-			<Typography textAlign="center" variant="h2" sx={{mt: '20px', fontWeight: 'bold'}}>Accedi</Typography>
+			<Typography textAlign="center" variant="h2" sx={{mt: '20px', fontWeight: 'bold'}}>{t('log-in.title')}</Typography>
 			<fieldset disabled={loading} aria-busy={loading} style={{border: 'none', padding: 0}}>
 				<TextField
 					fullWidth
@@ -73,26 +75,29 @@ export default function LogInForm({ isCheckout = false }: { isCheckout?: boolean
 					required
 					sx={{m: '20px 0 10px'}}
 				/>
-				<Link href="/my-area/forgot-password">
-					Forgot password?
+				<Link href="#" onClick={() => {
+					dispatch(closeLogInDrawer())
+					dispatch(openForgotPasswordDrawer())
+				}}>
+					{t('log-in.forgot-password')}
 				</Link>
 				{!isEmailValid ? (
-					<Typography>Invalid email. Please try again.</Typography>
+					<Typography>{t('log-in.error.email')}</Typography>
 				) : null}
 				{!isPasswordValid ? (
-					<Typography>Invalid password. Please try again.</Typography>
+					<Typography>{t('log-in.error.password')}</Typography>
 				) : null}
 				<Button endIcon={loading ? <CircularProgress size="20px" /> : undefined} sx={{mt: '20px'}} fullWidth type="submit" disabled={loading}>
-					{loading ? 'Logging in...' : 'Log in'}
+					{t(`log-in.${loading ? 'logging-in' : 'title'}`)}
 				</Button>
 			</fieldset>
 			<p className="account-sign-up-message">
-				Don&#39;t have an account yet?{' '}
+				{t('log-in.register')}{' '}
 				<Button variant="text" onClick={() => {
 					dispatch(closeLogInDrawer())
 					dispatch(openSignUpDrawer())
 				}}>
-					Sign up
+					{t('register.sign-up')}
 				</Button>
 			</p>
 		</form>

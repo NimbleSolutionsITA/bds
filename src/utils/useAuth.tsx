@@ -24,9 +24,11 @@ interface AuthData {
 	error?: ApolloError;
 	customer?: LoggedCustomer,
 	orders?: WooOrder[],
+	newsletterStatus: boolean;
 	updateCustomer: (data: any) => void;
 	getOrders: () => void
 	logOut: () => Promise<void>;
+	unsubscribeNewsletter: () => void;
 }
 
 const DEFAULT_STATE: AuthData = {
@@ -36,6 +38,8 @@ const DEFAULT_STATE: AuthData = {
 	isUpdating: false,
 	loginChecked: false,
 	error: undefined,
+	newsletterStatus: false,
+	unsubscribeNewsletter: async () => {},
 	logOut: async () => {},
 	updateCustomer: () => {},
 	getOrders: () => {}
@@ -114,6 +118,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 		}
 	)
+	const getNewsletterStatusQuery = useQuery(
+		['check-newsletter', user?.databaseId],
+		async () => {
+			const response = await fetch(`/api/customer/newsletter`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email: user?.email })
+			});
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const { subscribed } = await response.json();
+			return subscribed as boolean;
+		},
+		{
+			enabled: !!user?.databaseId,
+			initialData: false
+		}
+	)
+	const unsubscribeNewsletter = useMutation(
+		['unsubscribe-newsletter', user?.databaseId],
+		async () => {
+			const response = await fetch(`/api/customer/newsletter`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email: user?.email })
+			});
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json();
+		},
+		{
+			onSuccess: async () => {
+				await getNewsletterStatusQuery.refetch();
+			}
+		}
+	)
 	const updateCustomerMutation = useMutation(
 		['update-customer', user?.databaseId],
 		async (data: any) => {
@@ -140,6 +186,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const value = {
 		loggedIn,
 		user,
+		newsletterStatus: getNewsletterStatusQuery.data,
 		loading: getUserLoading || logoutLoading,
 		isUpdating: updateCustomerMutation.isLoading,
 		loginChecked,
@@ -148,9 +195,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		orders: getCustomerOrders.data.orders,
 		updateCustomer: updateCustomerMutation.mutate,
 		getOrders: getCustomerOrders.refetch,
-		logOut: async () => {
-			await logOut();
-		},
+		logOut: async () => { await logOut() },
+		unsubscribeNewsletter: unsubscribeNewsletter.mutate
 	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

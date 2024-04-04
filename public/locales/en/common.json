@@ -45,6 +45,20 @@
   "related-products": "Related products",
   "close": "close",
   "addToCart": "Add to cart",
+  "order": "order",
+  "order-details": "Order placed on <1>{{date}}</1> at <3>{{time}}</3> and paid with <5>{{paymentMethod}}</5>",
+  "edit-password": "Edit password",
+  "confirm-password": "Confirm password",
+  "my-area": {
+    "profile": "Profile",
+    "billing": "Billing",
+    "shipping": "Shipping",
+    "orders": "Orders",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "invoice": "Invoice"
+  },
   "cart":{
     "title":"Your shopping bag",
     "cta":"Go to checkout",
@@ -153,7 +167,8 @@
     "apply":"Apply",
     "go-to-payment":"Proceed to Payment",
     "remove": "Remove",
-    "customer-notes": "Special instructions for seller"
+    "customer-notes": "Special instructions for seller",
+    "invoice": "Invoice"
   },
   "form":{
     "name":"First Name",
@@ -165,7 +180,20 @@
     "phone":"Phone Number",
     "vat":"VAT Number",
     "company":"Company (optional)",
-    "state":"State"
+    "state":"State",
+    "tax": "Tax Code",
+    "sdi": "SDI Code or PEC address",
+    "billingChoice": "Type of billing",
+    "invoiceType": "Client type"
+  },
+  "billingChoice": {
+    "invoice": "Invoice",
+    "receipt": "Receipt"
+  },
+  "invoiceType": {
+    "private": "Private",
+    "company": "Company",
+    "freelance": "Freelance"
   },
   "available":"Available",
   "cookies": {
@@ -180,5 +208,36 @@
     "usage-body": "Finally, there are cookies that collect information about how the user uses the site in order to improve its quality, customize its features, and ensure an optimized browsing experience.",
     "save": "Save preferences",
     "accept": "Accept all"
+  },
+  "log-in": {
+    "title": "Login",
+    "forgot-password": "Forgot your password?",
+    "register": "Don't have an account yet?",
+    "error": {
+      "email": "Invalid email. Please try again.",
+      "password": "Invalid password. Please try again."
+    },
+    "logging-in": "Logging in..."
+  },
+  "register": {
+    "title": "Sign up",
+    "existing": "You're already signed up!",
+    "existing2": "Already have an account?",
+    "completed": {
+      "title": "Registration completed",
+      "body": "Thank you for registering. You will soon receive an email with the confirmation link to activate your account."
+    },
+    "sign-up": "Sign up",
+    "signing-up": "Signing up..."
+  },
+  "forgot-password": {
+    "title": "Reset password",
+    "body": "Enter the email associated with your account and you'll be sent a link to reset your password.",
+    "reset": "Send password reset email",
+    "resetting": "Sending...",
+    "completed": {
+      "title": "Warning",
+      "body": "Please check your email. A password reset link has been sent to you."
+    }
   }
 }

@@ -153,10 +153,7 @@ export const getProducts = async ({
 		...(fragrances && { fragrances: 'true' }),
 	});
 	return await fetch(`${WORDPRESS_SITE_URL}/wp-json/nimble/v1/products?${params.toString()}`)
-		.then(res => {
-			console.log(res, params)
-			return res.json()
-		})
+		.then(res => res.json())
 }
 
 export const getAllProducts = async (params: ProductsRequestQuery): Promise<BaseProduct[]> => {

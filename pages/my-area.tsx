@@ -1,13 +1,13 @@
-import {PageBaseProps} from "../../src/types/settings";
+import {PageBaseProps} from "../src/types/settings";
 import {
 	getLayoutProps,
 	getPageProps,
-} from "../../src/utils/wordpress_api";
-import Layout from "../../src/layout/Layout";
-import MyArea from "../../src/pages/my-area/MyArea";
-import {getShippingInfo} from "../api/shipping";
-import {Country} from "../../src/types/woocommerce";
-import AuthContent from "../../src/components/AuthContent";
+} from "../src/utils/wordpress_api";
+import Layout from "../src/layout/Layout";
+import MyArea from "../src/pages/my-area/MyArea";
+import {getShippingInfo} from "./api/shipping";
+import {Country} from "../src/types/woocommerce";
+import AuthContent from "../src/components/AuthContent";
 
 export type MyAreaPageProps = PageBaseProps & { countries: Country[] }
 

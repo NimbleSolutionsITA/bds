@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
-import {BillingData, Country, InvoiceData, ShippingClass, ShippingData} from "../../types/woocommerce";
+import {BillingData, Country, InvoiceData, LoggedCustomer, ShippingClass, ShippingData} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
 import CheckoutDesktop from "./CheckoutDesktop";
 import {useMediaQuery, useTheme} from "@mui/material";
@@ -9,6 +9,7 @@ import {AppDispatch, RootState} from "../../redux/store";
 import {setCustomerData, updateShippingCountry} from "../../redux/cartSlice";
 import CheckoutMobile from "./CheckoutMobile";
 import {PaymentErrorDialog} from "./Payment";
+import useAuth from "../../utils/useAuth";
 
 export type CheckoutGridProps = {
 	shipping: {
@@ -28,15 +29,22 @@ export type Step = 'ADDRESS'|'INVOICE'|'PAYMENT_STRIPE'|'PAYMENT_PAYPAL'
 
 const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 	const { cart, customer } = useSelector((state: RootState) => state.cart);
+	const { customer: loggedCustomer, updateCustomer ,loggedIn } = useAuth();
 	const dispatch = useDispatch<AppDispatch>()
 	const [step, setStep] = useState<Step>('ADDRESS');
 	const [addressTab, setAddressTab] = useState<number>(0);
 	const methods = useForm<Inputs>({
 		defaultValues: {
-			has_shipping: false,
+			has_shipping: getCustomerMetaData('has_shipping', false, loggedCustomer),
 			billing: customer.billing,
 			shipping: customer.shipping,
-			invoice: customer.invoice,
+			invoice: {
+				vat: getCustomerMetaData('vat', customer.invoice.vat, loggedCustomer),
+				tax: getCustomerMetaData('tax', customer.invoice.tax, loggedCustomer),
+				sdi: getCustomerMetaData('sdi',  customer.invoice.sdi, loggedCustomer),
+				billingChoice: getCustomerMetaData('billing_choice', customer.invoice.billingChoice, loggedCustomer),
+				invoiceType: getCustomerMetaData('invoice_type', customer.invoice.invoiceType, loggedCustomer)
+			},
 		},
 		reValidateMode: 'onSubmit'
 	});
@@ -57,7 +65,20 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 				shipping: data.has_shipping ? data.shipping : data.billing,
 				invoice: data.invoice
 			}))
-
+			if (loggedIn) {
+				updateCustomer({
+					billing: data.billing,
+					shipping: data.has_shipping ? data.shipping : data.billing,
+					meta_data: [
+						{ key: 'has_shipping', value: data.has_shipping },
+						{ key: 'vat', value: data.invoice.vat },
+						{ key: 'tax', value: data.invoice.tax },
+						{ key: 'sdi', value: data.invoice.sdi },
+						{ key: 'billing_choice', value: data.invoice.billingChoice },
+						{ key: 'invoice_type', value: data.invoice.invoiceType}
+					]
+				})
+			}
 			setStep(onValidStep);
 		}
 	}
@@ -91,6 +112,10 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 			<PaymentErrorDialog error={paymentError} setError={setPaymentError} />
 		</FormProvider>
 	)
+}
+
+const getCustomerMetaData = (key: string, fallback: any, customer?: LoggedCustomer) => {
+	return customer?.meta_data.find(({key: k}) => k === key)?.value ?? fallback
 }
 
 export default CheckoutGrid;

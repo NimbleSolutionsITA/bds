@@ -5,13 +5,10 @@ import useAuth from "../../utils/useAuth";
 import {useTranslation} from "next-i18next";
 import {WooLineItem, WooOrder} from "../../types/woocommerce";
 import Image from "next/image";
-import Link from "next/link";
-import Minus from "../../layout/cart/Minus";
-import Plus from "../../layout/cart/Plus";
 import PriceFormat from "../../components/PriceFormat";
-import {getCartItemPrice} from "../../utils/utils";
 import Loading from "../../components/Loading";
 import {Trans} from "react-i18next";
+import {useRouter} from "next/router";
 
 const OrderList = () => {
 	const { orders, getOrders } = useAuth();
@@ -64,11 +61,12 @@ type OrderItemProps = {
 }
 const OrderItem = ({expanded, handleChange, order}: OrderItemProps) => {
 	const { t } = useTranslation();
-	const subtotal = (parseFloat(order.subtotal) + parseFloat(order.subtotal_tax))
 	const total = parseFloat(order.total) + ''
 	const shippingTotal = (parseFloat(order.shipping_total) + parseFloat(order.shipping_tax))
 	const discount = (parseFloat(order.discount_total) + parseFloat(order.discount_tax))
 	const totalTax = parseFloat(order.total_tax)
+	const orderDate = new Date(order.date_paid)
+	const locale = useRouter().locale
 	return (
 		<Accordion
 			expanded={expanded === order.id}
@@ -81,12 +79,23 @@ const OrderItem = ({expanded, handleChange, order}: OrderItemProps) => {
 				id={`panel-${order.id}-bh-header`}
 				sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}
 			>
-				<Typography sx={{ fontSize: '18px', fontWeight: 700 }}>
-					ORDINE: {order.id}<br />
-					<span style={{fontSize: '14px', fontWeight: 300}}>del {new Date(order.date_paid).toLocaleDateString()}</span>
-				</Typography>
-				<Typography sx={{ fontSize: '16px', my: 'auto' }}>
-					Pagato con <b>{order.payment_method_title}</b>
+				<Typography sx={{ fontSize: '18px', fontWeight: 300 }}>
+					<strong>#{order.id}</strong> {t("total")}: <strong><PriceFormat value={total} /></strong><br />
+					<span style={{fontSize: '14px'}}>
+						<Trans
+							i18nKey="order-details"
+							components={{
+								1: <strong />, // For the date
+								3: <strong />, // For the time
+								5: <strong /> // For the payment method
+							}}
+							values={{
+								date: orderDate.toLocaleDateString(),
+								time: orderDate.toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit' }),
+								paymentMethod: order.payment_method_title
+							}}
+						/>
+					</span>
 				</Typography>
 			</AccordionSummary>
 			<AccordionDetails sx={{backgroundColor: 'divider', padding: '20px'}}>

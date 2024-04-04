@@ -50,7 +50,6 @@ export default async function handler(
 			responseData.customer = data
 		}
 		catch ( error ) {
-			console.log('PATCH CUSTOMER', req.query.id, req.body, error)
 			if (typeof error === "string") {
 				responseData.error = error
 			} else if (error instanceof Error) {

@@ -45,6 +45,20 @@
   "related-products": "Prodotti correlati",
   "close": "chiudi",
   "addToCart": "Aggiungi al carrello",
+  "order": "ordine",
+  "order-details": "Effettuato il <1>{{date}}</1> alle <3>{{time}}</3> e pagato con <5>{{paymentMethod}}</5>",
+  "edit-password": "Modifica password",
+  "confirm-password": "Conferma password",
+  "my-area": {
+    "profile": "Profilo",
+    "billing": "Fatturazione",
+    "shipping": "Spedizione",
+    "orders": "Ordini",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Registrati",
+    "invoice": "Fatturazione"
+  },
   "sorting": {
     "price-desc": "Prezzo: dal più alto",
     "price-asc": "Prezzo: dal più basso",
@@ -156,7 +170,8 @@
     "apply":"Applica",
     "go-to-payment":"Vai al pagamento",
     "remove": "Rimuovi",
-    "customer-notes": "Note per il corriere"
+    "customer-notes": "Note per il corriere",
+    "invoice": "Fatturazione"
   },
   "form":{
     "name":"Nome",
@@ -169,7 +184,20 @@
     "vat":"Partita IVA",
     "company":"Azienda (facoltativo)",
     "state":"Provincia",
-    "read-more":"Leggi di più"
+    "read-more":"Leggi di più",
+    "tax": "Codice Fiscale",
+    "sdi": "PEC o Codice Destinatario",
+    "billingChoice": "Tipo di documento",
+    "invoiceType": "Tipo di cliente"
+  },
+  "billingChoice": {
+    "invoice": "Fattura",
+    "receipt": "Ricevuta"
+  },
+  "invoiceType": {
+    "private": "Privato",
+    "company": "Azienda",
+    "freelance": "Libero professionista"
   },
   "available":"Disponibile",
   "cookies": {
@@ -185,5 +213,36 @@
     "usage-body": "Infine, esistono cookie che raccolgono informazioni sulle modalità di utilizzo del sito da parte dell'utente, al fine di migliorarne la qualità, personalizzarne le funzionalità e garantire un'esperienza di navigazione ottimizzata.",
     "save": "Salva preferenze",
     "accept": "Accetta tutti"
+  },
+  "log-in": {
+    "title": "Accedi",
+    "forgot-password": "Password dimenticata?",
+    "register": "Non sei ancora registrato?",
+    "error": {
+      "email": "Indirizzo email non valido",
+      "password": "Password non valida"
+    },
+    "logging-in": "Accesso in corso..."
+  },
+  "register": {
+    "title": "Registrati",
+    "existing": "Sei già registrato!",
+    "existing2": "Possiedi già un account?",
+    "completed": {
+      "title": "Registrazione completata",
+      "body": "Grazie! Controlla la tua email: ti è stata inviata un'email di conferma dell'account con il link."
+    },
+    "sign-up": "Registrati",
+    "signing-up": "Registrazione in corso..."
+  },
+  "forgot-password": {
+    "title": "Password dimenticata",
+    "body": "Inserisci il tuo indirizzo email e ti invieremo un link per reimpostare la password.",
+    "reset": "Reimposta password",
+    "resetting": "Reimpostazione in corso...",
+    "completed": {
+      "title": "Attenzione",
+      "body": "Per reimpostare la tua password, segui le istruzioni contenute nell'email che ti abbiamo inviato."
+    }
   }
 }

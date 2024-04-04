@@ -37,6 +37,7 @@ const NewsletterForm = () => {
 						helperText={emailError ?? (message && <HtmlBlock html={message.toString()} />)}
 						error={!!emailError}
 					/>
+
 					<Typography sx={{fontStyle: 'italic', fontSize: '13px', lineHeight: '1.3', marginTop: '10px'}}>
 						<Trans i18nKey="newsletter.consentText" components={[<Link key={0} href="/privacy-policy" />]} />
 					</Typography>

@@ -10,7 +10,6 @@ import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {Hidden} from "@mui/material";
 import Head from "next/head";
-import {loadStripe} from "@stripe/stripe-js";
 import {Elements} from '@stripe/react-stripe-js';
 import parse from "html-react-parser";
 import InStockNotifierDrawer from "./drawers/InStockNotifierDrawer";
@@ -26,6 +25,7 @@ import GoogleAnalytics from "../components/GoogleAnalytics";
 import getStripe from "../utils/stripe-utils";
 import SignUpDrawer from "./drawers/SignUpDrawer";
 import LogInDrawer from "./drawers/LogInDrawer";
+import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
 
 type LayoutProps = {
     children: React.ReactNode,
@@ -87,6 +87,7 @@ export default function Layout({children, layout: {
             <NewsletterDrawer />
             <LogInDrawer />
             <SignUpDrawer />
+            <ForgotPasswordDrawer />
             <CartDrawer shipping={shipping} categories={categories} />
             <SearchModal
                 designers={categories.designers}

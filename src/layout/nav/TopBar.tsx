@@ -1,5 +1,5 @@
 import Container from "@mui/material/Container";
-import {IconButton, Box, Menu, MenuItem} from "@mui/material";
+import {IconButton, Box, Menu, MenuItem, Button} from "@mui/material";
 import {Facebook, Instagram} from "@mui/icons-material";
 import CartIndicator from "../../components/CartIndicator";
 import LanguageButton from "../../components/LanguageButton";
@@ -13,6 +13,9 @@ import UserIcon from "../../icons/UserIcon";
 import useAuth from "../../utils/useAuth";
 import {useState} from "react";
 import {useRouter} from "next/router";
+import {useTranslation} from "next-i18next";
+import Link from "../../components/Link";
+import {getRelativePath} from "../../utils/utils";
 
 export default function TopBar() {
     const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
@@ -72,18 +75,20 @@ function UserMenu() {
     };
 
     const loggedMenu = [
-        { label: 'Profile', onClick: () => router.push('/my-area', { query: { tab : 0 } }) },
-        { label: 'Billing', onClick: () => router.push('/my-area', { query: { tab : 1 } }) },
-        { label: 'Shipping', onClick: () => router.push('/my-area', { query: { tab : 2 } }) },
-        { label: 'Orders', onClick: () => router.push('/my-area', { query: { tab : 3 } }) },
-        { label: 'Logout', onClick: logOut },
+        { label: 'profile', href: "/my-area?tab=0" },
+        { label: 'billing', href: "/my-area?tab=1" },
+        { label: 'shipping', href: "/my-area?tab=2" },
+        { label: 'invoice', href: "/my-area?tab=3" },
+        { label: 'orders', href: "/my-area?tab=4" },
+        { label: 'logout', onClick: logOut },
     ]
 
     const guestMenu = [
-        { label: 'Login', onClick: () => dispatch(openLogInDrawer()) },
-        { label: 'Register', onClick: () => dispatch(openSignUpDrawer()) },
+        { label: 'login', onClick: () => dispatch(openLogInDrawer()), href: undefined },
+        { label: 'register', onClick: () => dispatch(openSignUpDrawer()) },
     ]
-    const menuItemns = loggedIn ? loggedMenu : guestMenu;
+    const menuItems = loggedIn ? loggedMenu : guestMenu;
+    const { t } = useTranslation()
     return (
         <>
             <IconButton
@@ -106,11 +111,29 @@ function UserMenu() {
                     'aria-labelledby': 'user-button',
                 }}
             >
-                {menuItemns.map(({onClick, label}) => (
+                {menuItems.map(({onClick = undefined, label, href = undefined}) => (
                     <MenuItem sx={{textTransform: 'uppercase'}} key={label} onClick={() => {
+                        onClick?.();
                         handleClose();
-                        onClick();
-                    }}>{label}</MenuItem>
+                    }}>
+                        {onClick ? t(`my-area.${label}`) : (
+                            <Button
+                                variant="text"
+                                size="small"
+                                component={Link}
+                                href={href}
+                                sx={{
+                                    fontWeight: 300,
+                                    padding: 0,
+                                    fontSize: '14px',
+                                    lineHeight: '1.5',
+                                    minWidth: 0
+                                }}
+                            >
+                                {t(`my-area.${label}`)}
+                            </Button>
+                        )}
+                    </MenuItem>
                 ))}
             </Menu>
         </>

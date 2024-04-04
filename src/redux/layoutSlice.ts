@@ -6,6 +6,7 @@ type LayoutState = {
 	searchDrawerOpen: boolean
 	logInDrawerOpen: boolean
 	signUpDrawerOpen: boolean
+	forgotPasswordDrawerOpen: boolean
 	inStockNotifierDrawer: {
 		open: boolean
 		productId: number | null
@@ -22,6 +23,7 @@ const initialState: LayoutState = {
 	searchDrawerOpen: false,
 	logInDrawerOpen: false,
 	signUpDrawerOpen: false,
+	forgotPasswordDrawerOpen: false,
 	inStockNotifierDrawer: {
 		open: false,
 		productId: null,
@@ -51,6 +53,9 @@ export const layoutSlice = createSlice({
 		openSignUpDrawer: (state) => {
 			state.signUpDrawerOpen = true
 		},
+		openForgotPasswordDrawer: (state) => {
+			state.forgotPasswordDrawerOpen = true
+		},
 		closeSearchDrawer: (state) => {
 			state.searchDrawerOpen = false
 		},
@@ -65,6 +70,9 @@ export const layoutSlice = createSlice({
 		},
 		closeSignUpDrawer: (state) => {
 			state.signUpDrawerOpen = false
+		},
+		closeForgotPasswordDrawer: (state) => {
+			state.forgotPasswordDrawerOpen = false
 		},
 		openInStockNotifierDrawer: (state, { payload }: PayloadAction<{ name: string, productId: number, category?: string, attributes?: string, variationId?: number }>) => {
 			state.inStockNotifierDrawer = {
@@ -98,7 +106,9 @@ export const {
 	openLogInDrawer,
 	closeLogInDrawer,
 	openSignUpDrawer,
-	closeSignUpDrawer
+	closeSignUpDrawer,
+	openForgotPasswordDrawer,
+	closeForgotPasswordDrawer
 } = layoutSlice.actions
 
 export default layoutSlice.reducer
