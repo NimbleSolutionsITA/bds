@@ -23,9 +23,10 @@ export type Inputs = {
 	billing: BillingData,
 	shipping?: ShippingData
 	invoice: InvoiceData
+	payment_method: 'paypal'|'stripe'
 };
 
-export type Step = 'ADDRESS'|'INVOICE'|'PAYMENT_STRIPE'|'PAYMENT_PAYPAL'
+export type Step = 'ADDRESS'|'INVOICE'|'RECAP'|'PAYMENT'
 
 const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 	const { cart, customer } = useSelector((state: RootState) => state.cart);
@@ -45,6 +46,7 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 				billingChoice: getCustomerMetaData('billing_choice', customer.invoice.billingChoice, loggedCustomer),
 				invoiceType: getCustomerMetaData('invoice_type', customer.invoice.invoiceType, loggedCustomer)
 			},
+			payment_method: 'stripe'
 		},
 		reValidateMode: 'onSubmit'
 	});

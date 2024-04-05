@@ -60,9 +60,6 @@ export default function Checkout({
 		}
 	}, [cart, customer, dispatch, initStep, logInDrawerOpen]);
 
-
-	console.log({initStep})
-
 	return <Fragment>
 		<Head>
 			{/* Set HTML language attribute */}

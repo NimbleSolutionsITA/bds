@@ -29,27 +29,7 @@ export type CheckoutDesktopProps = {
 	setCheckoutStep: Dispatch<SetStateAction<StepType>>
 }
 
-const getStep = (checkoutStep: StepType) => {
-	switch (checkoutStep) {
-		case 'ADDRESS':
-			return 0
-		case 'INVOICE':
-			return 1
-		default:
-			return 2
-	}
-}
-
-const getCheckoutStep = (index: number): StepType => {
-	switch (index) {
-		case 0:
-			return 'ADDRESS'
-		case 1:
-			return 'INVOICE'
-		default:
-			return 'PAYMENT_STRIPE'
-	}
-}
+const STEP_MAP = ['ADDRESS', 'INVOICE', 'PAYMENT'] as const
 
 const CheckoutDesktop = ({
 	countries,
@@ -61,16 +41,16 @@ const CheckoutDesktop = ({
 	setCheckoutStep,
 }: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
+	const indexStep = checkoutStep === "RECAP" ? 3 : STEP_MAP.indexOf(checkoutStep)
 	const handleStepClick = (index: number) => async () => {
-		const step = getStep(checkoutStep)
-		const destinationStep = getCheckoutStep(index)
-		if (index === step)
+		const destinationStep = index > 2 ? 'PAYMENT' : STEP_MAP[index]
+		if (destinationStep === checkoutStep)
 			return
-		if (step === 0) {
+		if (checkoutStep === 'ADDRESS') {
 			await updateOrder(destinationStep)()
 			return
 		}
-		if (step === 1 && index !== 0) {
+		if (checkoutStep === 'INVOICE' && index !== 0) {
 			await updateOrder(destinationStep)()
 			return
 		}
@@ -92,7 +72,7 @@ const CheckoutDesktop = ({
 					<Logo sx={{margin: '10px'}} />
 					<Stepper
 						alternativeLabel
-						activeStep={getStep(checkoutStep)}
+						activeStep={indexStep}
 						connector={<CheckoutStepConnector />}
 						sx={{width: '100%', marginBottom: '20px'}}
 					>
@@ -111,7 +91,7 @@ const CheckoutDesktop = ({
 										sx={{
 											fontSize: '16px',
 											textTransform: 'none',
-											fontWeight: getStep(checkoutStep) === index ? 500 : 300
+											fontWeight: indexStep === index ? 500 : 300
 										}}
 										onClick={handleStepClick(index)}
 									>
@@ -132,7 +112,7 @@ const CheckoutDesktop = ({
 					{checkoutStep === 'INVOICE' && (
 						<InvoiceForm />
 					)}
-					{['PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep) && (
+					{['PAYMENT', 'RECAP'].includes(checkoutStep) && (
 						<Payment
 							isLoading={isLoading}
 							editAddress={setTab}

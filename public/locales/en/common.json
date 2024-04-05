@@ -165,6 +165,7 @@
     "vat-included":"Includes <0></0> VAT",
     "coupon-code":"Coupon code",
     "apply":"Apply",
+    "go-to-invoice":"Proceed to Invoice",
     "go-to-payment":"Proceed to Payment",
     "remove": "Remove",
     "customer-notes": "Special instructions for seller",

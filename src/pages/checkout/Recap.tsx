@@ -41,15 +41,15 @@ type RecapProps = {
 const buttonLabel = {
 	ADDRESS: 'checkout.go-to-invoice',
 	INVOICE: 'checkout.go-to-payment',
-	PAYMENT_STRIPE: 'checkout.pay-now',
-	PAYMENT_PAYPAL: 'checkout.pay-now',
+	RECAP: 'checkout.pay-now',
+	PAYMENT: 'checkout.pay-now'
 }
 const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapProps) => {
-	const { formState: { errors } } = useFormContext();
+	const { formState: { errors }, watch } = useFormContext();
 	const { t } = useTranslation('common');
 	const { cart, customer: { customerNote }, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
-	const canEditData = !isLoading && ['INVOICE', 'PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep);
+	const canEditData = !isLoading && ['INVOICE', 'RECAP', 'PAYMENT'].includes(checkoutStep);
 	const isEU = getIsEU(cart?.customer)
 	const shipping = cart?.shipping?.packages.default
 	const shippingRates = shipping?.rates ?? {}
@@ -58,22 +58,18 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 	const hasCoupons = cart.coupons && cart.coupons.length > 0;
 	const [couponCode, setCouponCode] = useState(cart.coupons && cart.coupons.length > 0 ? cart.coupons[0].coupon : '');
 	const router = useRouter()
-
+	const paymentMethod = watch('payment_method')
 	const handleContinue = async () => {
 		switch (checkoutStep) {
 			case 'ADDRESS':
 				await updateOrder('INVOICE')()
 				break
 			case 'INVOICE':
-				await updateOrder('PAYMENT_STRIPE')()
+				await updateOrder('PAYMENT')()
 				break;
-			case 'PAYMENT_STRIPE':
-				await router.push('/checkout/stripe')
+			case 'PAYMENT':
+				await router.push(`/checkout/${paymentMethod}`)
 				break;
-			case 'PAYMENT_PAYPAL':
-				await router.push('/checkout/paypal')
-				break;
-
 		}
 	}
 

@@ -11,9 +11,15 @@ import  {CheckoutDesktopProps} from "./CheckoutDesktop";
 import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {useRouter} from "next/router";
+import InvoiceForm from "../../components/InvoiceForm";
+import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
+import {Inputs, Step as StepType, Step} from "./CheckoutGrid";
+import {BaseSyntheticEvent} from "react";
+import {useFormContext} from "react-hook-form";
+
+const STEP_MAP = ['ADDRESS', 'INVOICE', 'RECAP', 'PAYMENT'] as const
 
 export type CheckoutMobile = CheckoutDesktopProps
-
 const CheckoutMobile = ({
 	countries,
 	updateOrder,
@@ -23,16 +29,15 @@ const CheckoutMobile = ({
 	checkoutStep,
     setCheckoutStep,
 }: CheckoutMobile) => {
-	const { t } = useTranslation('common')
 	const { cart } = useSelector((state: RootState) => state.cart);
-	const mobileStep = checkoutStep === 'ADDRESS' ? 0 : checkoutStep === 'RECAP' ? 1 : 2
+	const mobileStep = STEP_MAP.indexOf(checkoutStep)
 	const [focus, setFocus] = React.useState(false)
-	const router = useRouter()
 	const editAddress = (tab: number) => {
 		setCheckoutStep('ADDRESS')
 		setTab(tab)
 	}
-
+	const { watch } = useFormContext<Inputs>();
+	const paymentMethod = watch('payment_method')
 	const checkoutComponent = [
 		<AddressForm
 			key="address"
@@ -42,6 +47,7 @@ const CheckoutMobile = ({
 			setTab={setTab}
 			setFocus={setFocus}
 		/>,
+		<InvoiceForm key="invoice" />,
 		<Recap
 			key="recap"
 			isLoading={isLoading}
@@ -77,7 +83,7 @@ const CheckoutMobile = ({
 	};
 
 	const bottomBarHeight = Number(cart.totals?.discount_total ?? 0) > 0 ? '225px' : '200px'
-
+	const stepButtonProps = { checkoutStep, setCheckoutStep, updateOrder, paymentMethod }
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
 			<Container sx={{width: '100%', flex: 1, overflow: 'hidden scroll', padding: '0 20px 250px 20px'}}>
@@ -105,31 +111,52 @@ const CheckoutMobile = ({
 				<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 101}}>
 					<PriceRecap isLoading={isLoading}/>
 					<Grid container sx={{marginTop: '5px'}} spacing={2}>
-						{checkoutStep === 'RECAP' && (
-							<Grid item xs={6}>
-								<Button fullWidth onClick={() => setCheckoutStep('ADDRESS')}>
-									{t('checkout.address')}
-								</Button>
-							</Grid>
+						{mobileStep > 0 && (
+							<StepButton isPrev {...stepButtonProps} />
 						)}
-						{['ADDRESS', 'RECAP'].includes(checkoutStep) && (
-							<Grid item xs={checkoutStep === 'ADDRESS' ? 12 : 6}>
-								<Button fullWidth onClick={() => checkoutStep === 'ADDRESS' ? updateOrder() : setCheckoutStep('PAYMENT_STRIPE')}>
-									{checkoutStep === 'ADDRESS' ? t('checkout.go-to-payment') : t('checkout.payment')}
-								</Button>
-							</Grid>
-						)}
-						{['PAYMENT_STRIPE', 'PAYMENT_PAYPAL'].includes(checkoutStep) && (
-							<Grid item xs={12}>
-								<Button fullWidth onClick={() => router.push('/checkout/' + (checkoutStep === 'PAYMENT_STRIPE' ? 'stripe' : 'paypal'))}>
-									{t('checkout.pay-now')}
-								</Button>
-							</Grid>
-						)}
+						<StepButton {...stepButtonProps} />
 					</Grid>
 				</Container>
 			)}
 		</div>
+	)
+}
+
+type StepButtonProps = {
+	isPrev?: boolean,
+	checkoutStep: Step,
+	setCheckoutStep: (step: Step) => void
+	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+	paymentMethod?: 'stripe'|'paypal'
+}
+const StepButton = ({isPrev, checkoutStep, setCheckoutStep, updateOrder, paymentMethod}: StepButtonProps) => {
+	const { t } = useTranslation('common')
+	const mobileStep = STEP_MAP.indexOf(checkoutStep)
+	const labelMap = ['address', 'invoice', 'shipping', 'payment', 'pay-now']
+	const targetStep = isPrev ? mobileStep - 1 : mobileStep + 1
+	const target = STEP_MAP[targetStep]
+	const router = useRouter()
+	const handleClick = async () => {
+		if (targetStep === 4) {
+			router.push('/checkout/' + paymentMethod)
+			return
+		}
+		if (targetStep < 2) {
+			await updateOrder(target)()
+			return
+		}
+		setCheckoutStep(target)
+	}
+
+	const iconProps = isPrev ?
+		{ startIcon: <ArrowBackIos /> } :
+		{ endIcon: <ArrowForwardIos /> }
+	return (
+		<Grid item xs={mobileStep === 0 ? 12 : 6}>
+			<Button fullWidth onClick={handleClick} {...iconProps}>
+				{t(`checkout.${labelMap[targetStep]}`)}
+			</Button>
+		</Grid>
 	)
 }
 

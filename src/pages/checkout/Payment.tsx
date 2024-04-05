@@ -12,7 +12,7 @@ import {Dispatch, SetStateAction} from "react";
 import Loading from "../../components/Loading";
 import PayPal from "../../icons/PayPal2";
 import {useTranslation} from "next-i18next";
-import {Step, Step as StepType} from "./CheckoutGrid";
+import {Inputs, Step, Step as StepType} from "./CheckoutGrid";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -21,6 +21,7 @@ import DialogActions from "@mui/material/DialogActions";
 import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import Stripe from "../../icons/Stripe";
+import {Controller, useFormContext} from "react-hook-form";
 
 type PaymentProps = {
 	isLoading: boolean
@@ -39,6 +40,7 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 	const shippingAddress = getAddressString(customer.shipping.first_name ? customer.shipping : customer.billing);
 	const billingAddress = getAddressString(customer.billing);
 	const { t } = useTranslation('common')
+	const { control } = useFormContext<Inputs>();
 
 	return (
 		<div style={{width: '100%', position: 'relative'}}>
@@ -82,31 +84,37 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 			</TableContainer>
 			<Typography sx={{fontSize: '18px', fontWeight: 500, marginTop: '40px'}}>{t('checkout.select-payment')}</Typography>
 			<Typography sx={{marginBottom: '20px'}}>{t('checkout.secured')}</Typography>
-			<RadioGroup
-				aria-labelledby="demo-controlled-radio-buttons-group"
-				name="controlled-radio-buttons-group"
-				value={checkoutStep}
-				onChange={(e,v) => setCheckoutStep(v as Step)}
-			>
-				<FormControlLabel
-					value="PAYMENT_STRIPE"
-					control={<Radio />}
-					label={(
-						<div style={{display: 'flex', alignItems: 'center'}}>
-							<Stripe sx={{fontSize: '50px'}} />
-						</div>
-					)}
-				/>
-				<FormControlLabel
-					value="PAYMENT_PAYPAL"
-					control={<Radio />}
-					label={(
-						<div style={{display: 'flex', alignItems: 'center'}}>
-							<PayPal sx={{fontSize: '80px'}} />
-						</div>
-					)}
-				/>
-			</RadioGroup>
+			<Controller
+				name="payment_method"
+				control={control}
+				render={({ field: { onChange, value, onBlur }}) => (
+					<RadioGroup
+						aria-labelledby="payment-method-group"
+						onChange={onChange}
+						onBlur={onBlur}
+						value={value}
+					>
+						<FormControlLabel
+							value="stripe"
+							control={<Radio />}
+							label={(
+								<div style={{display: 'flex', alignItems: 'center'}}>
+									<Stripe sx={{fontSize: '50px'}} />
+								</div>
+							)}
+						/>
+						<FormControlLabel
+							value="paypal"
+							control={<Radio />}
+							label={(
+								<div style={{display: 'flex', alignItems: 'center'}}>
+									<PayPal sx={{fontSize: '80px'}} />
+								</div>
+							)}
+						/>
+					</RadioGroup>
+				)}
+			/>
 		</div>
 	)
 }
