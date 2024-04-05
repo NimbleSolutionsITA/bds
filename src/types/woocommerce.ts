@@ -223,7 +223,7 @@ export type WooOrder = {
 	shipping: ShippingData
 	payment_method: string;
 	payment_method_title: string;
-	status: string;
+	status: 'processing'|'completed'|'pending'|'refunded'|'failed'|'cancelled'|'on-hold';
 	line_items: WooLineItem[]
 	coupon_lines: {
 		id: number;

@@ -249,5 +249,14 @@
       "title": "Attenzione",
       "body": "Per reimpostare la tua password, segui le istruzioni contenute nell'email che ti abbiamo inviato."
     }
+  },
+  "order-status": {
+    "processing": "In lavorazione",
+    "completed": "Completato",
+    "cancelled": "Annullato",
+    "refunded": "Rimborsato",
+    "failed": "Fallito",
+    "on-hold": "In attesa",
+    "pending": "In sospeso"
   }
 }

@@ -1,4 +1,14 @@
-import {Accordion, AccordionDetails, AccordionSummary, Box, Container, Divider, Grid, Typography} from "@mui/material";
+import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Box,
+	Chip,
+	Container,
+	Divider,
+	Grid,
+	Typography
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {ReactNode, SyntheticEvent, useEffect, useState} from "react";
 import useAuth from "../../utils/useAuth";
@@ -17,7 +27,6 @@ const OrderList = () => {
 		getOrders();
 	}, [getOrders]);
 
-	console.log(orders)
 	return (
 		<Container maxWidth="sm">
 			{(orders && orders.length > 0) ? (
@@ -79,8 +88,8 @@ const OrderItem = ({expanded, handleChange, order}: OrderItemProps) => {
 				id={`panel-${order.id}-bh-header`}
 				sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}
 			>
-				<Typography sx={{ fontSize: '18px', fontWeight: 300 }}>
-					<strong>#{order.id}</strong> {t("total")}: <strong><PriceFormat value={total} /></strong><br />
+				<Typography sx={{ fontSize: '16px', fontWeight: 300 }}>
+					<strong>#{order.id}</strong> {t("total")}: <strong><PriceFormat value={total} /></strong><OrderStatusChip status={order.status} /><br />
 					<span style={{fontSize: '14px'}}>
 						<Trans
 							i18nKey="order-details"
@@ -181,5 +190,28 @@ const SplitField = ({label, value, isLoading, labelWeight = 300, disabled = fals
 		</Typography>
 	</Box>
 )
+
+const OrderStatusChip = ({status}: {status: WooOrder['status']}) => {
+	const { t } = useTranslation();
+	const statusMap = {
+		'processing': 'warning',
+		'completed': 'success',
+		'pending': 'info',
+		'failed': 'error',
+		'refunded': undefined,
+		'cancelled': undefined,
+		'on-hold': 'info'
+	} as const;
+	return (
+		<Chip
+			label={t(`order-status.${status}`)}
+			color={statusMap[status]}
+			sx={{
+				position: 'absolute',
+				right: '50px'
+			}}
+		/>
+	)
+}
 
 export default OrderList;

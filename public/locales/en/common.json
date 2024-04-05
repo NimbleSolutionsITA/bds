@@ -244,5 +244,14 @@
       "title": "Warning",
       "body": "Please check your email. A password reset link has been sent to you."
     }
-  }
+  },
+    "order-status": {
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "refunded": "Refunded",
+      "failed": "Failed",
+      "on-hold": "On hold",
+      "pending": "Pending"
+    }
 }
