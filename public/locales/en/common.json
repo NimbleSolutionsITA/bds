@@ -218,7 +218,11 @@
       "email": "Invalid email. Please try again.",
       "password": "Invalid password. Please try again."
     },
-    "logging-in": "Logging in..."
+    "logging-in": "Logging in...",
+    "guest": {
+      "title": "Don't want to register?",
+      "button": "Continue as guest"
+    }
   },
   "register": {
     "title": "Sign up",

@@ -3,15 +3,13 @@ import {useDispatch, useSelector} from "react-redux";
 import {closeLogInDrawer, openLogInDrawer} from "../../redux/layoutSlice";
 import {RootState} from "../../redux/store";
 import {CloseSharp} from "@mui/icons-material";
-import {useTranslation} from "react-i18next";
 import LogInForm from "../../pages/my-area/LoginForm";
 import useAuth from "../../utils/useAuth";
 
-const LogInDrawer = ({ isCheckout = false }: { isCheckout?: boolean }) => {
+const LogInDrawer = () => {
 	const { logInDrawerOpen } = useSelector((state: RootState) => state.layout);
 	const dispatch = useDispatch()
 	const { loggedIn } = useAuth();
-	const { t } = useTranslation('common');
 	return (
 		<SwipeableDrawer
 			anchor="right"

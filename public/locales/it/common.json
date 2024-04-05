@@ -223,7 +223,11 @@
       "email": "Indirizzo email non valido",
       "password": "Password non valida"
     },
-    "logging-in": "Accesso in corso..."
+    "logging-in": "Accesso in corso...",
+    "guest": {
+      "title": "Non vuoi registrati?",
+      "button": "Continua come ospite"
+    }
   },
   "register": {
     "title": "Registrati",

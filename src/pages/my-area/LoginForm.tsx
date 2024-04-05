@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { useMutation, gql } from "@apollo/client";
-
 import { GET_USER } from "../../utils/useAuth";
-import HelperText from "../../components/HelperText";
 import {TextField, Typography, Button, CircularProgress} from "@mui/material";
-import {useRouter} from "next/router";
 import {useDispatch} from "react-redux";
 import {closeLogInDrawer, openForgotPasswordDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
 import {useTranslation} from "next-i18next";
+import {useRouter} from "next/router";
 
 const LOG_IN = gql`
     mutation logIn($login: String!, $password: String!) {
@@ -20,7 +18,7 @@ const LOG_IN = gql`
     }
 `;
 
-export default function LogInForm({ isCheckout = false }: { isCheckout?: boolean }) {
+export default function LogInForm() {
 	const { t } = useTranslation();
 	const [logIn, { loading, error }] = useMutation(LOG_IN, {
 		refetchQueries: [
@@ -51,6 +49,9 @@ export default function LogInForm({ isCheckout = false }: { isCheckout?: boolean
 		});
 	}
 	const dispatch = useDispatch();
+	const router = useRouter()
+	const isCheckout = router.pathname.includes('checkout')
+
 	return (
 		<form method="post" onSubmit={handleSubmit} style={{padding: '40px 0'}}>
 			<Typography textAlign="center" variant="h2" sx={{mt: '20px', fontWeight: 'bold'}}>{t('log-in.title')}</Typography>
@@ -100,6 +101,16 @@ export default function LogInForm({ isCheckout = false }: { isCheckout?: boolean
 					{t('register.sign-up')}
 				</Button>
 			</p>
+			{isCheckout && (
+				<p className="account-sign-up-message">
+					{t('log-in.guest.title')}{' '}
+					<Button variant="text" onClick={() => {
+						dispatch(closeLogInDrawer())
+					}}>
+						{t('log-in.guest.button')}
+					</Button>
+				</p>
+			)}
 		</form>
 	);
 }

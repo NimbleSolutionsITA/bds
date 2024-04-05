@@ -297,7 +297,8 @@ export const getAllPagesIds = async () => {
 		'cookie-settings',
 		'negozi-ottica-firenze',
 		'store',
-		'designers'
+		'designers',
+		'my-area',
 	].includes(slug)).map(page => ({
 		params: {
 			page: page.slug,
