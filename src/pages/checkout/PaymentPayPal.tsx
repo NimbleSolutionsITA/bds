@@ -7,7 +7,7 @@ import {gtagPurchase} from "../../utils/utils";
 import {useRouter} from "next/router";
 
 const PaymentPayPal = () => {
-	const { customer, customerNote, cart } = useSelector((state: RootState) => state.cart);
+	const { customer, cart } = useSelector((state: RootState) => state.cart);
 	const router = useRouter();
 	const payWithPayPal = async () => {
 		try {
@@ -18,8 +18,7 @@ const PaymentPayPal = () => {
 				},
 				body: JSON.stringify({
 					cart,
-					customer,
-					customerNote,
+					customer
 				})
 			}).then((r) => r.json())
 			if (order.error) {
