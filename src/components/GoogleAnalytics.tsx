@@ -27,7 +27,11 @@ export default function GoogleAnalytics({GA_MEASUREMENT_ID} : {GA_MEASUREMENT_ID
                 gtag('js', new Date());
 
                 gtag('consent', 'default', {
-                    'analytics_storage': 'denied'
+                   'ad_user_data': 'denied',
+				   'ad_personalization': 'denied',
+				   'ad_storage': 'denied',
+				   'analytics_storage': 'denied',
+				   'wait_for_update': 500,
                 });
                 
                 gtag('config', '${GA_MEASUREMENT_ID}', {

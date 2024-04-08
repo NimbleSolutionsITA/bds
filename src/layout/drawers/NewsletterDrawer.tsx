@@ -18,7 +18,10 @@ const NewsletterDrawer = () => {
 				sx: {
 					padding: '20px 0',
 					height: 'auto',
-					top: '200px',
+					top: {
+						xs: 0,
+						md: '10%'
+					},
 					right: {
 						xs: 0,
 						md: '24px'

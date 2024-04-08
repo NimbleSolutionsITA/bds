@@ -76,12 +76,14 @@ export default function LogInForm() {
 					required
 					sx={{m: '20px 0 10px'}}
 				/>
-				<Link href="#" onClick={() => {
-					dispatch(closeLogInDrawer())
-					dispatch(openForgotPasswordDrawer())
-				}}>
-					{t('log-in.forgot-password')}
-				</Link>
+				{!isCheckout && (
+					<Link href="#" onClick={() => {
+						dispatch(closeLogInDrawer())
+						dispatch(openForgotPasswordDrawer())
+					}}>
+						{t('log-in.forgot-password')}
+					</Link>
+				)}
 				{!isEmailValid ? (
 					<Typography>{t('log-in.error.email')}</Typography>
 				) : null}
@@ -92,22 +94,23 @@ export default function LogInForm() {
 					{t(`log-in.${loading ? 'logging-in' : 'title'}`)}
 				</Button>
 			</fieldset>
-			<p className="account-sign-up-message">
-				{t('log-in.register')}{' '}
-				<Button variant="text" onClick={() => {
-					dispatch(closeLogInDrawer())
-					dispatch(openSignUpDrawer())
-				}}>
-					{t('register.sign-up')}
-				</Button>
-			</p>
-			{isCheckout && (
-				<p className="account-sign-up-message">
+			{isCheckout ? (
+				<p>
 					{t('log-in.guest.title')}{' '}
 					<Button variant="text" onClick={() => {
 						dispatch(closeLogInDrawer())
 					}}>
 						{t('log-in.guest.button')}
+					</Button>
+				</p>
+			) : (
+				<p>
+					{t('log-in.register')}{' '}
+					<Button variant="text" onClick={() => {
+						dispatch(closeLogInDrawer())
+						dispatch(openSignUpDrawer())
+					}}>
+						{t('register.sign-up')}
 					</Button>
 				</p>
 			)}
