@@ -25,7 +25,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
 import {
-    DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH,
+    DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH,
     OUR_PRODUCTION_SUB_PATH,
     PROFUMUM_ROMA_SUB_PATH
 } from "../../../utils/endpoints";
@@ -143,6 +143,12 @@ export default function NavBarMobile({
                         items={categories.fragrances.liquides}
                         handleClick={handleClick}
                         path={LIQUIDES_IMAGINAIRES_SUB_PATH}
+                    />
+                    <AccordionNavButton
+                        title={categories.fragrances.maisonMain[0].name}
+                        items={categories.fragrances.maison}
+                        handleClick={handleClick}
+                        path={MAISON_GABRIELLA_CHIEFFO_SUB_PATH}
                     />
 
                     {mobileMenu.map(nav => (

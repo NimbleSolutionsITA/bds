@@ -16,18 +16,30 @@ const CookiesDrawer = () => {
 		setLocalStorage('cookie_consent', {
 			analytics: true,
 			profiling: true,
-			usage: true
+			usage: true,
+			storage: true
 		})
-		gtagConsent(true)
+		gtagConsent({
+			'ad_user_data': 'granted',
+			'ad_personalization': 'granted',
+			'ad_storage': 'granted',
+			'analytics_storage': 'granted'
+		})
 		dispatch(closeCookiesDrawer())
 	}
 	const handleGoToSettings = () => {
 		setLocalStorage('cookie_consent', {
 			analytics: false,
 			profiling: false,
-			usage: true
+			usage: false,
+			storage: false
 		})
-		gtagConsent(false)
+		gtagConsent({
+			'ad_user_data': 'denied',
+			'ad_personalization': 'denied',
+			'ad_storage': 'denied',
+			'analytics_storage': 'denied'
+		})
 		dispatch(closeCookiesDrawer())
 		return push('/cookie-settings')
 	}

@@ -10,14 +10,18 @@ import {gtagConsent} from "../../utils/utils";
 const defaultCookieSettings = {
 	analytics: true,
 	profiling: true,
-	usage: true
+	usage: true,
+	storage: true
 }
+
+const getConsent = (consent: boolean) => consent ? 'granted' : 'denied'
 
 const CookieSettings = () => {
 	const { t } = useTranslation('common');
 	const [analytics, setAnalytics] = useState(defaultCookieSettings.analytics);
 	const [profiling, setProfiling] = useState(defaultCookieSettings.profiling);
 	const [usage, setUsage] = useState(defaultCookieSettings.usage);
+	const [storage, setStorage] = useState(defaultCookieSettings.storage);
 	const [saved, setSaved] = useState(false);
 	const [drawerTimer, setDrawerTimer] = useState<NodeJS.Timeout | null>(null);
 
@@ -26,13 +30,21 @@ const CookieSettings = () => {
 			setAnalytics(true);
 			setProfiling(true);
 			setUsage(true);
+			setStorage(true);
 		}
-		setLocalStorage('cookie_consent', {
+		const preferences = {
 			analytics: allTrue || analytics,
 			profiling: allTrue || profiling,
-			usage: allTrue || usage
+			usage: allTrue || usage,
+			storage: allTrue || storage
+		}
+		setLocalStorage('cookie_consent', preferences)
+		gtagConsent({
+			'ad_user_data': getConsent(preferences.usage),
+			'ad_personalization': getConsent(preferences.profiling),
+			'ad_storage': getConsent(preferences.storage),
+			'analytics_storage': getConsent(preferences.analytics),
 		})
-		gtagConsent(allTrue || analytics)
 		setSaved(true);
 	}
 
@@ -58,13 +70,10 @@ const CookieSettings = () => {
 
 	useEffect (() => {
 		let cookieSettings = getLocalStorage("cookie_consent", defaultCookieSettings)
-		if (!cookieSettings.analytics && !cookieSettings.profiling && !cookieSettings.usage) {
-			cookieSettings = defaultCookieSettings
-			setLocalStorage('cookie_consent', cookieSettings)
-		}
 		setAnalytics(cookieSettings.analytics)
 		setProfiling(cookieSettings.profiling)
 		setUsage(cookieSettings.usage)
+		setStorage(cookieSettings.storage)
 	}, [])
 
 	return (
@@ -90,15 +99,24 @@ const CookieSettings = () => {
 			<Typography>
 				{t('cookies.analytics-body')}
 			</Typography>
-			{/*<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
+			<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
 					<Switch checked={profiling} onChange={(e, value) => {
 						setSaved(false)
 						setProfiling(value)
 					}} />
 				)} label={t('cookies.profiling')} />
-				<Typography>
-					{t('cookies.profiling-body')}
-				</Typography>*/}
+			<Typography>
+				{t('cookies.profiling-body')}
+			</Typography>
+			<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
+				<Switch checked={storage} onChange={(e, value) => {
+					setSaved(false)
+					setStorage(value)
+				}} />
+			)} label={t('cookies.storage')} />
+			<Typography>
+				{t('cookies.storage-body')}
+			</Typography>
 			<FormControlLabel sx={formLabelStyle} labelPlacement="end" control={(
 				<Switch checked={usage} onChange={(e, value) => {
 					setSaved(false)

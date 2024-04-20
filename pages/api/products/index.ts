@@ -161,6 +161,7 @@ export const getAllProducts = async (params: ProductsRequestQuery): Promise<Base
 	let page = 1
 	let total = 99
 	while (total === 99) {
+		console.log(params)
 		const response = await getProducts({
 			...params,
 			per_page: '99',
