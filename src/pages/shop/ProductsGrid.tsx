@@ -8,6 +8,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import {useRouter} from "next/router";
 import Loading from "../../components/Loading";
 import {SearchParams} from "./ShopLayout";
+import usePageState from "../../redux/usePageState";
 
 type ProductsGridProps = {
 	products: BaseProduct[]
@@ -22,7 +23,8 @@ type ProductsGridProps = {
 }
 
 const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searchParams, open, drawerWidth, title }: ProductsGridProps) => {
-	const {locale} = useRouter()
+	const { pages, pageParams, setState } = usePageState({pages: [products], pageParams: []})
+	const {locale, pathname} = useRouter()
 	const { data, status, fetchNextPage, hasNextPage, isRefetching } = useInfiniteQuery(
 		["products", searchParams],
 		async ({ pageParam = 1}): Promise<BaseProduct[]> => {
@@ -62,7 +64,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 					return pages.length + 1;
 				}
 			},
-			initialData: {pages: [products], pageParams: []}
+			initialData: {pages, pageParams}
 		}
 	);
 
@@ -70,6 +72,10 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 		if (isRefetching)
 			window.scrollTo({top: 0, behavior: 'smooth'})
 	} , [isRefetching])
+
+	useEffect(() => {
+		setState({pages: data?.pages, pageParams: data?.pageParams})
+	}, [data?.pages, data?.pageParams]);
 
 	return (
 		<Box sx={{
