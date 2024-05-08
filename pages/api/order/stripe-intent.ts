@@ -68,7 +68,6 @@ export default async function handler(
 			if (!paymentIntentId) {
 				throw new Error('Payment intent ID is missing')
 			}
-			console.log('vat', customer.billing.vat)
 			const orderPayload = await prepareOrderPayload(cart, customer, api)
 			const { data: order } = await api.post("orders", {
 				payment_method: 'stripe',
@@ -97,7 +96,7 @@ export default async function handler(
 			res.json({ success: true });
 		}
 	} catch (error) {
-		console.log(error)
+		console.error(error)
 		let responseData = {
 			success: false,
 			error: "",

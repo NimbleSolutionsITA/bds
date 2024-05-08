@@ -63,13 +63,13 @@ const PaymentPayPal = () => {
 			}
 
 		} catch (error) {
-			console.log(error)
+			console.error(error)
 		}
 	}
 
 	const onPayPalError = async (err: any) => {
-		console.log('onPayPalError', err)
-		console.log(err.message ?? 'Paypal payment error')
+		console.error('onPayPalError', err)
+		console.error(err.message ?? 'Paypal payment error')
 	}
 
 	const onPayPalCancel = async (data: any) => {

@@ -51,7 +51,6 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 	const shippingLine = useRef<ShippingLine>()
 	const router = useRouter();
 	const { t } = useTranslation();
-	const dispatch = useDispatch<AppDispatch>()
 	const { cart: { cart_key: cartKey } } = useSelector((state: RootState) => state.cart);
 
 	const shippingOptions = getShippingOptions(shippingCountry.current, shipping, getTotalByCountry(items, shippingCountry.current) / 100)
@@ -142,11 +141,11 @@ const StripePaymentButton = ({items, shipping, isCart}: StripePaymentButtonProps
 					paymentIntent,
 				} = await stripe.confirmCardPayment(clientSecret, {
 					payment_method: e.paymentMethod.id,
-				}, { handleActions: false });
+				});
 
-				if (stripeError) {
+				if (stripeError || paymentIntent?.status !== 'succeeded') {
 					// Show error to your customer (e.g., insufficient funds)
-					console.log(stripeError.message);
+					console.error(stripeError ? stripeError.message : paymentIntent?.status);
 					return;
 				}
 

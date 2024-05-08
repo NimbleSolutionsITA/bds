@@ -56,7 +56,7 @@ export const getGooglePlaces = async (lang: string) => {
 	const url2 = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId2}&key=${apiKey}&language=${lang}`;
 	const details2 = await fetch(url2, { cache: "force-cache", next: { revalidate: 24 * 60 * 60 } });
 	const { result: result2 } = await details2.json();
-	console.log(`google places api called at ${new Date().toLocaleString()}`)
+	console.error(`google places api called at ${new Date().toLocaleString()}`)
 	return {
 		main: mapResult(result),
 		secondary: mapResult(result2)

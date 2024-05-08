@@ -52,7 +52,6 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		per_page: '99',
 		fragrances: true
 	})
-	console.log('products', products)
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },

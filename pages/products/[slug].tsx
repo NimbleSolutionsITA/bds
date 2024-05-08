@@ -49,8 +49,8 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		seo = await fetch(`${ WORDPRESS_RANK_MATH_SEO_ENDPOINT}?url=${product.link}`).then(response => response.json())
 	}
 	catch (e) {
-		console.log('RANKMATH SEO ERROR', product.link)
-		console.log(e)
+		console.error('RANKMATH SEO ERROR', product.link)
+		console.error(e)
 	}
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
