@@ -9,6 +9,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import {closeSearchDrawer, openSearchDrawer} from "../../redux/layout";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
+import {Trans} from "react-i18next";
+import React from "react";
 
 export default function TopBar() {
     const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
@@ -37,10 +39,14 @@ export default function TopBar() {
                         position: 'absolute',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        color: '#FFF'
+                        color: '#FFF',
+                        textAlign: 'center'
                     }}
                 >
-                    <ShippingBanner />
+                    <Trans i18nKey="shipping.lineb" components={[<b key={0} />]} />
+                    <Box sx={{fontSize: '16px', marginTop: '5px'}}>
+                        <Trans i18nKey="newsletter.promo-banner" components={[<b key={0} />]} />
+                    </Box>
                 </div>
                 <div>
                     <IconButton onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}>
