@@ -332,15 +332,15 @@ export interface PurchaseItem {
 export const gtagPurchase = (order: WooOrder) => {
     const params: PurchaseEvent = {
         transaction_id: order.id.toString(),
-        value: Number(order.total) / 100,
-        tax: Number(order.total_tax) / 100,
-        shipping: Number(order.shipping_total) / 100,
+        value: Number(order.total),
+        tax: Number(order.total_tax),
+        shipping: Number(order.shipping_total),
         items: order.line_items.map((item) => {
             return {
                 item_id: item.product_id.toString(),
                 item_name: item.name,
                 item_variant: item.variation_id?.toString(),
-                price: Number(item.total) / 100,
+                price: Number(item.total),
                 quantity: item.quantity
             }
         })
