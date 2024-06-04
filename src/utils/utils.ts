@@ -10,7 +10,7 @@ import {
 } from "../types/woocommerce";
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
-import {LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "./endpoints";
+import {LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "./endpoints";
 import {Cart, Item} from "../types/cart-type";
 
 export const sanitize = (html: string) => {
@@ -47,6 +47,11 @@ export const PROFUMUM_ROMA_CATEGORY = {
 export const LIQUIDES_IMAGINAIRES_CATEGORY = {
     it: 1166,
     en: 1188
+}
+
+export const MAISON_GABRIELLA_CHIEFFO_CATEGORY = {
+    it: 14511,
+    en: 14513
 }
 
 export const BOTTEGA_DI_SGUARDI_CATEGORY = {
@@ -229,7 +234,9 @@ export function formatDistance(date: Date | number, locale: 'it'|'en') {
 }
 
 export function getProductMainCategory(product: BaseProduct): BaseCategory {
-    const fragrance = product.categories.find((category) => [LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH].includes(category.slug))
+    const fragrance = product.categories.find((category) => [
+        LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH
+    ].includes(category.slug))
     if (fragrance)
         return fragrance;
     return product.categories.find((category) => category.parent && MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
@@ -325,15 +332,15 @@ export interface PurchaseItem {
 export const gtagPurchase = (order: WooOrder) => {
     const params: PurchaseEvent = {
         transaction_id: order.id.toString(),
-        value: Number(order.total) / 100,
-        tax: Number(order.total_tax) / 100,
-        shipping: Number(order.shipping_total) / 100,
+        value: Number(order.total),
+        tax: Number(order.total_tax),
+        shipping: Number(order.shipping_total),
         items: order.line_items.map((item) => {
             return {
                 item_id: item.product_id.toString(),
                 item_name: item.name,
                 item_variant: item.variation_id?.toString(),
-                price: Number(item.total) / 100,
+                price: Number(item.total),
                 quantity: item.quantity
             }
         })
@@ -343,12 +350,14 @@ export const gtagPurchase = (order: WooOrder) => {
         ...params
     });
 };
-
-export const gtagConsent = (granted: boolean) => {
-    const newValue = granted ? 'granted' : 'denied'
-    window.gtag("consent", 'update', {
-        'analytics_storage': newValue
-    });
+type Consent = 'granted' | 'denied'
+export const gtagConsent = (consent: {
+    'ad_user_data': Consent,
+    'ad_personalization': Consent,
+    'ad_storage': Consent,
+    'analytics_storage': Consent
+}) => {
+    window.gtag("consent", 'update', consent);
 }
 
 export const prepareOrderPayload = async (cart: any, customerData: any, api: any) => {

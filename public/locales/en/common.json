@@ -1,6 +1,7 @@
   {
   "liquides-imaginaires":"Liquides Imaginaries",
   "profumum-roma":"Profumum Roma",
+  "maison-gabriella-chieffo":"Maison Gabriella Chieffo",
   "buy-now":"Buy now",
   "explore-section":"Explore the section",
   "read-reviews":"Read all the reviews",
@@ -126,13 +127,15 @@
     "consentText":"By subscribing to the newsletter, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes.",
     "cta":"Notify me",
     "promo-text": "<0>Subscribe to our newsletter</0> and get <0>10% discount</0> on next order!",
-    "promo-banner": "sconto del <0>10% su tutti gli occhiali</0> con codice promozionale"
+    "promo-banner": "<0>10% discount on all models</0> with promo code SCONTO10"
   },
   "shop":"{{address}} SHOP",
   "shipping":{
+    "line": "SHIPPING IN ITALY WITHIN 24/48h AND IN EUROPE within 24/72h",
     "line1":"FREE SHIPPING for orders over €150",
     "line2":"SHIPPING IN ITALY within 24/48 hours",
     "line3":"SHIPPING IN EUROPE within 2/3 days",
+    "lineb": "Shipping in Italy within 24/48h and in Europe within 24/72h",
     "line1b":"<0>Free shipping</0> for orders over 150€.",
     "line2b":"<0>Shipping in Italy</0> with DHL or GLS within 24/48 hours",
     "line3b":"<0>Shipping in Europe</0> with DHL or GLS within 2/3 days"

@@ -1,8 +1,9 @@
 import {BaseAttributes, BaseProduct, Color, ImageColor, TextAttribute} from "../../types/woocommerce";
 import {Box, Container, Grid, MenuItem, Select} from "@mui/material";
 import ProductCard from "../../components/ProductCard";
-import {useState} from "react";
+import {useEffect} from "react";
 import {useTranslation} from "next-i18next";
+import usePageState from "../../redux/usePageState";
 
 type DesignerProductGridProps = {
 	products: BaseProduct[]
@@ -12,8 +13,10 @@ type Filters = {
 }
 type SortOption = "price-asc" | "price-desc" | "name-asc" | "name-desc"
 const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
-	const [filters, setFilters] = useState<Filters>({})
-	const [sortOption, setSortOption] = useState<SortOption>("name-asc");
+	const { filters, sortOption, setState } = usePageState({
+		filters: {},
+		sortOption: "name-asc"
+	})
 	const { t } = useTranslation('common');
 	const availableAttributes = getUniqueAttributeOptions(products)
 	const sortedAndFilteredProducts = products
@@ -48,7 +51,7 @@ const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
 			<div style={{margin: '20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
 				<Select
 					value={sortOption}
-					onChange={(e) => setSortOption(e.target.value as SortOption)}
+					onChange={(e) => setState({ sortOption: e.target.value as SortOption})}
 				>
 					<MenuItem value="price-asc">{t('sorting.price-asc')}</MenuItem>
 					<MenuItem value="price-desc">{t('sorting.price-desc')}</MenuItem>
@@ -66,7 +69,7 @@ const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
 							}}
 							key={attribute}
 							value={filters[attribute as keyof BaseAttributes] ?? 'all'}
-							onChange={(e) => setFilters((filters) => ({ ...filters, [attribute]: e.target.value === 'all' ? null : e.target.value }))}
+							onChange={(e) => setState({ filters: { ...filters, [attribute]: e.target.value === 'all' ? null : e.target.value }})}
 						>
 							<MenuItem value="all">
 								{t('attributes.pa_'+attribute.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase())}

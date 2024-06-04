@@ -33,7 +33,7 @@ const PaymentStripe = () => {
 		}).then((r) => r.json())
 
 		if (!response.success) {
-			console.log(response.error)
+			console.error(response.error)
 			return;
 		}
 
@@ -53,7 +53,7 @@ const PaymentStripe = () => {
 				},
 				body: JSON.stringify({ intentId: stripeIntent.intentId })
 			}).then((r) => r.json())
-			console.log(result.error.message);
+			console.error(result.error.message);
 		}
 		setLoading(false)
 	};

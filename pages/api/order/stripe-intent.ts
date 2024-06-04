@@ -89,7 +89,7 @@ export default async function handler(
 			res.json({ success: true });
 		}
 	} catch (error) {
-		console.log(error)
+		console.error(error)
 		let responseData = {
 			success: false,
 			error: "",

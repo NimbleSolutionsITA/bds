@@ -10,12 +10,13 @@ import {
 } from "@mui/icons-material";
 import CartIndicator from "../../components/CartIndicator";
 import LanguageButton from "../../components/LanguageButton";
-import ShippingBanner from "./ShippingBanner";
 import {FACEBOOK_LINK, INSTAGRAM_LINK} from "../../utils/endpoints";
 import SearchIcon from '@mui/icons-material/Search';
 import {closeSearchDrawer, openLogInDrawer, openSearchDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
+import {Trans} from "react-i18next";
+import React from "react";
 import UserIcon from "../../icons/UserIcon";
 import useAuth from "../../utils/useAuth";
 import {useState} from "react";
@@ -51,10 +52,14 @@ export default function TopBar() {
                         position: 'absolute',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        color: '#FFF'
+                        color: '#FFF',
+                        textAlign: 'center'
                     }}
                 >
-                    <ShippingBanner />
+                    <Trans i18nKey="shipping.lineb" components={[<b key={0} />]} />
+                    <Box sx={{fontSize: '16px', marginTop: '5px'}}>
+                        <Trans i18nKey="newsletter.promo-banner" components={[<b key={0} />]} />
+                    </Box>
                 </div>
                 <div>
                     <UserMenu />

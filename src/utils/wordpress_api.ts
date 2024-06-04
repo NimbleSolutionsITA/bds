@@ -2,7 +2,7 @@ import {
 	BLOG_POST_SUB_PATH, CHECKOUT_SUB_PATH,
 	DESIGNERS_SUB_PATH,
 	FRAGRANCES_SUB_PATH,
-	LIQUIDES_IMAGINAIRES_SUB_PATH, OPTICAL_SUB_PATH,
+	LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH, OPTICAL_SUB_PATH,
 	OUR_PRODUCTION_SUB_PATH,
 	PROFUMUM_ROMA_SUB_PATH, SUNGLASSES_SUB_PATH,
 	WORDPRESS_API_ENDPOINT,
@@ -25,8 +25,9 @@ import {
 	EYEWEAR_CATEGORY,
 	PROFUMUM_ROMA_CATEGORY,
 	LIQUIDES_IMAGINAIRES_CATEGORY,
+	MAISON_GABRIELLA_CHIEFFO_CATEGORY,
+	OUR_PRODUCTION_CATEGORIES,
 	sanitize,
-	OUR_PRODUCTION_CATEGORIES
 } from "./utils";
 import {getShippingInfo} from "../../pages/api/shipping";
 import {getProducts} from "../../pages/api/products";
@@ -39,7 +40,8 @@ type MenuCategories = {
 	designers: WooProductCategory[],
 	fragrances: {
 		profumum: WooProductCategory[],
-		liquides: WooProductCategory[]
+		liquides: WooProductCategory[],
+		maison: WooProductCategory[],
 	},
 	ourProduction: WooProductCategory[]
 }
@@ -52,10 +54,11 @@ function mapMenuItem(categories?: MenuCategories) {
 			child_items = categories.designers.map(categoryToMenu(DESIGNERS_SUB_PATH))
 		}
 		else if (item.slug === FRAGRANCES_SUB_PATH && categories?.fragrances) {
-			groups = [PROFUMUM_ROMA_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH]
+			groups = [PROFUMUM_ROMA_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH]
 			child_items = [
 				...categories.fragrances.profumum.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(PROFUMUM_ROMA_SUB_PATH)),
-				...categories.fragrances.liquides.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(LIQUIDES_IMAGINAIRES_SUB_PATH))
+				...categories.fragrances.liquides.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(LIQUIDES_IMAGINAIRES_SUB_PATH)),
+				...categories.fragrances.maison.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(MAISON_GABRIELLA_CHIEFFO_SUB_PATH))
 			]
 		}
 		else if (item.slug === OUR_PRODUCTION_SUB_PATH) {
@@ -112,8 +115,10 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {1
 		fragrances: {
 			profumumMain: productCategories.filter(cat => cat.id === PROFUMUM_ROMA_CATEGORY[locale]),
 			liquidesMain: productCategories.filter(cat => cat.id === LIQUIDES_IMAGINAIRES_CATEGORY[locale]),
+			maisonMain: productCategories.filter(cat => cat.id === MAISON_GABRIELLA_CHIEFFO_CATEGORY[locale]),
 			profumum: productCategories.filter(cat => cat.parent === PROFUMUM_ROMA_CATEGORY[locale]),
-			liquides: productCategories.filter(cat => cat.parent === LIQUIDES_IMAGINAIRES_CATEGORY[locale])
+			liquides: productCategories.filter(cat => cat.parent === LIQUIDES_IMAGINAIRES_CATEGORY[locale]),
+			maison: productCategories.filter(cat => cat.parent === MAISON_GABRIELLA_CHIEFFO_CATEGORY[locale])
 		},
 		ourProduction: productCategories.filter(cat => [
 			...OUR_PRODUCTION_CATEGORIES.it,
@@ -141,8 +146,10 @@ export const getLayoutProps = async (locale: 'it' | 'en') => {1
 			fragrances: {
 				profumumMain: categories.fragrances.profumumMain.map(mapProductCategory),
 				liquidesMain: categories.fragrances.liquidesMain.map(mapProductCategory),
+				maisonMain: categories.fragrances.maisonMain.map(mapProductCategory),
 				profumum: categories.fragrances.profumum.map(mapProductCategory),
-				liquides: categories.fragrances.liquides.map(mapProductCategory)
+				liquides: categories.fragrances.liquides.map(mapProductCategory),
+				maison: categories.fragrances.maison.map(mapProductCategory)
 			}
 		},
 		shipping,
@@ -196,8 +203,10 @@ export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) =>
 		...layout.categories.designers,
 		...layout.categories.fragrances.liquides,
 		...layout.categories.fragrances.profumum,
+		...layout.categories.fragrances.maison,
 		...layout.categories.fragrances.profumumMain,
-		...layout.categories.fragrances.liquidesMain
+		...layout.categories.fragrances.liquidesMain,
+		...layout.categories.fragrances.maisonMain,
 	].find(cat => cat.slug === slug)
 	const seo =  productCategory && await getSeo(productCategory?.link)
 	return { layout: { ...layout, seo: seo ?? null }, productCategory }
@@ -291,6 +300,7 @@ export const getAllPagesIds = async () => {
 		BLOG_POST_SUB_PATH,
 		PROFUMUM_ROMA_SUB_PATH,
 		LIQUIDES_IMAGINAIRES_SUB_PATH,
+		MAISON_GABRIELLA_CHIEFFO_SUB_PATH,
 		OUR_PRODUCTION_SUB_PATH,
 		'shop',
 		'home',

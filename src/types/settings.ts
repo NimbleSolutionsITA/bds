@@ -36,8 +36,10 @@ export type BaseLayoutProps = {
 		fragrances: {
 			profumum: WooProductCategory[],
 			liquides: WooProductCategory[],
+			maison: WooProductCategory[],
 			profumumMain: WooProductCategory[],
-			liquidesMain: WooProductCategory[]
+			liquidesMain: WooProductCategory[],
+			maisonMain: WooProductCategory[],
 		}
 	}
 	seo: string

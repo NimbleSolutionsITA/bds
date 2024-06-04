@@ -416,7 +416,7 @@ export const callCartData = async (url: string, payload = {}, method: 'GET' | 'P
 
 		return response.data;
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		throw error;
 	}
 };

@@ -15,6 +15,11 @@ type LayoutState = {
 		category?: string | null
 		attributes?: string | null
 	}
+	pageStates?: {
+		route: string
+		scroll: number
+		state: any
+	}[]
 }
 
 const initialState: LayoutState = {
@@ -90,6 +95,14 @@ export const layoutSlice = createSlice({
 				attributes: null
 			}
 		},
+		setPageState: (state, { payload }: PayloadAction<{ route: string, scroll: number, state: any }>) => {
+			const index = state.pageStates?.findIndex(pageState => pageState.route === payload.route) ?? -1
+			if (index !== -1) {
+				state.pageStates![index] = payload
+			} else {
+				state.pageStates = state.pageStates ? [...state.pageStates, payload] : [payload]
+			}
+		},
 	},
 })
 
@@ -103,6 +116,7 @@ export const {
 	closeInStockNotifierDrawer,
 	openSearchDrawer,
 	closeSearchDrawer,
+	setPageState,
 	openLogInDrawer,
 	closeLogInDrawer,
 	openSignUpDrawer,

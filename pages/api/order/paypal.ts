@@ -90,7 +90,7 @@ export default async function handler(
 			responseData.success = true
 		}
 	} catch (error) {
-		console.log(error)
+		console.error(error)
 		responseData.success = false
 		if (typeof error === "string") {
 			responseData.error = error
