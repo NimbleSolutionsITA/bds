@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		}
 
 		const subscriberHash = md5(email.toLowerCase());
-		const url = `https://<dc>.api.mailchimp.com/3.0/lists/${listId}/members/${subscriberHash}`;
+		const url = `https://us5.api.mailchimp.com/3.0/lists/${listId}/members/${subscriberHash}`;
 
 		try {
 			const response = await fetch(url, {
@@ -27,7 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			if (response.status === 200) {
 				const subscriberInfo = await response.json();
 				return res.status(200).json({ subscribed: true, subscriberInfo });
-			} else if (response.status === 404) {
+			} else if ([401, 404].includes(response.status)) {
 				return res.status(200).json({ subscribed: false });
 			} else {
 				const data = await response.json();
@@ -45,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		}
 
 		const subscriberHash = md5(email.toLowerCase());
-		const url = `https://<dc>.api.mailchimp.com/3.0/lists/${listId}/members/${subscriberHash}`;
+		const url = `https://us5.api.mailchimp.com/3.0/lists/${listId}/members/${subscriberHash}`;
 
 		try {
 			const response = await fetch(url, {

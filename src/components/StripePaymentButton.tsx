@@ -4,11 +4,10 @@ import {PaymentRequest, PaymentRequestUpdateDetails} from "@stripe/stripe-js/typ
 import {ShippingClass} from "../types/woocommerce";
 import {NEXT_API_ENDPOINT} from "../utils/endpoints";
 import {useRouter} from "next/router";
-import {getCartItemPriceWithoutTax, getIsEU, getName, gtagPurchase} from "../utils/utils";
+import {getName, gtagPurchase} from "../utils/utils";
 import {useTranslation} from "next-i18next";
-import {AppDispatch, RootState} from "../redux/store";
-import {useDispatch, useSelector} from "react-redux";
-import {destroyCart} from "../redux/cartSlice";
+import {RootState} from "../redux/store";
+import {useSelector} from "react-redux";
 import {Button} from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";

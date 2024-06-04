@@ -50,8 +50,8 @@ export const LIQUIDES_IMAGINAIRES_CATEGORY = {
 }
 
 export const MAISON_GABRIELLA_CHIEFFO_CATEGORY = {
-    it: 14511,
-    en: 14513
+    it: 13927,
+    en: 13927
 }
 
 export const BOTTEGA_DI_SGUARDI_CATEGORY = {

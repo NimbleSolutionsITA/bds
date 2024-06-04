@@ -36,6 +36,7 @@ export default function Checkout({
 	const {locale} = useRouter()
 
 	useEffect(() => {
+		console.log('loginChecked', loginChecked, 'loggedIn', loggedIn)
 		if (loginChecked && !loggedIn) {
 			dispatch(openLogInDrawer())
 			setInitStep('ask-login')
@@ -52,8 +53,8 @@ export default function Checkout({
 		}
 		if (
 			initStep === 'init-customer-data' &&
-			customer && customer.billing && customer.billing.first_name &&
-			cart && cart.items && cart.items.length > 0
+			Object.keys(customer?.billing ?? {}).includes('first_name') &&
+			cart?.items?.length > 0
 		) {
 			dispatch(initCheckout());
 			setInitStep('completed')

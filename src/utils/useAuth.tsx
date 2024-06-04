@@ -121,15 +121,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const getNewsletterStatusQuery = useQuery(
 		['check-newsletter', user?.databaseId],
 		async () => {
-			const response = await fetch(`/api/customer/newsletter`, {
+			const response = await fetch(`/api/customer/newsletter?email=${user?.email}`, {
 				method: 'GET',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ email: user?.email })
 			});
 			if (!response.ok) {
-				throw new Error('Network response was not ok');
+				return false;
 			}
 			const { subscribed } = await response.json();
 			return subscribed as boolean;
