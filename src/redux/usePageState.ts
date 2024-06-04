@@ -1,7 +1,7 @@
 import {useRouter} from "next/router";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "./store";
-import {setPageState} from "./layout";
+import {setPageState} from "./layoutSlice"
 import {useEffect} from "react";
 
 const usePageState = (initialState: any) => {
