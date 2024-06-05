@@ -31,6 +31,7 @@ import {
 } from "../../../utils/endpoints";
 import NavButton from "../../../components/NavButton";
 import AccordionNavButton from "../../../components/AccordionNavButton";
+import {UserMenu} from "../UserMenu";
 
 
 type NavBarMobileProps = {
@@ -78,12 +79,13 @@ export default function NavBarMobile({
                         <MenuToggle isOpen={open} />
                     </IconButton>
                     <div>
+                        <UserMenu />
                         <IconButton
                             onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}
                         >
-                            <SearchIcon fontSize="large" />
+                            <SearchIcon fontSize="medium" />
                         </IconButton>
-                        <CartIndicator iconProps={{fontSize: 'large'}} />
+                        <CartIndicator iconProps={{fontSize: 'medium'}} />
                     </div>
                 </Toolbar>
                 {breadcrumbs && <BottomBar breadcrumbs={breadcrumbs}/>}
