@@ -28,7 +28,7 @@ type CartDrawerProps = {
 
 const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 	const { cartDrawerOpen, cart, loading } = useSelector((state: RootState) => state.cart);
-	const isEU = cart?.customer?.shipping_address?.shipping_country !== 'IT'
+	const isEU = !!cart?.customer?.shipping_address?.shipping_country && cart?.customer?.shipping_address?.shipping_country !== 'IT'
 	const dispatch = useDispatch()
 	const totalItems = cart?.item_count ?? 0
 	const { t } = useTranslation('common')

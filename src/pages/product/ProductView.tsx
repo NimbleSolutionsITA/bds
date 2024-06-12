@@ -52,7 +52,7 @@ const removeDuplicates = (array: ImageDetailed[]) => {
 
 const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	const { cart: { customer: { shipping_address: { shipping_country }} } } = useSelector((state: RootState) => state.cart);
-	const isEU = shipping_country !== 'IT'
+	const isEU = !!shipping_country && shipping_country !== 'IT'
 	const init = getDefaultProduct(product);
 	const isEyewear = product.categories.find(({id, parent }) =>
 		EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
