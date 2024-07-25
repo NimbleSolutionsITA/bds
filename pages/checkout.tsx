@@ -25,6 +25,7 @@ export type CheckoutProps = {
 type InitStep = 'check-login'|'ask-login'|'init-customer-data'|'completed'
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
+const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
 export default function Checkout({
      shipping
@@ -69,7 +70,9 @@ export default function Checkout({
 			<title>Bottega di Sguardi - Checkout</title>
 		</Head>
 
-		{GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+		{GA_MEASUREMENT_ID && TAG_MANAGER_ID &&
+			<GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
+		}
 
 		<LogInDrawer />
 
