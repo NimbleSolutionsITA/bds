@@ -14,6 +14,7 @@ import {AppDispatch} from "../../src/redux/store";
 import {destroyCart} from "../../src/redux/cartSlice";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
+const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
 export default function CheckoutResult() {
 	const { t } = useTranslation('common')
@@ -30,7 +31,9 @@ export default function CheckoutResult() {
 				<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
 				<title>Bottega di Sguardi - Pagamento completato</title>
 			</Head>
-			{GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+			{GA_MEASUREMENT_ID && TAG_MANAGER_ID &&
+                <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
+			}
 
 			<IconButton
 				component={Link}
