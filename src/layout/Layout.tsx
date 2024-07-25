@@ -33,6 +33,7 @@ type LayoutProps = {
 }
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
+const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
 export default function Layout({children, layout: {
     seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping, categories
@@ -60,7 +61,9 @@ export default function Layout({children, layout: {
                 {seo && parse(seo)}
             </Head>
 
-            {GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+            {GA_MEASUREMENT_ID && TAG_MANAGER_ID && (
+                <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
+            )}
 
             <Script id="twak" type="text/javascript">
                 {`

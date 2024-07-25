@@ -280,10 +280,14 @@ export const getCartItemPrice = (item: Item, isEU: boolean) => (isEU && item.car
     Number(item.cart_item_data.priceEU) * Number(item.quantity.value) :
     (Number(item.totals.total) + Number(item.totals.tax))
 
-export const getIsEU = (customer?: Cart['customer']) => (customer?.shipping_address?.shipping_country ?? customer?.billing_address?.billing_country ) !== 'IT'
+export const getIsEU = (customer?: Cart['customer']) => {
+    const shippingCountry = customer?.shipping_address?.shipping_country ?? customer?.billing_address?.billing_country ?? 'IT'
+    return shippingCountry !== 'IT'
+}
 
 export const getCartTotals = (cart?: Cart) => {
     const isEU = getIsEU(cart?.customer)
+    console.log(cart?.customer)
 
     const subtotal = isEU ?
         cart?.items?.reduce((acc: number, item: any) => {

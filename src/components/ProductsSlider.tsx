@@ -19,7 +19,7 @@ const ProductsSlider = ({products, title}: ProductsSliderProps) => {
 			<Box p={{xs: 0, md: '0 7%'}}>
 				<Swiper>
 					{products.map((product) =>
-						<ProductCard product={product} key={product.id} />
+						product && <ProductCard product={product} key={product.id} />
 					)}
 				</Swiper>
 			</Box>
