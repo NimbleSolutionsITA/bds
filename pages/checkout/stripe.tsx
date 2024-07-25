@@ -17,6 +17,7 @@ import PaymentStripe from "../../src/pages/checkout/PaymentStripe";
 export type CheckoutProps = {}
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
+const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
 export default function Checkout({}: CheckoutProps) {
 	const { cart, stripe, customer } = useSelector((state: RootState) => state.cart);
@@ -35,7 +36,9 @@ export default function Checkout({}: CheckoutProps) {
 			<title>Bottega di Sguardi - Checkout Stripe</title>
 		</Head>
 
-		{GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+		{GA_MEASUREMENT_ID && TAG_MANAGER_ID &&
+            <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
+		}
 
 		{(cart && cart.items && cart.items.length > 0 && stripe?.clientSecret)  ? (
 			<Elements

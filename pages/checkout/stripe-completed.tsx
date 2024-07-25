@@ -11,6 +11,7 @@ import GoogleAnalytics from "../../src/components/GoogleAnalytics";
 import {Container} from "@mui/material";
 
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
+const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
 export default function CheckoutResult() {
 	const dispatch = useDispatch<AppDispatch>()
@@ -56,7 +57,9 @@ export default function CheckoutResult() {
 				<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
 				<title>Bottega di Sguardi - Pagamento completato</title>
 			</Head>
-			{GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+			{GA_MEASUREMENT_ID && TAG_MANAGER_ID &&
+                <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
+			}
 			<Loading />
 		</Container>
 	)
