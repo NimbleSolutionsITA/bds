@@ -35,9 +35,9 @@ export default function Checkout({
 	const { cart: { cart, customer }, layout: { logInDrawerOpen } } = useSelector((state: RootState) => state);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
+	console.log(cart, customer)
 
 	useEffect(() => {
-		console.log('loginChecked', loginChecked, 'loggedIn', loggedIn)
 		if (loginChecked && !loggedIn) {
 			dispatch(openLogInDrawer())
 			setInitStep('ask-login')
@@ -45,7 +45,7 @@ export default function Checkout({
 		if (loginChecked && loggedIn) {
 			setInitStep('init-customer-data')
 		}
-	}, [loginChecked, loggedIn, dispatch])
+	}, [loginChecked, loggedIn])
 
 	useEffect(() => {
 		if (initStep === 'ask-login' && !logInDrawerOpen) {
@@ -60,7 +60,7 @@ export default function Checkout({
 			dispatch(initCheckout());
 			setInitStep('completed')
 		}
-	}, [cart, customer, dispatch, initStep, logInDrawerOpen]);
+	}, [cart, customer, initStep, logInDrawerOpen]);
 
 	return <Fragment>
 		<Head>

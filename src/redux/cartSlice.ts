@@ -115,7 +115,7 @@ type UpdateItemInCartPayload = {
 export const updateCartItem = createAsyncThunk('cart/updateItem', async (payload: UpdateItemInCartPayload, thunkAPI) => {
 	return await callCartData('/v2/cart/item/' + payload.key , {
 		item_key: payload.key,
-		quantity: payload.quantity
+		quantity: payload.quantity.toString()
 	}, "POST");
 });
 

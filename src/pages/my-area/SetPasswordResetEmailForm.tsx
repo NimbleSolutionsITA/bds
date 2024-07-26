@@ -26,7 +26,6 @@ export default function SendPasswordResetEmailForm() {
 	const [sendPasswordResetEmail, { loading, error, data }] = useMutation(
 		SEND_PASSWORD_RESET_EMAIL
 	);
-	console.log(data)
 	const [completedModalOpen, setCompletedModalOpen] = React.useState(false);
 	const wasEmailSent = Boolean(data?.sendPasswordResetEmail?.user === null);
 	const dispatch = useDispatch();

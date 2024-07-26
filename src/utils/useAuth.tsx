@@ -71,7 +71,7 @@ const LOG_OUT = gql`
 export function AuthProvider({ children }: { children: ReactNode }) {
 	const dispatch = useDispatch<AppDispatch>();
 	const [ loginChecked, setLoginChecked ] = React.useState(false);
-	const { data: { viewer: user} = { viewer: null}, loading: getUserLoading, error: getUserError } = useApolloQuery(GET_USER, {
+	const { data: { viewer: user } = { viewer: null}, loading: getUserLoading, error: getUserError } = useApolloQuery(GET_USER, {
 		onCompleted: (data) => {
 			setLoginChecked(true);
 		}
