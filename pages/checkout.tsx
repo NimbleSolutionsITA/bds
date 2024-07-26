@@ -35,7 +35,6 @@ export default function Checkout({
 	const { cart: { cart, customer }, layout: { logInDrawerOpen } } = useSelector((state: RootState) => state);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
-	console.log(cart, customer)
 
 	useEffect(() => {
 		if (loginChecked && !loggedIn) {

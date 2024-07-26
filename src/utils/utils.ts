@@ -281,12 +281,15 @@ export const getCartItemPrice = (item: Item, isEU: boolean) => (isEU && item.car
     (Number(item.totals.total) + Number(item.totals.tax))
 
 export const getIsEU = (customer?: Cart['customer']) => {
-    console.log({
-        shippingCountry: customer?.shipping_address?.shipping_country,
-        billingCountry: customer?.billing_address?.billing_country
-    })
-    const shippingCountry = customer?.shipping_address?.shipping_country ?? customer?.billing_address?.billing_country ?? 'IT'
-    return shippingCountry !== 'IT'
+    let country = (!customer?.shipping_address?.shipping_country || customer?.shipping_address?.shipping_country === '') ?
+        customer?.billing_address?.billing_country : customer?.shipping_address?.shipping_country
+
+    country = (!country || country === '') ?
+        'IT' : country
+
+    console.log({country})
+
+    return country !== 'IT'
 }
 
 export const getCartTotals = (cart?: Cart) => {
