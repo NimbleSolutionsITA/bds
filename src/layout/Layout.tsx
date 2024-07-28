@@ -42,7 +42,7 @@ export default function Layout({children, layout: {
     const dispatch = useDispatch<AppDispatch>()
 
     useEffect(() => {
-        dispatch(initCart());
+        // dispatch(initCart());
         const firstAccess = Cookies.get('is_first_access');
         if (!firstAccess) {
             // 'firstAccess' cookie doesn't exist. Setting the cookie and opening the CookiesDrawer.

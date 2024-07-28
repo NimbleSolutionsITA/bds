@@ -117,6 +117,8 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
         bannerContact
     } } = page;
 
+    console.log(page.acf)
+
     return {
         props: {
             page: {

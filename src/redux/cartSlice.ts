@@ -3,7 +3,7 @@ import { Cart, Totals} from "../types/cart-type";
 import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../utils/endpoints";
 import {RootState} from "./store";
 import {BillingData, InvoiceData, ShippingData} from "../types/woocommerce";
-import axios, {AxiosResponse} from "axios";
+import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
 
 type CartState = {
 	nonce?: string
@@ -395,36 +395,56 @@ export const {
 
 export default cartSlice.reducer
 
-export const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 'DELETE'): Promise<Cart> => {
-	try {
-		const response: AxiosResponse<Cart> = await axios({
-			method: method,
-			url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url,
-			withCredentials: true,
-			headers: {
-				Accept: 'application/json',
-				...(payload && method === 'POST' ? {'Content-Type': 'application/json'} : {})
-			},
-			...(payload && method === 'POST' ? {data: payload} : {}),
-			responseEncoding: 'utf8',
-			responseType: 'json'
-		});
-
-		if (response.status !== 200) {
-			throw new Error('Failed to add cart item');
+const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 'DELETE', params?: {[key: string]: string}): Promise<Cart> => {
+	// get cart key from local storage
+	const cartKey = localStorage.getItem('cart_key');
+	let urlParams = params;
+	if (cartKey) {
+		urlParams = {
+			...params,
+			cart_key: cartKey
 		}
-
-		return response.data;
-	} catch (error) {
-		console.error(error);
-		throw error;
 	}
+
+	const getAxiosParams = (p?: {[key: string]: string}):  AxiosRequestConfig<{}> => ({
+		method: method,
+		url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (p ? '?' + new URLSearchParams(p).toString() : ''),
+		withCredentials: true,
+		headers: {
+			Accept: 'application/json',
+			...(payload && method === 'POST' ? {'Content-Type': 'application/json'} : {})
+		},
+		...(payload && method === 'POST' ? {data: payload} : {}),
+		responseEncoding: 'utf8',
+		responseType: 'json'
+	})
+
+	let response: AxiosResponse<Cart>
+
+	try {
+		response = await axios(getAxiosParams(urlParams));
+		if (!!response.data?.customer?.billing_address?.billing_email) {
+			localStorage.removeItem('cart_key')
+		} else if (!!response.data.cart_key) {
+			localStorage.setItem('cart_key', response.data.cart_key as string)
+		}
+	} catch (error) {
+		response = await axios(getAxiosParams(params));
+		localStorage.removeItem('cart_key');
+	}
+
+	return response.data;
 };
 
 const initCartData = async () => {
 	let cart = await callCartData('/v2/cart', {}, "GET")
 	if (cart.coupons?.length && cart.coupons.length > 0) {
-		await callCartData('/v1/get-cart/coupon?coupon=' + cart.coupons[0].coupon, {}, "DELETE");
+		await callCartData(
+			'/v1/get-cart/coupon?coupon=',
+			{},
+			"DELETE",
+			{coupon: cart.coupons[0].coupon}
+		);
 		cart = await callCartData('/v2/cart', {}, "GET")
 	}
 	return cart

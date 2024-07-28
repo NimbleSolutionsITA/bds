@@ -3,7 +3,7 @@ import React, { createContext, useContext, ReactNode } from "react";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {LoggedCustomer, WooOrder} from "../types/woocommerce";
 import {useDispatch} from "react-redux";
-import {setCustomerData, updateShippingCountry} from "../redux/cartSlice";
+import {initCart, setCustomerData, updateShippingCountry} from "../redux/cartSlice";
 import {AppDispatch} from "../redux/store";
 
 export interface User {
@@ -74,12 +74,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const { data: { viewer: user } = { viewer: null}, loading: getUserLoading, error: getUserError } = useApolloQuery(GET_USER, {
 		onCompleted: (data) => {
 			setLoginChecked(true);
+			dispatch(initCart());
 		}
 	});
 	const [logOut, { loading: logoutLoading, error: logoutError, data: logoutData }] = useApolloMutation(LOG_OUT, {
 		refetchQueries: [
 			{ query: GET_USER }
 		],
+		onCompleted: () => {
+			console.log('logout')
+			dispatch(initCart());
+		}
 	});
 
 	const loggedIn = Boolean(user);
