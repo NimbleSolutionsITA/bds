@@ -147,8 +147,6 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
         brands
     } } = page;
 
-    console.log(brands)
-
     return {
         props: {
             page: {
