@@ -1,6 +1,5 @@
 import React, {useEffect} from "react";
-import {Box, Container, Tab, Tabs, Typography} from "@mui/material";
-import {TabPanelProps} from "@mui/base";
+import {Box, Container, Tab, Tabs} from "@mui/material";
 import ProfileForm from "./ProfileForm";
 import {ShippingForm, BillingForm} from "./AddressesForm";
 import OrderList from "./OrderList";
@@ -55,7 +54,7 @@ const MyArea = ({countries}: {countries: Country[]}) => {
 	)
 }
 
-function TabPanel(props: TabPanelProps & { index: number }) {
+function TabPanel(props: any) {
 	const { children, value, index, ...other } = props;
 	return (
 		<div
