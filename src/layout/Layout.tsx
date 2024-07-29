@@ -61,9 +61,7 @@ export default function Layout({children, layout: {
                 {seo && parse(seo)}
             </Head>
 
-            {GA_MEASUREMENT_ID && TAG_MANAGER_ID && (
-                <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
-            )}
+            <GoogleAnalytics />
 
             <Script id="twak" type="text/javascript">
                 {`

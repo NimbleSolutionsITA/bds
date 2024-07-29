@@ -17,8 +17,6 @@ interface MyDocumentProps extends DocumentProps {
     emotionStyleTags: JSX.Element[];
 }
 
-const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
-
 export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
     return (
         <Html lang="en">
@@ -30,13 +28,8 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
                 {emotionStyleTags}
             </Head>
             <body>
-            <Main/>
-            <NextScript/>
-            <noscript
-                dangerouslySetInnerHTML={{
-                    __html: `<iframe src={"https://www.googletagmanager.com/ns.html?id=${TAG_MANAGER_ID}"} height="0" width="0" style="display: none; visibility: hidden;" />`,
-                }}
-            />
+                <Main/>
+                <NextScript/>
             </body>
         </Html>
     );

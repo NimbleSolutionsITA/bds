@@ -194,7 +194,7 @@ const ActionButton = ({ currentProduct, product, category }: ActionButtonProps) 
                 padding: '10px'
             }}
         >
-            {t(inStock  ? 'addToCart' : 'notify me')}
+            {t(inStock  ? 'addToCart' : 'upon-request')}
         </Button>
     )
 }

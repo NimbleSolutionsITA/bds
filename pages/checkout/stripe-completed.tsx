@@ -57,9 +57,7 @@ export default function CheckoutResult() {
 				<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
 				<title>Bottega di Sguardi - Pagamento completato</title>
 			</Head>
-			{GA_MEASUREMENT_ID && TAG_MANAGER_ID &&
-                <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
-			}
+			<GoogleAnalytics />
 			<Loading />
 		</Container>
 	)

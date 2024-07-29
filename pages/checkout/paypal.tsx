@@ -30,9 +30,7 @@ export default function Checkout({}: CheckoutProps) {
 			<title>Bottega di Sguardi - Checkout PayPal</title>
 		</Head>
 
-		{GA_MEASUREMENT_ID && TAG_MANAGER_ID &&
-            <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} TAG_MANAGER_ID={TAG_MANAGER_ID} />
-		}
+		<GoogleAnalytics />
 
 		{(cart && cart.items && cart.items.length > 0 && CLIENT_ID)  ? (
 			<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons', intent: 'capture' }}>

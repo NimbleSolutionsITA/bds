@@ -50,6 +50,7 @@
   "order-details": "Effettuato il <1>{{date}}</1> alle <3>{{time}}</3> e pagato con <5>{{paymentMethod}}</5>",
   "edit-password": "Modifica password",
   "confirm-password": "Conferma password",
+  "upon-request": "Su richiesta",
   "my-area": {
     "profile": "Profilo",
     "billing": "Fatturazione",
