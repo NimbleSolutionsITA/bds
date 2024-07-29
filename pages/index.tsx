@@ -23,10 +23,6 @@ export type HomeProps = PageBaseProps & {
             body: string
             images: string[]
         }
-        ourSelection: {
-            title: string
-            products: BaseProduct[]
-        }
         selectionTop: {
             isActive: boolean
             title: string
@@ -139,7 +135,6 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 
     const { acf: {
         sliderWithText,
-        ourSelection,
         newsletter,
         shipping,
         designers,
@@ -152,13 +147,12 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
         brands
     } } = page;
 
-
+    console.log(brands)
 
     return {
         props: {
             page: {
                 sliderWithText,
-                ourSelection,
                 newsletter,
                 shipping,
                 designers,
