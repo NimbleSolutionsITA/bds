@@ -12,7 +12,6 @@ import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "./endpoints";
 import {Cart, Item} from "../types/cart-type";
-import {sendGTMEvent} from "@next/third-parties/google";
 
 export const sanitize = (html: string) => {
   return sanitizeHtml(html, {
@@ -315,6 +314,12 @@ export const getCartTotals = (cart?: Cart) => {
     }
 }
 
+export const pageview = (GA_MEASUREMENT_ID : string, url : string) => {
+    window.gtag("config", GA_MEASUREMENT_ID, {
+        page_path: url,
+    });
+};
+
 export interface PurchaseEvent {
     transaction_id: string
     value: number
@@ -334,8 +339,7 @@ export interface PurchaseItem {
 }
 
 export const gtagPurchase = (order: WooOrder) => {
-    sendGTMEvent({ event: 'purchase', value: {
-        currency: 'EUR',
+    const params: PurchaseEvent = {
         transaction_id: order.id.toString(),
         value: Number(order.total),
         tax: Number(order.total_tax),
@@ -349,9 +353,12 @@ export const gtagPurchase = (order: WooOrder) => {
                 quantity: item.quantity
             }
         })
-    }})
+    }
+    window.gtag("event", 'purchase', {
+        currency: 'EUR',
+        ...params
+    });
 };
-
 type Consent = 'granted' | 'denied'
 export const gtagConsent = (consent: {
     'ad_user_data': Consent,
