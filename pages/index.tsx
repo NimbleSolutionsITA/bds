@@ -6,11 +6,12 @@ import {PageBaseProps} from "../src/types/settings";
 import {AcfAdvancedLink, AcfImage, AcfProductCategory, BaseProduct} from "../src/types/woocommerce";
 
 const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
-const ProductsSlider = dynamic(() => import("../src/components/ProductsSlider"));
+const ProductsCategorySlider = dynamic(() => import("../src/components/ProductsCategorySlider"));
 const BannerNewsletter = dynamic(() => import("../src/components/BannerNewsletter"));
 const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
 const BannerDesigners = dynamic(() => import("../src/pages/home/BannerDesigners"));
 const BannerTop = dynamic(() => import("../src/pages/home/BannerTop"));
+const BannerBrands = dynamic(() => import("../src/pages/home/BannerBrands"));
 const BannerBottom = dynamic(() => import("../src/pages/home/BannerBottom"));
 const BannerBottom2 = dynamic(() => import("../src/pages/home/BannerBottom2"));
 const BannerTestimonials = dynamic(() => import("../src/pages/home/BannerTestimonials"));
@@ -23,6 +24,35 @@ export type HomeProps = PageBaseProps & {
             images: string[]
         }
         ourSelection: {
+            title: string
+            products: BaseProduct[]
+        }
+        selectionTop: {
+            isActive: boolean
+            title: string
+            products: BaseProduct[]
+        }
+        brands: {
+            isActive: boolean
+            title: string
+            left: {
+                title: string
+                photo: AcfImage
+                link: AcfAdvancedLink
+            },
+            center: {
+                title: string
+                photo: AcfImage
+                link: AcfAdvancedLink
+            },
+            right: {
+                title: string
+                photo: AcfImage
+                link: AcfAdvancedLink
+            }
+        }
+        selectionBottom: {
+            isActive: boolean
             title: string
             products: BaseProduct[]
         }
@@ -77,7 +107,9 @@ export default function Home({page, layout}: HomeProps) {
     return (
       <Layout layout={layout}>
           <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
-          <ProductsSlider products={page.ourSelection.products ?? []} title={page.ourSelection.title} />
+          <ProductsCategorySlider {...page.selectionTop} />
+          <BannerBrands {...page.brands} />
+          <ProductsCategorySlider {...page.selectionBottom} />
           <BannerDesigners designers={page.designers}/>
           <BannerTop bannerTop={page.bannerTop} />
           <BannerBottom bannerBottom={page.bannerBottom} />
@@ -114,10 +146,13 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
         bannerTop: { imageLeft, body, imageRight },
         bannerBottom: { leftColumn, imageCenter, rightColumn },
         bannerBottom2,
-        bannerContact
+        bannerContact,
+        selectionTop,
+        selectionBottom,
+        brands
     } } = page;
 
-    console.log(page.acf)
+
 
     return {
         props: {
@@ -138,7 +173,28 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
                     rightColumn
                 },
                 bannerBottom2,
-                bannerContact
+                bannerContact,
+                selectionTop,
+                selectionBottom,
+                brands: {
+                    isActive: brands.isActive,
+                    title: brands.title,
+                    left: {
+                        title: brands.left.title,
+                        photo: mapAcfImage(brands.left.photo),
+                        link: brands.left.link
+                    },
+                    center: {
+                        title: brands.center.title,
+                        photo: mapAcfImage(brands.center.photo),
+                        link: brands.center.link
+                    },
+                    right: {
+                        title: brands.right.title,
+                        photo: mapAcfImage(brands.right.photo),
+                        link: brands.right.link
+                    }
+                }
             },
             layout: {
                 ...layoutProps,
