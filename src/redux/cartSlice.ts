@@ -163,7 +163,7 @@ export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetC
 	if (!check) {
 		throw new Error('Coupon not valid for email')
 	}*/
-	await callCartData('/v1/get-cart/coupon', {coupon: payload.code}, "POST")
+	await callCartData('/v1/coupon', {coupon: payload.code}, "POST")
 	return await callCartData('/v2/cart', {}, "GET")
 });
 
@@ -172,7 +172,7 @@ type RemoveCouponPayload = {
 }
 
 export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload: RemoveCouponPayload, thunkAPI) => {
-	await callCartData('/v1/get-cart/coupon?coupon=' + payload.code, {}, "DELETE");
+	await callCartData('/v1/coupon' + payload.code, {coupon: payload.code}, "DELETE");
 	return await callCartData('/v2/cart', {}, "GET")
 });
 
@@ -395,20 +395,13 @@ export const {
 
 export default cartSlice.reducer
 
-const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 'DELETE', params?: {[key: string]: string}): Promise<Cart> => {
+const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 'DELETE'): Promise<Cart> => {
 	// get cart key from local storage
-	const cartKey = localStorage.getItem('cart_key');
-	let urlParams = params;
-	if (cartKey) {
-		urlParams = {
-			...params,
-			cart_key: cartKey
-		}
-	}
+	const cartKey = localStorage.getItem('cart_key') ?? undefined;
 
-	const getAxiosParams = (p?: {[key: string]: string}):  AxiosRequestConfig<{}> => ({
+	const getAxiosParams = (cartKey?: string):  AxiosRequestConfig<{}> => ({
 		method: method,
-		url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (p ? '?' + new URLSearchParams(p).toString() : ''),
+		url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (cartKey ? `?cart_key=${cartKey}` : ''),
 		withCredentials: true,
 		headers: {
 			Accept: 'application/json',
@@ -422,14 +415,14 @@ const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 
 	let response: AxiosResponse<Cart>
 
 	try {
-		response = await axios(getAxiosParams(urlParams));
+		response = await axios(getAxiosParams(cartKey));
 		if (!!response.data?.customer?.billing_address?.billing_email) {
 			localStorage.removeItem('cart_key')
 		} else if (!!response.data.cart_key) {
 			localStorage.setItem('cart_key', response.data.cart_key as string)
 		}
 	} catch (error) {
-		response = await axios(getAxiosParams(params));
+		response = await axios(getAxiosParams());
 		localStorage.removeItem('cart_key');
 	}
 
@@ -440,10 +433,9 @@ const initCartData = async () => {
 	let cart = await callCartData('/v2/cart', {}, "GET")
 	if (cart.coupons?.length && cart.coupons.length > 0) {
 		await callCartData(
-			'/v1/get-cart/coupon?coupon=',
-			{},
-			"DELETE",
-			{coupon: cart.coupons[0].coupon}
+			'/v1/coupon',
+			{coupon: cart.coupons[0].coupon},
+			"DELETE"
 		);
 		cart = await callCartData('/v2/cart', {}, "GET")
 	}
