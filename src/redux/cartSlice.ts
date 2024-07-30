@@ -172,7 +172,7 @@ type RemoveCouponPayload = {
 }
 
 export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload: RemoveCouponPayload, thunkAPI) => {
-	await callCartData('/v1/coupon' + payload.code, {coupon: payload.code}, "DELETE");
+	await callCartData('/v1/coupon', {coupon: payload.code}, "DELETE");
 	return await callCartData('/v2/cart', {}, "GET")
 });
 
