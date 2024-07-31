@@ -12,6 +12,7 @@ import {useRouter} from "next/router";
 import LogInDrawer from "../src/layout/drawers/LogInDrawer";
 import useAuth from "../src/utils/useAuth";
 import {openLogInDrawer} from "../src/redux/layoutSlice";
+import CartErrorModal from "../src/layout/cart/CartErrorModal";
 
 const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
 
@@ -68,6 +69,7 @@ export default function Checkout({
 
 		<GoogleAnalytics />
 
+		<CartErrorModal />
 		<LogInDrawer />
 
 		{initStep === 'completed'  ? (

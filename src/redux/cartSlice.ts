@@ -5,8 +5,10 @@ import {RootState} from "./store";
 import {BillingData, InvoiceData, ShippingData} from "../types/woocommerce";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
 
+type CoCartError = {error: string, message: string}
+
 type CartState = {
-	nonce?: string
+	error: CoCartError|null
 	cart: Cart
 	cartDrawerOpen: boolean
 	loading: boolean
@@ -34,6 +36,7 @@ const defaultAddressValues = {
 }
 
 const initialState: CartState = {
+	error: null,
 	loading: false,
 	cartDrawerOpen: false,
 	cart: {
@@ -92,7 +95,14 @@ const initialState: CartState = {
 }
 
 export const fetchCartData = createAsyncThunk('cart/fetchData', async (params, thunkAPI) => {
-	return await callCartData('/v2/cart', {}, "GET")
+	try {
+		return await callCartData('/v2/cart', "GET")
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 
@@ -104,7 +114,14 @@ export type AddItemToCartPayload = {
 }
 
 export const addCartItem = createAsyncThunk('cart/addItem', async (payload: AddItemToCartPayload, thunkAPI) => {
-	return await callCartData('/v2/cart/add-item', payload, "POST");
+	try {
+		return await callCartData('/v2/cart/add-item', "POST", payload);
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 type UpdateItemInCartPayload = {
@@ -113,10 +130,17 @@ type UpdateItemInCartPayload = {
 }
 
 export const updateCartItem = createAsyncThunk('cart/updateItem', async (payload: UpdateItemInCartPayload, thunkAPI) => {
-	return await callCartData('/v2/cart/item/' + payload.key , {
-		item_key: payload.key,
-		quantity: payload.quantity.toString()
-	}, "POST");
+	try {
+		return await callCartData('/v2/cart/item/' + payload.key, "POST", {
+			item_key: payload.key,
+			quantity: payload.quantity.toString()
+		});
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 type DeleteItemFromCartPayload = {
@@ -124,7 +148,14 @@ type DeleteItemFromCartPayload = {
 }
 
 export const deleteCartItem = createAsyncThunk('cart/deleteItem', async (payload: DeleteItemFromCartPayload, thunkAPI) => {
-	return await callCartData('/v2/cart/item/' + payload.key, {}, "DELETE");
+	try {
+		return await callCartData('/v2/cart/item/' + payload.key, "DELETE");
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 type UpdateShippingCountry = {
@@ -135,8 +166,15 @@ type UpdateShippingCountry = {
 }
 
 export const updateShippingCountry = createAsyncThunk('cart/updateCustomer', async (payload: UpdateShippingCountry, thunkAPI) => {
-	await callCartData('/v1/calculate/shipping', payload, "POST");
-	return await callCartData('/v2/cart', {}, "GET")
+	try {
+		await callCartData('/v1/calculate/shipping', "POST", payload);
+		return await callCartData('/v2/cart', "GET")
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 type SelectShippingPayload = {
@@ -144,8 +182,15 @@ type SelectShippingPayload = {
 }
 
 export const selectShipping = createAsyncThunk('cart/selectShipping', async (payload: SelectShippingPayload, thunkAPI) => {
-	await callCartData('/v1/shipping-methods', payload, "POST");
-	return await callCartData('/v2/cart', {}, "GET")
+	try {
+		await callCartData('/v1/shipping-methods', "POST", payload);
+		return await callCartData('/v2/cart', "GET")
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 type SetCouponPayload = {
@@ -163,8 +208,15 @@ export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetC
 	if (!check) {
 		throw new Error('Coupon not valid for email')
 	}*/
-	await callCartData('/v1/coupon', {coupon: payload.code}, "POST")
-	return await callCartData('/v2/cart', {}, "GET")
+	try {
+		await callCartData('/v1/coupon', "POST", {coupon: payload.code})
+		return await callCartData('/v2/cart', "GET")
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 type RemoveCouponPayload = {
@@ -172,61 +224,102 @@ type RemoveCouponPayload = {
 }
 
 export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload: RemoveCouponPayload, thunkAPI) => {
-	await callCartData('/v1/coupon', {coupon: payload.code}, "DELETE");
-	return await callCartData('/v2/cart', {}, "GET")
+	try {
+		await callCartData('/v1/coupon', "DELETE", {coupon: payload.code});
+		return await callCartData('/v2/cart', "GET")
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 export const initCheckout = createAsyncThunk('cart/initCheckout', async (payload, thunkAPI) => {
-	const cart = await initCartData()
-	const total = cart.totals?.total;
-	if (!total) {
-		throw new Error('Cart not found');
+	try {
+		const cart = await initCartData()
+		const total = cart.totals?.total;
+		if (!total) {
+			return thunkAPI.rejectWithValue({
+				error: 'cart_total_empty',
+				message: 'Cart total is empty',
+			})
+		}
+		return { cart }
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
 	}
-	return { cart }
 });
 
 export const initStripePayment = createAsyncThunk('cart/initStripePayment', async (payload, thunkAPI) => {
-	const { cart: { stripe, cart }} = thunkAPI?.getState() as RootState
-	const total = cart.totals?.total;
-	if (!total) {
-		throw new Error('Cart not found');
-	}
-	let paymentIntent = {
-		paymentIntentId: stripe?.intentId,
-		clientSecret: stripe?.clientSecret,
-		error: null
-	}
-	if (paymentIntent.paymentIntentId || paymentIntent.clientSecret) {
-		await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
-			method: 'PUT',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ cart, paymentIntentId: paymentIntent.paymentIntentId })
-		}).then((r) => r.json());
-	}
-	else {
-		paymentIntent = await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ cart })
-		}).then((r) => r.json());
-		if (paymentIntent.error) {
-			throw new Error(paymentIntent.error);
+	try {
+		const { cart: { stripe, cart }} = thunkAPI?.getState() as RootState
+		const total = cart.totals?.total;
+		if (!total) {
+			throw new Error('Cart not found');
 		}
+		let paymentIntent = {
+			paymentIntentId: stripe?.intentId,
+			clientSecret: stripe?.clientSecret,
+			error: null
+		}
+		if (paymentIntent.paymentIntentId || paymentIntent.clientSecret) {
+			await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ cart, paymentIntentId: paymentIntent.paymentIntentId })
+			}).then((r) => r.json());
+		}
+		else {
+			paymentIntent = await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ cart })
+			}).then((r) => r.json());
+			if (paymentIntent.error) {
+				return thunkAPI.rejectWithValue({
+					error: paymentIntent.error,
+					message: paymentIntent.error,
+				})
+			}
+		}
+		return { cart, paymentIntent}
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
 	}
-	return { cart, paymentIntent}
 });
 
 export const initCart = createAsyncThunk('cart/initCart', async (payload, thunkAPI) => {
-	return await initCartData()
+	try {
+		return await initCartData()
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 export const destroyCart = createAsyncThunk('cart/destroy', async (arg, thunkAPI) => {
-	await callCartData('/v2/cart/clear', {}, "POST");
-	return await callCartData('/v2/cart', {}, "GET")
+	try {
+		await callCartData('/v2/cart/clear', "POST");
+		return await callCartData('/v2/cart', "GET")
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
 });
 
 export const cartSlice = createSlice({
@@ -250,6 +343,9 @@ export const cartSlice = createSlice({
 		},
 		destroyIntent: (state) => {
 			state.stripe = undefined
+		},
+		resetCartError: (state) => {
+			state.error = null
 		}
 	},
 	extraReducers: (builder) => {
@@ -260,7 +356,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(fetchCartData.rejected, (state) => {
+		builder.addCase(fetchCartData.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(addCartItem.pending, (state) => {
@@ -268,10 +365,11 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(addCartItem.fulfilled, (state, action) => {
 			state.cartDrawerOpen = true
-			state.cart = action.payload
+			state.cart = {...state.cart, ...action.payload}
 			state.loading = false;
 		});
-		builder.addCase(addCartItem.rejected, (state) => {
+		builder.addCase(addCartItem.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(updateCartItem.pending, (state) => {
@@ -281,7 +379,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(updateCartItem.rejected, (state) => {
+		builder.addCase(updateCartItem.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(deleteCartItem.pending, (state) => {
@@ -291,7 +390,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(deleteCartItem.rejected, (state) => {
+		builder.addCase(deleteCartItem.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(updateShippingCountry.pending, (state) => {
@@ -301,7 +401,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(updateShippingCountry.rejected, (state) => {
+		builder.addCase(updateShippingCountry.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(selectShipping.pending, (state) => {
@@ -311,7 +412,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(selectShipping.rejected, (state) => {
+		builder.addCase(selectShipping.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(setCoupon.pending, (state) => {
@@ -321,7 +423,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(setCoupon.rejected, (state) => {
+		builder.addCase(setCoupon.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(removeCoupon.pending, (state) => {
@@ -331,7 +434,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(removeCoupon.rejected, (state) => {
+		builder.addCase(removeCoupon.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(initCheckout.pending, (state) => {
@@ -341,7 +445,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload.cart
 			state.loading = false;
 		});
-		builder.addCase(initCheckout.rejected, (state) => {
+		builder.addCase(initCheckout.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(initStripePayment.pending, (state) => {
@@ -355,7 +460,8 @@ export const cartSlice = createSlice({
 			}
 			state.loading = false;
 		});
-		builder.addCase(initStripePayment.rejected, (state) => {
+		builder.addCase(initStripePayment.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(initCart.pending, (state) => {
@@ -365,7 +471,8 @@ export const cartSlice = createSlice({
 			state.cart = action.payload
 			state.loading = false;
 		});
-		builder.addCase(initCart.rejected, (state) => {
+		builder.addCase(initCart.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 		builder.addCase(destroyCart.pending, (state) => {
@@ -377,7 +484,8 @@ export const cartSlice = createSlice({
 			state.stripe = undefined
 			state.loading = false;
 		});
-		builder.addCase(destroyCart.rejected, (state) => {
+		builder.addCase(destroyCart.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
 			state.loading = false;
 		});
 	},
@@ -390,12 +498,12 @@ export const {
 	closeCartDrawer,
 	setCustomerData,
 	setCustomerNote,
-	destroyIntent
+	resetCartError
 } = cartSlice.actions
 
 export default cartSlice.reducer
 
-const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 'DELETE'): Promise<Cart> => {
+const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payload?: {[key: string]: any} ): Promise<Cart> => {
 	// get cart key from local storage
 	const cartKey = localStorage.getItem('cart_key') ?? undefined;
 
@@ -405,9 +513,9 @@ const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 
 		withCredentials: true,
 		headers: {
 			Accept: 'application/json',
-			...(payload && method === 'POST' ? {'Content-Type': 'application/json'} : {})
+			...(payload ? {'Content-Type': 'application/json'} : {})
 		},
-		...(payload && method === 'POST' ? {data: payload} : {}),
+		...(payload ? {data: payload} : {}),
 		responseEncoding: 'utf8',
 		responseType: 'json'
 	})
@@ -430,14 +538,14 @@ const callCartData = async (url: string, payload = {}, method: 'GET' | 'POST' | 
 };
 
 const initCartData = async () => {
-	let cart = await callCartData('/v2/cart', {}, "GET")
+	let cart = await callCartData('/v2/cart', "GET")
 	if (cart.coupons?.length && cart.coupons.length > 0) {
 		await callCartData(
 			'/v1/coupon',
+			"DELETE",
 			{coupon: cart.coupons[0].coupon},
-			"DELETE"
 		);
-		cart = await callCartData('/v2/cart', {}, "GET")
+		cart = await callCartData('/v2/cart', "GET")
 	}
 	return cart
 }

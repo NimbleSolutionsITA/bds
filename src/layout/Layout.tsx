@@ -4,11 +4,9 @@ import NavBarMobile from "./nav/mobile/NavBarMobile";
 import {BaseLayoutProps} from "../types/settings";
 import Footer from "./footer/Footer";
 import {useDispatch} from "react-redux";
-
-import {initCart} from "../redux/cartSlice";
 import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
-import {Hidden} from "@mui/material";
+import {useMediaQuery, useTheme} from "@mui/material";
 import Head from "next/head";
 import {Elements} from '@stripe/react-stripe-js';
 import parse from "html-react-parser";
@@ -26,21 +24,20 @@ import getStripe from "../utils/stripe-utils";
 import SignUpDrawer from "./drawers/SignUpDrawer";
 import LogInDrawer from "./drawers/LogInDrawer";
 import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
+import CartErrorModal from "./cart/CartErrorModal";
 
 type LayoutProps = {
     children: React.ReactNode,
     layout: BaseLayoutProps
 }
 
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
-const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
-
 export default function Layout({children, layout: {
     seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping, categories
 }}: LayoutProps) {
     const {locale} = useRouter()
     const dispatch = useDispatch<AppDispatch>()
-
+    const theme = useTheme();
+    const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
     useEffect(() => {
         // dispatch(initCart());
         const firstAccess = Cookies.get('is_first_access');
@@ -76,13 +73,13 @@ export default function Layout({children, layout: {
                         })();
                     `}
             </Script>
-            <Hidden mdUp>
-                <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} categories={categories} />
-                <ShippingBannerMobile />
-            </Hidden>
-            <Hidden mdDown>
-                <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} />
-            </Hidden>
+            {mdUp ?
+                <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} /> : (
+                <>
+                    <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} categories={categories} />
+                    <ShippingBannerMobile />
+                </>
+            )}
             <CookiesDrawer />
             <InStockNotifierDrawer />
             <NewsletterDrawer />
@@ -90,6 +87,7 @@ export default function Layout({children, layout: {
             <SignUpDrawer />
             <ForgotPasswordDrawer />
             <CartDrawer shipping={shipping} categories={categories} />
+            <CartErrorModal />
             <SearchModal
                 designers={categories.designers}
                 profumum={categories.fragrances.profumum}
