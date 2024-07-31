@@ -4,6 +4,7 @@ import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../utils/endpoints";
 import {RootState} from "./store";
 import {BillingData, InvoiceData, ShippingData} from "../types/woocommerce";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
+import {sendGTMEvent} from "@next/third-parties/google";
 
 type CoCartError = {error: string, message: string}
 
@@ -115,7 +116,26 @@ export type AddItemToCartPayload = {
 
 export const addCartItem = createAsyncThunk('cart/addItem', async (payload: AddItemToCartPayload, thunkAPI) => {
 	try {
-		return await callCartData('/v2/cart/add-item', "POST", payload);
+		const cart = await callCartData('/v2/cart/add-item', "POST", payload);
+		const item = cart.items.find((item) => item.id === Number(payload.id))
+		if (item) {
+			const productId = item.meta?.product_type === 'variation' ? item.meta.variation.parent_id : item.id
+			const variantId = item.meta?.product_type === 'variation' ? item.id : ''
+			sendGTMEvent({
+				event: "add_to_cart",
+				ecommerce: {
+					items: [{
+						item_id: productId,
+						item_name: item.name,
+						item_variant: variantId,
+						price: Number(item.price),
+						quantity: item.quantity.value
+					}],
+				}
+			})
+		}
+
+		return cart
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
 			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
@@ -365,7 +385,7 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(addCartItem.fulfilled, (state, action) => {
 			state.cartDrawerOpen = true
-			state.cart = {...state.cart, ...action.payload}
+			state.cart = action.payload
 			state.loading = false;
 		});
 		builder.addCase(addCartItem.rejected, (state, {payload}) => {

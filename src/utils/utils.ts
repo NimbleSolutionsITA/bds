@@ -334,22 +334,23 @@ export interface PurchaseItem {
 }
 
 export const gtagPurchase = (order: WooOrder) => {
-    sendGTMEvent({ event: 'purchase', value: {
-            currency: 'EUR',
-            transaction_id: order.id.toString(),
-            value: Number(order.total),
-            tax: Number(order.total_tax),
-            shipping: Number(order.shipping_total),
-            items: order.line_items.map((item) => {
-                return {
-                    item_id: item.product_id.toString(),
-                    item_name: item.name,
-                    item_variant: item.variation_id?.toString(),
-                    price: Number(item.total),
-                    quantity: item.quantity
-                }
-            })
-        }})
+    sendGTMEvent({
+        event: 'purchase',
+        currency: 'EUR',
+        transaction_id: order.id.toString(),
+        value: Number(order.total),
+        tax: Number(order.total_tax),
+        shipping: Number(order.shipping_total),
+        items: order.line_items.map((item) => {
+            return {
+                item_id: item.product_id.toString(),
+                item_name: item.name,
+                item_variant: item.variation_id?.toString(),
+                price: Number(item.total),
+                quantity: item.quantity
+            }
+        })
+    })
 };
 
 type Consent = 'granted' | 'denied'
