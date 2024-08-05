@@ -7,10 +7,10 @@ import sanitize from "sanitize-html";
 import {getAllProductsIds, getLayoutProps} from "../../src/utils/wordpress_api";
 import {getProduct} from "../api/products/[slug]";
 import {getProductMainCategory} from "../../src/utils/utils";
-import {
-	WORDPRESS_RANK_MATH_SEO_ENDPOINT
-} from "../../src/utils/endpoints";
+import {WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "../../src/utils/endpoints";
 import {useTranslation} from "next-i18next";
+import getStripe from "../../src/utils/stripe-utils";
+import {Elements} from "@stripe/react-stripe-js";
 
 const ProductView = dynamic(() => import('../../src/pages/product/ProductView'), { ssr: false });
 const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
@@ -22,9 +22,12 @@ export type ProductPageProps = PageBaseProps & {
 export default function Product({ product, layout }: ProductPageProps) {
 	const category = getProductMainCategory(product as unknown as BaseProduct) as ProductCategory
 	const { t } = useTranslation('common')
+	const stripePromise = getStripe();
 	return (
 		<Layout layout={layout}>
-			<ProductView product={product} category={category} shipping={layout.shipping} />
+			<Elements stripe={stripePromise}>
+				<ProductView product={product} category={category} shipping={layout.shipping} />
+			</Elements>
 			<ProductsSlider products={product.related ?? []} title={t('related-products')} />
 			<SeoFooter category={category} />
 		</Layout>

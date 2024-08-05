@@ -8,19 +8,16 @@ import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {useMediaQuery, useTheme} from "@mui/material";
 import Head from "next/head";
-import {Elements} from '@stripe/react-stripe-js';
 import parse from "html-react-parser";
 import InStockNotifierDrawer from "./drawers/InStockNotifierDrawer";
 import CookiesDrawer from "./drawers/CookiesDrawer";
 import {openCookiesDrawer} from "../redux/layoutSlice";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
-import Script from 'next/script'
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
 import SearchModal from "./drawers/SearchModal";
 import {AppDispatch} from "../redux/store";
 import GoogleAnalytics from "../components/GoogleAnalytics";
-import getStripe from "../utils/stripe-utils";
 import SignUpDrawer from "./drawers/SignUpDrawer";
 import LogInDrawer from "./drawers/LogInDrawer";
 import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
@@ -38,6 +35,7 @@ export default function Layout({children, layout: {
     const dispatch = useDispatch<AppDispatch>()
     const theme = useTheme();
     const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
+
     useEffect(() => {
         // dispatch(initCart());
         const firstAccess = Cookies.get('is_first_access');
@@ -47,10 +45,9 @@ export default function Layout({children, layout: {
             dispatch(openCookiesDrawer());
         }
     }, [])
-    const stripePromise = getStripe();
 
     return (
-        <Elements stripe={stripePromise}>
+        <>
             <Head>
                 {/* Set HTML language attribute */}
                 <meta httpEquiv="content-language" content={locale} />
@@ -58,28 +55,13 @@ export default function Layout({children, layout: {
                 {seo && parse(seo)}
             </Head>
 
-            <GoogleAnalytics />
-
-            <Script id="twak" type="text/javascript">
-                {`
-                        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-                        (function(){
-                            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-                            s1.async=true;
-                            s1.src='https://embed.tawk.to/623ae69c5a88d50db1a6e778/1fur19kvb';
-                            s1.charset='UTF-8';
-                            s1.setAttribute('crossorigin','*');
-                            s0.parentNode.insertBefore(s1,s0);
-                        })();
-                    `}
-            </Script>
             {mdUp ?
                 <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} /> : (
-                <>
-                    <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} categories={categories} />
-                    <ShippingBannerMobile />
-                </>
-            )}
+                    <>
+                        <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} categories={categories} />
+                        <ShippingBannerMobile />
+                    </>
+                )}
             <CookiesDrawer />
             <InStockNotifierDrawer />
             <NewsletterDrawer />
@@ -95,6 +77,8 @@ export default function Layout({children, layout: {
             />
             {children}
             <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={mobileMenu} />
-        </Elements>
+
+            <GoogleAnalytics />
+        </>
     )
 }

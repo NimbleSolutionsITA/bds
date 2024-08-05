@@ -334,7 +334,7 @@ export interface PurchaseItem {
 }
 
 export const gtagPurchase = (order: WooOrder) => {
-    sendGTMEvent({
+    const event = {
         event: 'purchase',
         currency: 'EUR',
         transaction_id: order.id.toString(),
@@ -350,7 +350,9 @@ export const gtagPurchase = (order: WooOrder) => {
                 quantity: item.quantity
             }
         })
-    })
+    }
+    console.log('gtagPurchase', event)
+    sendGTMEvent(event)
 };
 
 type Consent = 'granted' | 'denied'
