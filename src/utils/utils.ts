@@ -288,8 +288,6 @@ export const getIsEU = (customer?: Cart['customer']) => {
     country = (!country || country === '') ?
         'IT' : country
 
-    console.log({country})
-
     return country !== 'IT'
 }
 
@@ -334,7 +332,7 @@ export interface PurchaseItem {
 }
 
 export const gtagPurchase = (order: WooOrder) => {
-    const event = {
+    sendGTMEvent({
         event: 'purchase',
         currency: 'EUR',
         transaction_id: order.id.toString(),
@@ -350,9 +348,7 @@ export const gtagPurchase = (order: WooOrder) => {
                 quantity: item.quantity
             }
         })
-    }
-    console.log('gtagPurchase', event)
-    sendGTMEvent(event)
+    })
 };
 
 type Consent = 'granted' | 'denied'

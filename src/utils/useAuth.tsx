@@ -82,7 +82,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			{ query: GET_USER }
 		],
 		onCompleted: () => {
-			console.log('logout')
 			dispatch(initCart());
 		}
 	});
