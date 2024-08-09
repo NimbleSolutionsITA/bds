@@ -127,7 +127,7 @@ type StepButtonProps = {
 	checkoutStep: Step,
 	setCheckoutStep: (step: Step) => void
 	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
-	paymentMethod?: 'stripe'|'paypal'
+	paymentMethod?: 'stripe'|'paypal'|'cards'
 }
 const StepButton = ({isPrev, checkoutStep, setCheckoutStep, updateOrder, paymentMethod}: StepButtonProps) => {
 	const { t } = useTranslation('common')
