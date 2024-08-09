@@ -1,6 +1,6 @@
 
 export interface Cart {
-	cart_hash?: string
+	cart_hash: string
 	cart_key?: string
 	currency?: Currency
 	customer: Customer

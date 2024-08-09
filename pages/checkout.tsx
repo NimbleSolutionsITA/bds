@@ -30,17 +30,24 @@ export default function Checkout({
 }: CheckoutProps) {
 	const [ initStep, setInitStep ] = useState<InitStep>('check-login')
 	const { loginChecked, loggedIn } = useAuth()
-	const { cart: { cart, customer }, layout: { logInDrawerOpen } } = useSelector((state: RootState) => state);
+	const { logInDrawerOpen} = useSelector((state: RootState) => state.layout);
+	const { cart, customer, checkout } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
 
 	useEffect(() => {
-		if (loginChecked && !loggedIn) {
-			dispatch(openLogInDrawer())
-			setInitStep('ask-login')
+		if (checkout) {
+			dispatch(initCheckout());
+			setInitStep('completed')
 		}
-		if (loginChecked && loggedIn) {
-			setInitStep('init-customer-data')
+		else {
+			if (loginChecked && !loggedIn) {
+				dispatch(openLogInDrawer())
+				setInitStep('ask-login')
+			}
+			if (loginChecked && loggedIn) {
+				setInitStep('init-customer-data')
+			}
 		}
 	}, [loginChecked, loggedIn])
 

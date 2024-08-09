@@ -15,7 +15,7 @@ import {
 	Typography,
 } from "@mui/material";
 import {useFormContext} from "react-hook-form";
-import {Step as StepType, Step} from "./CheckoutGrid";
+import {Inputs, Step as StepType, Step} from "./CheckoutGrid";
 import Link from "next/link";
 import PriceFormat from "../../components/PriceFormat";
 import {LocalShippingSharp, StorefrontSharp} from "@mui/icons-material";
@@ -27,7 +27,7 @@ import {useTranslation} from "next-i18next";
 import {BaseSyntheticEvent, Dispatch, SetStateAction, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
-import {removeCoupon, selectShipping, setCoupon, setCustomerNote} from "../../redux/cartSlice";
+import {removeCoupon, selectShipping, setCheckoutState, setCoupon, setCustomerNote} from "../../redux/cartSlice";
 import {getCartItemPrice, getIsEU} from "../../utils/utils";
 import {useRouter} from "next/router";
 
@@ -45,7 +45,7 @@ const buttonLabel = {
 	PAYMENT: 'checkout.pay-now'
 }
 const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapProps) => {
-	const { formState: { errors }, watch } = useFormContext();
+	const { formState: { errors }, handleSubmit } = useFormContext();
 	const { t } = useTranslation('common');
 	const { cart, customer: { customerNote }, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
@@ -58,7 +58,6 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 	const hasCoupons = cart.coupons && cart.coupons.length > 0;
 	const [couponCode, setCouponCode] = useState(cart.coupons && cart.coupons.length > 0 ? cart.coupons[0].coupon : '');
 	const router = useRouter()
-	const paymentMethod = watch('payment_method')
 	const handleContinue = async () => {
 		switch (checkoutStep) {
 			case 'ADDRESS':
@@ -68,7 +67,11 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 				await updateOrder('PAYMENT')()
 				break;
 			case 'PAYMENT':
-				await router.push(`/checkout/${paymentMethod}`)
+				handleSubmit((form) => {
+					const paymentMethod = form.payment_method === 'cards' ? 'stripe' : form.payment_method
+					dispatch(setCheckoutState(form as Inputs))
+					router.push(`/checkout/${paymentMethod}`)
+				})()
 				break;
 		}
 	}

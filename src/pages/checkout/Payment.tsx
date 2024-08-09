@@ -22,6 +22,7 @@ import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import Stripe from "../../icons/Stripe";
 import {Controller, useFormContext} from "react-hook-form";
+import Payments from "../../components/Payments";
 
 type PaymentProps = {
 	isLoading: boolean
@@ -95,8 +96,20 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 						value={value}
 					>
 						<FormControlLabel
+							value="cards"
+							control={<Radio />}
+							style={{height: '80px'}}
+							label={(
+								<div style={{fontSize: '16px', fontWeight: 'bold'}}>
+									{t('cards')} <br />
+									<Payments mt={0} hidePaypal/>
+								</div>
+							)}
+						/>
+						<FormControlLabel
 							value="stripe"
 							control={<Radio />}
+							style={{height: '80px'}}
 							label={(
 								<div style={{display: 'flex', alignItems: 'center'}}>
 									<Stripe sx={{fontSize: '50px'}} />
@@ -106,6 +119,7 @@ const Payment = ({isLoading, editAddress, checkoutStep, setCheckoutStep}: Paymen
 						<FormControlLabel
 							value="paypal"
 							control={<Radio />}
+							style={{height: '80px'}}
 							label={(
 								<div style={{display: 'flex', alignItems: 'center'}}>
 									<PayPal sx={{fontSize: '80px'}} />

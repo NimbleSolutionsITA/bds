@@ -5,6 +5,7 @@ import {RootState} from "./store";
 import {BillingData, InvoiceData, ShippingData} from "../types/woocommerce";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
 import {sendGTMEvent} from "@next/third-parties/google";
+import {Inputs} from "../pages/checkout/CheckoutGrid";
 
 type CoCartError = {error: string, message: string}
 
@@ -17,11 +18,15 @@ type CartState = {
 		intentId: string
 		clientSecret: string
 	}
-	customer:{
+	customer: {
 		billing: BillingData
 		shipping: ShippingData
 		invoice: InvoiceData,
 		customerNote: string
+	},
+	checkout?: {
+		cart_hash: string,
+		form: Inputs
 	}
 }
 
@@ -41,6 +46,7 @@ const initialState: CartState = {
 	loading: false,
 	cartDrawerOpen: false,
 	cart: {
+		cart_hash: "",
 		items: [],
 		totals: {
 			subtotal: '0',
@@ -366,7 +372,13 @@ export const cartSlice = createSlice({
 		},
 		resetCartError: (state) => {
 			state.error = null
-		}
+		},
+		setCheckoutState: (state, {payload} ) => {
+			state.checkout = {
+				cart_hash: state.cart.cart_hash,
+				form: payload
+			}
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchCartData.pending, (state) => {
@@ -463,6 +475,10 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(initCheckout.fulfilled, (state, action) => {
 			state.cart = action.payload.cart
+			if (state.checkout) {
+				if (state.checkout.cart_hash !== action.payload.cart.cart_hash)
+					state.checkout = undefined
+			}
 			state.loading = false;
 		});
 		builder.addCase(initCheckout.rejected, (state, {payload}) => {
@@ -518,7 +534,8 @@ export const {
 	closeCartDrawer,
 	setCustomerData,
 	setCustomerNote,
-	resetCartError
+	resetCartError,
+	setCheckoutState
 } = cartSlice.actions
 
 export default cartSlice.reducer

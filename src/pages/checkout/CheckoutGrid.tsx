@@ -23,19 +23,19 @@ export type Inputs = {
 	billing: BillingData,
 	shipping?: ShippingData
 	invoice: InvoiceData
-	payment_method: 'paypal'|'stripe'
+	payment_method: 'paypal'|'stripe'|'cards'
 };
 
 export type Step = 'ADDRESS'|'INVOICE'|'RECAP'|'PAYMENT'
 
 const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
-	const { cart, customer } = useSelector((state: RootState) => state.cart);
+	const { cart, customer, checkout } = useSelector((state: RootState) => state.cart);
 	const { customer: loggedCustomer, updateCustomer ,loggedIn } = useAuth();
 	const dispatch = useDispatch<AppDispatch>()
-	const [step, setStep] = useState<Step>('ADDRESS');
+	const [step, setStep] = useState<Step>(checkout?.cart_hash ? 'PAYMENT' : 'ADDRESS');
 	const [addressTab, setAddressTab] = useState<number>(0);
 	const methods = useForm<Inputs>({
-		defaultValues: {
+		defaultValues: checkout?.form ?? {
 			has_shipping: getCustomerMetaData('has_shipping', false, loggedCustomer),
 			billing: customer.billing,
 			shipping: customer.shipping,
@@ -46,7 +46,7 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 				billingChoice: getCustomerMetaData('billing_choice', customer.invoice.billingChoice, loggedCustomer),
 				invoiceType: getCustomerMetaData('invoice_type', customer.invoice.invoiceType, loggedCustomer)
 			},
-			payment_method: 'stripe'
+			payment_method: 'cards'
 		},
 		reValidateMode: 'onSubmit'
 	});
