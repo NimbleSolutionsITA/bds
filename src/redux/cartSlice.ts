@@ -235,7 +235,7 @@ export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetC
 		throw new Error('Coupon not valid for email')
 	}*/
 	try {
-		await callCartData('/v1/coupon', "POST", {coupon: payload.code})
+		await callCartData('/v2/cart/apply-coupon', "POST", {code: payload.code})
 		return await callCartData('/v2/cart', "GET")
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
@@ -251,7 +251,7 @@ type RemoveCouponPayload = {
 
 export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload: RemoveCouponPayload, thunkAPI) => {
 	try {
-		await callCartData('/v1/coupon', "DELETE", {coupon: payload.code});
+		await callCartData(`/v2/cart/coupons`, "DELETE");
 		return await callCartData('/v2/cart', "GET")
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
@@ -578,9 +578,8 @@ const initCartData = async () => {
 	let cart = await callCartData('/v2/cart', "GET")
 	if (cart.coupons?.length && cart.coupons.length > 0) {
 		await callCartData(
-			'/v1/coupon',
+			`/v2/cart/coupons`,
 			"DELETE",
-			{coupon: cart.coupons[0].coupon},
 		);
 		cart = await callCartData('/v2/cart', "GET")
 	}
