@@ -4,7 +4,7 @@ import {
     BaseProduct,
     BaseVariation,
     Color,
-    Product, ProductCategory,
+    Product,
     ShippingMethod,
     Variation, WooOrder
 } from "../types/woocommerce";
@@ -331,24 +331,42 @@ export interface PurchaseItem {
     quantity?: number
 }
 
-export const gtagPurchase = (order: WooOrder) => {
+export const gtagAddToCart = (item: Item, productId: number, variantId: number|"") => {
     sendGTMEvent({
-        event: 'purchase',
-        currency: 'EUR',
-        transaction_id: order.id.toString(),
-        value: Number(order.total),
-        tax: Number(order.total_tax),
-        shipping: Number(order.shipping_total),
-        items: order.line_items.map((item) => {
-            return {
-                item_id: item.product_id.toString(),
+        event: "add_to_cart",
+        ecommerce: {
+            items: [{
+                item_id: productId,
                 item_name: item.name,
-                item_variant: item.variation_id?.toString(),
-                price: Number(item.total),
-                quantity: item.quantity
-            }
-        })
+                item_variant: variantId,
+                price: Number(item.price),
+                quantity: item.quantity.value
+            }],
+        }
     })
+}
+
+export const gtagPurchase = (order: WooOrder) => {
+    const event = {
+        event: 'purchase',
+        ecommerce: {
+            currency: 'EUR',
+            transaction_id: order.id.toString(),
+            value: Number(order.total),
+            tax: Number(order.total_tax),
+            shipping: Number(order.shipping_total),
+            items: order.line_items.map((item) => {
+                return {
+                    item_id: item.product_id.toString(),
+                    item_name: item.name,
+                    item_variant: item.variation_id?.toString(),
+                    price: Number(item.total),
+                    quantity: item.quantity
+                }
+            })
+        }
+    }
+    sendGTMEvent(event)
 };
 
 type Consent = 'granted' | 'denied'
