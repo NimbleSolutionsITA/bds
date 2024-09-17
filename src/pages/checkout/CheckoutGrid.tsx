@@ -6,7 +6,7 @@ import CheckoutDesktop from "./CheckoutDesktop";
 import {useMediaQuery, useTheme} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
-import {setCustomerData, updateShippingCountry} from "../../redux/cartSlice";
+import {setCustomerData, updateCartCustomer, updateShippingCountry} from "../../redux/cartSlice";
 import CheckoutMobile from "./CheckoutMobile";
 import {PaymentErrorDialog} from "./Payment";
 import useAuth from "../../utils/useAuth";
@@ -59,9 +59,20 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 		if (data && data.shipping && data.billing) {
 			const deliveryCountry = data.has_shipping ? data.shipping.country : data.billing.country;
 			const orderDeliveryCountry = cart.customer?.shipping_address.shipping_country
-			if (deliveryCountry !== orderDeliveryCountry) {
-				dispatch(updateShippingCountry({ country: deliveryCountry }))
-			}
+			dispatch(updateCartCustomer({
+				...data.billing,
+				ship_to_different_address: data.has_shipping,
+				...(data.has_shipping ? {
+					s_first_name: data.shipping.first_name,
+					s_last_name: data.shipping.last_name,
+					s_address_1: data.shipping.address_1,
+					s_city: data.shipping.city,
+					s_state: data.shipping.state,
+					s_postcode: data.shipping.postcode,
+					s_country: data.shipping.country,
+					s_company: data.shipping.company,
+				} : {}),
+			}))
 			dispatch(setCustomerData({
 				billing: data.billing,
 				shipping: data.has_shipping ? data.shipping : data.billing,

@@ -4,8 +4,8 @@ import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../utils/endpoints";
 import {RootState} from "./store";
 import {BillingData, InvoiceData, ShippingData} from "../types/woocommerce";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
-import {sendGTMEvent} from "@next/third-parties/google";
 import {Inputs} from "../pages/checkout/CheckoutGrid";
+import {gtagAddToCart} from "../utils/utils";
 
 type CoCartError = {error: string, message: string}
 
@@ -127,18 +127,7 @@ export const addCartItem = createAsyncThunk('cart/addItem', async (payload: AddI
 		if (item) {
 			const productId = item.meta?.product_type === 'variation' ? item.meta.variation.parent_id : item.id
 			const variantId = item.meta?.product_type === 'variation' ? item.id : ''
-			sendGTMEvent({
-				event: "add_to_cart",
-				ecommerce: {
-					items: [{
-						item_id: productId,
-						item_name: item.name,
-						item_variant: variantId,
-						price: Number(item.price),
-						quantity: item.quantity.value
-					}],
-				}
-			})
+			gtagAddToCart(item, productId, variantId)
 		}
 
 		return cart
@@ -176,6 +165,40 @@ type DeleteItemFromCartPayload = {
 export const deleteCartItem = createAsyncThunk('cart/deleteItem', async (payload: DeleteItemFromCartPayload, thunkAPI) => {
 	try {
 		return await callCartData('/v2/cart/item/' + payload.key, "DELETE");
+	} catch (error: any) {
+		return thunkAPI.rejectWithValue({
+			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
+			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
+		})
+	}
+});
+
+type UpdateCartCustomer = {
+	first_name?: string,
+	last_name?: string,
+	email?: string,
+	phone?: string,
+	company?: string,
+	address_1?: string,
+	address_2?: string,
+	city?: string,
+	state?: string,
+	country?: string,
+	postcode?: string,
+	s_first_name?: string,
+	s_last_name?: string,
+	s_address_1?: string,
+	s_city?: string,
+	s_state?: string,
+	s_postcode?: string,
+	s_country?: string,
+	s_company?: string,
+	ship_to_different_address?: boolean
+}
+
+export const updateCartCustomer = createAsyncThunk('cart/updateCartCustomer', async (payload: UpdateCartCustomer, thunkAPI) => {
+	try {
+		return await callCartData('/v2/cart/update', "POST", payload, {namespace: 'update-customer'});
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
 			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
@@ -404,6 +427,17 @@ export const cartSlice = createSlice({
 			state.error = payload as CoCartError
 			state.loading = false;
 		});
+		builder.addCase(updateCartCustomer.pending, (state) => {
+			state.loading = true;
+		});
+		builder.addCase(updateCartCustomer.fulfilled, (state, action) => {
+			state.cart = action.payload
+			state.loading = false;
+		});
+		builder.addCase(updateCartCustomer.rejected, (state, {payload}) => {
+			state.error = payload as CoCartError
+			state.loading = false;
+		});
 		builder.addCase(updateCartItem.pending, (state) => {
 			state.loading = true;
 		});
@@ -540,13 +574,19 @@ export const {
 
 export default cartSlice.reducer
 
-const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payload?: {[key: string]: any} ): Promise<Cart> => {
+const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payload?: {[key: string]: any}, params?: {[key: string]: any} ): Promise<Cart> => {
 	// get cart key from local storage
 	const cartKey = localStorage.getItem('cart_key') ?? undefined;
 
+	const p = {
+		...(cartKey ? { cart_key: cartKey } : {}),
+		...params
+	}
+	const urlParams = new URLSearchParams(p);
+
 	const getAxiosParams = (cartKey?: string):  AxiosRequestConfig<{}> => ({
 		method: method,
-		url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (cartKey ? `?cart_key=${cartKey}` : ''),
+		url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (Object.keys(p).length > 0 ? '?' + urlParams.toString() : ''),
 		withCredentials: true,
 		headers: {
 			Accept: 'application/json',
