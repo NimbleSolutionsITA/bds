@@ -1,104 +1,24 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
-import { Cart, Totals} from "../types/cart-type";
-import {NEXT_API_ENDPOINT, WORDPRESS_SITE_URL} from "../utils/endpoints";
-import {RootState} from "./store";
-import {BillingData, InvoiceData, ShippingData} from "../types/woocommerce";
+import { Cart } from "../types/cart-type";
+import {WORDPRESS_SITE_URL} from "../utils/endpoints";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
-import {Inputs} from "../pages/checkout/CheckoutGrid";
 import {gtagAddToCart} from "../utils/utils";
 
 type CoCartError = {error: string, message: string}
 
 type CartState = {
 	error: CoCartError|null
-	cart: Cart
+	cart?: Cart
 	cartDrawerOpen: boolean
 	loading: boolean
-	stripe?: {
-		intentId: string
-		clientSecret: string
-	}
-	customer: {
-		billing: BillingData
-		shipping: ShippingData
-		invoice: InvoiceData,
-		customerNote: string
-	},
-	checkout?: {
-		cart_hash: string,
-		form: Inputs
-	}
-}
-
-const defaultAddressValues = {
-	first_name: '',
-	last_name: '',
-	address_1: '',
-	address_2: '',
-	company: '',
-	city: '',
-	state: '',
-	postcode: ''
+	customerNote: string
 }
 
 const initialState: CartState = {
 	error: null,
 	loading: false,
 	cartDrawerOpen: false,
-	cart: {
-		cart_hash: "",
-		items: [],
-		totals: {
-			subtotal: '0',
-			subtotal_tax: '0',
-		} as Totals,
-		customer: {
-			shipping_address: {
-				shipping_first_name: "",
-				shipping_last_name: "",
-				shipping_company: "",
-				shipping_country: "IT",
-				shipping_address_1: "",
-				shipping_address_2: "",
-				shipping_postcode: "",
-				shipping_city: "",
-				shipping_state: ""
-			},
-			billing_address: {
-				billing_first_name: "",
-				billing_last_name: "",
-				billing_company: "",
-				billing_country: "IT",
-				billing_address_1: "",
-				billing_address_2: "",
-				billing_postcode: "",
-				billing_city: "",
-				billing_state: "",
-				billing_phone: "",
-				billing_email: "",
-			}
-		}
-	},
-	customer: {
-		customerNote: '',
-		billing: {
-			email: '',
-			phone: '',
-			country: 'IT',
-			...defaultAddressValues
-		},
-		shipping: {
-			country: 'IT',
-			...defaultAddressValues
-		},
-		invoice: {
-			vat: '',
-			tax: '',
-			sdi: '',
-			billingChoice: 'invoice' as const,
-			invoiceType: 'private' as const
-		},
-	}
+	customerNote: ""
 }
 
 export const fetchCartData = createAsyncThunk('cart/fetchData', async (params, thunkAPI) => {
@@ -207,25 +127,6 @@ export const updateCartCustomer = createAsyncThunk('cart/updateCartCustomer', as
 	}
 });
 
-type UpdateShippingCountry = {
-	country: string
-	state?: string
-	city?: string
-	postcode?: string
-}
-
-export const updateShippingCountry = createAsyncThunk('cart/updateCustomer', async (payload: UpdateShippingCountry, thunkAPI) => {
-	try {
-		await callCartData('/v1/calculate/shipping', "POST", payload);
-		return await callCartData('/v2/cart', "GET")
-	} catch (error: any) {
-		return thunkAPI.rejectWithValue({
-			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
-			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
-		})
-	}
-});
-
 type SelectShippingPayload = {
 	key: string
 }
@@ -247,16 +148,6 @@ type SetCouponPayload = {
 }
 
 export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
-	const { cart: { customer }} = thunkAPI?.getState() as RootState
-	/*const email = customer?.billing.email
-	if (!email) {
-		throw new Error('Email required')
-	}
-	const response = await fetch(WORDPRESS_SITE_URL + '/wp-json/nimble/v1/check-coupon-usage?code=' + payload.code + '&email=' + customer?.billing.email)
-	const { check } = await response.json()
-	if (!check) {
-		throw new Error('Coupon not valid for email')
-	}*/
 	try {
 		await callCartData('/v2/cart/apply-coupon', "POST", {code: payload.code})
 		return await callCartData('/v2/cart', "GET")
@@ -276,70 +167,6 @@ export const removeCoupon = createAsyncThunk('cart/removeCoupon', async (payload
 	try {
 		await callCartData(`/v2/cart/coupons`, "DELETE");
 		return await callCartData('/v2/cart', "GET")
-	} catch (error: any) {
-		return thunkAPI.rejectWithValue({
-			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
-			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
-		})
-	}
-});
-
-export const initCheckout = createAsyncThunk('cart/initCheckout', async (payload, thunkAPI) => {
-	try {
-		const cart = await initCartData()
-		const total = cart.totals?.total;
-		if (!total) {
-			return thunkAPI.rejectWithValue({
-				error: 'cart_total_empty',
-				message: 'Cart total is empty',
-			})
-		}
-		return { cart }
-	} catch (error: any) {
-		return thunkAPI.rejectWithValue({
-			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
-			message: error?.response?.data?.message ?? error?.message ?? 'generic error',
-		})
-	}
-});
-
-export const initStripePayment = createAsyncThunk('cart/initStripePayment', async (payload, thunkAPI) => {
-	try {
-		const { cart: { stripe, cart }} = thunkAPI?.getState() as RootState
-		const total = cart.totals?.total;
-		if (!total) {
-			throw new Error('Cart not found');
-		}
-		let paymentIntent = {
-			paymentIntentId: stripe?.intentId,
-			clientSecret: stripe?.clientSecret,
-			error: null
-		}
-		if (paymentIntent.paymentIntentId || paymentIntent.clientSecret) {
-			await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
-				method: 'PUT',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ cart, paymentIntentId: paymentIntent.paymentIntentId })
-			}).then((r) => r.json());
-		}
-		else {
-			paymentIntent = await fetch(NEXT_API_ENDPOINT + '/order/stripe-intent', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({ cart })
-			}).then((r) => r.json());
-			if (paymentIntent.error) {
-				return thunkAPI.rejectWithValue({
-					error: paymentIntent.error,
-					message: paymentIntent.error,
-				})
-			}
-		}
-		return { cart, paymentIntent}
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
 			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
@@ -384,24 +211,12 @@ export const cartSlice = createSlice({
 		closeCartDrawer: (state) => {
 			state.cartDrawerOpen = false
 		},
-		setCustomerData: (state, action) => {
-			state.customer = { ...state.customer, ...action.payload}
-		},
-		setCustomerNote: (state, action) => {
-			state.customer.customerNote = action.payload
-		},
-		destroyIntent: (state) => {
-			state.stripe = undefined
-		},
 		resetCartError: (state) => {
 			state.error = null
 		},
-		setCheckoutState: (state, {payload} ) => {
-			state.checkout = {
-				cart_hash: state.cart.cart_hash,
-				form: payload
-			}
-		},
+		setCustomerNote: (state, action) => {
+			state.customerNote = action.payload
+		}
 	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchCartData.pending, (state) => {
@@ -460,17 +275,6 @@ export const cartSlice = createSlice({
 			state.error = payload as CoCartError
 			state.loading = false;
 		});
-		builder.addCase(updateShippingCountry.pending, (state) => {
-			state.loading = true;
-		});
-		builder.addCase(updateShippingCountry.fulfilled, (state, action) => {
-			state.cart = action.payload
-			state.loading = false;
-		});
-		builder.addCase(updateShippingCountry.rejected, (state, {payload}) => {
-			state.error = payload as CoCartError
-			state.loading = false;
-		});
 		builder.addCase(selectShipping.pending, (state) => {
 			state.loading = true;
 		});
@@ -504,36 +308,6 @@ export const cartSlice = createSlice({
 			state.error = payload as CoCartError
 			state.loading = false;
 		});
-		builder.addCase(initCheckout.pending, (state) => {
-			state.loading = true;
-		});
-		builder.addCase(initCheckout.fulfilled, (state, action) => {
-			state.cart = action.payload.cart
-			if (state.checkout) {
-				if (state.checkout.cart_hash !== action.payload.cart.cart_hash)
-					state.checkout = undefined
-			}
-			state.loading = false;
-		});
-		builder.addCase(initCheckout.rejected, (state, {payload}) => {
-			state.error = payload as CoCartError
-			state.loading = false;
-		});
-		builder.addCase(initStripePayment.pending, (state) => {
-			state.loading = true;
-		});
-		builder.addCase(initStripePayment.fulfilled, (state, action) => {
-			state.cart = action.payload.cart
-			state.stripe = {
-				intentId: action.payload.paymentIntent.paymentIntentId ?? '',
-				clientSecret: action.payload.paymentIntent.clientSecret ?? ''
-			}
-			state.loading = false;
-		});
-		builder.addCase(initStripePayment.rejected, (state, {payload}) => {
-			state.error = payload as CoCartError
-			state.loading = false;
-		});
 		builder.addCase(initCart.pending, (state) => {
 			state.loading = true;
 		});
@@ -550,8 +324,6 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(destroyCart.fulfilled, (state, action) => {
 			state.cart = action.payload
-			state.customer = initialState.customer
-			state.stripe = undefined
 			state.loading = false;
 		});
 		builder.addCase(destroyCart.rejected, (state, {payload}) => {
@@ -566,10 +338,8 @@ export const {
 	toggleCartDrawer,
 	openCartDrawer,
 	closeCartDrawer,
-	setCustomerData,
-	setCustomerNote,
 	resetCartError,
-	setCheckoutState
+	setCustomerNote
 } = cartSlice.actions
 
 export default cartSlice.reducer
@@ -578,24 +348,25 @@ const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payl
 	// get cart key from local storage
 	const cartKey = localStorage.getItem('cart_key') ?? undefined;
 
-	const p = {
-		...(cartKey ? { cart_key: cartKey } : {}),
-		...params
+	const getAxiosParams = (cartKey?: string):  AxiosRequestConfig<{}> => {
+		const p = {
+			...(cartKey ? { cart_key: cartKey } : {}),
+			...params
+		}
+		const urlParams = new URLSearchParams(p);
+		return {
+			method: method,
+			url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (Object.keys(p).length > 0 ? '?' + urlParams.toString() : ''),
+			withCredentials: true,
+			headers: {
+				Accept: 'application/json',
+				...(payload ? {'Content-Type': 'application/json'} : {})
+			},
+			...(payload ? {data: payload} : {}),
+			responseEncoding: 'utf8',
+			responseType: 'json'
+		}
 	}
-	const urlParams = new URLSearchParams(p);
-
-	const getAxiosParams = (cartKey?: string):  AxiosRequestConfig<{}> => ({
-		method: method,
-		url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (Object.keys(p).length > 0 ? '?' + urlParams.toString() : ''),
-		withCredentials: true,
-		headers: {
-			Accept: 'application/json',
-			...(payload ? {'Content-Type': 'application/json'} : {})
-		},
-		...(payload ? {data: payload} : {}),
-		responseEncoding: 'utf8',
-		responseType: 'json'
-	})
 
 	let response: AxiosResponse<Cart>
 

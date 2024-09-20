@@ -1,8 +1,8 @@
 import {SyntheticEvent, Dispatch, SetStateAction} from "react";
-import {Controller, Form, useFormContext, useWatch} from "react-hook-form";
+import {Controller, useFormContext, useWatch} from "react-hook-form";
 import {Tabs, Tab, TextField, Switch, FormControlLabel} from "@mui/material";
 import {Country} from "../../types/woocommerce";
-import {Inputs} from "./CheckoutGrid";
+import {FormFields} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
 import MotionPanel from "../../components/MotionPanel";
 import {useTranslation} from "next-i18next";
@@ -10,15 +10,13 @@ import CustomerAddressForm from "../../components/CustomerAddressForm";
 
 type AddressFormProps = {
 	countries: Country[]
-	isLoading?: boolean
-	tab: number
-	setTab: Dispatch<SetStateAction<number>>
 	setFocus?: Dispatch<SetStateAction<boolean>>
 }
-const AddressForm = ({isLoading = false, countries, tab, setTab, setFocus}: AddressFormProps) => {
-	const { control, formState: { errors }, setError } = useFormContext<Inputs>();
+const AddressForm = ({countries, setFocus}: AddressFormProps) => {
+	const { control, formState: { errors }, setError, watch, setValue,  } = useFormContext<FormFields>();
+	const tab = watch('addressTab')
 	const handleChange = (event: SyntheticEvent, newValue: number) => {
-		setTab(newValue);
+		setValue('addressTab', newValue);
 	};
 	const { t } = useTranslation('common');
 	const hasShipping = useWatch({name: 'has_shipping', control});
@@ -44,7 +42,6 @@ const AddressForm = ({isLoading = false, countries, tab, setTab, setFocus}: Addr
 							field.onChange(e)
 							setError(field.name, {})
 						}}
-						disabled={isLoading}
 						fullWidth
 						variant="outlined"
 						label="Email"

@@ -10,10 +10,9 @@ import Logo from "./Logo";
 import  {CheckoutDesktopProps} from "./CheckoutDesktop";
 import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
-import {useRouter} from "next/router";
 import InvoiceForm from "../../components/InvoiceForm";
 import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
-import {Inputs, Step as StepType, Step} from "./CheckoutGrid";
+import {FormFields, Step as StepType} from "./CheckoutGrid";
 import {BaseSyntheticEvent} from "react";
 import {useFormContext} from "react-hook-form";
 
@@ -23,45 +22,17 @@ export type CheckoutMobile = CheckoutDesktopProps
 const CheckoutMobile = ({
 	countries,
 	updateOrder,
-	isLoading,
-	tab,
-	setTab,
-	checkoutStep,
-    setCheckoutStep,
 }: CheckoutMobile) => {
-	const { cart } = useSelector((state: RootState) => state.cart);
+	const { cart, loading } = useSelector((state: RootState) => state.cart);
+	const { watch, setValue } = useFormContext<FormFields>()
+	const {step: checkoutStep, addressTab: tab} = watch()
 	const mobileStep = STEP_MAP.indexOf(checkoutStep)
 	const [focus, setFocus] = React.useState(false)
-	const editAddress = (tab: number) => {
-		setCheckoutStep('ADDRESS')
-		setTab(tab)
-	}
-	const { watch } = useFormContext<Inputs>();
-	const paymentMethod = watch('payment_method')
 	const checkoutComponent = [
-		<AddressForm
-			key="address"
-			countries={countries}
-			isLoading={isLoading}
-			tab={tab}
-			setTab={setTab}
-			setFocus={setFocus}
-		/>,
+		<AddressForm key="address" countries={countries} setFocus={setFocus} />,
 		<InvoiceForm key="invoice" />,
-		<Recap
-			key="recap"
-			isLoading={isLoading}
-			checkoutStep={checkoutStep}
-			setCheckoutStep={setCheckoutStep}
-			updateOrder={updateOrder}
-		/>,
-		<Payment
-			key="payment"
-			isLoading={isLoading}
-			editAddress={editAddress}
-			checkoutStep={checkoutStep}
-			setCheckoutStep={setCheckoutStep}
-		/>
+		<Recap key="recap" updateOrder={updateOrder} />,
+		<Payment key="payment" />
 	]
 	const variants = {
 		enter: (direction: number): { y: number; opacity: number } => {
@@ -82,8 +53,8 @@ const CheckoutMobile = ({
 		}
 	};
 
-	const bottomBarHeight = Number(cart.totals?.discount_total ?? 0) > 0 ? '225px' : '200px'
-	const stepButtonProps = { checkoutStep, setCheckoutStep, updateOrder, paymentMethod }
+	const bottomBarHeight = Number(cart?.totals?.discount_total ?? 0) > 0 ? '225px' : '200px'
+	const stepButtonProps = { updateOrder }
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
 			<Container sx={{width: '100%', flex: 1, overflow: 'hidden scroll', padding: '0 20px 250px 20px'}}>
@@ -109,7 +80,7 @@ const CheckoutMobile = ({
 			</Container>
 			{!focus && (
 				<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 101}}>
-					<PriceRecap isLoading={isLoading}/>
+					<PriceRecap isLoading={loading}/>
 					<Grid container sx={{marginTop: '5px'}} spacing={2}>
 						{mobileStep > 0 && (
 							<StepButton isPrev {...stepButtonProps} />
@@ -124,28 +95,25 @@ const CheckoutMobile = ({
 
 type StepButtonProps = {
 	isPrev?: boolean,
-	checkoutStep: Step,
-	setCheckoutStep: (step: Step) => void
 	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
-	paymentMethod?: 'stripe'|'paypal'|'cards'
 }
-const StepButton = ({isPrev, checkoutStep, setCheckoutStep, updateOrder, paymentMethod}: StepButtonProps) => {
+const StepButton = ({isPrev, updateOrder}: StepButtonProps) => {
 	const { t } = useTranslation('common')
+	const { watch, setValue } = useFormContext<FormFields>()
+	const checkoutStep = watch('step')
 	const mobileStep = STEP_MAP.indexOf(checkoutStep)
 	const labelMap = ['address', 'invoice', 'shipping', 'payment', 'pay-now']
 	const targetStep = isPrev ? mobileStep - 1 : mobileStep + 1
 	const target = STEP_MAP[targetStep]
-	const router = useRouter()
 	const handleClick = async () => {
 		if (targetStep === 4) {
-			router.push('/checkout/' + paymentMethod)
 			return
 		}
 		if (targetStep < 2) {
 			await updateOrder(target)()
 			return
 		}
-		setCheckoutStep(target)
+		setValue('step', target)
 	}
 
 	const iconProps = isPrev ?

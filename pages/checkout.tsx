@@ -4,7 +4,6 @@ import dynamic from "next/dynamic";
 import {Country, ShippingClass} from "../src/types/woocommerce";
 import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {initCheckout} from "../src/redux/cartSlice";
 import {AppDispatch, RootState} from "../src/redux/store";
 import Head from "next/head";
 import GoogleAnalytics from "../src/components/GoogleAnalytics";
@@ -13,6 +12,9 @@ import LogInDrawer from "../src/layout/drawers/LogInDrawer";
 import useAuth from "../src/utils/useAuth";
 import {openLogInDrawer} from "../src/redux/layoutSlice";
 import CartErrorModal from "../src/layout/cart/CartErrorModal";
+import {PayPalScriptProvider} from "@paypal/react-paypal-js";
+
+const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
 const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
 
@@ -23,64 +25,60 @@ export type CheckoutProps = {
 	}
 }
 
-type InitStep = 'check-login'|'ask-login'|'init-customer-data'|'completed'
-
 export default function Checkout({
      shipping
 }: CheckoutProps) {
-	const [ initStep, setInitStep ] = useState<InitStep>('check-login')
 	const { loginChecked, loggedIn } = useAuth()
-	const { logInDrawerOpen} = useSelector((state: RootState) => state.layout);
-	const { cart, customer, checkout } = useSelector((state: RootState) => state.cart);
+	const { cart } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
+	const [clientToken, setClientToken] = useState(null);
+	const router = useRouter();
 
 	useEffect(() => {
-		if (checkout) {
-			dispatch(initCheckout());
-			setInitStep('completed')
+		if (loginChecked && !loggedIn) {
+			dispatch(openLogInDrawer())
 		}
-		else {
-			if (loginChecked && !loggedIn) {
-				dispatch(openLogInDrawer())
-				setInitStep('ask-login')
-			}
-			if (loginChecked && loggedIn) {
-				setInitStep('init-customer-data')
-			}
-		}
-	}, [loginChecked, loggedIn])
+	}, [loginChecked, loggedIn, dispatch])
 
 	useEffect(() => {
-		if (initStep === 'ask-login' && !logInDrawerOpen) {
-			dispatch(initCheckout());
-			setInitStep('completed')
+		if (cart && cart.items.length === 0) {
+			router.push('/')
 		}
-		if (
-			initStep === 'init-customer-data' &&
-			Object.keys(customer?.billing ?? {}).includes('first_name') &&
-			cart?.items?.length > 0
-		) {
-			dispatch(initCheckout());
-			setInitStep('completed')
-		}
-	}, [cart, customer, initStep, logInDrawerOpen]);
+	}, [cart, router]);
+
+	useEffect(() => {
+		(async () => {
+			const response = await fetch("/api/paypal/token", {
+				method: "POST",
+			});
+			const { client_token } = await response.json();
+			setClientToken(client_token);
+		})();
+	}, []);
 
 	return <Fragment>
 		<Head>
 			{/* Set HTML language attribute */}
-			<meta httpEquiv="content-language" content={locale} />
-			<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+			<meta httpEquiv="content-language" content={locale}/>
+			<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'/>
 			<title>Bottega di Sguardi - Checkout</title>
 		</Head>
 
-		<GoogleAnalytics />
+
+		<GoogleAnalytics/>
 
 		<CartErrorModal />
 		<LogInDrawer />
 
-		{initStep === 'completed'  ? (
-			<CheckoutGrid shipping={shipping}  />
+		{(cart && loginChecked && clientToken && PAYPAL_CLIENT_ID)  ? (
+			<PayPalScriptProvider options={{
+				"clientId": PAYPAL_CLIENT_ID,
+				components: "card-fields,buttons,marks",
+				currency: "EUR",
+			}}>
+				<CheckoutGrid shipping={shipping} />
+			</PayPalScriptProvider>
 		) : (
 			<Backdrop
 				sx={{ backgroundColor: 'rgba(255,255,255,0.75)', zIndex: (theme) => theme.zIndex.appBar - 2 }}

@@ -3,7 +3,7 @@ import React, { createContext, useContext, ReactNode } from "react";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {LoggedCustomer, WooOrder} from "../types/woocommerce";
 import {useDispatch} from "react-redux";
-import {initCart, setCustomerData, updateShippingCountry} from "../redux/cartSlice";
+import {initCart} from "../redux/cartSlice";
 import {AppDispatch} from "../redux/store";
 
 export interface User {
@@ -88,43 +88,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 	const loggedIn = Boolean(user);
 
-	const getCustomerQuery = useQuery<LoggedCustomer|null>(
-		['get-customer', user?.databaseId],
-		async () => {
+	const getCustomerQuery = useQuery<LoggedCustomer|null>({
+		queryKey: ['get-customer', user?.databaseId],
+		queryFn: async () => {
 			const response = await fetch(`/api/customer/${user?.databaseId}`);
 			if (!response.ok) {
 				throw new Error('Network response was not ok');
 			}
 			const {customer} = await response.json();
-			const { billing, shipping } = customer;
-			dispatch(setCustomerData({ shipping, billing }))
-			dispatch(updateShippingCountry({ country: shipping.country ?? billing.country ?? 'IT' }))
 			return customer;
 		},
-		{
-			enabled: !!user?.databaseId,
-			initialData: null
-		}
-	)
-	const getCustomerOrders = useQuery(
-		['get-customer-orders', user?.databaseId],
-		async () => {
+		enabled: !!user?.databaseId,
+		initialData: null
+	})
+	const getCustomerOrders = useQuery({
+		queryKey: ['get-customer-orders', user?.databaseId],
+		queryFn: async () => {
 			const response = await fetch(`/api/customer/${user?.databaseId}/orders`);
 			if (!response.ok) {
 				throw new Error('Network response was not ok');
 			}
 			return response.json();
 		},
-		{
-			enabled: false,
-			initialData: {
-				orders: []
-			}
+		enabled: false,
+		initialData: {
+			orders: []
 		}
-	)
-	const getNewsletterStatusQuery = useQuery(
-		['check-newsletter', user?.databaseId],
-		async () => {
+	})
+	const getNewsletterStatusQuery = useQuery({
+		queryKey: ['check-newsletter', user?.databaseId],
+		queryFn: async () => {
 			const response = await fetch(`/api/customer/newsletter?email=${user?.email}`, {
 				method: 'GET',
 				headers: {
@@ -137,14 +130,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			const { subscribed } = await response.json();
 			return subscribed as boolean;
 		},
-		{
-			enabled: !!user?.databaseId,
-			initialData: false
-		}
-	)
-	const unsubscribeNewsletter = useMutation(
-		['unsubscribe-newsletter', user?.databaseId],
-		async () => {
+		enabled: !!user?.databaseId,
+		initialData: false
+	})
+	const unsubscribeNewsletter = useMutation({
+		mutationFn: async () => {
 			const response = await fetch(`/api/customer/newsletter`, {
 				method: 'DELETE',
 				headers: {
@@ -157,15 +147,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 			return response.json();
 		},
-		{
-			onSuccess: async () => {
-				await getNewsletterStatusQuery.refetch();
-			}
+		onSuccess: async () => {
+			await getNewsletterStatusQuery.refetch();
 		}
-	)
-	const updateCustomerMutation = useMutation(
-		['update-customer', user?.databaseId],
-		async (data: any) => {
+	})
+	const updateCustomerMutation = useMutation({
+		mutationFn: async (data: any) => {
 			const response = await fetch(`/api/customer/${user?.databaseId}`, {
 				method: 'PUT',
 				headers: {
@@ -178,23 +165,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 			return response.json();
 		},
-		{
-			onSuccess: async () => {
-				await getCustomerQuery.refetch();
-			}
-
+		onSuccess: async () => {
+			await getCustomerQuery.refetch();
 		}
-	)
+
+	})
 
 	const value = {
 		loggedIn,
 		user,
 		newsletterStatus: getNewsletterStatusQuery.data,
 		loading: getUserLoading || logoutLoading,
-		isUpdating: updateCustomerMutation.isLoading,
+		isUpdating: updateCustomerMutation.isPending,
 		loginChecked,
 		error: logoutError || getUserError,
 		customer: getCustomerQuery.data || undefined,
+		refetchCustomer: getCustomerQuery.refetch,
 		orders: getCustomerOrders.data.orders,
 		updateCustomer: updateCustomerMutation.mutate,
 		getOrders: getCustomerOrders.refetch,

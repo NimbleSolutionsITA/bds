@@ -7,15 +7,14 @@ import {
 	FormControl,
 	FormHelperText,
 	Grid,
-	Hidden,
 	InputLabel,
 	MenuItem,
 	Select, SelectChangeEvent,
 	TextField,
-	Typography,
+	Typography, useMediaQuery, useTheme,
 } from "@mui/material";
 import {useFormContext} from "react-hook-form";
-import {Inputs, Step as StepType, Step} from "./CheckoutGrid";
+import {Step as StepType, Step} from "./CheckoutGrid";
 import Link from "next/link";
 import PriceFormat from "../../components/PriceFormat";
 import {LocalShippingSharp, StorefrontSharp} from "@mui/icons-material";
@@ -24,18 +23,15 @@ import PriceRecap from "./PriceRecap";
 import Minus from "../../layout/cart/Minus";
 import Plus from "../../layout/cart/Plus";
 import {useTranslation} from "next-i18next";
-import {BaseSyntheticEvent, Dispatch, SetStateAction, useState} from "react";
+import {BaseSyntheticEvent, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
-import {removeCoupon, selectShipping, setCheckoutState, setCoupon, setCustomerNote} from "../../redux/cartSlice";
+import {removeCoupon, selectShipping, setCoupon, setCustomerNote} from "../../redux/cartSlice";
 import {getCartItemPrice, getIsEU} from "../../utils/utils";
-import {useRouter} from "next/router";
+import {tr} from "date-fns/locale";
 
 type RecapProps = {
-	isLoading: boolean
-	checkoutStep: Step
-	setCheckoutStep: Dispatch<SetStateAction<StepType>>
-	updateOrder: (step: Step) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
+	updateOrder: (step: Step) => (e?: (BaseSyntheticEvent | undefined)) => Promise<void>
 }
 
 const buttonLabel = {
@@ -44,20 +40,23 @@ const buttonLabel = {
 	RECAP: 'checkout.pay-now',
 	PAYMENT: 'checkout.pay-now'
 }
-const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapProps) => {
-	const { formState: { errors }, handleSubmit } = useFormContext();
+const Recap = ({updateOrder}: RecapProps) => {
+	const { formState: { errors }, watch } = useFormContext();
 	const { t } = useTranslation('common');
-	const { cart, customer: { customerNote }, loading } = useSelector((state: RootState) => state.cart);
+	const { cart, customerNote, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
-	const canEditData = !isLoading && ['INVOICE', 'RECAP', 'PAYMENT'].includes(checkoutStep);
+	const checkoutStep = watch('step') as StepType
+	const canEditData = true;
 	const isEU = getIsEU(cart?.customer)
 	const shipping = cart?.shipping?.packages.default
 	const shippingRates = shipping?.rates ?? {}
 	const hasFreeShipping = Object.values(shippingRates).find(r => r.method_id === 'free_shipping')
 	const selectedRate = shipping?.chosen_method
-	const hasCoupons = cart.coupons && cart.coupons.length > 0;
-	const [couponCode, setCouponCode] = useState(cart.coupons && cart.coupons.length > 0 ? cart.coupons[0].coupon : '');
-	const router = useRouter()
+	const hasCoupons = cart?.coupons && cart?.coupons.length > 0;
+	const [couponCode, setCouponCode] = useState(cart?.coupons && cart?.coupons.length > 0 ? cart?.coupons[0].coupon : '');
+	const theme = useTheme();
+	const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
+
 	const handleContinue = async () => {
 		switch (checkoutStep) {
 			case 'ADDRESS':
@@ -67,11 +66,6 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 				await updateOrder('PAYMENT')()
 				break;
 			case 'PAYMENT':
-				handleSubmit((form) => {
-					const paymentMethod = form.payment_method === 'cards' ? 'stripe' : form.payment_method
-					dispatch(setCheckoutState(form as Inputs))
-					router.push(`/checkout/${paymentMethod}`)
-				})()
 				break;
 		}
 	}
@@ -158,8 +152,8 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 					<Button
 						fullWidth
 						onClick={handleSetCoupon}
-						disabled={!canEditData || isLoading || loading}
-						endIcon={(isLoading || loading) && <CircularProgress size={16} />}
+						disabled={!canEditData || loading}
+						endIcon={(loading) && <CircularProgress size={16} />}
 					>
 						{t(hasCoupons ? 'checkout.remove' : 'checkout.apply').toUpperCase()}
 					</Button>
@@ -181,7 +175,7 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 							}
 						}}
 
-						startAdornment={isLoading ? <CircularProgress size={16} /> : <SelectStartAdornment methodId={selectedRate} />}
+						startAdornment={loading ? <CircularProgress size={16} /> : <SelectStartAdornment methodId={selectedRate} />}
 					>
 						{Object.values(shippingRates).filter(r => !hasFreeShipping || r.cost === '0').map((method) => (
 							<MenuItem key={method.key} value={method.key}>
@@ -209,20 +203,22 @@ const Recap = ({isLoading, checkoutStep, setCheckoutStep, updateOrder}: RecapPro
 					onChange={(e) => dispatch(setCustomerNote(e.target.value))}
 				/>
 			</FormControl>
-			<Hidden smDown>
-				<Divider sx={{margin: '5px 0'}} />
-				<PriceRecap isLoading={isLoading} />
-				<Divider sx={{margin: '10px 0 20px'}} />
-				<Button
-					fullWidth
-					onClick={handleContinue}
-					disabled={isLoading}
-					startIcon={(isLoading) && <CircularProgress size={16} />}
-				>
-					{t(buttonLabel[checkoutStep])}
-				</Button>
-				<Payments />
-			</Hidden>
+			{isDesktop && (
+				<>
+					<Divider sx={{margin: '5px 0'}} />
+					<PriceRecap isLoading={loading} />
+					<Divider sx={{margin: '10px 0 20px'}} />
+					<Button
+						fullWidth
+						onClick={handleContinue}
+						disabled={loading}
+						startIcon={(loading) && <CircularProgress size={16} />}
+					>
+						{t(buttonLabel[checkoutStep])}
+					</Button>
+					<Payments />
+				</>
+			)}
 		</Box>
 	)
 }

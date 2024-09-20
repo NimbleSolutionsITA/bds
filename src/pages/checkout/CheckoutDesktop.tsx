@@ -12,21 +12,17 @@ import Logo from "./Logo";
 import AddressForm from "./AddressForm";
 import Recap from "./Recap";
 import Payment from "./Payment";
-import {Step as StepType} from "./CheckoutGrid";
+import {FormFields, Step as StepType} from "./CheckoutGrid";
 import {Check} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
 import {Country} from "../../types/woocommerce";
-import {BaseSyntheticEvent, Dispatch, SetStateAction} from "react";
+import {BaseSyntheticEvent} from "react";
 import InvoiceForm from "../../components/InvoiceForm";
+import { useFormContext } from "react-hook-form";
 
 export type CheckoutDesktopProps = {
 	countries: Country[]
 	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
-	isLoading: boolean
-	tab: number
-	setTab: Dispatch<SetStateAction<number>>
-	checkoutStep: StepType
-	setCheckoutStep: Dispatch<SetStateAction<StepType>>
 }
 
 const STEP_MAP = ['ADDRESS', 'INVOICE', 'PAYMENT'] as const
@@ -34,13 +30,10 @@ const STEP_MAP = ['ADDRESS', 'INVOICE', 'PAYMENT'] as const
 const CheckoutDesktop = ({
 	countries,
     updateOrder,
-	isLoading,
-	tab,
-	setTab,
-	checkoutStep,
-	setCheckoutStep,
 }: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
+	const { watch, setValue } = useFormContext<FormFields>()
+	const checkoutStep = watch('step')
 	const indexStep = checkoutStep === "RECAP" ? 3 : STEP_MAP.indexOf(checkoutStep)
 	const handleStepClick = (index: number) => async () => {
 		const destinationStep = index > 2 ? 'PAYMENT' : STEP_MAP[index]
@@ -54,7 +47,7 @@ const CheckoutDesktop = ({
 			await updateOrder(destinationStep)()
 			return
 		}
-		setCheckoutStep(destinationStep)
+		setValue('step', destinationStep)
 	}
 	return (
 		<Grid container sx={{height: '100vh', position: 'relative'}}>
@@ -102,23 +95,13 @@ const CheckoutDesktop = ({
 						))}
 					</Stepper>
 					{checkoutStep === 'ADDRESS' && (
-						<AddressForm
-							countries={countries}
-							isLoading={isLoading}
-							tab={tab}
-							setTab={setTab}
-						/>
+						<AddressForm countries={countries} />
 					)}
 					{checkoutStep === 'INVOICE' && (
 						<InvoiceForm />
 					)}
 					{['PAYMENT', 'RECAP'].includes(checkoutStep) && (
-						<Payment
-							isLoading={isLoading}
-							editAddress={setTab}
-							checkoutStep={checkoutStep}
-							setCheckoutStep={setCheckoutStep}
-						/>
+						<Payment />
 					)}
 				</div>
 			</Grid>
@@ -132,12 +115,7 @@ const CheckoutDesktop = ({
 			      }}
 			>
 				<div style={{width: '100%', padding: '0 24px', maxWidth: '400px', display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
-					<Recap
-						isLoading={isLoading}
-						checkoutStep={checkoutStep}
-						setCheckoutStep={setCheckoutStep}
-						updateOrder={updateOrder}
-					/>
+					<Recap updateOrder={updateOrder} />
 				</div>
 			</Grid>
 		</Grid>

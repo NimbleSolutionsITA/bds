@@ -3,7 +3,7 @@ import NavBar from "./nav/NavBar";
 import NavBarMobile from "./nav/mobile/NavBarMobile";
 import {BaseLayoutProps} from "../types/settings";
 import Footer from "./footer/Footer";
-import {useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {useMediaQuery, useTheme} from "@mui/material";
@@ -16,12 +16,13 @@ import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
 import SearchModal from "./drawers/SearchModal";
-import {AppDispatch} from "../redux/store";
+import {AppDispatch, RootState} from "../redux/store";
 import GoogleAnalytics from "../components/GoogleAnalytics";
 import SignUpDrawer from "./drawers/SignUpDrawer";
 import LogInDrawer from "./drawers/LogInDrawer";
 import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
 import CartErrorModal from "./cart/CartErrorModal";
+import Loading from "../components/Loading";
 
 type LayoutProps = {
     children: React.ReactNode,
@@ -35,6 +36,7 @@ export default function Layout({children, layout: {
     const dispatch = useDispatch<AppDispatch>()
     const theme = useTheme();
     const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
+    const { cart} = useSelector((state: RootState) => state.cart);
 
     useEffect(() => {
         // dispatch(initCart());
@@ -75,7 +77,7 @@ export default function Layout({children, layout: {
                 profumum={categories.fragrances.profumum}
                 liquides={categories.fragrances.liquides}
             />
-            {children}
+            {cart ? children : <Loading />}
             <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={mobileMenu} />
 
             <GoogleAnalytics />

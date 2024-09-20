@@ -6,10 +6,11 @@ import CheckoutDesktop from "./CheckoutDesktop";
 import {useMediaQuery, useTheme} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
-import {setCustomerData, updateCartCustomer, updateShippingCountry} from "../../redux/cartSlice";
+import {updateCartCustomer} from "../../redux/cartSlice";
 import CheckoutMobile from "./CheckoutMobile";
 import {PaymentErrorDialog} from "./Payment";
 import useAuth from "../../utils/useAuth";
+import {BillingAddress, ShippingAddress} from "../../types/cart-type";
 
 export type CheckoutGridProps = {
 	shipping: {
@@ -23,42 +24,54 @@ export type Inputs = {
 	billing: BillingData,
 	shipping?: ShippingData
 	invoice: InvoiceData
-	payment_method: 'paypal'|'stripe'|'cards'
+	customerNote: string
 };
+
+export type CheckoutState = {
+	step: Step,
+	addressTab: number
+	paymentError?: string
+}
+
+export type FormFields = CheckoutState & Inputs
 
 export type Step = 'ADDRESS'|'INVOICE'|'RECAP'|'PAYMENT'
 
 const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
-	const { cart, customer, checkout } = useSelector((state: RootState) => state.cart);
+	const { cart, customerNote } = useSelector((state: RootState) => state.cart);
 	const { customer: loggedCustomer, updateCustomer ,loggedIn } = useAuth();
 	const dispatch = useDispatch<AppDispatch>()
-	const [step, setStep] = useState<Step>(checkout?.cart_hash ? 'PAYMENT' : 'ADDRESS');
-	const [addressTab, setAddressTab] = useState<number>(0);
-	const methods = useForm<Inputs>({
-		defaultValues: checkout?.form ?? {
+	const methods = useForm<FormFields>({
+		defaultValues: {
 			has_shipping: getCustomerMetaData('has_shipping', false, loggedCustomer),
-			billing: customer.billing,
-			shipping: customer.shipping,
+			billing: Object.keys(cart?.customer.billing_address ?? {}).reduce((acc, key) => {
+				const newKey = key.substring(8) as keyof BillingData
+				return {...acc, [newKey]: cart?.customer.billing_address[key as keyof BillingAddress]};
+			}, {}),
+			shipping: Object.keys(cart?.customer.shipping_address ?? {}).reduce((acc, key) => {
+				const newKey = key.substring(9) as keyof ShippingData
+				return {...acc, [newKey]: cart?.customer.shipping_address[key as keyof ShippingAddress]};
+			}, {}),
 			invoice: {
-				vat: getCustomerMetaData('vat', customer.invoice.vat, loggedCustomer),
-				tax: getCustomerMetaData('tax', customer.invoice.tax, loggedCustomer),
-				sdi: getCustomerMetaData('sdi',  customer.invoice.sdi, loggedCustomer),
-				billingChoice: getCustomerMetaData('billing_choice', customer.invoice.billingChoice, loggedCustomer),
-				invoiceType: getCustomerMetaData('invoice_type', customer.invoice.invoiceType, loggedCustomer)
+				vat: getCustomerMetaData('vat', '', loggedCustomer),
+				tax: getCustomerMetaData('tax', '', loggedCustomer),
+				sdi: getCustomerMetaData('sdi',  '', loggedCustomer),
+				billingChoice: getCustomerMetaData('billing_choice', '', loggedCustomer),
+				invoiceType: getCustomerMetaData('invoice_type', '', loggedCustomer)
 			},
-			payment_method: 'cards'
+			customerNote,
+			step: 'ADDRESS',
+			addressTab: 0
 		},
 		reValidateMode: 'onSubmit'
 	});
-	const { handleSubmit } = methods
+	const { handleSubmit , setValue } = methods
 	const theme = useTheme();
 	const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 	const [paymentError, setPaymentError] = useState<string>();
 
 	const onValid = (onValidStep: Step): SubmitHandler<Inputs> => (data)  => {
 		if (data && data.shipping && data.billing) {
-			const deliveryCountry = data.has_shipping ? data.shipping.country : data.billing.country;
-			const orderDeliveryCountry = cart.customer?.shipping_address.shipping_country
 			dispatch(updateCartCustomer({
 				...data.billing,
 				ship_to_different_address: data.has_shipping,
@@ -72,11 +85,6 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 					s_country: data.shipping.country,
 					s_company: data.shipping.company,
 				} : {}),
-			}))
-			dispatch(setCustomerData({
-				billing: data.billing,
-				shipping: data.has_shipping ? data.shipping : data.billing,
-				invoice: data.invoice
 			}))
 			if (loggedIn) {
 				updateCustomer({
@@ -92,26 +100,21 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 					]
 				})
 			}
-			setStep(onValidStep);
+			setValue('step', onValidStep);
 		}
 	}
 
 	const onInvalid: SubmitErrorHandler<Inputs> = (data) => {
 		if (data.shipping || data.billing)
-			setAddressTab(data.shipping ? 1 : 0);
+			setValue('addressTab', data.shipping ? 1 : 0);
 		if (data.invoice)
-			setStep('INVOICE');
+			setValue('step', 'INVOICE');
 	}
 
 	const updateOrder = (onValidStep: Step) => handleSubmit(onValid(onValidStep), onInvalid);
 
 	const checkoutProps = {
 		countries: shipping.countries,
-		isLoading: false,
-		tab: addressTab,
-		setTab: setAddressTab,
-		checkoutStep: step,
-		setCheckoutStep: setStep,
 		updateOrder,
 	}
 
