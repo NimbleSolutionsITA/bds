@@ -102,5 +102,5 @@ export const getShippingInfo = async (lang: string) => {
 			}))).flat()
 		}
 	}))
-	return {classes, countries} ?? null
+	return {classes, countries}
 }
