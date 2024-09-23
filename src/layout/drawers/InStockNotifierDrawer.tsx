@@ -35,8 +35,9 @@ const InStockNotifierDrawer = () => {
 		reValidateMode: 'onSubmit'
 	});
 
-	const {isLoading, isError, error, isSuccess, mutate, reset} = useMutation(
-		async (data: Inputs) => {
+	const {isPending: isLoading, isError, error, isSuccess, mutate, reset} = useMutation({
+		mutationKey: ['inStockNotifier', productId, variationId],
+		mutationFn: async (data: Inputs) => {
 			const response = await fetch(NEXT_API_ENDPOINT + '/in-stock-notifier?' + new URLSearchParams({
 				product_id: productId ? productId.toString() : '',
 				variation_id: variationId?.toString() ?? '',
@@ -47,11 +48,8 @@ const InStockNotifierDrawer = () => {
 				throw new Error(response.message ?? 'Server error');
 			}
 			return response;
-		},
-		{
-			mutationKey: ['inStockNotifier', productId, variationId]
-		},
-	);
+		}
+	});
 
 	const onSubmit: SubmitHandler<Inputs> = async (data) => {
 		mutate(data);
