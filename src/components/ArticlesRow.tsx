@@ -1,7 +1,7 @@
 import {Article} from "../types/woocommerce";
 import SectionTitle from "./SectionTitle";
 import ArticleCard from "./ArticleCard";
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import {useRouter} from "next/router";
 import {WORDPRESS_API_ENDPOINT} from "../utils/endpoints";
 import {mapArticle} from "../utils/mappers";
@@ -43,23 +43,23 @@ const ArticlesRow = ({ postsByCategory }: ArticlesRowProps) => {
 	};
 
 	const {
-		isLoading,
-		isError,
-		error,
 		data,
 		isFetching,
-		isPreviousData
-	} = useQuery(['posts', postsByCategory.id, page], () => fetchPosts(page), {
-		keepPreviousData: true,
+	} = useQuery({
+		queryKey: ['posts', postsByCategory.id, page],
+		queryFn: () => fetchPosts(page),
 		initialData: postsByCategory.posts,
 	});
 
 	// Prefetch the next page and check if it's the last page!
 	useEffect(() => {
 		if (data) {
-			queryClient.prefetchQuery(['posts', postsByCategory.id, page + 1], () => fetchPosts(page + 1))
+			queryClient.prefetchQuery({
+				queryKey: ['posts', postsByCategory.id, page + 1],
+				queryFn: () => fetchPosts(page + 1),
+			})
 		}
-	}, [data, page, postsByCategory.id, queryClient, locale]);
+	}, [data, page, postsByCategory.id, queryClient, locale, fetchPosts]);
 
 	return (
 		<div style={{marginTop: '20px'}}>
@@ -68,16 +68,14 @@ const ArticlesRow = ({ postsByCategory }: ArticlesRowProps) => {
 				onPrev={() => setPage(old => Math.max(old - 1, 0))}
 				disablePrev={page === 1}
 				onNext={() => {
-					if (!isPreviousData) {
-						setPage(old => old + 1)
-					}
+					setPage(old => old + 1)
 				}}
 				disableNext={totalPages ? page >= totalPages : false}
-				isLoading={!isPreviousData && isFetching}
+				isLoading={isFetching}
 			/>
 			<Grid container spacing={2}>
 				{data?.map((post:  Article) => (
-					<Grid key={post.id} item xs={6} md={3}>
+					<Grid key={post.id} component="div" size={{xs: 6, md: 3}}>
 						<ArticleCard key={post.id} article={post} />
 					</Grid>
 				))}

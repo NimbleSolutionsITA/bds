@@ -1,6 +1,6 @@
 import {useEffect} from "react";
 import {BaseProduct} from "../../types/woocommerce";
-import {Backdrop, Box, CircularProgress, Grid, Typography} from "@mui/material";
+import {Backdrop, Box, CircularProgress, Grid2 as Grid, Typography} from "@mui/material";
 import ProductCard from "../../components/ProductCard";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
@@ -25,9 +25,9 @@ type ProductsGridProps = {
 const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searchParams, open, drawerWidth, title }: ProductsGridProps) => {
 	const { pages, pageParams, setState } = usePageState({pages: [products], pageParams: []})
 	const {locale, pathname} = useRouter()
-	const { data, status, fetchNextPage, hasNextPage, isRefetching } = useInfiniteQuery(
-		["products", searchParams],
-		async ({ pageParam = 1}): Promise<BaseProduct[]> => {
+	const { data, status, fetchNextPage, hasNextPage, isRefetching } = useInfiniteQuery({
+		queryKey: ["products", searchParams],
+		queryFn: async ({pageParam = 1}): Promise<BaseProduct[]> => {
 			const queryParams = Object.fromEntries(Object.entries({
 				categories: searchParams.categories,
 				name: searchParams.name,
@@ -40,7 +40,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 				formato: searchParams.formato,
 				montatura_lenti: searchParams.montatura_lenti,
 				price_range: searchParams.price_range,
-				tags: [searchParams.styles, searchParams.materials].filter(v=>v).join(','),
+				tags: [searchParams.styles, searchParams.materials].filter(v => v).join(','),
 				sunglasses: isSunglasses ? true : searchParams.sunglasses,
 				optical: isOptical ? true : searchParams.optical,
 				man: isMan ? true : searchParams.man,
@@ -58,15 +58,14 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 
 			return data
 		},
-		{
-			getNextPageParam: (lastPage, pages) => {
-				if (lastPage?.length === 12) {
-					return pages.length + 1;
-				}
-			},
-			initialData: {pages, pageParams}
-		}
-	);
+		initialPageParam: 1,
+		getNextPageParam: (lastPage, pages) => {
+			if (lastPage?.length === 12) {
+				return pages.length + 1;
+			}
+		},
+		initialData: {pages, pageParams}
+	});
 
 	useEffect(() => {
 		if (isRefetching)
@@ -121,7 +120,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 					{data?.pages[0]?.length > 0 ? (
 						<Grid container spacing={3}>
 							{data?.pages.map(products => products.map((product: BaseProduct) => (
-								<Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
+								<Grid component="div" size={{xs: 12, sm: 6, md: 4, xl: 3}} key={product.id}>
 									<ProductCard product={product} />
 								</Grid>
 							)))}

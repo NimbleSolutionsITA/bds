@@ -21,6 +21,14 @@ const initialState: CartState = {
 	customerNote: ""
 }
 
+
+export const initialCart = {
+	customer: {
+		billing_address: { billing_email: "" },
+		shipping_address: { shipping_country: "IT" }
+	}
+}
+
 export const fetchCartData = createAsyncThunk('cart/fetchData', async (params, thunkAPI) => {
 	try {
 		return await callCartData('/v2/cart', "GET")
@@ -354,6 +362,7 @@ const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payl
 			...params
 		}
 		const urlParams = new URLSearchParams(p);
+		console.log('urlParams', urlParams.toString())
 		return {
 			method: method,
 			url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (Object.keys(p).length > 0 ? '?' + urlParams.toString() : ''),
@@ -372,12 +381,11 @@ const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payl
 
 	try {
 		response = await axios(getAxiosParams(cartKey));
-		if (!!response.data?.customer?.billing_address?.billing_email) {
-			localStorage.removeItem('cart_key')
-		} else if (!!response.data.cart_key) {
+		if (!!response.data.cart_key) {
 			localStorage.setItem('cart_key', response.data.cart_key as string)
 		}
 	} catch (error) {
+		console.log('cart error', error)
 		response = await axios(getAxiosParams());
 		localStorage.removeItem('cart_key');
 	}

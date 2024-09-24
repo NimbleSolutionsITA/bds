@@ -22,13 +22,12 @@ const PayPalCheckout = () => {
 	}
 	return (
 		<Box sx={{display: 'flex', flexDirection: 'column', mt: '32px'}}>
-			<PayPalMarks fundingSource={undefined} />
 			<PayPalButtons
 				style={{
 					shape: "rect",
 					color: 'black',
 					layout: "vertical",
-					label: "pay",
+					label: "pay", 
 				}}
 				createOrder={createOrder}
 				onApprove={onApprove}

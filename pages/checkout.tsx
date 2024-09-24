@@ -74,7 +74,7 @@ export default function Checkout({
 		{(cart && loginChecked && clientToken && PAYPAL_CLIENT_ID)  ? (
 			<PayPalScriptProvider options={{
 				clientId: PAYPAL_CLIENT_ID,
-				components: "card-fields,buttons,marks,funding-eligibility",
+				components: "buttons,applepay,card-fields",
 				currency: "EUR",
 			}}>
 				<CheckoutGrid shipping={shipping} />

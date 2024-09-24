@@ -1,6 +1,5 @@
 import { createTheme } from '@mui/material/styles';
 import { red } from '@mui/material/colors';
-import {Appearance} from "@stripe/stripe-js/types/stripe-js/elements-group";
 
 export const CUSTOM_COLOR = 'rgba(102,130,113)';
 
@@ -149,20 +148,3 @@ const theme = createTheme({
 });
 
 export default theme;
-
-export const stripeTheme: Appearance = {
-    theme: 'stripe',
-    labels: 'floating',
-    variables: {
-        fontWeightNormal: '500',
-        borderRadius: '0',
-        colorPrimary: '#000',
-        colorIconTabSelected: 'rgba(0, 0, 0, 0.1)',
-        spacingGridRow: '16px',
-        focusBoxShadow: 'none',
-        fontFamily: 'Apercu, sans-serif',
-    },
-    rules: {
-
-    }
-}

@@ -6,14 +6,14 @@ import {
 	ShippingClass,
 	Variation
 } from "../../types/woocommerce";
-import {Button, Container, Grid, Tooltip, Typography} from "@mui/material";
+import {Button, Container, Grid2 as Grid, Tooltip, Typography} from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
 import {EYEWEAR_CATEGORIES, findVariationFromAttributes, getDefaultProduct, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
 import React, {useEffect, useState} from "react";
-import {addCartItem} from "../../redux/cartSlice";
+import {addCartItem, initialCart} from "../../redux/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {AttributeCheckboxes} from "../../components/AttributeCheckboxes";
 import InStock from "../../icons/InStock";
@@ -22,7 +22,6 @@ import {ArrowForwardIosSharp, ArrowBackIosSharp} from "@mui/icons-material";
 import placeholder from "../../images/placeholder.jpg";
 import {AppDispatch, RootState} from "../../redux/store";
 import PriceFormat from "../../components/PriceFormat";
-import StripePaymentButton from "../../components/StripePaymentButton";
 import {openInStockNotifierDrawer} from "../../redux/layoutSlice";
 import DHL from "../../icons/DHL";
 import GLS from "../../icons/GLS";
@@ -51,7 +50,7 @@ const removeDuplicates = (array: ImageDetailed[]) => {
 }
 
 const ProductView = ({product, category, shipping}: ProductViewProps) => {
-	const { cart: { customer: { shipping_address: { shipping_country }} } } = useSelector((state: RootState) => state.cart);
+	const { cart: { customer: { shipping_address: { shipping_country }} } = initialCart } = useSelector((state: RootState) => state.cart);
 	const isEU = !!shipping_country && shipping_country !== 'IT'
 	const init = getDefaultProduct(product);
 	const isEyewear = product.categories.find(({id, parent }) =>
@@ -120,7 +119,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	return (
 		<Container key={product.id}>
 			<Grid container spacing={5}>
-				<Grid item xs={12} md={isEyewear ? 7 : 5} lg={isEyewear ? 7 : 4} xl={isEyewear ? 7 : 3}>
+				<Grid component="div" size={{xs: 12, md: isEyewear ? 7 : 5, lg: isEyewear ? 7 : 4, xl: isEyewear ? 7 : 3}}>
 					<Carousel
 						animation="slide"
 						autoPlay={false}
@@ -184,7 +183,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						))}
 					</Carousel>
 				</Grid>
-				<Grid item xs={12} md={isEyewear ? 5 : 7} lg={isEyewear ? 5 : 8} xl={isEyewear ? 5 : 9}>
+				<Grid component="div" size={{xs: 12, md: isEyewear ? 5 : 7, lg: isEyewear ? 5 : 8, xl: isEyewear ? 5 : 9}}>
 					<Typography
 						variant="h1"
 						dangerouslySetInnerHTML={{__html: sanitize(product.name)}}
@@ -267,10 +266,7 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 						)}
 						{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
 							<div style={{width: '250px', height: '48px'}}>
-								<StripePaymentButton
-									shipping={shipping}
-									items={[cartItem]}
-								/>
+
 							</div>
 						)}
 					</div>

@@ -6,7 +6,6 @@ import {CloseOutlined} from "@mui/icons-material";
 import CartItem from "./CartItem";
 import Link from "next/link";
 import PriceFormat from "../../components/PriceFormat";
-import StripePaymentButton from "../../components/StripePaymentButton";
 import React from "react";
 import {Category, ShippingClass} from "../../types/woocommerce";
 import {BaseLayoutProps} from "../../types/settings";
@@ -26,7 +25,7 @@ type CartDrawerProps = {
 	categories: BaseLayoutProps['categories']
 }
 
-const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
+const CartDrawer = ({categories}: CartDrawerProps) => {
 	const { cartDrawerOpen, cart, loading } = useSelector((state: RootState) => state.cart);
 	const isEU = !!cart?.customer?.shipping_address?.shipping_country && cart?.customer?.shipping_address?.shipping_country !== 'IT'
 	const dispatch = useDispatch()
@@ -85,22 +84,6 @@ const CartDrawer = ({shipping, categories}: CartDrawerProps) => {
 						<Button component={Link} href={`/${CHECKOUT_SUB_PATH}`} disabled={loading}>
 							{t('cart.cta')}
 						</Button>
-						{/*{cartDrawerOpen && (
-							<div style={{marginTop: '10px', pointerEvents: loading ? 'none' : 'auto'}}>
-								<StripePaymentButton
-									items={cart.items.map(item => ({
-										product_id: item.meta.product_type === 'variation' ? item.meta.variation.parent_id : item.id,
-										variation_id: item.meta.product_type === 'variation' ? item.id : undefined,
-										name: item.name,
-										price: Number(item.price) / 100,
-										priceEU: Number(item.cart_item_data.priceEU ?? '0'),
-										qty: item.quantity.value
-									}))}
-									shipping={shipping}
-									isCart
-								/>
-							</div>
-						)}*/}
 					</>
 				) : (
 					<>

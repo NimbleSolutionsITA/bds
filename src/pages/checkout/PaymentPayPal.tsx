@@ -5,9 +5,11 @@ import {RootState} from "../../redux/store";
 import {OnApproveData} from "@paypal/paypal-js";
 import {gtagPurchase} from "../../utils/utils";
 import {useRouter} from "next/router";
+import {initialCart} from "../../redux/cartSlice";
 
 const PaymentPayPal = () => {
-	const { customer, cart } = useSelector((state: RootState) => state.cart);
+	const { cart = initialCart } = useSelector((state: RootState) => state.cart);
+	const { customer } = cart;
 	const router = useRouter();
 	const payWithPayPal = async () => {
 		try {
@@ -18,7 +20,7 @@ const PaymentPayPal = () => {
 				},
 				body: JSON.stringify({
 					cart,
-					customer
+					customer: cart.customer
 				})
 			}).then((r) => r.json())
 			if (order.error) {
@@ -54,7 +56,7 @@ const PaymentPayPal = () => {
 					pathname: '/checkout/completed',
 					query: {
 						paid: true,
-						email: customer?.billing?.email
+						email: customer?.billing_address?.billing_email
 					}
 				});
 			} else {

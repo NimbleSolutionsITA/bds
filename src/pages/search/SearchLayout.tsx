@@ -31,9 +31,11 @@ const SearchLayout = ({designers, profumum, liquides}: Props) => {
 	const { t } = useTranslation('common');
 	const router = useRouter()
 	const dispatch = useDispatch()
-	const eyewar = useInfiniteQuery(
-		["products", search],
-		async ({ pageParam = 1}): Promise<BaseProduct[]> => {
+
+	const eyewar = useInfiniteQuery({
+		queryKey: ["products", search],
+		initialPageParam: 1,
+		queryFn: async ({ pageParam }: {pageParam: number}): Promise<BaseProduct[]> => {
 
 			const {products: data} = await fetch(NEXT_API_ENDPOINT + '/products?' + new URLSearchParams({
 				page: pageParam.toString(),
@@ -45,19 +47,18 @@ const SearchLayout = ({designers, profumum, liquides}: Props) => {
 
 			return data
 		},
-		{
-			getNextPageParam: (lastPage, pages) => {
-				if (lastPage?.length === 12) {
-					return pages.length + 1;
-				}
-			},
-			initialData: {pages: [], pageParams: []}
-		}
-	);
+		getNextPageParam: (lastPage, pages) => {
+			if (lastPage?.length === 12) {
+				return pages.length + 1;
+			}
+		},
+		initialData: {pages: [], pageParams: []}
+	});
 
-	const perfumes = useInfiniteQuery(
-		["fragrances", search],
-		async ({ pageParam = 1}): Promise<BaseProduct[]> => {
+	const perfumes = useInfiniteQuery({
+		queryKey: ["fragrances", search],
+		initialPageParam: 1,
+		queryFn: async ({ pageParam}): Promise<BaseProduct[]> => {
 
 			const {products: data} = await fetch(NEXT_API_ENDPOINT + '/products?' + new URLSearchParams({
 				page: pageParam.toString(),
@@ -70,15 +71,13 @@ const SearchLayout = ({designers, profumum, liquides}: Props) => {
 
 			return data
 		},
-		{
-			getNextPageParam: (lastPage, pages) => {
-				if (lastPage?.length === 12) {
-					return pages.length + 1;
-				}
-			},
-			initialData: {pages: [], pageParams: []}
-		}
-	);
+		getNextPageParam: (lastPage, pages) => {
+			if (lastPage?.length === 12) {
+				return pages.length + 1;
+			}
+		},
+		initialData: {pages: [], pageParams: []}
+	});
 	const designersList = designers.filter((d => d.name.toLowerCase().includes(search.toLowerCase())))
 	const fragrancesList = fragrances.filter((f => f.name.toLowerCase().includes(search.toLowerCase())))
 	const onClose = () => dispatch(closeSearchDrawer())

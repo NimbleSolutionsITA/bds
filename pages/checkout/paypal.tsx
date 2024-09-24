@@ -18,7 +18,7 @@ const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GOOGLE_GA_MEASUREMENT_ID;
 const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
 
 export default function Checkout({}: CheckoutProps) {
-	const { cart, stripe } = useSelector((state: RootState) => state.cart);
+	const { cart } = useSelector((state: RootState) => state.cart);
 	const {locale} = useRouter()
 
 
@@ -33,7 +33,7 @@ export default function Checkout({}: CheckoutProps) {
 		<GoogleAnalytics />
 
 		{(cart && cart.items && cart.items.length > 0 && CLIENT_ID)  ? (
-			<PayPalScriptProvider options={{ "client-id": CLIENT_ID, currency: "EUR", components: 'buttons', intent: 'capture' }}>
+			<PayPalScriptProvider options={{ "clientId": CLIENT_ID, currency: "EUR", components: 'buttons', intent: 'capture' }}>
 				<FinalStepContainer>
 					<PaymentPayPal />
 				</FinalStepContainer>

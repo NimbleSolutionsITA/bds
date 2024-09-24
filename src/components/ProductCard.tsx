@@ -13,7 +13,7 @@ import {
 } from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
 import {useDispatch, useSelector} from "react-redux";
-import {addCartItem} from "../redux/cartSlice";
+import {addCartItem, initialCart} from "../redux/cartSlice";
 import Image from "next/image";
 import Link from "./Link";
 import placeholder from "../images/placeholder.jpg";
@@ -31,7 +31,7 @@ type ProductCardProps = {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-    const { cart: { customer: { shipping_address: { shipping_country }} } } = useSelector((state: RootState) => state.cart);
+    const { cart: { customer: { shipping_address: { shipping_country }} } = initialCart } = useSelector((state: RootState) => state.cart);
     const isEU = !!shipping_country && shipping_country !== 'IT'
     const isEyewear = product.categories.find(({id, parent }) =>
         EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
