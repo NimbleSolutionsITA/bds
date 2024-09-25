@@ -4,7 +4,7 @@ import {useTranslation} from "next-i18next";
 import {
 	PayPalButtons,
 	PayPalCardFieldsForm,
-	PayPalCardFieldsProvider, PayPalMarks, usePayPalCardFields,
+	PayPalCardFieldsProvider, usePayPalCardFields,
 } from "@paypal/react-paypal-js";
 import {OnApproveData} from "@paypal/paypal-js";
 
@@ -27,7 +27,7 @@ const PayPalCheckout = () => {
 					shape: "rect",
 					color: 'black',
 					layout: "vertical",
-					label: "pay", 
+					label: "pay",
 				}}
 				createOrder={createOrder}
 				onApprove={onApprove}
