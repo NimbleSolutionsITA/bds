@@ -1,4 +1,10 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
+import {Country, ShippingClass} from "../types/woocommerce";
+
+export type ShippingData = {
+	classes: ShippingClass[],
+	countries: Country[]
+}
 
 type LayoutState = {
 	newsletterDrawerOpen: boolean
@@ -20,6 +26,7 @@ type LayoutState = {
 		scroll: number
 		state: any
 	}[]
+	shipping?: ShippingData
 }
 
 const initialState: LayoutState = {
@@ -103,6 +110,9 @@ export const layoutSlice = createSlice({
 				state.pageStates = state.pageStates ? [...state.pageStates, payload] : [payload]
 			}
 		},
+		setShippingData: (state, { payload }: PayloadAction<ShippingData>) => {
+			state.shipping = payload
+		},
 	},
 })
 
@@ -122,7 +132,8 @@ export const {
 	openSignUpDrawer,
 	closeSignUpDrawer,
 	openForgotPasswordDrawer,
-	closeForgotPasswordDrawer
+	closeForgotPasswordDrawer,
+	setShippingData
 } = layoutSlice.actions
 
 export default layoutSlice.reducer

@@ -1,86 +1,70 @@
-import {Dispatch, FC, SetStateAction, useState} from "react";
-import {Box} from "@mui/material";
+import {Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup} from "@mui/material";
 import {useTranslation} from "next-i18next";
 import {
-	PayPalButtons,
-	PayPalCardFieldsForm,
-	PayPalCardFieldsProvider, usePayPalCardFields,
+	PayPalCardFieldsForm, PayPalMessages,
 } from "@paypal/react-paypal-js";
-import {OnApproveData} from "@paypal/paypal-js";
-
+import {Controller, useFormContext} from "react-hook-form";
+import {FormFields, PAYMENT_METHODS} from "./CheckoutGrid";
+import {useSelector} from "react-redux";
+import {RootState} from "../../redux/store";
+import ApplePay from "../../icons/payments/ApplePay";
+import GooglePay from "../../icons/payments/GooglePay";
+import PayPal from "../../icons/payments/PayPal";
+import CreditCard from "../../icons/payments/CreditCard";
 
 const PayPalCheckout = () => {
+	const { applePayConfig, googlePayConfig } = useSelector((state: RootState) => state.cart);
 	const { t } = useTranslation();
-	const [isPaying, setIsPaying] = useState(false);
-
-	async function createOrder() {
-		console.log('createOrder')
-		return Promise.resolve('test-order-id')
-	}
-	async function onApprove(data: OnApproveData) {
-		console.log(data)
-	}
+	const {  control, watch } = useFormContext<FormFields>();
+	const availablePaymentMethods = PAYMENT_METHODS.filter(m => {
+		if (m === 'applepay' && (!applePayConfig?.isEligible || !window.ApplePaySession)) return false;
+		return !(m === 'googlepay' && !googlePayConfig?.isEligible);
+	})
+	const { paymentMethod } = watch()
 	return (
 		<Box sx={{display: 'flex', flexDirection: 'column', mt: '32px'}}>
-			<PayPalButtons
-				style={{
-					shape: "rect",
-					color: 'black',
-					layout: "vertical",
-					label: "pay",
-				}}
-				createOrder={createOrder}
-				onApprove={onApprove}
-				onError={console.log}
-			/>
-
-			<PayPalCardFieldsProvider
-				createOrder={createOrder}
-				onApprove={onApprove}
-				onError={console.log}
-			>
-				<PayPalCardFieldsForm />
-				<SubmitPayment isPaying={isPaying} setIsPaying={setIsPaying} />
-			</PayPalCardFieldsProvider>
+			<FormControl>
+				<FormLabel>{t('select-payment')}</FormLabel>
+				<Controller
+					rules={{ required: true }}
+					control={control}
+					name="paymentMethod"
+					render={({ field }) => (
+						<RadioGroup {...field} row>
+							{availablePaymentMethods.map((method) => (
+								<FormControlLabel
+									key={method}
+									value={method}
+									control={<Radio />}
+									label={radioButtons(method === paymentMethod, method)}
+								/>
+							))}
+						</RadioGroup>
+					)}
+				/>
+			</FormControl>
+			<PayPalMessages />
+			{paymentMethod === "card" && (
+				<Box sx={{margin: "20px -6px 20px -6px"}}>
+					<PayPalCardFieldsForm />
+				</Box>
+			)}
 		</Box>
 	);
 };
 
-const SubmitPayment: FC<{
-	setIsPaying: Dispatch<SetStateAction<boolean>>;
-	isPaying: boolean;
-}> = ({ isPaying, setIsPaying }) => {
-	const { cardFieldsForm, fields } = usePayPalCardFields();
+const radioButtonProps = {
+	sx: {
+		height: 'auto',
+		width: '70px'
+	}
+}
 
-	const handleClick = async () => {
-		if (!cardFieldsForm) {
-			const childErrorMessage =
-				"Unable to find any child components in the <PayPalCardFieldsProvider />";
-
-			throw new Error(childErrorMessage);
-		}
-		const formState = await cardFieldsForm.getState();
-
-		if (!formState.isFormValid) {
-			return alert("The payment form is invalid");
-		}
-		setIsPaying(true);
-
-		cardFieldsForm.submit().catch(() => {
-			setIsPaying(false);
-		});
-	};
-
-	return (
-		<button
-			className={isPaying ? "btn" : "btn btn-primary"}
-			style={{ float: "right" }}
-			onClick={handleClick}
-		>
-			{isPaying ? <div className="spinner tiny" /> : "Pay"}
-		</button>
-	);
-};
-
+const radioButtons = (selected: boolean, method: string) => ({
+	applepay: <ApplePay {...radioButtonProps} selected={selected} />,
+	googlepay: <GooglePay {...radioButtonProps} selected={selected} />,
+	card: <CreditCard {...radioButtonProps} selected={selected} />,
+	paypal: <PayPal {...radioButtonProps} selected={selected} />
+}[method])
 
 export default PayPalCheckout;

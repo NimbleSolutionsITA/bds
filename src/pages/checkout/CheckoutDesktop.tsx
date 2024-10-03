@@ -1,7 +1,7 @@
 import {
 	Box,
 	Button,
-	Grid,
+	Grid2 as Grid,
 	Step,
 	StepConnector,
 	stepConnectorClasses,
@@ -15,26 +15,23 @@ import Payment from "./Payment";
 import {FormFields, Step as StepType} from "./CheckoutGrid";
 import {Check} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
-import {Country} from "../../types/woocommerce";
 import {BaseSyntheticEvent} from "react";
 import InvoiceForm from "../../components/InvoiceForm";
 import { useFormContext } from "react-hook-form";
 
 export type CheckoutDesktopProps = {
-	countries: Country[]
 	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
 }
 
 const STEP_MAP = ['ADDRESS', 'INVOICE', 'PAYMENT'] as const
 
 const CheckoutDesktop = ({
-	countries,
     updateOrder,
 }: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
 	const { watch, setValue } = useFormContext<FormFields>()
 	const checkoutStep = watch('step')
-	const indexStep = checkoutStep === "RECAP" ? 3 : STEP_MAP.indexOf(checkoutStep)
+	const indexStep = STEP_MAP.indexOf(checkoutStep)
 	const handleStepClick = (index: number) => async () => {
 		const destinationStep = index > 2 ? 'PAYMENT' : STEP_MAP[index]
 		if (destinationStep === checkoutStep)
@@ -51,7 +48,7 @@ const CheckoutDesktop = ({
 	}
 	return (
 		<Grid container sx={{height: '100vh', position: 'relative'}}>
-			<Grid item xs={12} md={7} sx={{display: 'flex', alignItems: 'flex-end', flexDirection: 'column'}}>
+			<Grid size={{xs: 12, md: 7}} sx={{display: 'flex', alignItems: 'flex-end', flexDirection: 'column'}}>
 				<div
 					style={{
 						padding: '0 24px',
@@ -95,17 +92,18 @@ const CheckoutDesktop = ({
 						))}
 					</Stepper>
 					{checkoutStep === 'ADDRESS' && (
-						<AddressForm countries={countries} />
+						<AddressForm />
 					)}
 					{checkoutStep === 'INVOICE' && (
 						<InvoiceForm />
 					)}
-					{['PAYMENT', 'RECAP'].includes(checkoutStep) && (
+					{checkoutStep === 'PAYMENT' && (
 						<Payment />
 					)}
 				</div>
 			</Grid>
-			<Grid item xs={12} md={5}
+			<Grid
+				size={{xs: 12, md: 5}}
 			      sx={{
 				      backgroundColor: 'rgba(0,0,0,0.1)',
 				      borderRight: '2px solid rgba(0,0,0,0.4)',

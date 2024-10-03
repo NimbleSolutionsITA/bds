@@ -7,11 +7,8 @@ import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
 import {getAllProducts} from "../api/products";
-import { MAISON_GABRIELLA_CHIEFFO_CATEGORY} from "../../src/utils/utils";
-import {
-	FRAGRANCES_SUB_PATH,
-	MAISON_GABRIELLA_CHIEFFO_SUB_PATH
-} from "../../src/utils/endpoints";
+import {FRAGRANCES_CATEGORY as FRAGRANCES_CATEGORY_PATH, } from "../../src/utils/endpoints";
+import {FRAGRANCES_CATEGORY} from "../../src/utils/utils";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -35,12 +32,13 @@ export default function Fragrance({ productCategory, products, layout }: Fragran
 	);
 }
 
-export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
+export async function getStaticProps({ locale, params: {page, slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string, page: string }}) {
 	const [
 		{ productCategory, layout: {ssrTranslations, ...layout} }
 	] = await Promise.all([
 		getCategoryPageProps(locale, slug)
 	]);
+	console.log('productCategory', productCategory, page, slug)
 	if (!productCategory) {
 		return {
 			notFound: true
@@ -55,8 +53,8 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
-		{ name: 'Fragranze', href: urlPrefix + '/'+FRAGRANCES_SUB_PATH },
-		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+MAISON_GABRIELLA_CHIEFFO_SUB_PATH+'/' + productCategory.slug },
+		{ name: 'Fragranze', href: urlPrefix + '/'+FRAGRANCES_CATEGORY_PATH },
+		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+page+'/' + productCategory.slug },
 	]
 	return {
 		props: {
@@ -74,11 +72,12 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 
 export async function getStaticPaths() {
 	const productCategories = await getProductCategories();
-	const paths = productCategories.filter(({parent}) => parent && [
-			MAISON_GABRIELLA_CHIEFFO_CATEGORY.it,
-		MAISON_GABRIELLA_CHIEFFO_CATEGORY.en
-		].includes(parent))
-		.map(({slug}: WooProductCategory) => ({ params: { slug } }));
+	const paths = productCategories.filter(({parent}) => {
+		if (!parent) return false
+		const parentCat = productCategories.find(category => category.id === parent)?.parent as number
+		return parentCat && [FRAGRANCES_CATEGORY.it, FRAGRANCES_CATEGORY.en].includes(parentCat);
+	}).map(({slug, parent}: WooProductCategory) => ({ params: { slug, page: productCategories.find(({id}) => id === parent)?.slug } }));
+
 	return {
 		paths,
 		fallback: 'blocking',

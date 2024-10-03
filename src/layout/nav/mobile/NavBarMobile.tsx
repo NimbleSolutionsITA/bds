@@ -24,18 +24,14 @@ import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layoutSlice";
 import SearchIcon from "@mui/icons-material/Search";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../../redux/store";
-import {
-    DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH,
-    OUR_PRODUCTION_SUB_PATH,
-    PROFUMUM_ROMA_SUB_PATH
-} from "../../../utils/endpoints";
 import NavButton from "../../../components/NavButton";
 import AccordionNavButton from "../../../components/AccordionNavButton";
 import {UserMenu} from "../UserMenu";
+import {DESIGNERS_CATEGORY, FRAGRANCES_CATEGORY, OUR_PRODUCTION_SUB_PATH} from "../../../utils/endpoints";
 
 
 type NavBarMobileProps = {
-    mobileMenu: Menus['mobileMenu']
+    mobileMenu: Menus['mobile']
     breadcrumbs?: BreadCrumb[]
     categories: BaseLayoutProps['categories']
 }
@@ -54,8 +50,12 @@ export default function NavBarMobile({
         setOpen(false)
     }
     const appbarHeight = ref.current ? ref.current.clientHeight : 0 + 'px'
-    const ourProductionCategories = categories.designers.filter(c => [...OUR_PRODUCTION_CATEGORIES.it, ...OUR_PRODUCTION_CATEGORIES.en].includes(c.id))
 
+    const accordionCategories = [
+        {id: designers.id, name: designers.title, slug: DESIGNERS_CATEGORY, child_items: categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items},
+        {id: ourProduction.id, name: ourProduction.title, slug: OUR_PRODUCTION_SUB_PATH, child_items: categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items?.filter(c => [...OUR_PRODUCTION_CATEGORIES.it, ...OUR_PRODUCTION_CATEGORIES.en].includes(c.id))},
+        ...(categories.find(c => c.slug === FRAGRANCES_CATEGORY)?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? [])
+    ]
     return (
         <>
             <AppBar
@@ -122,36 +122,15 @@ export default function NavBarMobile({
                         <TopNavButtons title={t('man').toUpperCase()} nav1={opticalMan} nav2={sunglassesMan} handleClick={handleClick} />
                         <TopNavButtons title={t('woman').toUpperCase()} nav1={opticalWoman} nav2={sunglassesWoman} handleClick={handleClick} />
                     </div>
-                    <AccordionNavButton
-                        title={designers.title}
-                        items={categories.designers}
-                        handleClick={handleClick}
-                        path={DESIGNERS_SUB_PATH}
-                    />
-                    <AccordionNavButton
-                        title={ourProduction.title}
-                        items={ourProductionCategories}
-                        handleClick={handleClick}
-                        path={OUR_PRODUCTION_SUB_PATH}
-                    />
-                    <AccordionNavButton
-                        title={categories.fragrances.profumumMain[0].name}
-                        items={categories.fragrances.profumum}
-                        handleClick={handleClick}
-                        path={PROFUMUM_ROMA_SUB_PATH}
-                    />
-                    <AccordionNavButton
-                        title={categories.fragrances.liquidesMain[0].name}
-                        items={categories.fragrances.liquides}
-                        handleClick={handleClick}
-                        path={LIQUIDES_IMAGINAIRES_SUB_PATH}
-                    />
-                    <AccordionNavButton
-                        title={categories.fragrances.maisonMain[0].name}
-                        items={categories.fragrances.maison}
-                        handleClick={handleClick}
-                        path={MAISON_GABRIELLA_CHIEFFO_SUB_PATH}
-                    />
+                    {accordionCategories.map(category => category.child_items && (
+                        <AccordionNavButton
+                            key={category.id}
+                            title={category.name}
+                            items={category.child_items}
+                            handleClick={handleClick}
+                            path={category.slug}
+                        />
+                    ))}
 
                     {mobileMenu.map(nav => (
                         <NavButton key={nav.id} nav={nav} handleClick={handleClick} />

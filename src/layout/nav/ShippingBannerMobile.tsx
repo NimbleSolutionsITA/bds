@@ -3,9 +3,11 @@ import React, {useEffect, useState} from "react";
 import SaveMoney from "../../icons/SaveMoney";
 import FastShipping from "../../icons/FastShipping";
 import EuShipping from "../../icons/EuShipping";
-import {Trans} from "react-i18next";
+import {Trans, useTranslation} from "react-i18next";
+import useClientSideRendering from "../../utils/useClientSideRendering";
 
 const ShippingBannerMobile = () => {
+	const isClientSide = useClientSideRendering()
 	const shippingPromos = [
 		<Trans key="line1" i18nKey="shipping.line1b" components={[<b key={0} />]} />,
 		<Trans key="line2" i18nKey="shipping.line2b" components={[<b key={0} />]} />,
@@ -24,7 +26,7 @@ const ShippingBannerMobile = () => {
 	const Icons = [SaveMoney, FastShipping, FastShipping, EuShipping]
 	const Icon = Icons[index]
 
-	return (
+	return isClientSide ? (
 		<div style={{position: 'relative', background: '#000', color: '#FFF', padding: '10px 20px', fontSize: '14px'}}>
 			<AnimatePresence mode="wait">
 				<motion.div
@@ -44,7 +46,7 @@ const ShippingBannerMobile = () => {
 				</motion.div>
 			</AnimatePresence>
 		</div>
-	);
+	) : null;
 }
 
 export default ShippingBannerMobile;

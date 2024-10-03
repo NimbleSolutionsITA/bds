@@ -3,9 +3,8 @@ import {
     AttributeType, BaseCategory,
     BaseProduct,
     BaseVariation,
-    Color,
+    Color, LoggedCustomer,
     Product,
-    ShippingMethod,
     Variation, WooOrder
 } from "../types/woocommerce";
 import { formatDistance as fd } from 'date-fns';
@@ -41,18 +40,9 @@ export const OPTICAL_CATEGORY = {
     it: 43,
     en: 493
 }
-export const PROFUMUM_ROMA_CATEGORY = {
-    it: 51,
-    en: 518
-}
-export const LIQUIDES_IMAGINAIRES_CATEGORY = {
-    it: 1166,
-    en: 1188
-}
-
-export const MAISON_GABRIELLA_CHIEFFO_CATEGORY = {
-    it: 14511,
-    en: 14513
+export const FRAGRANCES_CATEGORY = {
+    it: 15674,
+    en: 15676
 }
 
 export const BOTTEGA_DI_SGUARDI_CATEGORY = {
@@ -79,10 +69,6 @@ export const SHOP_CATEGORIES = {
     optical: { it: 2796, en: 9604 },
     sunglasses: { it: 2990, en: 9602 }
 }
-export const MAIN_CATEGORIES = [
-    EYEWEAR_CATEGORY.it,
-    EYEWEAR_CATEGORY.en,
-]
 export const EYEWEAR_CATEGORIES = [
     SUNGLASSES_CATEGORY.it,
     SUNGLASSES_CATEGORY.en,
@@ -188,28 +174,6 @@ export function findVariationFromAttributes(product: BaseProduct | Product, attr
         }
     )
 }
-export function shippingMethodApplies(method: ShippingMethod, totalOrderAmount: number, totalDiscounts: number) {
-    if(!method.enabled) {
-        return false;
-    }
-    if (method.methodId === 'free_shipping') {
-        if (method.requires === 'min_amount') {
-            const minAmount = parseFloat(method.minAmount);
-            let effectiveOrderAmount = totalOrderAmount;
-            // Check if discounts should be ignored
-            if (method.ignoreDiscounts === 'yes') {
-                effectiveOrderAmount += totalDiscounts;
-            }
-            if (effectiveOrderAmount < minAmount) {
-                // The order amount is less than the required minimum for free shipping
-                return false;
-            }
-        }
-        // Add more conditions here if needed...
-    }
-    // If none of the conditions above matched, the method applies
-    return true;
-}
 
 export function getRelativePath(url: string): string {
     try {
@@ -219,14 +183,6 @@ export function getRelativePath(url: string): string {
         // If it's not a valid URL, assume it's a relative path
         return url;
     }
-}
-
-export function getName(fullName?: string | null): [string | undefined, string | undefined] {
-    const [name, ...lastName] = fullName?.split(' ') ?? []
-    return [
-        name,
-        lastName.join(' ')
-    ]
 }
 
 export function formatDistance(date: Date | number, locale: 'it'|'en') {
@@ -240,7 +196,7 @@ export function getProductMainCategory(product: BaseProduct): BaseCategory {
     ].includes(category.slug))
     if (fragrance)
         return fragrance;
-    return product.categories.find((category) => category.parent && MAIN_CATEGORIES.includes(category.parent)) ?? product.categories[0];
+    return product.categories.find((category) => category.parent) ?? product.categories[0];
 }
 export const regExpEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
@@ -278,8 +234,8 @@ export const getCartItemPriceWithoutTax = (item: Item, isEU: boolean) => (isEU &
     Number(item.totals.total)
 
 export const getCartItemPrice = (item: Item, isEU: boolean) => (isEU && item.cart_item_data.priceEU) ?
-    Number(item.cart_item_data.priceEU) * Number(item.quantity.value) :
-    (Number(item.totals.total) + Number(item.totals.tax))
+    parseFloat((Number(item.cart_item_data.priceEU) * Number(item.quantity.value)).toFixed(2)) :
+    parseFloat((Number(item.totals.total) + Number(item.totals.tax)).toFixed(1))
 
 export const getIsEU = (customer?: Cart['customer']) => {
     let country = (!customer?.shipping_address?.shipping_country || customer?.shipping_address?.shipping_country === '') ?
@@ -305,20 +261,12 @@ export const getCartTotals = (cart?: Cart) => {
     const taxRate = (Number(cart?.totals?.total_tax) / Number(cart?.totals?.total)) ;
     const totalTax =  isEU ? (total * taxRate) : (Number(cart?.totals?.total_tax) / 100);
     return {
-        subtotal,
-        shipping,
-        discount,
-        total,
-        totalTax
-    }
-}
-
-export interface PurchaseEvent {
-    transaction_id: string
-    value: number
-    tax?: number
-    shipping?: number
-    items: PurchaseItem[]
+        subtotal: parseFloat(subtotal.toFixed(2)),
+        shipping: parseFloat(shipping.toFixed(2)),
+        discount: parseFloat(discount.toFixed(2)),
+        total: parseFloat(total.toFixed(2)),
+        totalTax: parseFloat(totalTax.toFixed(2))
+    };
 }
 
 export interface PurchaseItem {
@@ -418,4 +366,16 @@ export const prepareOrderLineItem = (api: any, isEu: boolean) => async (item: It
         quantity: item.quantity.value,
         total,
     }
+}
+
+export const getInvoice = (customer?: LoggedCustomer) => ({
+    vat: getCustomerMetaData('vat', '', customer),
+    tax: getCustomerMetaData('tax', '', customer),
+    sdi: getCustomerMetaData('sdi', '', customer),
+    billingChoice: getCustomerMetaData('billing_choice', 'invoice', customer),
+    invoiceType: getCustomerMetaData('invoice_type', 'private', customer)
+})
+
+export const getCustomerMetaData = (key: string, fallback: any, customer?: LoggedCustomer) => {
+    return customer?.meta_data.find(({key: k}) => k === key)?.value ?? fallback
 }

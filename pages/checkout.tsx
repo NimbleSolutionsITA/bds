@@ -1,7 +1,6 @@
 import React, {Fragment, useEffect, useState} from "react";
 import {getCheckoutPageProps} from "../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
-import {Country, ShippingClass} from "../src/types/woocommerce";
 import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../src/redux/store";
@@ -10,30 +9,33 @@ import GoogleAnalytics from "../src/components/GoogleAnalytics";
 import {useRouter} from "next/router";
 import LogInDrawer from "../src/layout/drawers/LogInDrawer";
 import useAuth from "../src/utils/useAuth";
-import {openLogInDrawer} from "../src/redux/layoutSlice";
+import {openLogInDrawer, ShippingData} from "../src/redux/layoutSlice";
 import CartErrorModal from "../src/layout/cart/CartErrorModal";
-import {PayPalScriptProvider} from "@paypal/react-paypal-js";
-
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+import PayPalProvider from "../src/components/PayPalProvider";
+import {initCart} from "../src/redux/cartSlice";
 
 const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
 
 export type CheckoutProps = {
-	shipping: {
-		classes: ShippingClass[],
-		countries: Country[]
-	}
+	shipping: ShippingData
 }
 
 export default function Checkout({
      shipping
 }: CheckoutProps) {
 	const { loginChecked, loggedIn } = useAuth()
-	const { cart } = useSelector((state: RootState) => state.cart);
+	const { cart: { cart, initLoading }, layout: { logInDrawerOpen } } = useSelector((state: RootState) => state);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
-	const [clientToken, setClientToken] = useState(null);
 	const router = useRouter();
+	const isCheckoutReady = cart && loginChecked && !logInDrawerOpen && !initLoading
+	const cartEmpty = cart ? cart.item_count === 0 : true
+
+	useEffect(() => {
+		if (cart && !cart.shipping?.packages?.default?.chosen_method) {
+			dispatch(initCart())
+		}
+	}, []);
 
 	useEffect(() => {
 		if (loginChecked && !loggedIn) {
@@ -42,20 +44,10 @@ export default function Checkout({
 	}, [loginChecked, loggedIn, dispatch])
 
 	useEffect(() => {
-		if (cart && cart.items.length === 0) {
+		if (isCheckoutReady && cartEmpty) {
 			router.push('/')
 		}
-	}, [cart, router]);
-
-	useEffect(() => {
-		(async () => {
-			const response = await fetch("/api/paypal/token", {
-				method: "POST",
-			});
-			const { client_token } = await response.json();
-			setClientToken(client_token);
-		})();
-	}, []);
+	}, [cartEmpty, isCheckoutReady, router]);
 
 	return <Fragment>
 		<Head>
@@ -65,20 +57,15 @@ export default function Checkout({
 			<title>Bottega di Sguardi - Checkout</title>
 		</Head>
 
-
 		<GoogleAnalytics/>
 
 		<CartErrorModal />
 		<LogInDrawer />
 
-		{(cart && loginChecked && clientToken && PAYPAL_CLIENT_ID)  ? (
-			<PayPalScriptProvider options={{
-				clientId: PAYPAL_CLIENT_ID,
-				components: "buttons,applepay,card-fields",
-				currency: "EUR",
-			}}>
+		{(isCheckoutReady && !cartEmpty) ? (
+			<PayPalProvider>
 				<CheckoutGrid shipping={shipping} />
-			</PayPalScriptProvider>
+			</PayPalProvider>
 		) : (
 			<Backdrop
 				sx={{ backgroundColor: 'rgba(255,255,255,0.75)', zIndex: (theme) => theme.zIndex.appBar - 2 }}
@@ -89,6 +76,8 @@ export default function Checkout({
 		)}
 	</Fragment>
 }
+
+
 export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
 	const [
 		{ shipping, ssrTranslations },

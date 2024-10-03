@@ -10,13 +10,14 @@ import {
 } from "@mui/icons-material";
 import {openLogInDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
 import {useTranslation} from "next-i18next";
-import {Button, IconButton, Menu, MenuItem, Hidden} from "@mui/material";
+import {Button, IconButton, Menu, MenuItem, useMediaQuery, useTheme} from "@mui/material";
 import UserIcon from "../../icons/UserIcon";
 import Link from "../../components/Link";
 
 export function UserMenu() {
 	const { logOut, loggedIn, user } = useAuth();
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	const isMobile = useMediaQuery(useTheme().breakpoints.down('md'));
 	const open = Boolean(anchorEl);
 	const dispatch = useDispatch()
 	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -51,8 +52,8 @@ export function UserMenu() {
 				onClick={handleClick}
 				sx={{color: {xs: "rgba(0, 0, 0, 0.54)", md: '#fff'}, fontSize: '12px'}}
 			>
-				<UserIcon sx={{padding: '3px', marginRight: loggedMenu && user?.firstName ? '5px' : 0}} />
-				<Hidden mdDown>{loggedMenu && user?.firstName && user.firstName}</Hidden>
+				<UserIcon sx={{padding: '3px', marginRight: loggedMenu && user?.first_name ? '5px' : 0}} />
+				{!isMobile && loggedMenu && user?.first_name && user.first_name}
 			</IconButton>
 			<Menu
 				id="user-menu"

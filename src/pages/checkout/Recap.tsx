@@ -6,7 +6,7 @@ import {
 	Divider,
 	FormControl,
 	FormHelperText,
-	Grid,
+	Grid2 as Grid,
 	InputLabel,
 	MenuItem,
 	Select, SelectChangeEvent,
@@ -28,7 +28,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {removeCoupon, selectShipping, setCoupon, setCustomerNote} from "../../redux/cartSlice";
 import {getCartItemPrice, getIsEU} from "../../utils/utils";
-import {tr} from "date-fns/locale";
+import PaymentButtons from "../../components/PaymentButtons";
 
 type RecapProps = {
 	updateOrder: (step: Step) => (e?: (BaseSyntheticEvent | undefined)) => Promise<void>
@@ -37,7 +37,6 @@ type RecapProps = {
 const buttonLabel = {
 	ADDRESS: 'checkout.go-to-invoice',
 	INVOICE: 'checkout.go-to-payment',
-	RECAP: 'checkout.pay-now',
 	PAYMENT: 'checkout.pay-now'
 }
 const Recap = ({updateOrder}: RecapProps) => {
@@ -72,18 +71,11 @@ const Recap = ({updateOrder}: RecapProps) => {
 
 	const handleSetCoupon = () => {
 		hasCoupons ?
-			dispatch(removeCoupon({
-				code: couponCode
-			})) :
-			dispatch(setCoupon({
-				code: couponCode
-			}))
-
+			dispatch(removeCoupon({ code: couponCode })) :
+			dispatch(setCoupon({code: couponCode }))
 	}
 	const handleSelectShipping = (e: SelectChangeEvent<string>) => {
-		dispatch(selectShipping({
-			key: e.target.value
-		}))
+		dispatch(selectShipping({ key: e.target.value }))
 	}
 
 	return (
@@ -138,7 +130,7 @@ const Recap = ({updateOrder}: RecapProps) => {
 			</div>
 			<Divider sx={{margin: '5px 0'}} />
 			<Grid container spacing={1} sx={{padding: '20px 0', alignItems: 'center', marginBottom: errors.coupon_code ? '7px' : 0}}>
-				<Grid item xs={7}>
+				<Grid size={{xs: 7}}>
 					<TextField
 						disabled={!canEditData || hasCoupons}
 						value={couponCode}
@@ -148,7 +140,7 @@ const Recap = ({updateOrder}: RecapProps) => {
 						label={t('checkout.coupon-code')}
 					/>
 				</Grid>
-				<Grid item xs={5}>
+				<Grid size={{xs: 5}}>
 					<Button
 						fullWidth
 						onClick={handleSetCoupon}
@@ -160,7 +152,7 @@ const Recap = ({updateOrder}: RecapProps) => {
 				</Grid>
 			</Grid>
 			<Divider sx={{margin: '5px 0'}} />
-			{shippingRates && (
+			{selectedRate && (
 				<FormControl fullWidth sx={{margin: '20px 0'}}>
 					<InputLabel>{t('checkout.shipping')}</InputLabel>
 					<Select
@@ -208,14 +200,18 @@ const Recap = ({updateOrder}: RecapProps) => {
 					<Divider sx={{margin: '5px 0'}} />
 					<PriceRecap isLoading={loading} />
 					<Divider sx={{margin: '10px 0 20px'}} />
-					<Button
-						fullWidth
-						onClick={handleContinue}
-						disabled={loading}
-						startIcon={(loading) && <CircularProgress size={16} />}
-					>
-						{t(buttonLabel[checkoutStep])}
-					</Button>
+					{checkoutStep === "PAYMENT" ?
+						<PaymentButtons /> :
+						<Button
+							fullWidth
+							variant="contained"
+							color="primary"
+							onClick={handleContinue}
+						>
+							{t(buttonLabel[checkoutStep])}
+						</Button>
+					}
+
 					<Payments />
 				</>
 			)}

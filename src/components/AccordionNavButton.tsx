@@ -3,8 +3,6 @@ import {MenuItem} from "../types/settings";
 import {Accordion, AccordionDetails, AccordionSummary} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NavButton from "./NavButton";
-import {LIQUIDES_IMAGINAIRES_SUB_PATH, NEXT_SITE_URL} from "../utils/endpoints";
-import {LIQUIDES_IMAGINAIRES_CATEGORY} from "../utils/utils";
 import React from "react";
 
 type AccordionNavButtonProps = {
@@ -60,8 +58,10 @@ const AccordionNavButton = ({title, items, handleClick, path}: AccordionNavButto
 					nav={{
 						id: category.id,
 						title: category.name,
-						url: NEXT_SITE_URL + '/' + (category.parent && [LIQUIDES_IMAGINAIRES_CATEGORY.it, LIQUIDES_IMAGINAIRES_CATEGORY.en].includes(category.parent) ? LIQUIDES_IMAGINAIRES_SUB_PATH : path) + '/' + category.slug,
-						child_items: []
+						url: '/' + path + '/' + category.slug,
+						child_items: [],
+						slug: category.slug,
+						parent: category.parent
 					}}
 					handleClick={handleClick}
 				/>

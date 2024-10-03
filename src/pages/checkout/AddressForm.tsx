@@ -7,12 +7,13 @@ import HelperText from "../../components/HelperText";
 import MotionPanel from "../../components/MotionPanel";
 import {useTranslation} from "next-i18next";
 import CustomerAddressForm from "../../components/CustomerAddressForm";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
 type AddressFormProps = {
-	countries: Country[]
 	setFocus?: Dispatch<SetStateAction<boolean>>
 }
-const AddressForm = ({countries, setFocus}: AddressFormProps) => {
+const AddressForm = ({setFocus}: AddressFormProps) => {
+	const { shipping: { countries }} = usePayPalCheckout()
 	const { control, formState: { errors }, setError, watch, setValue,  } = useFormContext<FormFields>();
 	const tab = watch('addressTab')
 	const handleChange = (event: SyntheticEvent, newValue: number) => {
@@ -55,7 +56,7 @@ const AddressForm = ({countries, setFocus}: AddressFormProps) => {
 				name="has_shipping"
 				render={({ field }) => (
 					<FormControlLabel sx={{marginTop: '10px', marginRight: 'auto'}} labelPlacement="start" control={(
-						<Switch checked={hasShipping} {...field} />
+						<Switch checked={!!hasShipping} {...field} />
 					)} label={t('checkout.different-address')} />
 				)}
 			/>

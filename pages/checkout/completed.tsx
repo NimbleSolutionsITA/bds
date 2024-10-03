@@ -1,5 +1,5 @@
 import {useRouter} from "next/router";
-import React, {useEffect} from "react";
+import React from "react";
 import {getSSRTranslations} from "../../src/utils/wordpress_api";
 import Head from "next/head";
 import GoogleAnalytics from "../../src/components/GoogleAnalytics";
@@ -9,17 +9,10 @@ import Image from "next/image";
 import logo from "../../src/images/bottega-di-sguardi-logo.png";
 import {CheckCircleOutlineSharp} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
-import {useDispatch} from "react-redux";
-import {AppDispatch} from "../../src/redux/store";
-import {destroyCart} from "../../src/redux/cartSlice";
 
 export default function CheckoutResult() {
 	const { t } = useTranslation('common')
 	const {locale} = useRouter()
-	const dispatch = useDispatch<AppDispatch>()
-	useEffect(() => {
-		dispatch(destroyCart())
-	}, [dispatch]);
 	return (
 		<div style={{backgroundColor: 'rgba(0,0,0,0.1)'}}>
 			<Head>

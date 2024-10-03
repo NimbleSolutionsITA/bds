@@ -2,11 +2,10 @@ import {BaseProduct, WooProductCategory} from "../../types/woocommerce";
 import {IconButton, TextField, Typography} from "@mui/material";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {
-	DESIGNERS_SUB_PATH,
-	LIQUIDES_IMAGINAIRES_SUB_PATH,
+	DESIGNERS_CATEGORY,
+	DESIGNERS_SUB_PATH, FRAGRANCES_CATEGORY,
 	NEXT_API_ENDPOINT,
 	PRODUCT_SUB_PATH,
-	PROFUMUM_ROMA_SUB_PATH
 } from "../../utils/endpoints";
 import React, {useState} from "react";
 import {useRouter} from "next/router";
@@ -19,13 +18,12 @@ import {closeSearchDrawer} from "../../redux/layoutSlice";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
 
 type Props = {
-	designers: WooProductCategory[],
-	profumum: WooProductCategory[]
-	liquides: WooProductCategory[]
+	categories: WooProductCategory[]
 }
 
-const SearchLayout = ({designers, profumum, liquides}: Props) => {
-	const fragrances = [...profumum, ...liquides]
+const SearchLayout = ({categories}: Props) => {
+	const fragrances = categories.find(category => category.slug === FRAGRANCES_CATEGORY)?.child_items?.map(c => c.child_items?.map(ci => ({...ci, parent: c.slug}))).flat() ?? [] as WooProductCategory[]
+	const designers = categories.find(category => category.slug === DESIGNERS_CATEGORY)?.child_items ?? []
 	const { locale } = useRouter()
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation('common');
@@ -79,7 +77,7 @@ const SearchLayout = ({designers, profumum, liquides}: Props) => {
 		initialData: {pages: [], pageParams: []}
 	});
 	const designersList = designers.filter((d => d.name.toLowerCase().includes(search.toLowerCase())))
-	const fragrancesList = fragrances.filter((f => f.name.toLowerCase().includes(search.toLowerCase())))
+	const fragrancesList = fragrances.filter((f => f && f.name.toLowerCase().includes(search.toLowerCase())))
 	const onClose = () => dispatch(closeSearchDrawer())
 	const handleClick = (route: string) => {
 		router.push(route)
@@ -114,125 +112,83 @@ const SearchLayout = ({designers, profumum, liquides}: Props) => {
 
 			{search.length > 0 && (
 				<>
-					{designersList.length > 0 && (
-						<>
-							<Typography variant="h5" sx={{textTransform: 'uppercase', marginTop: '40px'}}>
-								{t('designers')}
-							</Typography>
-							<Box sx={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '10px', marginTop: '20px'}}>
-								{designersList.map(designer => (
-									<Chip
-										key={designer.slug}
-										tag={{name: designer.name}}
-										onClick={() => handleClick(`/${DESIGNERS_SUB_PATH}/${designer.slug}`)}
-									/>
-								))}
-							</Box>
-						</>
-					)}
-
-					{eyewar.status === "success" && (
-						<InfiniteScroll
-							style={{
-								width: '100%',
-								overflow: 'hidden'
-							}}
-							dataLength={eyewar.data?.pages.length * 24}
-							next={eyewar.fetchNextPage}
-							hasMore={eyewar.hasNextPage || false}
-							loader={<div  />}
-							scrollableTarget="html"
-						>
-							{eyewar.data?.pages[0]?.length > 0 && (
-								<>
-									<Typography variant="h5" sx={{textTransform: 'uppercase', marginTop: '40px'}}>
-										{t('eyewear')}
-									</Typography>
-									<Box sx={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '20px'}}>
-										{eyewar.data?.pages.map(products => products.map((product: BaseProduct) => (
-											<Chip
-												avatar={product.image}
-												key={product.slug}
-												tag={{name: `<b>${product.name}</b><br />${product.categories[0].name}`}}
-												onClick={() => handleClick(`/${PRODUCT_SUB_PATH}/${product.slug}`)}
-												size="medium"
-												sxMobile={{
-													margin: '0 auto',
-													'& .MuiChip-avatar': {
-														width: '100px',
-														height: '50px'
-													}
-												}}
-											/>
-										)))}
-									</Box>
-								</>
-							)}
-						</InfiniteScroll>
-					)}
-
-					{fragrancesList.length > 0 && (
-						<>
-							<Typography variant="h5" sx={{textTransform: 'uppercase', marginTop: '40px'}}>
-								{t('fragrances')}
-							</Typography>
-							<Box sx={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '10px'}}>
-								{fragrances.map(category => (
-									<Chip
-										key={category.slug}
-										tag={{name: category.name}}
-										onClick={() => handleClick(`/${profumum.find(p => p.id === category.id) ? PROFUMUM_ROMA_SUB_PATH : LIQUIDES_IMAGINAIRES_SUB_PATH}/${category.slug}`)}
-									/>
-								))}
-							</Box>
-						</>
-					)}
-
-					{perfumes.status === "success" && (
-						<InfiniteScroll
-							style={{
-								width: '100%',
-								overflow: 'hidden'
-							}}
-							dataLength={perfumes.data?.pages.length * 24}
-							next={eyewar.fetchNextPage}
-							hasMore={eyewar.hasNextPage || false}
-							loader={<div  />}
-							scrollableTarget="html"
-						>
-							{perfumes.data?.pages[0]?.length > 0 && (
-								<>
-									{fragrancesList.length === 0 && (
-										<Typography variant="h5" sx={{textTransform: 'uppercase', marginTop: '40px'}}>
-											{t('fragrances')}
-										</Typography>
-									)}
-									<Box sx={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '20px'}}>
-										{perfumes.data?.pages.map(products => products.map((product: BaseProduct) => (
-											<Chip
-												avatar={product.image}
-												key={product.slug}
-												tag={{name: `<b>${product.name}</b><br />${product.categories[0].name}`}}
-												onClick={() => handleClick(`/${PRODUCT_SUB_PATH}/${product.slug}`)}
-												size="medium"
-												sxMobile={{
-													margin: '0 auto',
-													'& .MuiChip-avatar': {
-														width: '100px',
-														height: '50px'
-													}
-												}}
-											/>
-										)))}
-									</Box>
-								</>
-							)}
-						</InfiniteScroll>
-					)}
+					<ChipList query={eyewar} list={designersList} title="designers" />
+					<ChipList query={perfumes} list={fragrancesList} title="fragrances" />
 				</>
 			)}
 		</div>
 	)
+}
+
+const ChipList = ({query, list, title}: {query: any, list: any, title: string}) => {
+	const { t } = useTranslation('common');
+	const router = useRouter()
+	const dispatch = useDispatch()
+
+	const handleClick = (route: string) => {
+		router.push(route)
+		dispatch(closeSearchDrawer())
+	}
+
+	return (<>
+		{list.length > 0 && (
+			<>
+				<Typography variant="h5" sx={{textTransform: 'uppercase', marginTop: '40px'}}>
+					{t(title)}
+				</Typography>
+				<Box sx={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '10px'}}>
+					{list.map((category: any) => category && (
+						<Chip
+							key={category.slug}
+							tag={{name: category.name}}
+							onClick={() => handleClick(`/${category.parent}/${category.slug}`)}
+						/>
+					))}
+				</Box>
+			</>
+		)}
+		{query.status === "success" && (
+			<InfiniteScroll
+				style={{
+					width: '100%',
+					overflow: 'hidden'
+				}}
+				dataLength={query.data?.pages.length * 24}
+				next={query.fetchNextPage}
+				hasMore={query.hasNextPage || false}
+				loader={<div  />}
+				scrollableTarget="html"
+			>
+				{query.data?.pages[0]?.length > 0 && (
+					<>
+						{list.length === 0 && (
+							<Typography variant="h5" sx={{textTransform: 'uppercase', marginTop: '40px'}}>
+								{t(title)}
+							</Typography>
+						)}
+						<Box sx={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '20px', marginTop: '20px'}}>
+							{query.data?.pages.map((products: any) => products.map((product: BaseProduct) => (
+								<Chip
+									avatar={product.image}
+									key={product.slug}
+									tag={{name: `<b>${product.name}</b><br />${product.categories[0].name}`}}
+									onClick={() => handleClick(`/${PRODUCT_SUB_PATH}/${product.slug}`)}
+									size="medium"
+									sxMobile={{
+										margin: '0 auto',
+										'& .MuiChip-avatar': {
+											width: '100px',
+											height: '50px'
+										}
+									}}
+								/>
+							)))}
+						</Box>
+					</>
+				)}
+			</InfiniteScroll>
+		)}
+	</>)
 }
 
 export default SearchLayout

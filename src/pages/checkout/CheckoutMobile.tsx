@@ -2,7 +2,7 @@ import AddressForm from "./AddressForm";
 import Recap from "./Recap";
 import Payment from "./Payment";
 import {AnimatePresence, motion} from "framer-motion";
-import {Button, Container, Grid} from "@mui/material";
+import {Box, Button, Container, Grid2 as Grid} from "@mui/material";
 import * as React from "react";
 import PriceRecap from "./PriceRecap";
 import {useTranslation} from "next-i18next";
@@ -15,21 +15,19 @@ import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
 import {FormFields, Step as StepType} from "./CheckoutGrid";
 import {BaseSyntheticEvent} from "react";
 import {useFormContext} from "react-hook-form";
+import PaymentButtons from "../../components/PaymentButtons";
 
-const STEP_MAP = ['ADDRESS', 'INVOICE', 'RECAP', 'PAYMENT'] as const
+const STEP_MAP = ['ADDRESS', 'INVOICE', 'PAYMENT'] as const
 
 export type CheckoutMobile = CheckoutDesktopProps
-const CheckoutMobile = ({
-	countries,
-	updateOrder,
-}: CheckoutMobile) => {
+const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
 	const { cart, loading } = useSelector((state: RootState) => state.cart);
-	const { watch, setValue } = useFormContext<FormFields>()
+	const { watch } = useFormContext<FormFields>()
 	const {step: checkoutStep, addressTab: tab} = watch()
 	const mobileStep = STEP_MAP.indexOf(checkoutStep)
 	const [focus, setFocus] = React.useState(false)
 	const checkoutComponent = [
-		<AddressForm key="address" countries={countries} setFocus={setFocus} />,
+		<AddressForm key="address" setFocus={setFocus} />,
 		<InvoiceForm key="invoice" />,
 		<Recap key="recap" updateOrder={updateOrder} />,
 		<Payment key="payment" />
@@ -81,12 +79,18 @@ const CheckoutMobile = ({
 			{!focus && (
 				<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 101}}>
 					<PriceRecap isLoading={loading}/>
-					<Grid container sx={{marginTop: '5px'}} spacing={2}>
-						{mobileStep > 0 && (
-							<StepButton isPrev {...stepButtonProps} />
-						)}
-						<StepButton {...stepButtonProps} />
-					</Grid>
+					{mobileStep === 4 ? (
+						<Box sx={{marginTop: '5px'}}>
+							<PaymentButtons />
+						</Box>
+						) : (
+						<Grid container sx={{marginTop: '5px'}} spacing={2}>
+							{mobileStep > 0 && (
+								<StepButton isPrev {...stepButtonProps} />
+							)}
+							<StepButton {...stepButtonProps} />
+						</Grid>
+					)}
 				</Container>
 			)}
 		</div>
@@ -120,7 +124,7 @@ const StepButton = ({isPrev, updateOrder}: StepButtonProps) => {
 		{ startIcon: <ArrowBackIos /> } :
 		{ endIcon: <ArrowForwardIos /> }
 	return (
-		<Grid item xs={mobileStep === 0 ? 12 : 6}>
+		<Grid size={{xs: mobileStep === 0 ? 12 : 6}}>
 			<Button fullWidth onClick={handleClick} {...iconProps}>
 				{t(`checkout.${labelMap[targetStep]}`)}
 			</Button>

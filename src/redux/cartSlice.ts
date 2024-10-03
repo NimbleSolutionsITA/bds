@@ -3,20 +3,27 @@ import { Cart } from "../types/cart-type";
 import {WORDPRESS_SITE_URL} from "../utils/endpoints";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
 import {gtagAddToCart} from "../utils/utils";
+import ApplePayMerchantCapability = ApplePayJS.ApplePayMerchantCapability;
+import {PayPalApplePayConfig, PayPalGooglePayConfig} from "../components/PayPalProvider";
+import CallbackIntent = google.payments.api.CallbackIntent;
 
 type CoCartError = {error: string, message: string}
 
-type CartState = {
+export type CartState = {
 	error: CoCartError|null
 	cart?: Cart
 	cartDrawerOpen: boolean
 	loading: boolean
+	initLoading: boolean
 	customerNote: string
+	applePayConfig?: PayPalApplePayConfig
+	googlePayConfig?: PayPalGooglePayConfig
 }
 
 const initialState: CartState = {
 	error: null,
 	loading: false,
+	initLoading: false,
 	cartDrawerOpen: false,
 	customerNote: ""
 }
@@ -45,7 +52,10 @@ export type AddItemToCartPayload = {
 	id: string
 	quantity: string
 	variation?: { [key: string]: string }
-	item_data?: object
+	item_data?: {
+		category: string,
+		priceEU: string
+	}
 }
 
 export const addCartItem = createAsyncThunk('cart/addItem', async (payload: AddItemToCartPayload, thunkAPI) => {
@@ -126,7 +136,8 @@ type UpdateCartCustomer = {
 
 export const updateCartCustomer = createAsyncThunk('cart/updateCartCustomer', async (payload: UpdateCartCustomer, thunkAPI) => {
 	try {
-		return await callCartData('/v2/cart/update', "POST", payload, {namespace: 'update-customer'});
+		await callCartData('/v2/cart/update', "POST", payload, {namespace: 'update-customer'});
+		return await callCartData('/v2/cart', "GET")
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
 			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
@@ -224,7 +235,13 @@ export const cartSlice = createSlice({
 		},
 		setCustomerNote: (state, action) => {
 			state.customerNote = action.payload
-		}
+		},
+		setApplePayConfig: (state, action) => {
+			state.applePayConfig = action.payload
+		},
+		setGooglePayConfig: (state, action) => {
+			state.googlePayConfig = action.payload
+		},
 	},
 	extraReducers: (builder) => {
 		builder.addCase(fetchCartData.pending, (state) => {
@@ -317,15 +334,15 @@ export const cartSlice = createSlice({
 			state.loading = false;
 		});
 		builder.addCase(initCart.pending, (state) => {
-			state.loading = true;
+			state.initLoading = true;
 		});
 		builder.addCase(initCart.fulfilled, (state, action) => {
 			state.cart = action.payload
-			state.loading = false;
+			state.initLoading = false;
 		});
 		builder.addCase(initCart.rejected, (state, {payload}) => {
 			state.error = payload as CoCartError
-			state.loading = false;
+			state.initLoading = false;
 		});
 		builder.addCase(destroyCart.pending, (state) => {
 			state.loading = true;
@@ -347,7 +364,9 @@ export const {
 	openCartDrawer,
 	closeCartDrawer,
 	resetCartError,
-	setCustomerNote
+	setCustomerNote,
+	setApplePayConfig,
+	setGooglePayConfig
 } = cartSlice.actions
 
 export default cartSlice.reducer
@@ -356,42 +375,43 @@ const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payl
 	// get cart key from local storage
 	const cartKey = localStorage.getItem('cart_key') ?? undefined;
 
-	const getAxiosParams = (cartKey?: string):  AxiosRequestConfig<{}> => {
-		const p = {
-			...(cartKey ? { cart_key: cartKey } : {}),
-			...params
-		}
-		const urlParams = new URLSearchParams(p);
-		console.log('urlParams', urlParams.toString())
-		return {
-			method: method,
-			url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (Object.keys(p).length > 0 ? '?' + urlParams.toString() : ''),
-			withCredentials: true,
-			headers: {
-				Accept: 'application/json',
-				...(payload ? {'Content-Type': 'application/json'} : {})
-			},
-			...(payload ? {data: payload} : {}),
-			responseEncoding: 'utf8',
-			responseType: 'json'
-		}
-	}
-
 	let response: AxiosResponse<Cart>
 
 	try {
-		response = await axios(getAxiosParams(cartKey));
+		response = await axios(getCoCartAxiosParams(url, method, params, payload, cartKey));
 		if (!!response.data.cart_key) {
 			localStorage.setItem('cart_key', response.data.cart_key as string)
 		}
 	} catch (error) {
 		console.log('cart error', error)
-		response = await axios(getAxiosParams());
+		response = await axios(getCoCartAxiosParams(url, method, params, payload));
 		localStorage.removeItem('cart_key');
 	}
 
 	return response.data;
 };
+
+export const getCoCartAxiosParams = (url: string, method: 'GET' | 'POST' | 'DELETE', params?: {[key: string]: any,}, payload?: {[key: string]: any}, cartKey?: string, guestMode = false):  AxiosRequestConfig<{}> => {
+	const key = localStorage.getItem('cocart_key');
+	const auth = (!guestMode && key) ? {username: atob(key).split(':')[0], password: atob(key).split(':')[1]} : undefined;
+	const p = {
+		...((!auth && cartKey) ? { cart_key: cartKey } : {}),
+		...params
+	}
+	const urlParams = new URLSearchParams(p);
+	return {
+		method: method,
+		url: WORDPRESS_SITE_URL + '/wp-json/cocart' + url + (Object.keys(p).length > 0 ? '?' + urlParams.toString() : ''),
+		headers: {
+			Accept: 'application/json',
+			...(payload ? {'Content-Type': 'application/json'} : {})
+		},
+		...(payload ? {data: payload} : {}),
+		responseEncoding: 'utf8',
+		responseType: 'json',
+		auth
+	}
+}
 
 const initCartData = async () => {
 	let cart = await callCartData('/v2/cart', "GET")
@@ -400,6 +420,10 @@ const initCartData = async () => {
 			`/v2/cart/coupons`,
 			"DELETE",
 		);
+		cart = await callCartData('/v2/cart', "GET")
+	}
+	if ((cart.item_count ?? 0) > 0 && !cart.shipping?.packages?.default?.chosen_method) {
+		await callCartData('/v2/cart/update', "POST", { country: "IT" }, {namespace: 'update-customer'});
 		cart = await callCartData('/v2/cart', "GET")
 	}
 	return cart

@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
-import {BillingData, Country, InvoiceData, LoggedCustomer, ShippingClass, ShippingData} from "../../types/woocommerce";
+import {BillingData, InvoiceData, LoggedCustomer, ShippingData} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
 import CheckoutDesktop from "./CheckoutDesktop";
 import {useMediaQuery, useTheme} from "@mui/material";
@@ -10,13 +10,13 @@ import {updateCartCustomer} from "../../redux/cartSlice";
 import CheckoutMobile from "./CheckoutMobile";
 import {PaymentErrorDialog} from "./Payment";
 import useAuth from "../../utils/useAuth";
-import {BillingAddress, ShippingAddress} from "../../types/cart-type";
+import {BillingAddress, Customer, ShippingAddress} from "../../types/cart-type";
+import {PayPalCheckoutProvider} from "../../components/PayPalCheckoutProvider";
+import {ShippingData as WooShippingData} from "../../redux/layoutSlice";
+import {getCustomerMetaData, getInvoice} from "../../utils/utils";
 
 export type CheckoutGridProps = {
-	shipping: {
-		classes: ShippingClass[],
-		countries: Country[]
-	}
+	shipping: WooShippingData
 }
 
 export type Inputs = {
@@ -27,43 +27,44 @@ export type Inputs = {
 	customerNote: string
 };
 
+export type PaymentMethod = "applepay" | "googlepay" | "card" | "paypal"
+
 export type CheckoutState = {
 	step: Step,
 	addressTab: number
 	paymentError?: string
+	paymentMethod: PaymentMethod
 }
+
+export const PAYMENT_METHODS = ['card', 'applepay', 'googlepay', 'paypal'] as PaymentMethod[]
 
 export type FormFields = CheckoutState & Inputs
 
-export type Step = 'ADDRESS'|'INVOICE'|'RECAP'|'PAYMENT'
+export type Step = 'ADDRESS'|'INVOICE'|'PAYMENT'
 
 const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 	const { cart, customerNote } = useSelector((state: RootState) => state.cart);
 	const { customer: loggedCustomer, updateCustomer ,loggedIn } = useAuth();
 	const dispatch = useDispatch<AppDispatch>()
+	const defaultValues = {
+		has_shipping: getCustomerMetaData('has_shipping', false, loggedCustomer),
+		billing: Object.keys(cart?.customer.billing_address ?? {}).reduce((acc, key) => {
+			const newKey = key.substring(8) as keyof BillingData
+			return {...acc, [newKey]: cart?.customer.billing_address[key as keyof BillingAddress]};
+		}, {}),
+		shipping: Object.keys(cart?.customer.shipping_address ?? {}).reduce((acc, key) => {
+			const newKey = key.substring(9) as keyof ShippingData
+			return {...acc, [newKey]: cart?.customer.shipping_address[key as keyof ShippingAddress]};
+		}, {}),
+		invoice: getInvoice(loggedCustomer),
+		customerNote,
+		addressTab: 0,
+		paymentMethod: 'card',
+		step: "ADDRESS"
+ 	} as FormFields
 	const methods = useForm<FormFields>({
-		defaultValues: {
-			has_shipping: getCustomerMetaData('has_shipping', false, loggedCustomer),
-			billing: Object.keys(cart?.customer.billing_address ?? {}).reduce((acc, key) => {
-				const newKey = key.substring(8) as keyof BillingData
-				return {...acc, [newKey]: cart?.customer.billing_address[key as keyof BillingAddress]};
-			}, {}),
-			shipping: Object.keys(cart?.customer.shipping_address ?? {}).reduce((acc, key) => {
-				const newKey = key.substring(9) as keyof ShippingData
-				return {...acc, [newKey]: cart?.customer.shipping_address[key as keyof ShippingAddress]};
-			}, {}),
-			invoice: {
-				vat: getCustomerMetaData('vat', '', loggedCustomer),
-				tax: getCustomerMetaData('tax', '', loggedCustomer),
-				sdi: getCustomerMetaData('sdi',  '', loggedCustomer),
-				billingChoice: getCustomerMetaData('billing_choice', '', loggedCustomer),
-				invoiceType: getCustomerMetaData('invoice_type', '', loggedCustomer)
-			},
-			customerNote,
-			step: 'ADDRESS',
-			addressTab: 0
-		},
-		reValidateMode: 'onSubmit'
+		defaultValues: Object.assign(defaultValues, { step: getDefaultStep(defaultValues) }),
+		reValidateMode: 'onSubmit',
 	});
 	const { handleSubmit , setValue } = methods
 	const theme = useTheme();
@@ -113,25 +114,29 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 
 	const updateOrder = (onValidStep: Step) => handleSubmit(onValid(onValidStep), onInvalid);
 
-	const checkoutProps = {
-		countries: shipping.countries,
-		updateOrder,
-	}
-
 	return (
 		<FormProvider {...methods}>
-			{isMobile ? (
-				<CheckoutMobile {...checkoutProps} />
+			<PayPalCheckoutProvider shipping={shipping}>
+				{isMobile ? (
+					<CheckoutMobile updateOrder={updateOrder} />
 				) : (
-				<CheckoutDesktop {...checkoutProps} />
-			)}
-			<PaymentErrorDialog error={paymentError} setError={setPaymentError} />
+					<CheckoutDesktop updateOrder={updateOrder} />
+				)}
+				<PaymentErrorDialog error={paymentError} setError={setPaymentError} />
+			</PayPalCheckoutProvider>
 		</FormProvider>
 	)
 }
 
-const getCustomerMetaData = (key: string, fallback: any, customer?: LoggedCustomer) => {
-	return customer?.meta_data.find(({key: k}) => k === key)?.value ?? fallback
+const getDefaultStep = (defaultValues: FormFields): Step => {
+	const shippingOk = defaultValues.has_shipping ? defaultValues.shipping?.first_name && defaultValues.shipping?.last_name && defaultValues.shipping?.address_1 && defaultValues.shipping?.city && defaultValues.shipping?.postcode && defaultValues.shipping?.country : true
+	const billingOk = defaultValues.billing.first_name && defaultValues.billing.last_name && defaultValues.billing.address_1 && defaultValues.billing.city && defaultValues.billing.postcode && defaultValues.billing.country
+	const invoiceOk = defaultValues.invoice.billingChoice && defaultValues.invoice.invoiceType
+	if (shippingOk && billingOk && invoiceOk)
+		return "PAYMENT"
+	if (shippingOk && billingOk)
+		return "INVOICE"
+	return "ADDRESS"
 }
 
 export default CheckoutGrid;

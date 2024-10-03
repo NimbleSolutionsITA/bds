@@ -41,6 +41,32 @@ export default async function handler(
 	}
 }
 
+export const getAllCategoriesIds = async (): Promise<WooProductCategory[]> => {
+	let page = 1
+	let { data } = await api.get(
+		'products/categories',
+		{
+			per_page: 99,
+			page,
+			parent: 0,
+		}
+	)
+	let result = data
+	while (data.length === 99) {
+		page++
+		let { data } = await api.get(
+			'products/categories',
+			{
+				per_page: 99,
+				page,
+				parent: 0,
+			}
+		)
+		result = [...data, ...result]
+	}
+	return result
+}
+
 export const getProductCategories = async (
 	lang?: string | string[] | undefined,
 	parent?: string | string[] | undefined
@@ -70,4 +96,22 @@ export const getProductCategories = async (
 		result = [...data, ...result]
 	}
 	return result
+}
+
+export const getProductCategory = async (
+	lang?: string | string[] | undefined,
+	slug?: string | string[] | undefined
+): Promise<WooProductCategory> => {
+	let { data } = await api.get(
+		'products/categories',
+		{
+			per_page: 1,
+			slug,
+			lang
+		}
+	)
+	if (data.length === 0) {
+		throw new Error("Category not found")
+	}
+	return data[0]
 }

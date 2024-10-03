@@ -1,19 +1,20 @@
 import {GooglePlaces} from "../../pages/api/google-places";
-import {ShippingClass, WooProductCategory} from "./woocommerce";
+import {Country, ShippingClass, WooProductCategory} from "./woocommerce";
 
 export type MenuItem = {
 	id: number
+	slug: string,
 	title: string
 	url: string
+	parent?: number | string
 	child_items: MenuItem[] | null
 	groups?: string[] | null
-	parent?: string | null
 }
 
 export type Menus = {
-	leftMenu: MenuItem[],
-	rightMenu: MenuItem[],
-	mobileMenu: MenuItem[],
+	left: MenuItem[],
+	right: MenuItem[],
+	mobile: MenuItem[],
 	privacy: MenuItem[],
 }
 
@@ -31,16 +32,7 @@ export type BaseLayoutProps = {
 	googlePlaces: GooglePlaces,
 	breadcrumbs?: BreadCrumb[]
 	shipping: ShippingClass[]
-	categories: {
-		designers: WooProductCategory[],
-		fragrances: {
-			profumum: WooProductCategory[],
-			liquides: WooProductCategory[],
-			maison: WooProductCategory[],
-			profumumMain: WooProductCategory[],
-			liquidesMain: WooProductCategory[],
-			maisonMain: WooProductCategory[],
-		}
-	}
+	countries: Country[]
+	categories: WooProductCategory[]
 	seo: string
 }

@@ -13,8 +13,8 @@ import {useTranslation} from "next-i18next";
 import {LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../utils/endpoints";
 
 type AppBarProps = {
-    leftMenu: Menus['leftMenu'],
-    rightMenu: Menus['rightMenu']
+    leftMenu: MenuItem[],
+    rightMenu: MenuItem[]
 }
 
 export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
@@ -57,7 +57,7 @@ export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
                     display="flex"
                     alignItems="center"
                 >
-                    {rightMenu.map(item => <NavButton key={item.id} item={item} isRight />)}
+                    {rightMenu.map( item => <NavButton key={item.id} item={item} isRight />)}
                 </Box>
             </Container>
         </MuiAppBar>
@@ -165,7 +165,7 @@ const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) =>
             {groups.map((group) => (
                 <div key={group} style={{display: 'flex', flexDirection: 'column', marginRight: '20px'}}>
                     <Box
-                        component={isFragrances(group) ? Link : 'div'}
+                        component={['A-J', 'K-Z'].includes(group) ? 'div' : Link}
                         style={{
                             fontSize: '14px',
                             fontWeight: 500,
@@ -175,7 +175,7 @@ const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) =>
                             textTransform: 'uppercase',
                             textDecoration: 'none'
                         }}
-                        href={isFragrances(group) ? '/'+getRelativePath(group) : undefined}
+                        href={['A-J', 'K-Z'].includes(group) ? undefined : '/'+getRelativePath(group)}
                     >
                         {t(group)}
                     </Box>
@@ -187,8 +187,6 @@ const GroupedItems = ({items, groups}: {items: MenuItem[], groups: string[]}) =>
         </div>
     )
 }
-
-const isFragrances = (slug: string) => [LIQUIDES_IMAGINAIRES_SUB_PATH , PROFUMUM_ROMA_SUB_PATH].includes(slug)
 
 const SubItem = ({subItem}: {subItem: MenuItem}) => (
     <motion.div variants={itemVariants} key={subItem.id}>

@@ -6,6 +6,7 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import {LoggedCustomer} from "../../types/woocommerce";
 import InvoiceForm from "../../components/InvoiceForm";
+import {getInvoice} from "../../utils/utils";
 
 export default function InvoiceFormTab() {
 	const { customer, updateCustomer, isUpdating: loading } = useAuth();
@@ -28,13 +29,7 @@ function Form({customer, onValid, loading}: {customer: LoggedCustomer, onValid: 
 	const profileForm = useForm(
 		{
 			defaultValues: {
-				invoice: {
-					vat: getCustomerMetaData('vat', '', customer),
-					tax: getCustomerMetaData('tax', '', customer),
-					sdi: getCustomerMetaData('sdi',   '', customer),
-					billingChoice: getCustomerMetaData('billing_choice', 'invoice', customer),
-					invoiceType: getCustomerMetaData('invoice_type', 'private', customer)
-				}
+				invoice: getInvoice(customer)
 			}
 		}
 	)
@@ -52,8 +47,4 @@ function Form({customer, onValid, loading}: {customer: LoggedCustomer, onValid: 
 			</Button>
 		</Container>
 	);
-}
-
-const getCustomerMetaData = (key: string, fallback: any, customer?: LoggedCustomer) => {
-	return customer?.meta_data.find(({key: k}) => k === key)?.value ?? fallback
 }

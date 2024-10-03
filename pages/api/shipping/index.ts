@@ -2,13 +2,11 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {Country, ShippingClass, ShippingZone} from "../../../src/types/woocommerce";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
+import {ShippingData} from "../../../src/redux/layoutSlice";
 
 type Data = {
 	success: boolean
-	shipping?: {
-		classes: ShippingClass[],
-		countries: Country[]
-	}
+	shipping?: ShippingData
 	error?: string
 }
 

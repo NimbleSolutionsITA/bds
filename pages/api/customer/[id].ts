@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import {WooOrder} from "../../../src/types/woocommerce";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 
 export type CreateOrderResponse = {

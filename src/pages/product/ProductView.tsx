@@ -1,5 +1,5 @@
 import {
-	AttributeType,
+	AttributeType, Country,
 	ImageDetailed,
 	Product,
 	ProductCategory,
@@ -31,11 +31,13 @@ import {DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PAT
 import SaveMoney from "../../icons/SaveMoney";
 import FastShipping from "../../icons/FastShipping";
 import EuShipping from "../../icons/EuShipping";
+import AppleGooglePayButtons from "../../components/AppleGooglePayButtons";
 
 type ProductViewProps = {
 	product: Product
 	category?: ProductCategory
 	shipping: ShippingClass[]
+	countries: Country[]
 }
 
 const removeDuplicates = (array: ImageDetailed[]) => {
@@ -49,7 +51,7 @@ const removeDuplicates = (array: ImageDetailed[]) => {
 	})
 }
 
-const ProductView = ({product, category, shipping}: ProductViewProps) => {
+const ProductView = ({product, category, shipping, countries}: ProductViewProps) => {
 	const { cart: { customer: { shipping_address: { shipping_country }} } = initialCart } = useSelector((state: RootState) => state.cart);
 	const isEU = !!shipping_country && shipping_country !== 'IT'
 	const init = getDefaultProduct(product);
@@ -80,33 +82,27 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 	}
 
 	const cartItem = {
-		product_id: product.id,
-		variation_id: product.type === 'variable' ? currentProduct.id : undefined,
-		name: product.name,
-		image: currentProduct.image.url ?? product.image.url,
 		price: parseFloat(currentProduct.price as string),
 		priceEU: currentProduct.price_eu ? parseFloat(currentProduct.price_eu) : undefined,
-		qty: 1,
 		stock_quantity: Number(currentProduct.stock_quantity),
-		attributes: currentProduct.attributes ?? [],
-		category: category?.name ?? '',
-		slug: product.slug,
+	}
+
+	const addCartItemPayload = {
+		id: currentProduct.id.toString(),
+		quantity: '1',
+		variation: currentProduct.attributes?.reduce((result: { [key: string]: string }, attribute) => {
+			result[`attribute_${attribute.id}`] = attribute.option;
+			return result;
+		}, {}),
+		item_data: {
+			category: category?.name ?? '',
+			priceEU: currentProduct.price_eu ?? '',
+		}
 	}
 
 	const handleAddToCart = () => {
 		if (currentProduct.stock_status === 'instock') {
-			dispatch(addCartItem({
-				id: currentProduct.id.toString(),
-				quantity: '1',
-				variation: currentProduct.attributes?.reduce((result: { [key: string]: string }, attribute) => {
-					result[`attribute_${attribute.id}`] = attribute.option;
-					return result;
-				}, {}),
-				item_data: {
-					category: category?.name ?? '',
-					priceEU: currentProduct.price_eu ?? '',
-				}
-			}))
+			dispatch(addCartItem(addCartItemPayload))
 		}
 	}
 
@@ -253,21 +249,22 @@ const ProductView = ({product, category, shipping}: ProductViewProps) => {
 					)}
 					<div style={{display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap'}}>
 						{currentProduct.stock_status === 'instock'  && (
-							<Button
-								onClick={handleAddToCart}
-								disabled={cartQuantity >= (currentProduct.stock_quantity ?? 0)}
-								sx={{
-									width: '250px',
-									height: '48px'
-								}}
-							>
-								{t('cart.add')}
-							</Button>
-						)}
-						{!cartDrawerOpen && cartItem.stock_quantity > 0 && cartItem.price > 0 && (
-							<div style={{width: '250px', height: '48px'}}>
-
-							</div>
+							<>
+								<Button
+									onClick={handleAddToCart}
+									disabled={cartQuantity >= (currentProduct.stock_quantity ?? 0)}
+									sx={{
+										width: '250px',
+										height: '48px'
+									}}
+								>
+									{t('cart.add')}
+								</Button>
+								<AppleGooglePayButtons
+									item={addCartItemPayload}
+									shipping={{classes: shipping, countries}}
+								/>
+							</>
 						)}
 					</div>
 					<div style={{marginTop: '40px', lineHeight: 1}}>

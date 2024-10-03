@@ -116,6 +116,7 @@ export type WooProductCategory = BaseCategory & Category & {
 	image: Image|null;
 	menu_order: number;
 	link: string;
+	child_items?: WooProductCategory[]
 }
 
 export type BaseAttributes = {
@@ -132,7 +133,7 @@ export type BaseCategory = {
 	id: number;
 	name: string;
 	slug: string;
-	parent?: number;
+	parent?: number | string;
 }
 
 export type BaseProduct = {

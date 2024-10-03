@@ -1,30 +1,14 @@
 import Link from "next/link";
-import { useMutation, gql } from "@apollo/client";
-import { GET_USER } from "../../utils/useAuth";
+import useAuth from "../../utils/useAuth";
 import {TextField, Typography, Button, CircularProgress} from "@mui/material";
 import {useDispatch} from "react-redux";
 import {closeLogInDrawer, openForgotPasswordDrawer, openSignUpDrawer} from "../../redux/layoutSlice";
 import {useTranslation} from "next-i18next";
 import {useRouter} from "next/router";
 
-const LOG_IN = gql`
-    mutation logIn($login: String!, $password: String!) {
-        loginWithCookies(input: {
-            login: $login
-            password: $password
-        }) {
-            status
-        }
-    }
-`;
-
 export default function LogInForm() {
 	const { t } = useTranslation();
-	const [logIn, { loading, error }] = useMutation(LOG_IN, {
-		refetchQueries: [
-			{ query: GET_USER }
-		],
-	});
+	const { logIn, logInError: error, logInLoading: loading } = useAuth();
 	const errorMessage = error?.message || '';
 	const isEmailValid =
 		!errorMessage.includes('empty_email') &&
@@ -40,10 +24,8 @@ export default function LogInForm() {
 		const data = new FormData(event.currentTarget);
 		const { email, password } = Object.fromEntries(data);
 		logIn({
-			variables: {
-				login: email,
-				password,
-			}
+			username: email,
+			password,
 		}).catch(error => {
 			console.error(error);
 		});
@@ -97,7 +79,7 @@ export default function LogInForm() {
 			{isCheckout ? (
 				<p>
 					{t('log-in.guest.title')}{' '}
-					<Button variant="text" onClick={() => {
+					<Button disabled={loading} variant="text" onClick={() => {
 						dispatch(closeLogInDrawer())
 					}}>
 						{t('log-in.guest.button')}
@@ -106,7 +88,7 @@ export default function LogInForm() {
 			) : (
 				<p>
 					{t('log-in.register')}{' '}
-					<Button variant="text" onClick={() => {
+					<Button variant="text" disabled={loading} onClick={() => {
 						dispatch(closeLogInDrawer())
 						dispatch(openSignUpDrawer())
 					}}>

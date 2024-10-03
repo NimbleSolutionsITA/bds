@@ -7,18 +7,16 @@ import CartItem from "./CartItem";
 import Link from "next/link";
 import PriceFormat from "../../components/PriceFormat";
 import React from "react";
-import {Category, ShippingClass} from "../../types/woocommerce";
+import {ShippingClass, WooProductCategory} from "../../types/woocommerce";
 import {BaseLayoutProps} from "../../types/settings";
 import Chip from "../../components/Chip";
 import {useRouter} from "next/router";
 import {useTranslation} from "next-i18next";
 import {
 	CHECKOUT_SUB_PATH,
-	DESIGNERS_SUB_PATH,
-	LIQUIDES_IMAGINAIRES_SUB_PATH,
-	PROFUMUM_ROMA_SUB_PATH
 } from "../../utils/endpoints";
 import {Item} from "../../types/cart-type";
+import {EYEWEAR_CATEGORY, FRAGRANCES_CATEGORY} from "../../utils/utils";
 
 type CartDrawerProps = {
 	shipping: ShippingClass[]
@@ -81,7 +79,7 @@ const CartDrawer = ({categories}: CartDrawerProps) => {
 								<PriceFormat value={getSubtotal(cart.items, isEU)} decimalScale={0} />
 							</Typography>
 						</div>
-						<Button component={Link} href={`/${CHECKOUT_SUB_PATH}`} disabled={loading}>
+						<Button component={Link} onClick={() => dispatch(closeCartDrawer())} href={`/${CHECKOUT_SUB_PATH}`} disabled={loading}>
 							{t('cart.cta')}
 						</Button>
 					</>
@@ -93,9 +91,7 @@ const CartDrawer = ({categories}: CartDrawerProps) => {
 						<Typography sx={{textAlign: 'center'}}>
 							{t('cart.empty.subtitle')}
 						</Typography>
-						<CategoryChips title="Designers" categories={categories.designers} path={`/${DESIGNERS_SUB_PATH}`} />
-						<CategoryChips title="Liquides Imaginaries" categories={categories.fragrances.liquides} path={`/${LIQUIDES_IMAGINAIRES_SUB_PATH}`} />
-						<CategoryChips title="Profumum Roma" categories={categories.fragrances.profumum} path={`/${PROFUMUM_ROMA_SUB_PATH}`} />
+						{categories.filter(c => [FRAGRANCES_CATEGORY.it, FRAGRANCES_CATEGORY.en, EYEWEAR_CATEGORY.it, EYEWEAR_CATEGORY.en].includes(c.id)).map((category) => <CategoryChips key={category.slug} category={category} />)}
 					</>
 				)}
 			</Container>
@@ -118,25 +114,23 @@ const getSubtotal = (items: Item[], isEU: boolean) => {
 }
 
 type CategoryChipsProps = {
-	categories: Category[]
-	title: string
-	path: string
+	category: WooProductCategory
 }
 
-const CategoryChips = ({categories, title, path}: CategoryChipsProps) => {
+const CategoryChips = ({category}: CategoryChipsProps) => {
 	const router = useRouter()
 	const dispatch = useDispatch()
 	return (
 		<div style={{marginTop: '40px', textAlign: 'center'}}>
-			<Typography variant="h4">{title}</Typography>
+			<Typography variant="h4">{category.name}</Typography>
 			<div style={{display: 'flex', flexWrap: 'wrap', gap: '10px', margin: '20px 0', justifyContent: 'center'}}>
-				{categories.map((category) => (
+				{category.child_items?.map((prodCategory) => (
 					<Chip
-						key={category.slug}
-						tag={{name: category.name}}
+						key={prodCategory.slug}
+						tag={{name: prodCategory.name}}
 						onClick={() => {
 							dispatch(closeCartDrawer())
-							router.push(`${path}/${category.slug}`)
+							router.push(`${category.slug}/${prodCategory.slug}`)
 						}}
 					/>
 				))}

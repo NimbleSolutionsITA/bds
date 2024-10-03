@@ -1,19 +1,20 @@
-import Layout from "../src/layout/Layout";
-import {getLayoutProps, getPageProps} from "../src/utils/wordpress_api";
-import {PageBaseProps} from "../src/types/settings";
+import Layout from "../../src/layout/Layout";
+import {getLayoutProps, getPageProps} from "../../src/utils/wordpress_api";
+import {PageBaseProps} from "../../src/types/settings";
 import dynamic from "next/dynamic";
-import {DESIGNERS_SUB_PATH} from "../src/utils/endpoints";
+import {DESIGNERS_CATEGORY, DESIGNERS_SUB_PATH} from "../../src/utils/endpoints";
 
-const DesignersList = dynamic(() => import("../src/pages/designers/DesignersList"));
+const DesignersList = dynamic(() => import("../../src/pages/designers/DesignersList"));
 
 export type DesignersProps = PageBaseProps & {
 
 }
 
-export default function EyewearDesigners({ layout }: DesignersProps) {
+export default function Index({ layout }: DesignersProps) {
+    const designers = layout.categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items
     return (
       <Layout layout={layout}>
-          <DesignersList designers={layout.categories.designers} />
+          {designers && <DesignersList designers={designers} />}
       </Layout>
     );
 }
@@ -29,7 +30,6 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     return {
         props: {
-            productCategories: layoutProps.categories.designers,
             layout: {
                 ...layoutProps,
                 breadcrumbs: [

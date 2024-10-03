@@ -18,8 +18,8 @@ export const LIQUIDES_IMAGINAIRES_SUB_PATH = 'liquides-imaginaires'
 export const MAISON_GABRIELLA_CHIEFFO_SUB_PATH = 'maison-gabriella-chieffo'
 export const OUR_PRODUCTION_SUB_PATH = 'nostra-produzione'
 export const PRODUCT_SUB_PATH = 'products'
-export const SUNGLASSES_SUB_PATH = 'occhiali-da-sole'
-export const OPTICAL_SUB_PATH = 'occhiali-da-vista'
 
 export const INSTAGRAM_LINK = 'https://www.instagram.com/bottegadisguardi/'
 export const FACEBOOK_LINK = 'https://www.facebook.com/bottegadisguardi'
+export const DESIGNERS_CATEGORY = "eyewear"
+export const FRAGRANCES_CATEGORY = "fragrances"

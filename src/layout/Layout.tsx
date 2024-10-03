@@ -30,7 +30,7 @@ type LayoutProps = {
 }
 
 export default function Layout({children, layout: {
-    seo, breadcrumbs, googlePlaces, menus: {leftMenu, rightMenu, mobileMenu}, shipping, categories
+    seo, breadcrumbs, googlePlaces, menus, shipping, categories
 }}: LayoutProps) {
     const {locale} = useRouter()
     const dispatch = useDispatch<AppDispatch>()
@@ -39,7 +39,6 @@ export default function Layout({children, layout: {
     const { cart} = useSelector((state: RootState) => state.cart);
 
     useEffect(() => {
-        // dispatch(initCart());
         const firstAccess = Cookies.get('is_first_access');
         if (!firstAccess) {
             // 'firstAccess' cookie doesn't exist. Setting the cookie and opening the CookiesDrawer.
@@ -51,19 +50,17 @@ export default function Layout({children, layout: {
     return (
         <>
             <Head>
-                {/* Set HTML language attribute */}
+                 Set HTML language attribute
                 <meta httpEquiv="content-language" content={locale} />
                 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
                 {seo && parse(seo)}
             </Head>
 
             {mdUp ?
-                <NavBar leftMenu={leftMenu} rightMenu={rightMenu} breadcrumbs={breadcrumbs} /> : (
-                    <>
-                        <NavBarMobile mobileMenu={mobileMenu} breadcrumbs={breadcrumbs} categories={categories} />
-                        <ShippingBannerMobile />
-                    </>
-                )}
+                <NavBar left={menus.left} right={menus.right} categories={categories} breadcrumbs={breadcrumbs} /> : (<>
+                <NavBarMobile mobileMenu={menus.mobile} breadcrumbs={breadcrumbs} categories={categories} />
+                <ShippingBannerMobile />
+            </>)}
             <CookiesDrawer />
             <InStockNotifierDrawer />
             <NewsletterDrawer />
@@ -72,13 +69,9 @@ export default function Layout({children, layout: {
             <ForgotPasswordDrawer />
             <CartDrawer shipping={shipping} categories={categories} />
             <CartErrorModal />
-            <SearchModal
-                designers={categories.designers}
-                profumum={categories.fragrances.profumum}
-                liquides={categories.fragrances.liquides}
-            />
+            <SearchModal categories={categories} />
             {cart ? children : <Loading />}
-            <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={mobileMenu} />
+            <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={menus.mobile} />
 
             <GoogleAnalytics />
         </>

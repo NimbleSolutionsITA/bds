@@ -1,10 +1,4 @@
 import {
-	BLOG_POST_SUB_PATH, CHECKOUT_SUB_PATH,
-	DESIGNERS_SUB_PATH,
-	FRAGRANCES_SUB_PATH,
-	LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH, OPTICAL_SUB_PATH,
-	OUR_PRODUCTION_SUB_PATH,
-	PROFUMUM_ROMA_SUB_PATH, SUNGLASSES_SUB_PATH,
 	WORDPRESS_API_ENDPOINT,
 	WORDPRESS_MENUS_ENDPOINT,
 	WORDPRESS_RANK_MATH_SEO_ENDPOINT
@@ -20,13 +14,9 @@ import {
 	WPPage
 } from "../types/woocommerce";
 import {googlePlaces} from "../../pages/api/google-places";
-import {getProductCategories} from "../../pages/api/products/categories";
+import {getProductCategories, getProductCategory} from "../../pages/api/products/categories";
 import {
 	EYEWEAR_CATEGORY,
-	PROFUMUM_ROMA_CATEGORY,
-	LIQUIDES_IMAGINAIRES_CATEGORY,
-	MAISON_GABRIELLA_CHIEFFO_CATEGORY,
-	OUR_PRODUCTION_CATEGORIES,
 	sanitize,
 } from "./utils";
 import {getShippingInfo} from "../../pages/api/shipping";
@@ -36,123 +26,51 @@ import {getProductTags} from "../../pages/api/products/tags";
 import {mapArticle} from "./mappers";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
 
-type MenuCategories = {
-	designers: WooProductCategory[],
-	fragrances: {
-		profumum: WooProductCategory[],
-		liquides: WooProductCategory[],
-		maison: WooProductCategory[],
-	},
-	ourProduction: WooProductCategory[]
-}
-function mapMenuItem(categories?: MenuCategories) {
-	return function (item: any) {
-		let child_items
-		let groups = null
-		if (item.slug === DESIGNERS_SUB_PATH && categories?.designers) {
-			groups = ['A-J', 'K-Z']
-			child_items = categories.designers.map(categoryToMenu(DESIGNERS_SUB_PATH))
-		}
-		else if (item.slug === FRAGRANCES_SUB_PATH && categories?.fragrances) {
-			groups = [PROFUMUM_ROMA_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH]
-			child_items = [
-				...categories.fragrances.profumum.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(PROFUMUM_ROMA_SUB_PATH)),
-				...categories.fragrances.liquides.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(LIQUIDES_IMAGINAIRES_SUB_PATH)),
-				...categories.fragrances.maison.sort((a, b) => a.menu_order - b.menu_order).map(categoryToMenu(MAISON_GABRIELLA_CHIEFFO_SUB_PATH))
-			]
-		}
-		else if (item.slug === OUR_PRODUCTION_SUB_PATH) {
-			child_items = categories?.ourProduction.map(categoryToMenu(OUR_PRODUCTION_SUB_PATH)) ?? null
-		}
-		else {
-			child_items = item.child_items ? item.child_items.map(mapMenuItem()) : null
-		}
-		return {
-			id: item.ID,
-			title: item.title,
-			url: item.url,
-			child_items,
-			groups
-		}
-	}
-}
-function categoryToMenu(path: string) {
-	return function (category: WooProductCategory) {
-		let parent = null
-		let base = path
-		if (path === OUR_PRODUCTION_SUB_PATH) {
-			base = path
-		}
-		else if(path === DESIGNERS_SUB_PATH) {
-			const regex = /^[a-jA-J0-9\W]/;
-			parent = regex.test(category.name) ? 'A-J' : 'K-Z'
-		}
-		else {
-			parent = path
-			base = path
-		}
-		return {
-			id: category.id,
-			title: category.name,
-			url: '/' + base + '/' + category.slug,
-			child_items: null,
-			parent
-		}
-	}
-}
-
 export const getSSRTranslations = async (locale: 'it' | 'en') => {
 	return await serverSideTranslations(locale, [
 		'common',
 	])
 }
 
-export const getLayoutProps = async (locale: 'it' | 'en') => {1
+const getMenu = async (locale: 'it' | 'en', menuSlug: string) => {
+	const menu = await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/${menuSlug}${locale !== 'it' ? '-'+locale : ''}`).then(response => response.json())
+	return menu.items.map(mapMenuItems)
+}
+
+type MenuItem = {
+	id: number
+	slug: string
+	title: string
+	url: string
+	child_items: MenuItem[] | null
+}
+
+const mapMenuItems = (item: any): MenuItem => ({
+	id: item.ID,
+	slug: item.slug,
+	title: item.title,
+	url: item.url,
+	child_items: item.child_items ? item.child_items.map(mapMenuItems) : null
+})
+
+const getCategories = async (categories: WooProductCategory[]) =>
+	categories.filter(cat => cat.parent === 0).map(mapProductCategory(categories))
+
+export const getLayoutProps = async (locale: 'it' | 'en') => {
 	const ssrTranslations = await getSSRTranslations(locale)
 	const productCategories = (await getProductCategories(locale))
-	const categories = {
-		designers: productCategories.filter(cat => cat.parent === EYEWEAR_CATEGORY[locale]),
-		fragrances: {
-			profumumMain: productCategories.filter(cat => cat.id === PROFUMUM_ROMA_CATEGORY[locale]),
-			liquidesMain: productCategories.filter(cat => cat.id === LIQUIDES_IMAGINAIRES_CATEGORY[locale]),
-			maisonMain: productCategories.filter(cat => cat.id === MAISON_GABRIELLA_CHIEFFO_CATEGORY[locale]),
-			profumum: productCategories.filter(cat => cat.parent === PROFUMUM_ROMA_CATEGORY[locale]),
-			liquides: productCategories.filter(cat => cat.parent === LIQUIDES_IMAGINAIRES_CATEGORY[locale]),
-			maison: productCategories.filter(cat => cat.parent === MAISON_GABRIELLA_CHIEFFO_CATEGORY[locale])
-		},
-		ourProduction: productCategories.filter(cat => [
-			...OUR_PRODUCTION_CATEGORIES.it,
-			...OUR_PRODUCTION_CATEGORIES.en
-		].includes(cat.id))
-	}
-	const menus = {
-		leftMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-left${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
-			.then(response => response.json())).items.map(mapMenuItem(categories)),
-		rightMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-right${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
-			.then(response => response.json())).items.map(mapMenuItem(categories)),
-		mobileMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/menu-mobile${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
-			.then(response => response.json())).items.map(mapMenuItem()),
-		privacyMenu: (await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/policy${locale !== 'it' ? '-'+locale : ''}`, { cache: "force-cache", next: { revalidate: 60 * 60 } })
-			.then(response => response.json())).items.map(mapMenuItem())
-	}
-	// const googlePlaces = await getGooglePlaces(locale)
-
-	const { classes: shipping} = await getShippingInfo(locale)
+	const { classes: shipping, countries} = await getShippingInfo(locale)
 	return {
-		menus,
-		googlePlaces,
-		categories: {
-			designers: categories.designers.map(mapProductCategory),
-			fragrances: {
-				profumumMain: categories.fragrances.profumumMain.map(mapProductCategory),
-				liquidesMain: categories.fragrances.liquidesMain.map(mapProductCategory),
-				maisonMain: categories.fragrances.maisonMain.map(mapProductCategory),
-				profumum: categories.fragrances.profumum.map(mapProductCategory),
-				liquides: categories.fragrances.liquides.map(mapProductCategory),
-				maison: categories.fragrances.maison.map(mapProductCategory)
-			}
+		menus: {
+			left: await getMenu(locale, 'menu-left'),
+			right: await getMenu(locale, 'menu-right'),
+			mobile: await getMenu(locale, 'menu-mobile'),
+			privacy: await getMenu(locale, 'policy')
 		},
+		categories: await getCategories(productCategories),
+		googlePlaces,
 		shipping,
+		countries,
 		ssrTranslations
 	}
 }
@@ -199,15 +117,7 @@ export const getPostsAttributes = async (locale: 'it' | 'en'): Promise<{ tags: P
 
 export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) => {
 	const layout = await getLayoutProps(locale)
-	const productCategory = [
-		...layout.categories.designers,
-		...layout.categories.fragrances.liquides,
-		...layout.categories.fragrances.profumum,
-		...layout.categories.fragrances.maison,
-		...layout.categories.fragrances.profumumMain,
-		...layout.categories.fragrances.liquidesMain,
-		...layout.categories.fragrances.maisonMain,
-	].find(cat => cat.slug === slug)
+	const productCategory = await getProductCategory(locale, slug)
 	const seo =  productCategory && await getSeo(productCategory?.link)
 	return { layout: { ...layout, seo: seo ?? null }, productCategory }
 }
@@ -291,25 +201,7 @@ export const getAllPagesIds = async () => {
 		page++;
 	}
 
-	return pages.filter(({slug}) => ![
-		FRAGRANCES_SUB_PATH,
-		SUNGLASSES_SUB_PATH,
-		OPTICAL_SUB_PATH,
-		DESIGNERS_SUB_PATH,
-		CHECKOUT_SUB_PATH,
-		BLOG_POST_SUB_PATH,
-		PROFUMUM_ROMA_SUB_PATH,
-		LIQUIDES_IMAGINAIRES_SUB_PATH,
-		MAISON_GABRIELLA_CHIEFFO_SUB_PATH,
-		OUR_PRODUCTION_SUB_PATH,
-		'shop',
-		'home',
-		'cookie-settings',
-		'negozi-ottica-firenze',
-		'store',
-		'designers',
-		'my-area',
-	].includes(slug)).map(page => ({
+	return pages.map(page => ({
 		params: {
 			page: page.slug,
 		}
@@ -377,18 +269,21 @@ export const getAllPostIds = async () => {
 	}));
 }
 
-export const mapProductCategory = (category: WooProductCategory): WooProductCategory => ({
-	id: category.id,
-	name: category.name,
-	slug: category.slug,
-	description: category.description,
-	image: category.image ? mapImage(category.image) : null,
-	menu_order: category.menu_order,
-	count: category.count,
-	acf: category.acf,
-	parent: category.parent,
-	link: category.link
-})
+export const mapProductCategory = (categories: WooProductCategory[]) => (category: WooProductCategory): WooProductCategory => {
+	return {
+		id: category.id,
+		name: category.name,
+		slug: category.slug,
+		description: category.description,
+		image: category.image ? mapImage(category.image) : null,
+		menu_order: category.menu_order,
+		count: category.count,
+		acf: category.acf,
+		parent: category.parent,
+		link: category.link,
+		child_items: categories?.filter(cat => cat.parent === category.id).map(mapProductCategory(categories))
+	}
+}
 
 export const mapImage = ({id, src, name, alt}: Image) => ({
 	id, src, name, alt

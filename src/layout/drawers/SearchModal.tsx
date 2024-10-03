@@ -8,12 +8,10 @@ import {WooProductCategory} from "../../types/woocommerce";
 import SearchLayout from "../../pages/search/SearchLayout";
 
 type SearchDrawerProps = {
-	designers: WooProductCategory[],
-	profumum: WooProductCategory[]
-	liquides: WooProductCategory[]
+	categories: WooProductCategory[],
 }
 
-const SearchModal = ({ designers, profumum, liquides }: SearchDrawerProps) => {
+const SearchModal = ({ categories }: SearchDrawerProps) => {
 	const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
 	const dispatch = useDispatch()
 	const { t } = useTranslation('common')
@@ -38,7 +36,7 @@ const SearchModal = ({ designers, profumum, liquides }: SearchDrawerProps) => {
 			hideBackdrop
 		>
 			<Container sx={{display: 'flex', flexDirection: 'column', gap: '10px', position: 'relative', padding: '40px'}}>
-				<SearchLayout designers={designers} profumum={profumum} liquides={liquides} />
+				<SearchLayout categories={categories} />
 			</Container>
 		</Modal>
 	)
