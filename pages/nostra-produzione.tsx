@@ -4,7 +4,7 @@ import {PageBaseProps} from "../src/types/settings";
 import dynamic from "next/dynamic";
 import {OUR_PRODUCTION_CATEGORIES} from "../src/utils/utils";
 import {WooProductCategory} from "../src/types/woocommerce";
-import {OUR_PRODUCTION_SUB_PATH} from "../src/utils/endpoints";
+import {DESIGNERS_CATEGORY, OUR_PRODUCTION_SUB_PATH} from "../src/utils/endpoints";
 
 const DesignersList = dynamic(() => import("../src/pages/designers/DesignersList"));
 
@@ -32,7 +32,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: 'i
 	return {
 		props: {
 			ourProductionCategories:
-				layoutProps.categories.designers.filter((category) =>
+				layoutProps?.categories?.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items?.filter((category) =>
 					OUR_PRODUCTION_CATEGORIES[locale].includes(category.id)
 				),
 			layout: {
