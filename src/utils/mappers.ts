@@ -1,6 +1,6 @@
 import {Article, WPArticle} from "../types/woocommerce";
 
-export const mapArticle = ({id, image, slug, title, content, translations, link, acf, date, categories_data, tags_data, author_data, excerpt, minutes_read}: WPArticle): Article => ({
+export const mapArticle = ({id, image, slug, title, content, translations, link, acf, date, categories_data, tags_data, author_data, excerpt, minutes_read, lang}: WPArticle): Article => ({
 	id,
 	slug,
 	translations,
@@ -18,4 +18,5 @@ export const mapArticle = ({id, image, slug, title, content, translations, link,
 	excerpt: excerpt.rendered,
 	image,
 	minutesRead: minutes_read,
+	lang
 })
