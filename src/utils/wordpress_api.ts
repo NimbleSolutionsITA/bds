@@ -16,7 +16,7 @@ import {
 import {googlePlaces} from "../../pages/api/google-places";
 import {getProductCategories, getProductCategory} from "../../pages/api/products/categories";
 import {
-	EYEWEAR_CATEGORY,
+	EYEWEAR_CATEGORY, LOCALE,
 	sanitize,
 } from "./utils";
 import {getShippingInfo} from "../../pages/api/shipping";
@@ -136,7 +136,7 @@ export const mapTag = ({id, name, slug}: Category) => ({
 	id, name: sanitize(name), slug
 })
 
-export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}, slug = 'shop', parent?: number) => {
+export const getShopPageProps = async (locale: LOCALE, query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}, slug = 'shop', parent?: number) => {
 	const [
 		{ssrTranslations, ...layoutProps},
 		{ seo },
@@ -154,7 +154,7 @@ export const getShopPageProps = async (locale: 'it' | 'en', query: {sunglasses?:
 		}),
 		getAttributes(locale),
 		getProductTags(locale),
-		getProductCategories(locale, EYEWEAR_CATEGORY[locale as 'it' | 'en'].toString())
+		getProductCategories(locale, EYEWEAR_CATEGORY[locale])
 
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
@@ -200,11 +200,11 @@ export const getAllPagesIds = async () => {
 
 		page++;
 	}
-
 	return pages.map(page => ({
 		params: {
 			page: page.slug,
-		}
+		},
+		locale: page.lang
 	}));
 }
 
@@ -235,7 +235,8 @@ export const getAllProductsIds = async () => {
 	return pages.map(page => ({
 		params: {
 			slug: page.slug,
-		}
+		},
+		locale: page.lang
 	}));
 }
 
@@ -265,7 +266,8 @@ export const getAllPostIds = async () => {
 	return posts.map(post => ({
 		params: {
 			post: post.slug,
-		}
+		},
+		locale: post.lang
 	}));
 }
 
@@ -281,7 +283,8 @@ export const mapProductCategory = (categories: WooProductCategory[]) => (categor
 		acf: category.acf,
 		parent: category.parent,
 		link: category.link,
-		child_items: categories?.filter(cat => cat.parent === category.id).map(mapProductCategory(categories))
+		child_items: categories?.filter(cat => cat.parent === category.id).map(mapProductCategory(categories)),
+		lang: category.lang
 	}
 }
 

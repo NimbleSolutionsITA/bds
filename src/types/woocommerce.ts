@@ -1,3 +1,5 @@
+import {LOCALE} from "../utils/utils";
+
 export type Product = Omit<BaseProduct, 'image' | 'variations' | 'categories'> & {
 	type: "simple" | "variable" | "grouped";
 	short_description: string;
@@ -134,6 +136,7 @@ export type BaseCategory = {
 	name: string;
 	slug: string;
 	parent?: number | string;
+	lang: LOCALE;
 }
 
 export type BaseProduct = {
@@ -321,6 +324,7 @@ export type WPPage = {
 	}
 	link: string;
 	acf: any
+	lang: LOCALE
 }
 
 export type WPArticle = WPPage & {
@@ -361,6 +365,7 @@ export type Article = Page & ListArticle & {
 	categories: PostCategory[]
 	tags: PostCategory[]
 	excerpt: string;
+	lang: LOCALE
 }
 
 export type ACFListArticle = {

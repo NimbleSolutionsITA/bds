@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
 import {getAllProducts,} from "../api/products";
-import { OUR_PRODUCTION_CATEGORIES} from "../../src/utils/utils";
+import {EYEWEAR_CATEGORY, LOCALE, OUR_PRODUCTION_CATEGORIES} from "../../src/utils/utils";
 import { OUR_PRODUCTION_SUB_PATH} from "../../src/utils/endpoints";
 
 const DesignerTop = dynamic(() => import("../../src/components/CategoryTop"))
@@ -69,13 +69,13 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	}
 }
 
-export async function getStaticPaths() {
-	const productCategories = await getProductCategories();
-	const paths = productCategories
-		.filter(({id}) => [...OUR_PRODUCTION_CATEGORIES.it, ...OUR_PRODUCTION_CATEGORIES.en].includes(id))
-		.map(({slug}: WooProductCategory) => ({ params: { slug } }));
+export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+	const productCategories = await Promise.all(locales.map(async (locale) => await getProductCategories(locale, EYEWEAR_CATEGORY[locale])));
 	return {
-		paths,
+		paths: productCategories.flat().filter(({id, lang}) => OUR_PRODUCTION_CATEGORIES[lang].includes(id)).map(({slug, lang}) => ({
+			params: { slug },
+			locale: lang
+		})),
 		fallback: 'blocking',
 	};
 }

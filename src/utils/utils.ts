@@ -26,6 +26,8 @@ export const sanitize = (html: string) => {
     }
   });
 }
+export type LOCALE = 'it' | 'en'
+
 export const EYEWEAR_CATEGORY = {
   it: 188,
   en: 496

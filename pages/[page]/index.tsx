@@ -5,9 +5,10 @@ import Layout from "../../src/layout/Layout";
 import {BaseProduct, Page, WooProductCategory} from "../../src/types/woocommerce";
 import HtmlBlock from "../../src/components/HtmlBlock";
 import {getProducts} from "../api/products";
-import {FRAGRANCES_CATEGORY} from "../../src/utils/endpoints";
 import React from "react";
 import dynamic from "next/dynamic";
+import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
+import {getProductCategories} from "../api/products/categories";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -42,10 +43,9 @@ export default function GenericPage({page, layout, fragrancePage}: GenericPagePr
     )
 }
 
-export async function getStaticProps({ locale, params: { page: slug } }: { locale: 'it' | 'en', params: {page: string}}) {
+export async function getStaticProps({ locale, params: { page: slug } }: { locale: LOCALE, params: {page: string}}) {
     const { ssrTranslations, ...layoutProps } = await getLayoutProps(locale);
-
-    const productCategory = layoutProps.categories.find(category => category.slug === FRAGRANCES_CATEGORY)?.child_items?.find(category => category.slug === slug);
+    const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
 
     if (productCategory) {
         const products = await getProducts({
@@ -97,10 +97,12 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
     }
 }
 
-export async function getStaticPaths() {
+export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+    const productCategories = await Promise.all(locales.map(async (locale) => await getProductCategories(locale, FRAGRANCES_CATEGORY[locale])));
+    const fragrancesPaths = productCategories.flat().map(({slug, lang}) => ({ params: { page: slug }, locale: lang }));
     const paths = await getAllPagesIds();
     return {
-        paths,
+        paths: [...fragrancesPaths, ...paths],
         fallback: 'blocking',
     };
 }

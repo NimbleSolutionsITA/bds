@@ -8,7 +8,7 @@ import sanitize from "sanitize-html";
 import {getProductCategories} from "../api/products/categories";
 import {getAllProducts} from "../api/products";
 import {FRAGRANCES_CATEGORY as FRAGRANCES_CATEGORY_PATH, } from "../../src/utils/endpoints";
-import {FRAGRANCES_CATEGORY} from "../../src/utils/utils";
+import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -70,13 +70,16 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 	}
 }
 
-export async function getStaticPaths() {
+export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
 	const productCategories = await getProductCategories();
-	const paths = productCategories.filter(({parent}) => {
+	const paths = locales.map(locale => productCategories.filter(({parent}) => {
 		if (!parent) return false
 		const parentCat = productCategories.find(category => category.id === parent)?.parent as number
-		return parentCat && [FRAGRANCES_CATEGORY.it, FRAGRANCES_CATEGORY.en].includes(parentCat);
-	}).map(({slug, parent}: WooProductCategory) => ({ params: { slug, page: productCategories.find(({id}) => id === parent)?.slug } }));
+		return parentCat === FRAGRANCES_CATEGORY[locale];
+	}).map(({slug, parent}: WooProductCategory) => ({
+		params: { slug, page: productCategories.find(({id}) => id === parent)?.slug },
+		locale
+	}))).flat();
 
 	return {
 		paths,

@@ -26,7 +26,7 @@ export default async function handler(
 	const lang = req.query.lang;
 	const parent = req.query.parent;
 	try {
-		const data = await getProductCategories(lang, parent)
+		const data = await getProductCategories(lang, parent ? Number(parent) : undefined)
 		responseData.success = true
 		responseData.productCategories = data
 		res.json(responseData)
@@ -41,35 +41,9 @@ export default async function handler(
 	}
 }
 
-export const getAllCategoriesIds = async (): Promise<WooProductCategory[]> => {
-	let page = 1
-	let { data } = await api.get(
-		'products/categories',
-		{
-			per_page: 99,
-			page,
-			parent: 0,
-		}
-	)
-	let result = data
-	while (data.length === 99) {
-		page++
-		let { data } = await api.get(
-			'products/categories',
-			{
-				per_page: 99,
-				page,
-				parent: 0,
-			}
-		)
-		result = [...data, ...result]
-	}
-	return result
-}
-
 export const getProductCategories = async (
 	lang?: string | string[] | undefined,
-	parent?: string | string[] | undefined
+	parent?: number | undefined
 ): Promise<WooProductCategory[]> => {
 	let page = 1
 	let { data } = await api.get(
