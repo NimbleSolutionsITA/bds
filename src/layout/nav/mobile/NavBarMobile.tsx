@@ -28,7 +28,6 @@ import NavButton from "../../../components/NavButton";
 import AccordionNavButton from "../../../components/AccordionNavButton";
 import {UserMenu} from "../UserMenu";
 import {DESIGNERS_CATEGORY, FRAGRANCES_CATEGORY, OUR_PRODUCTION_SUB_PATH} from "../../../utils/endpoints";
-import Link from "../../../components/Link";
 
 
 type NavBarMobileProps = {
@@ -165,7 +164,7 @@ export default function NavBarMobile({
 const PhoneButton = ({title, url}: {title: string, url: string}) => (
     <Button
         variant="text"
-        component={Link}
+        component="a"
         href={url}
         target="_blank"
         startIcon={

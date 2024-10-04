@@ -38,7 +38,6 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 	] = await Promise.all([
 		getCategoryPageProps(locale, slug)
 	]);
-	console.log('productCategory', productCategory, page, slug)
 	if (!productCategory) {
 		return {
 			notFound: true
