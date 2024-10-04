@@ -1,9 +1,11 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
-import {getLayoutProps, getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
+import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
 import {PageBaseProps} from "../src/types/settings";
 import {AcfAdvancedLink, AcfImage, AcfProductCategory, BaseProduct} from "../src/types/woocommerce";
+import {LOCALE} from "../src/utils/utils";
+import {cacheGetLayoutProps} from "../src/utils/cache";
 
 const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
 const ProductsCategorySlider = dynamic(() => import("../src/components/ProductsCategorySlider"));
@@ -118,12 +120,12 @@ export default function Home({page, layout}: HomeProps) {
     );
 }
 
-export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
+export async function getStaticProps({ locale }: { locales: string[], locale: LOCALE}) {
     const [
         {ssrTranslations, ...layoutProps},
         { seo, page }
     ] = await Promise.all([
-        getLayoutProps(locale),
+        cacheGetLayoutProps(locale),
         getPageProps('home', locale)
     ]);
 

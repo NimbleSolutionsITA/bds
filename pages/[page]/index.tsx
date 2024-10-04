@@ -1,6 +1,6 @@
 import {Container} from "@mui/material";
 import {PageBaseProps} from "../../src/types/settings";
-import {getAllPagesIds, getLayoutProps, getPageProps} from "../../src/utils/wordpress_api";
+import {getAllPagesIds, getPageProps} from "../../src/utils/wordpress_api";
 import Layout from "../../src/layout/Layout";
 import {BaseProduct, Page, WooProductCategory} from "../../src/types/woocommerce";
 import HtmlBlock from "../../src/components/HtmlBlock";
@@ -9,6 +9,7 @@ import React from "react";
 import dynamic from "next/dynamic";
 import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
 import {getProductCategories} from "../api/products/categories";
+import {cacheGetLayoutProps} from "../../src/utils/cache";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -44,7 +45,7 @@ export default function GenericPage({page, layout, fragrancePage}: GenericPagePr
 }
 
 export async function getStaticProps({ locale, params: { page: slug } }: { locale: LOCALE, params: {page: string}}) {
-    const { ssrTranslations, ...layoutProps } = await getLayoutProps(locale);
+    const { ssrTranslations, ...layoutProps } = await cacheGetLayoutProps(locale);
     const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
 
     if (productCategory) {

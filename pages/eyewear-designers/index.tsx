@@ -1,8 +1,10 @@
 import Layout from "../../src/layout/Layout";
-import {getLayoutProps, getPageProps} from "../../src/utils/wordpress_api";
+import {getPageProps} from "../../src/utils/wordpress_api";
 import {PageBaseProps} from "../../src/types/settings";
 import dynamic from "next/dynamic";
 import {DESIGNERS_CATEGORY, DESIGNERS_SUB_PATH} from "../../src/utils/endpoints";
+import {LOCALE} from "../../src/utils/utils";
+import {cacheGetLayoutProps} from "../../src/utils/cache";
 
 const DesignersList = dynamic(() => import("../../src/pages/designers/DesignersList"));
 
@@ -19,12 +21,12 @@ export default function Index({ layout }: DesignersProps) {
     );
 }
 
-export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
+export async function getStaticProps({ locale }: { locales: string[], locale: LOCALE}) {
     const [
         {ssrTranslations, ...layoutProps},
         { seo },
     ] = await Promise.all([
-        getLayoutProps(locale),
+        cacheGetLayoutProps(locale),
         getPageProps(DESIGNERS_SUB_PATH, locale)
     ]);
     const urlPrefix = locale === 'it' ? '' : '/' + locale;

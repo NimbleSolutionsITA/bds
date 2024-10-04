@@ -34,7 +34,7 @@ export default function Designer({
 	);
 }
 
-export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
+export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: LOCALE, params: { slug: string }}) {
 	const [
 		{ productCategory, layout: {ssrTranslations, ...layout} }
 	] = await Promise.all([

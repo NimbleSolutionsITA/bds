@@ -4,12 +4,13 @@ import {PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, Product as ProductType, ProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
-import {getAllProductsIds, getLayoutProps} from "../../src/utils/wordpress_api";
+import {getAllProductsIds} from "../../src/utils/wordpress_api";
 import {getProduct} from "../api/products/[slug]";
-import {getProductMainCategory} from "../../src/utils/utils";
+import {getProductMainCategory, LOCALE} from "../../src/utils/utils";
 import {WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "../../src/utils/endpoints";
 import {useTranslation} from "next-i18next";
 import PayPalProvider from "../../src/components/PayPalProvider";
+import {cacheGetLayoutProps} from "../../src/utils/cache";
 
 const ProductView = dynamic(() => import('../../src/pages/product/ProductView'), { ssr: false });
 const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
@@ -33,12 +34,12 @@ export default function Product({ product, layout }: ProductPageProps) {
 	);
 }
 
-export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string }}) {
+export async function getStaticProps({ locale, params: {slug} }: { locales: string[], locale: LOCALE, params: { slug: string }}) {
 	const [
 		{ssrTranslations, ...layoutProps},
 		product,
 	] = await Promise.all([
-		getLayoutProps(locale),
+		cacheGetLayoutProps(locale),
 		getProduct(slug, locale)
 	]);
 	if (typeof product === 'string') {

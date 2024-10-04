@@ -1,8 +1,10 @@
 import {Container} from "@mui/material";
 import {PageBaseProps} from "../src/types/settings";
-import {getLayoutProps, getPageProps} from "../src/utils/wordpress_api";
+import {getPageProps} from "../src/utils/wordpress_api";
 import Layout from "../src/layout/Layout";
 import dynamic from "next/dynamic";
+import {LOCALE} from "../src/utils/utils";
+import {cacheGetLayoutProps} from "../src/utils/cache";
 
 const FullPageSlider = dynamic(() => import("../src/components/FullPageSlider"));
 const BannerTop = dynamic(() => import("../src/pages/store/BannerTop"));
@@ -35,12 +37,12 @@ export default function StorePage({acf, layout}: StorePageProps) {
 	)
 }
 
-export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
+export async function getStaticProps({ locale}: { locale: LOCALE}) {
 	const [
 		{ ssrTranslations, ...layoutProps},
 		{ seo, page }
 	] = await Promise.all([
-		getLayoutProps(locale),
+		cacheGetLayoutProps(locale),
 		getPageProps('negozi-ottica-firenze', locale)
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;

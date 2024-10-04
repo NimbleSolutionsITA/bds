@@ -1,11 +1,12 @@
-import {Container, Grid} from "@mui/material";
+import {Container, Grid2 as Grid} from "@mui/material";
 import {PageBaseProps} from "../../src/types/settings";
-import {getAllPostIds, getLayoutProps, getPosts, getPostsAttributes, getSeo} from "../../src/utils/wordpress_api";
+import {getAllPostIds, getPosts, getPostsAttributes, getSeo} from "../../src/utils/wordpress_api";
 import Layout from "../../src/layout/Layout";
 import HtmlBlock from "../../src/components/HtmlBlock";
 import {Article} from "../../src/types/woocommerce";
 import ArticleSidebar from "../../src/pages/dentro-diaries/ArticleSidebar";
 import {LOCALE} from "../../src/utils/utils";
+import {cacheGetLayoutProps} from "../../src/utils/cache";
 
 export type GenericPageProps = PageBaseProps & {
     post: Article
@@ -21,10 +22,10 @@ export default function BlogPage({post, postsByCategory, layout}: GenericPagePro
         <Layout layout={layout}>
             <Container>
                 <Grid container spacing={5}>
-                    <Grid item xs={12} md={9}>
+                    <Grid size={{xs: 12, md: 9}}>
                         <HtmlBlock sx={{width: '100%', overflowX: 'hidden'}} html={post.content} />
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid size={{xs: 12, md: 3}}>
                         <ArticleSidebar postsByCategory={postsByCategory} tags={post.tags} />
                     </Grid>
                 </Grid>
@@ -39,7 +40,7 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
         {posts: [post]},
         {  categories },
     ] = await Promise.all([
-        getLayoutProps(locale),
+        cacheGetLayoutProps(locale),
         getPosts(locale, undefined, undefined, slug),
         getPostsAttributes(locale)
     ]);

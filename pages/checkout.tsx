@@ -13,6 +13,7 @@ import {openLogInDrawer, ShippingData} from "../src/redux/layoutSlice";
 import CartErrorModal from "../src/layout/cart/CartErrorModal";
 import PayPalProvider from "../src/components/PayPalProvider";
 import {initCart} from "../src/redux/cartSlice";
+import {LOCALE} from "../src/utils/utils";
 
 const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
 
@@ -78,7 +79,7 @@ export default function Checkout({
 }
 
 
-export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
+export async function getStaticProps({ locale }: { locales: string[], locale: LOCALE}) {
 	const [
 		{ shipping, ssrTranslations },
 	] = await Promise.all([

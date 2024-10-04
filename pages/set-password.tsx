@@ -1,9 +1,11 @@
 import {Container} from "@mui/material";
 import {PageBaseProps} from "../src/types/settings";
-import {getLayoutProps, getPageProps} from "../src/utils/wordpress_api";
+import {getPageProps} from "../src/utils/wordpress_api";
 import Layout from "../src/layout/Layout";
 import SetPasswordForm from "../src/pages/my-area/SetPasswordForm";
 import {useRouter} from "next/router";
+import {LOCALE} from "../src/utils/utils";
+import {cacheGetLayoutProps} from "../src/utils/cache";
 
 
 export type SetPasswordPageProps = PageBaseProps
@@ -21,12 +23,12 @@ export default function SetPasswordPage({layout}: SetPasswordPageProps) {
 	)
 }
 
-export async function getStaticProps({ locale}: { locale: 'it' | 'en'}) {
+export async function getStaticProps({ locale}: { locale: LOCALE}) {
 	const [
 		{ ssrTranslations, ...layoutProps},
 		{ seo, page }
 	] = await Promise.all([
-		getLayoutProps(locale),
+		cacheGetLayoutProps(locale),
 		getPageProps('my-area', locale)
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;

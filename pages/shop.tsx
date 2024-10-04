@@ -3,6 +3,8 @@ import {getShopPageProps} from "../src/utils/wordpress_api";
 import {PageBaseProps} from "../src/types/settings";
 import {Attribute, BaseProduct, Category, Color, ProductTag} from "../src/types/woocommerce";
 import dynamic from "next/dynamic";
+import {cacheGetShopPageProps} from "../src/utils/cache";
+import {LOCALE} from "../src/utils/utils";
 
 const ShopLayout = dynamic(() => import("../src/pages/shop/ShopLayout"));
 
@@ -30,8 +32,8 @@ export default function Shop({
 	);
 }
 
-export async function getStaticProps({ locale }: { locales: string[], locale: 'it' | 'en'}) {
-	const props =  await getShopPageProps(locale)
+export async function getStaticProps({ locale }: { locales: LOCALE[], locale: LOCALE}) {
+	const props =  await cacheGetShopPageProps(locale)
 	return {
 		props,
 		revalidate: 10

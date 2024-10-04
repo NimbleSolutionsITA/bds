@@ -25,6 +25,7 @@ import {getAttributes} from "../../pages/api/products/colors";
 import {getProductTags} from "../../pages/api/products/tags";
 import {mapArticle} from "./mappers";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
+import {cacheGetLayoutProps} from "./cache";
 
 export const getSSRTranslations = async (locale: 'it' | 'en') => {
 	return await serverSideTranslations(locale, [
@@ -56,7 +57,7 @@ const mapMenuItems = (item: any): MenuItem => ({
 const getCategories = async (categories: WooProductCategory[]) =>
 	categories.filter(cat => cat.parent === 0).map(mapProductCategory(categories))
 
-export const getLayoutProps = async (locale: 'it' | 'en') => {
+export const getLayoutProps = async (locale: LOCALE) => {
 	const ssrTranslations = await getSSRTranslations(locale)
 	const productCategories = (await getProductCategories(locale))
 	const { classes: shipping, countries} = await getShippingInfo(locale)
@@ -116,7 +117,7 @@ export const getPostsAttributes = async (locale: 'it' | 'en'): Promise<{ tags: P
 }
 
 export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) => {
-	const layout = await getLayoutProps(locale)
+	const layout = await cacheGetLayoutProps(locale)
 	const productCategory = await getProductCategory(locale, slug)
 	const seo =  productCategory && await getSeo(productCategory?.link)
 	return { layout: { ...layout, seo: seo ?? null }, productCategory }

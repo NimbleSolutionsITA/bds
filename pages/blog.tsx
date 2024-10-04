@@ -1,7 +1,6 @@
 import {Container} from "@mui/material";
 import {PageBaseProps} from "../src/types/settings";
 import {
-	getLayoutProps,
 	getPageProps,
 	getPosts,
 	getPostsAttributes,
@@ -16,6 +15,7 @@ import NewsletterTopBar from "../src/pages/dentro-diaries/NewsletterTopBar";
 import ArticlesRow from "../src/components/ArticlesRow";
 import ArticlePreview from "../src/pages/dentro-diaries/ArticlePreview";
 import {useTranslation} from "next-i18next";
+import {cacheGetLayoutProps} from "../src/utils/cache";
 
 
 export type DentroDiariesProps = PageBaseProps & {
@@ -57,7 +57,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 		{ page, seo },
 		{  categories },
 	] = await Promise.all([
-		getLayoutProps(locale),
+		cacheGetLayoutProps(locale),
 		getPageProps('blog', locale),
 		getPostsAttributes(locale)
 	]);

@@ -1,8 +1,8 @@
 import Layout from "../../src/layout/Layout";
-import {getShopPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {ShopProps} from "../shop";
-import {SHOP_CATEGORIES} from "../../src/utils/utils";
+import {LOCALE, SHOP_CATEGORIES} from "../../src/utils/utils";
+import {cacheGetShopPageProps} from "../../src/utils/cache";
 
 const ShopLayout = dynamic(() => import("../../src/pages/shop/ShopLayout"));
 
@@ -23,10 +23,10 @@ export default function ShopSunglassesMan({ layout, products, colors, tags, desi
 	);
 }
 
-export async function getStaticProps({ locale, params: {gender} }: { locale: 'it' | 'en', params: {gender: 'uomo' | 'donna'} }) {
+export async function getStaticProps({ locale, params: {gender} }: { locale: LOCALE, params: {gender: 'uomo' | 'donna'} }) {
 	const man = gender === 'uomo'
 	const woman = gender === 'donna'
-	const props = await getShopPageProps(locale, {sunglasses: true, woman, man}, gender, SHOP_CATEGORIES.sunglasses[locale])
+	const props = await cacheGetShopPageProps(locale, {sunglasses: true, woman, man}, gender, SHOP_CATEGORIES.sunglasses[locale])
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const category = {
 		it: "Sole",
@@ -58,9 +58,8 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: 'it
 	}
 }
 
-export const getStaticPaths = async () => {
+export const getStaticPaths = async ({ locales }: { locales: LOCALE[] }) => {
 	const genders = ['uomo', 'donna'];
-	const locales = ['it', 'en'];
 
 	const paths = locales.flatMap(locale =>
 		genders.map(gender => ({

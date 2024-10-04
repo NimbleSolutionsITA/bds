@@ -9,6 +9,7 @@ import Image from "next/image";
 import logo from "../../src/images/bottega-di-sguardi-logo.png";
 import {CheckCircleOutlineSharp} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
+import {LOCALE} from "../../src/utils/utils";
 
 export default function CheckoutResult() {
 	const { t } = useTranslation('common')
@@ -58,7 +59,7 @@ export default function CheckoutResult() {
 		</div>
 	)
 }
-export async function getStaticProps({ locale }: { locale: 'it' | 'en', params: {id: string}}) {
+export async function getStaticProps({ locale }: { locale: LOCALE, params: {id: string}}) {
 	const [
 		ssrTranslations
 	] = await Promise.all([

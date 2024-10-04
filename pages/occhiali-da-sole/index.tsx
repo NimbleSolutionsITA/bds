@@ -1,8 +1,8 @@
 import Layout from "../../src/layout/Layout";
-import {getShopPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {ShopProps} from "../shop";
-import {SHOP_CATEGORIES} from "../../src/utils/utils";
+import {LOCALE} from "../../src/utils/utils";
+import {cacheGetShopPageProps} from "../../src/utils/cache";
 
 const ShopLayout = dynamic(() => import("../../src/pages/shop/ShopLayout"));
 
@@ -14,8 +14,8 @@ export default function ShopSunglassesMan({ layout, products, colors, tags, desi
 	);
 }
 
-export async function getStaticProps({ locale }: { locale: 'it' | 'en', }) {
-	const props = await getShopPageProps(locale, {sunglasses: true}, 'occhiali-da-sole')
+export async function getStaticProps({ locale }: { locale: LOCALE, }) {
+	const props = await cacheGetShopPageProps(locale, {sunglasses: true}, 'occhiali-da-sole')
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	return {
 		props: {
