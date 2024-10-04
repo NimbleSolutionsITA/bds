@@ -5,6 +5,7 @@ import Layout from "../../src/layout/Layout";
 import HtmlBlock from "../../src/components/HtmlBlock";
 import {Article} from "../../src/types/woocommerce";
 import ArticleSidebar from "../../src/pages/dentro-diaries/ArticleSidebar";
+import {LOCALE} from "../../src/utils/utils";
 
 export type GenericPageProps = PageBaseProps & {
     post: Article
@@ -32,7 +33,7 @@ export default function BlogPage({post, postsByCategory, layout}: GenericPagePro
     )
 }
 
-export async function getStaticProps({ locale, params: { post: slug } }: { locale: 'it' | 'en', params: {post: string}}) {
+export async function getStaticProps({ locale, params: { post: slug } }: { locale: LOCALE, params: {post: string}}) {
     const [
         {ssrTranslations, ...layoutProps},
         {posts: [post]},
