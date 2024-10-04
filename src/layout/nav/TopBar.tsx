@@ -27,10 +27,10 @@ export default function TopBar() {
             }}>
                 <div>
                     <LanguageButton color="#FFF" />
-                    <IconButton size="small" component="a" target="_blanh" href={FACEBOOK_LINK} sx={{color: '#FFF'}}>
+                    <IconButton size="small" component="a" target="_blank" href={FACEBOOK_LINK} sx={{color: '#FFF'}}>
                         <Facebook fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" component="a" target="_blanh" href={INSTAGRAM_LINK} sx={{color: '#FFF'}}>
+                    <IconButton size="small" component="a" target="_blank" href={INSTAGRAM_LINK} sx={{color: '#FFF'}}>
                         <Instagram fontSize="small" />
                     </IconButton>
                 </div>

@@ -27,7 +27,12 @@ import {RootState} from "../../../redux/store";
 import NavButton from "../../../components/NavButton";
 import AccordionNavButton from "../../../components/AccordionNavButton";
 import {UserMenu} from "../UserMenu";
-import {DESIGNERS_CATEGORY, FRAGRANCES_CATEGORY, OUR_PRODUCTION_SUB_PATH} from "../../../utils/endpoints";
+import {
+    DESIGNERS_CATEGORY,
+    FACEBOOK_LINK,
+    FRAGRANCES_CATEGORY, INSTAGRAM_LINK,
+    OUR_PRODUCTION_SUB_PATH
+} from "../../../utils/endpoints";
 
 
 type NavBarMobileProps = {
@@ -38,8 +43,8 @@ type NavBarMobileProps = {
 
 const drawerBleeding = 56;
 export default function NavBarMobile({
-    mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, designers, ourProduction, fragrances, ...mobileMenu], breadcrumbs, categories
-}: NavBarMobileProps) {
+                                         mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, designers, ourProduction, fragrances, ...mobileMenu], breadcrumbs, categories
+                                     }: NavBarMobileProps) {
     const ref = useRef<HTMLElement>(null);
     const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
     const dispatch = useDispatch()
@@ -146,12 +151,12 @@ export default function NavBarMobile({
                         />
                     </div>
                     <div style={{flexGrow: 1}} />
-                    <div style={{width: '100%', textAlign: 'right'}}>
+                    <div style={{width: '100%', textAlign: 'left'}}>
                         <LanguageButton onClick={() => setOpen(false)} />
-                        <IconButton size="small">
+                        <IconButton size="small" component="a" target="_blank" href={FACEBOOK_LINK}>
                             <Facebook fontSize="small" />
                         </IconButton>
-                        <IconButton size="small">
+                        <IconButton size="small" component="a" target="_blank" href={INSTAGRAM_LINK}>
                             <Instagram fontSize="small" />
                         </IconButton>
                     </div>
