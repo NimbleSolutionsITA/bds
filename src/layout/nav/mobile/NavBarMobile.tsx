@@ -28,6 +28,7 @@ import NavButton from "../../../components/NavButton";
 import AccordionNavButton from "../../../components/AccordionNavButton";
 import {UserMenu} from "../UserMenu";
 import {DESIGNERS_CATEGORY, FRAGRANCES_CATEGORY, OUR_PRODUCTION_SUB_PATH} from "../../../utils/endpoints";
+import Link from "../../../components/Link";
 
 
 type NavBarMobileProps = {
@@ -138,9 +139,11 @@ export default function NavBarMobile({
                     <div style={{marginTop: '20px'}}>
                         <PhoneButton
                             title={t('shop', {address: "VIA MARCONI"})}
+                            url="https://api.whatsapp.com/send?phone=393496393775&text=Ciao!"
                         />
                         <PhoneButton
                             title={t('shop', {address: "VIA DEL PARIONE"})}
+                            url="https://api.whatsapp.com/send?phone=393341577915&text=Ciao!"
                         />
                     </div>
                     <div style={{flexGrow: 1}} />
@@ -159,9 +162,12 @@ export default function NavBarMobile({
     )
 }
 
-const PhoneButton = ({title}: {title: string}) => (
+const PhoneButton = ({title, url}: {title: string, url: string}) => (
     <Button
         variant="text"
+        component={Link}
+        href={url}
+        target="_blank"
         startIcon={
             <div style={{backgroundColor: '#000', padding: '2px', height: '30px', width: '30px'}}>
                 <PhoneEnabledSharp color="secondary" />
