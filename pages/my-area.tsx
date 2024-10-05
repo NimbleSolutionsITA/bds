@@ -4,11 +4,10 @@ import {
 } from "../src/utils/wordpress_api";
 import Layout from "../src/layout/Layout";
 import MyArea from "../src/pages/my-area/MyArea";
-import {getShippingInfo} from "./api/shipping";
 import {Country} from "../src/types/woocommerce";
 import AuthContent from "../src/components/AuthContent";
 import {LOCALE} from "../src/utils/utils";
-import {cacheGetLayoutProps} from "../src/utils/cache";
+import {cacheGetLayoutProps, cacheGetShippingInfo} from "../src/utils/cache";
 
 export type MyAreaPageProps = PageBaseProps & { countries: Country[] }
 
@@ -29,7 +28,7 @@ export async function getStaticProps({ locale }: { locale: LOCALE}) {
 		{ seo, page }
 	] = await Promise.all([
 		cacheGetLayoutProps(locale),
-		getShippingInfo(locale),
+		cacheGetShippingInfo(locale),
 		getPageProps('my-area', locale)
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;

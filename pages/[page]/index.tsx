@@ -8,8 +8,7 @@ import {getProducts} from "../api/products";
 import React from "react";
 import dynamic from "next/dynamic";
 import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
-import {getProductCategories} from "../api/products/categories";
-import {cacheGetLayoutProps} from "../../src/utils/cache";
+import {cacheGetLayoutProps, cacheGetProductCategories} from "../../src/utils/cache";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -99,11 +98,38 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
-    const productCategories = await Promise.all(locales.map(async (locale) => await getProductCategories(locale, FRAGRANCES_CATEGORY[locale])));
-    const fragrancesPaths = productCategories.flat().map(({slug, lang}) => ({ params: { page: slug }, locale: lang }));
-    const paths = await getAllPagesIds();
+    const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, FRAGRANCES_CATEGORY[locale])));
+    const paths = [
+        productCategories.flat().map(({slug, lang}) => ({ params: { page: slug }, locale: lang })),
+        await getAllPagesIds()
+    ].flat().filter((path, index, self) =>
+        index === self.findIndex((p) => !PAGES_TO_EXCLUDE.includes(path.params.page) && p.params.page === path.params.page && p.locale === path.locale)
+    );
     return {
-        paths: [...fragrancesPaths, ...paths],
+        paths,
         fallback: 'blocking',
     };
 }
+
+const PAGES_TO_EXCLUDE = [
+    'my-area',
+    'eyewear-designers',
+    'nostra-produzione',
+    'home',
+    'blog',
+    'occhiali-da-vista',
+    'occhiali-da-sole',
+    'negozi-ottica-firenze',
+    'shop',
+    'donna',
+    'uomo',
+
+    'checkout',
+    'checkout-3',
+    'checkout-2',
+    'cart-2',
+    'cart-3',
+    'my-account',
+    'cart',
+    'fragranze',
+]

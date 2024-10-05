@@ -1,19 +1,19 @@
-import Layout from "../src/layout/Layout";
-import { getPageProps} from "../src/utils/wordpress_api";
-import {PageBaseProps} from "../src/types/settings";
+import Layout from "../../src/layout/Layout";
+import { getPageProps} from "../../src/utils/wordpress_api";
+import {PageBaseProps} from "../../src/types/settings";
 import dynamic from "next/dynamic";
-import {LOCALE, OUR_PRODUCTION_CATEGORIES} from "../src/utils/utils";
-import {WooProductCategory} from "../src/types/woocommerce";
-import {DESIGNERS_CATEGORY, OUR_PRODUCTION_SUB_PATH} from "../src/utils/endpoints";
-import {cacheGetLayoutProps} from "../src/utils/cache";
+import {LOCALE, OUR_PRODUCTION_CATEGORIES} from "../../src/utils/utils";
+import {WooProductCategory} from "../../src/types/woocommerce";
+import {DESIGNERS_CATEGORY, OUR_PRODUCTION_SUB_PATH} from "../../src/utils/endpoints";
+import {cacheGetLayoutProps} from "../../src/utils/cache";
 
-const DesignersList = dynamic(() => import("../src/pages/designers/DesignersList"));
+const DesignersList = dynamic(() => import("../../src/pages/designers/DesignersList"));
 
 export type OurProductionProps = PageBaseProps & {
 	ourProductionCategories: WooProductCategory[]
 }
 
-export default function NostraProduzione({ layout, ourProductionCategories }: OurProductionProps) {
+export default function Index({ layout, ourProductionCategories }: OurProductionProps) {
 	return (
 		<Layout layout={layout}>
 			<DesignersList designers={ourProductionCategories} subpath={OUR_PRODUCTION_SUB_PATH} />

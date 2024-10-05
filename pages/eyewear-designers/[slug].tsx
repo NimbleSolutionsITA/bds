@@ -5,10 +5,10 @@ import {PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
-import {getProductCategories} from "../api/products/categories";
 import {getAllProducts} from "../api/products";
 import {DESIGNERS_SUB_PATH, DESIGNERS_CATEGORY} from "../../src/utils/endpoints";
 import {EYEWEAR_CATEGORY, LOCALE} from "../../src/utils/utils";
+import {cacheGetProductCategories} from "../../src/utils/cache";
 
 const DesignerTop = dynamic(() => import("../../src/components/CategoryTop"))
 const DesignerProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -70,7 +70,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
-	const productCategories = await Promise.all(locales.map(async (locale) => await getProductCategories(locale, EYEWEAR_CATEGORY[locale])));
+	const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, EYEWEAR_CATEGORY[locale])));
 	return {
 		paths: productCategories.flat().map(({slug, lang}) => ({ params: { slug }, locale: lang })),
 		fallback: 'blocking',

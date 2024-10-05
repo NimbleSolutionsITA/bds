@@ -1,7 +1,7 @@
 import {
 	WORDPRESS_API_ENDPOINT,
 	WORDPRESS_MENUS_ENDPOINT,
-	WORDPRESS_RANK_MATH_SEO_ENDPOINT
+	WORDPRESS_RANK_MATH_SEO_ENDPOINT, WORDPRESS_SITE_URL
 } from "./endpoints"
 import {
 	AcfImage,
@@ -9,31 +9,33 @@ import {
 	Category,
 	Image,
 	ListArticle,
-	Page, PostCategory,
+	Page, PostCategory, Product,
 	WooProductCategory,
 	WPPage
 } from "../types/woocommerce";
 import {googlePlaces} from "../../pages/api/google-places";
-import {getProductCategories, getProductCategory} from "../../pages/api/products/categories";
+import {getProductCategory} from "../../pages/api/products/categories";
 import {
 	EYEWEAR_CATEGORY, LOCALE,
 	sanitize,
 } from "./utils";
-import {getShippingInfo} from "../../pages/api/shipping";
-import {getProducts} from "../../pages/api/products";
-import {getAttributes} from "../../pages/api/products/colors";
-import {getProductTags} from "../../pages/api/products/tags";
 import {mapArticle} from "./mappers";
 import {serverSideTranslations} from "next-i18next/serverSideTranslations";
-import {cacheGetLayoutProps} from "./cache";
+import {
+	cacheGetAttributes,
+	cacheGetLayoutProps, cacheGetMenu,
+	cacheGetProductCategories, cacheGetProducts,
+	cacheGetProductTags,
+	cacheGetShippingInfo
+} from "./cache";
 
-export const getSSRTranslations = async (locale: 'it' | 'en') => {
+export const getSSRTranslations = async (locale: LOCALE) => {
 	return await serverSideTranslations(locale, [
 		'common',
 	])
 }
 
-const getMenu = async (locale: 'it' | 'en', menuSlug: string) => {
+export const getMenu = async (locale: LOCALE, menuSlug: string) => {
 	const menu = await fetch(`${ WORDPRESS_MENUS_ENDPOINT}/${menuSlug}${locale !== 'it' ? '-'+locale : ''}`).then(response => response.json())
 	return menu.items.map(mapMenuItems)
 }
@@ -59,14 +61,14 @@ const getCategories = async (categories: WooProductCategory[]) =>
 
 export const getLayoutProps = async (locale: LOCALE) => {
 	const ssrTranslations = await getSSRTranslations(locale)
-	const productCategories = (await getProductCategories(locale))
-	const { classes: shipping, countries} = await getShippingInfo(locale)
+	const productCategories = (await cacheGetProductCategories(locale))
+	const { classes: shipping, countries} = await cacheGetShippingInfo(locale)
 	return {
 		menus: {
-			left: await getMenu(locale, 'menu-left'),
-			right: await getMenu(locale, 'menu-right'),
-			mobile: await getMenu(locale, 'menu-mobile'),
-			privacy: await getMenu(locale, 'policy')
+			left: await cacheGetMenu(locale, 'menu-left'),
+			right: await cacheGetMenu(locale, 'menu-right'),
+			mobile: await cacheGetMenu(locale, 'menu-mobile'),
+			privacy: await cacheGetMenu(locale, 'policy')
 		},
 		categories: await getCategories(productCategories),
 		googlePlaces,
@@ -75,7 +77,7 @@ export const getLayoutProps = async (locale: LOCALE) => {
 		ssrTranslations
 	}
 }
-export const getPageProps = async (slug: string, locale: 'it' | 'en', parent?: number) => {
+export const getPageProps = async (slug: string, locale: LOCALE, parent?: number) => {
 	const page: WPPage = (await fetch(
 		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
 	)
@@ -93,7 +95,7 @@ export const getSeo = async (link: string) => {
 	return seo.head ?? null
 }
 
-export const getPosts = async (locale?: 'it' | 'en', page?: number, perPage?: number, slug?: string, categories?: number[], tags?: number[]): Promise<{posts: Article[]}> => {
+export const getPosts = async (locale?: LOCALE, page?: number, perPage?: number, slug?: string, categories?: number[], tags?: number[]): Promise<{posts: Article[]}> => {
 	const posts = await fetch(
 		`${ WORDPRESS_API_ENDPOINT}/posts?&page=${page || 1}&per_page=${perPage || 99}${locale ? '&lang='+locale : ''}${slug ? '&slug='+slug : ''}${categories ? `&categories=${categories.join(',')}` : ''}${tags ? `&tags=${tags.join(',')}` : ''}`
 	)
@@ -101,7 +103,7 @@ export const getPosts = async (locale?: 'it' | 'en', page?: number, perPage?: nu
 	return {posts: posts.map(mapArticle)}
 }
 
-export const getPostsAttributes = async (locale: 'it' | 'en'): Promise<{ tags: PostCategory[], categories: PostCategory[] }> => {
+export const getPostsAttributes = async (locale: LOCALE): Promise<{ tags: PostCategory[], categories: PostCategory[] }> => {
 	const tags = await fetch(
 		`${ WORDPRESS_API_ENDPOINT}/tags?lang=${locale}&per_page=100&hide_empty=true`
 	)
@@ -116,15 +118,15 @@ export const getPostsAttributes = async (locale: 'it' | 'en'): Promise<{ tags: P
 	}
 }
 
-export const getCategoryPageProps = async (locale: 'it' | 'en', slug: string) => {
+export const getCategoryPageProps = async (locale: LOCALE, slug: string) => {
 	const layout = await cacheGetLayoutProps(locale)
 	const productCategory = await getProductCategory(locale, slug)
 	const seo =  productCategory && await getSeo(productCategory?.link)
 	return { layout: { ...layout, seo: seo ?? null }, productCategory }
 }
 
-export const getCheckoutPageProps = async (locale: 'it' | 'en') => {
-	const shipping = await getShippingInfo(locale)
+export const getCheckoutPageProps = async (locale: LOCALE) => {
+	const shipping = await cacheGetShippingInfo(locale)
 	const ssrTranslations = await getSSRTranslations(locale)
 	return { shipping, ssrTranslations }
 }
@@ -137,7 +139,9 @@ export const mapTag = ({id, name, slug}: Category) => ({
 	id, name: sanitize(name), slug
 })
 
-export const getShopPageProps = async (locale: LOCALE, query: {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean} = {}, slug = 'shop', parent?: number) => {
+export type GetShopPagePropsQuery = {sunglasses?: boolean, optical?:boolean, man?:boolean, woman?: boolean}
+
+export const getShopPageProps = async (locale: LOCALE, query: GetShopPagePropsQuery = {}, slug = 'shop', parent?: number) => {
 	const [
 		{ssrTranslations, ...layoutProps},
 		{ seo },
@@ -146,16 +150,12 @@ export const getShopPageProps = async (locale: LOCALE, query: {sunglasses?: bool
 		tags,
 		designers
 	] = await Promise.all([
-		getLayoutProps(locale),
+		cacheGetLayoutProps(locale),
 		getPageProps(slug, locale, parent),
-		getProducts({
-			lang: locale,
-			per_page: '12',
-			...query
-		}),
-		getAttributes(locale),
-		getProductTags(locale),
-		getProductCategories(locale, EYEWEAR_CATEGORY[locale])
+		cacheGetProducts(locale, query),
+		cacheGetAttributes(locale),
+		cacheGetProductTags(locale),
+		cacheGetProductCategories(locale, EYEWEAR_CATEGORY[locale])
 
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
@@ -270,6 +270,12 @@ export const getAllPostIds = async () => {
 		},
 		locale: post.lang
 	}));
+}
+
+export const getProduct = async (lang: string, slug: string): Promise<Product | string> => {
+	const params = new URLSearchParams({slug, lang})
+	return await fetch(`${WORDPRESS_SITE_URL}/wp-json/nimble/v1/product?${params.toString()}`)
+		.then(res => res.json())
 }
 
 export const mapProductCategory = (categories: WooProductCategory[]) => (category: WooProductCategory): WooProductCategory => {

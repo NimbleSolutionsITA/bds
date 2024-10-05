@@ -5,12 +5,11 @@ import {BaseProduct, Product as ProductType, ProductCategory} from "../../src/ty
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProductsIds} from "../../src/utils/wordpress_api";
-import {getProduct} from "../api/products/[slug]";
 import {getProductMainCategory, LOCALE} from "../../src/utils/utils";
 import {WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "../../src/utils/endpoints";
 import {useTranslation} from "next-i18next";
 import PayPalProvider from "../../src/components/PayPalProvider";
-import {cacheGetLayoutProps} from "../../src/utils/cache";
+import {cacheGetLayoutProps, cacheGetProduct} from "../../src/utils/cache";
 
 const ProductView = dynamic(() => import('../../src/pages/product/ProductView'), { ssr: false });
 const ProductsSlider = dynamic(() => import('../../src/components/ProductsSlider'), { ssr: false });
@@ -40,7 +39,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		product,
 	] = await Promise.all([
 		cacheGetLayoutProps(locale),
-		getProduct(slug, locale)
+		cacheGetProduct(locale, slug)
 	]);
 	if (typeof product === 'string') {
 		return {

@@ -1,21 +1,20 @@
 import {Container} from "@mui/material";
-import {PageBaseProps} from "../src/types/settings";
+import {PageBaseProps} from "../../src/types/settings";
 import {
 	getPageProps,
 	getPosts,
-	getPostsAttributes,
 	mapAcfImage,
 	mapListArticle
-} from "../src/utils/wordpress_api";
-import Layout from "../src/layout/Layout";
-import FeaturedArticles from "../src/pages/dentro-diaries/FeaturedArticles";
-import {AcfImage, Article, ListArticle} from "../src/types/woocommerce";
-import TopBanner from "../src/pages/dentro-diaries/TopBanner";
-import NewsletterTopBar from "../src/pages/dentro-diaries/NewsletterTopBar";
-import ArticlesRow from "../src/components/ArticlesRow";
-import ArticlePreview from "../src/pages/dentro-diaries/ArticlePreview";
+} from "../../src/utils/wordpress_api";
+import Layout from "../../src/layout/Layout";
+import FeaturedArticles from "../../src/pages/dentro-diaries/FeaturedArticles";
+import {AcfImage, Article, ListArticle} from "../../src/types/woocommerce";
+import TopBanner from "../../src/pages/dentro-diaries/TopBanner";
+import NewsletterTopBar from "../../src/pages/dentro-diaries/NewsletterTopBar";
+import ArticlesRow from "../../src/components/ArticlesRow";
+import ArticlePreview from "../../src/pages/dentro-diaries/ArticlePreview";
 import {useTranslation} from "next-i18next";
-import {cacheGetLayoutProps} from "../src/utils/cache";
+import {cacheGetLayoutProps, cacheGetPostAttributes} from "../../src/utils/cache";
 
 
 export type DentroDiariesProps = PageBaseProps & {
@@ -31,7 +30,7 @@ export type DentroDiariesProps = PageBaseProps & {
 	content: string
 }
 
-export default function Blog({headerGallery, featuredArticles, layout, preview, postsByCategory, title, content}: DentroDiariesProps) {
+export default function Index({headerGallery, featuredArticles, layout, preview, postsByCategory, title, content}: DentroDiariesProps) {
 	const { t } = useTranslation('common')
 	return (
 		<Layout layout={layout}>
@@ -59,7 +58,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 	] = await Promise.all([
 		cacheGetLayoutProps(locale),
 		getPageProps('blog', locale),
-		getPostsAttributes(locale)
+		cacheGetPostAttributes(locale)
 	]);
 	const postsByCategory = (await Promise.all(categories.map(category =>
 		getPosts(locale, 1, 4, undefined, [category.id])

@@ -1,27 +1,27 @@
 import React, {Fragment, useEffect, useState} from "react";
-import {getCheckoutPageProps} from "../src/utils/wordpress_api";
+import {getCheckoutPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
-import {AppDispatch, RootState} from "../src/redux/store";
+import {AppDispatch, RootState} from "../../src/redux/store";
 import Head from "next/head";
-import GoogleAnalytics from "../src/components/GoogleAnalytics";
+import GoogleAnalytics from "../../src/components/GoogleAnalytics";
 import {useRouter} from "next/router";
-import LogInDrawer from "../src/layout/drawers/LogInDrawer";
-import useAuth from "../src/utils/useAuth";
-import {openLogInDrawer, ShippingData} from "../src/redux/layoutSlice";
-import CartErrorModal from "../src/layout/cart/CartErrorModal";
-import PayPalProvider from "../src/components/PayPalProvider";
-import {initCart} from "../src/redux/cartSlice";
-import {LOCALE} from "../src/utils/utils";
+import LogInDrawer from "../../src/layout/drawers/LogInDrawer";
+import useAuth from "../../src/utils/useAuth";
+import {openLogInDrawer, ShippingData} from "../../src/redux/layoutSlice";
+import CartErrorModal from "../../src/layout/cart/CartErrorModal";
+import PayPalProvider from "../../src/components/PayPalProvider";
+import {initCart} from "../../src/redux/cartSlice";
+import {LOCALE} from "../../src/utils/utils";
 
-const CheckoutGrid = dynamic(() => import("../src/pages/checkout/CheckoutGrid"));
+const CheckoutGrid = dynamic(() => import("../../src/pages/checkout/CheckoutGrid"));
 
 export type CheckoutProps = {
 	shipping: ShippingData
 }
 
-export default function Checkout({
+export default function Index({
      shipping
 }: CheckoutProps) {
 	const { loginChecked, loggedIn } = useAuth()

@@ -5,10 +5,10 @@ import { PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
-import {getProductCategories} from "../api/products/categories";
 import {getAllProducts} from "../api/products";
 import {FRAGRANCES_CATEGORY as FRAGRANCES_CATEGORY_PATH, } from "../../src/utils/endpoints";
 import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
+import {cacheGetProductCategories} from "../../src/utils/cache";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -70,7 +70,7 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
-	const productCategories = await getProductCategories();
+	const productCategories = await cacheGetProductCategories();
 	const paths = locales.map(locale => productCategories.filter(({parent}) => {
 		if (!parent) return false
 		const parentCat = productCategories.find(category => category.id === parent)?.parent as number
