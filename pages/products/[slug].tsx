@@ -77,7 +77,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 export async function getStaticPaths() {
 	const paths = await getAllProductsIds();
 	return {
-		paths,
+		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
 		fallback: 'blocking',
 	};
 }

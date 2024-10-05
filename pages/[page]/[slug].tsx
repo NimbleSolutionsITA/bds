@@ -81,7 +81,7 @@ export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
 	}))).flat();
 
 	return {
-		paths,
+		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
 		fallback: 'blocking',
 	};
 }

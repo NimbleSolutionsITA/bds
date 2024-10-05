@@ -72,7 +72,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
 	const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, EYEWEAR_CATEGORY[locale])));
 	return {
-		paths: productCategories.flat().filter(({id, lang}) => OUR_PRODUCTION_CATEGORIES[lang].includes(id)).map(({slug, lang}) => ({
+		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : productCategories.flat().filter(({id, lang}) => OUR_PRODUCTION_CATEGORIES[lang].includes(id)).map(({slug, lang}) => ({
 			params: { slug },
 			locale: lang
 		})),

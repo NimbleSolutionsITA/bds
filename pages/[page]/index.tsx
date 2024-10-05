@@ -106,7 +106,7 @@ export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
         index === self.findIndex((p) => !PAGES_TO_EXCLUDE.includes(path.params.page) && p.params.page === path.params.page && p.locale === path.locale)
     );
     return {
-        paths,
+        paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
         fallback: 'blocking',
     };
 }

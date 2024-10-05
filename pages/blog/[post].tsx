@@ -82,7 +82,7 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
 export async function getStaticPaths() {
     const paths = await getAllPostIds();
     return {
-        paths,
+        paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
         fallback: 'blocking',
     };
 }
