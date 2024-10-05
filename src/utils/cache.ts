@@ -20,10 +20,10 @@ interface CacheItem {
 }
 
 const cache: { [key: string]: CacheItem } = {};
-const CACHE_TTL = 60 * 60 * 1000; // Cache for 1 hour
+const CACHE_TTL = 10 * 60 * 1000; // Cache for 10 minutes
 
 export const cacheGetLayoutProps = async (locale: LOCALE ): Promise<ReturnType<typeof getLayoutProps>> =>
-	cacheFunction(async () => await getLayoutProps(locale), `layoutProps_${locale}`);
+	cacheFunction(async () => await getLayoutProps(locale), `layoutProps_${locale}`, true);
 
 export const cacheGetShopPageProps = async (locale: LOCALE, query?: any, slug?: string, parent?: number): Promise<ReturnType<typeof getShopPageProps>> =>
 	cacheFunction(
@@ -38,16 +38,16 @@ export const cacheGetProductCategories = async (locale?: LOCALE, parent?: number
 	);
 
 export const cacheGetShippingInfo = async (locale: LOCALE ): Promise<ReturnType<typeof getShippingInfo>> =>
-	cacheFunction(async () => await getShippingInfo(locale), `shippingInfo_${locale}`);
+	cacheFunction(async () => await getShippingInfo(locale), `shippingInfo_${locale}`, true);
 
 export const cacheGetAttributes = async (locale: LOCALE ): Promise<ReturnType<typeof getAttributes>> =>
-	cacheFunction(async () => await getAttributes(locale), `attributes_${locale}`);
+	cacheFunction(async () => await getAttributes(locale), `attributes_${locale}`, true);
 
 export const cacheGetProductTags = async (locale: LOCALE ): Promise<ReturnType<typeof getProductTags>> =>
 	cacheFunction(async () => await getProductTags(locale), `productTags_${locale}`);
 
 export const cacheGetMenu = async (locale: LOCALE, menuSlug: string): Promise<ReturnType<typeof getMenu>> =>
-	cacheFunction(async () => await getMenu(locale, menuSlug), `menu_${locale}_${menuSlug}`);
+	cacheFunction(async () => await getMenu(locale, menuSlug), `menu_${locale}_${menuSlug}`, true);
 
 export const cacheGetPosts = async (locale: LOCALE, page?: number, perPage?: number, slug?: string, categories?: number[]): Promise<ReturnType<typeof getPosts>> =>
 	cacheFunction(
@@ -59,7 +59,7 @@ export const cacheGetProduct = async (locale: LOCALE, slug: string): Promise<Ret
 	cacheFunction(async () => await getProduct(locale, slug), `product_${locale}_${slug}`)
 
 export const cacheGetPostAttributes = async (locale: LOCALE): Promise<ReturnType<typeof getPostsAttributes>> =>
-	cacheFunction(async () => await getPostsAttributes(locale), `postAttributes_${locale}`);
+	cacheFunction(async () => await getPostsAttributes(locale), `postAttributes_${locale}`, true);
 
 export const cacheGetProducts = async (locale: LOCALE, query: GetShopPagePropsQuery = {}): Promise<ReturnType<typeof getProducts>> =>
 	cacheFunction(
@@ -71,7 +71,11 @@ export const cacheGetProducts = async (locale: LOCALE, query: GetShopPagePropsQu
 		`products_${locale}_${JSON.stringify(query)}`);
 
 
-const cacheFunction = async (fn: Function, cacheKey: string) => {
+const cacheFunction = async (fn: Function, cacheKey: string, force?: boolean) => {
+	if (!force && !process.env.DISABLE_DYNAMIC_BUILD) {
+		return await fn();
+	}
+
 	const cachedItem = cache[cacheKey];
 
 	if (cachedItem && (Date.now() - cachedItem.timestamp) < CACHE_TTL) {
