@@ -1,135 +1,188 @@
 import AddressForm from "./AddressForm";
-import Recap from "./Recap";
-import Payment from "./Payment";
-import {AnimatePresence, motion} from "framer-motion";
-import {Box, Button, Container, Grid2 as Grid} from "@mui/material";
+import {
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Box,
+	Button,
+	Divider, IconButton,
+	MobileStepper,
+	Typography
+} from "@mui/material";
 import * as React from "react";
-import PriceRecap from "./PriceRecap";
-import {useTranslation} from "next-i18next";
-import Logo from "./Logo";
 import  {CheckoutDesktopProps} from "./CheckoutDesktop";
-import {useSelector} from "react-redux";
-import {RootState} from "../../redux/store";
 import InvoiceForm from "../../components/InvoiceForm";
-import { ArrowBackIos, ArrowForwardIos } from '@mui/icons-material';
-import {FormFields, Step as StepType} from "./CheckoutGrid";
-import {BaseSyntheticEvent} from "react";
+import { KeyboardArrowLeft, KeyboardArrowRight} from '@mui/icons-material';
+import {FormFields} from "./CheckoutGrid";
 import {useFormContext} from "react-hook-form";
+import {useTranslation} from "next-i18next";
+import CartCoupon from "./CartCoupon";
+import CartShippingRate from "./CartShippingRate";
+import CartNote from "./CartNote";
 import PaymentButtons from "../../components/PaymentButtons";
+import CartRecap from "./CartRecap";
+import {ReactNode, useState} from "react";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import PayPalCheckout from "./PayPalCheckout";
+import CartAddressRecap from "./CartAddressRecap";
+import PriceRecap from "./PriceRecap";
+import Logo from "./Logo";
+import logo from "../../images/bottega-di-sguardi-logo.png";
+import Image from "next/image";
 
 const STEP_MAP = ['ADDRESS', 'INVOICE', 'PAYMENT'] as const
 
 export type CheckoutMobile = CheckoutDesktopProps
 const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
-	const { cart, loading } = useSelector((state: RootState) => state.cart);
-	const { watch } = useFormContext<FormFields>()
-	const {step: checkoutStep, addressTab: tab} = watch()
-	const mobileStep = STEP_MAP.indexOf(checkoutStep)
-	const [focus, setFocus] = React.useState(false)
-	const checkoutComponent = [
-		<AddressForm key="address" setFocus={setFocus} />,
-		<InvoiceForm key="invoice" />,
-		<Recap key="recap" updateOrder={updateOrder} />,
-		<Payment key="payment" />
-	]
-	const variants = {
-		enter: (direction: number): { y: number; opacity: number } => {
-			return {
-				y: direction > 0 ? 100 : -100,
-				opacity: 0
-			};
-		},
-		center: {
-			y: 0,
-			opacity: 1
-		},
-		exit: (direction: number): { y: number; opacity: number } => {
-			return {
-				y: direction < 0 ? 100 : -100,
-				opacity: 0
-			};
-		}
-	};
-
-	const bottomBarHeight = Number(cart?.totals?.discount_total ?? 0) > 0 ? '225px' : '200px'
-	const stepButtonProps = { updateOrder }
-	return (
-		<div style={{display: 'flex', flexDirection: 'column', height: '100%'}}>
-			<Container sx={{width: '100%', flex: 1, overflow: 'hidden scroll', padding: '0 20px 250px 20px'}}>
-				<div style={{width: '100%', textAlign: 'center'}}>
-					<Logo sx={{margin: '10px'}} />
-				</div>
-				<AnimatePresence custom={mobileStep}>
-					<motion.div
-						key={mobileStep}
-						custom={mobileStep}
-						variants={variants}
-						initial="enter"
-						animate="center"
-						exit="exit"
-						transition={{
-							y: { type: "spring", stiffness: 300, damping: 30 },
-							opacity: { duration: 0.2 }
-						}}
-					>
-						{checkoutComponent[mobileStep]}
-					</motion.div>
-				</AnimatePresence>
-			</Container>
-			{!focus && (
-				<Container sx={{position: 'fixed', bottom: 0, width: '100%', height: bottomBarHeight, paddingY: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', backgroundColor: '#e5e5e5', zIndex: 101}}>
-					<PriceRecap isLoading={loading}/>
-					{mobileStep === 4 ? (
-						<Box sx={{marginTop: '5px'}}>
-							<PaymentButtons />
-						</Box>
-						) : (
-						<Grid container sx={{marginTop: '5px'}} spacing={2}>
-							{mobileStep > 0 && (
-								<StepButton isPrev {...stepButtonProps} />
-							)}
-							<StepButton {...stepButtonProps} />
-						</Grid>
-					)}
-				</Container>
-			)}
-		</div>
-	)
-}
-
-type StepButtonProps = {
-	isPrev?: boolean,
-	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
-}
-const StepButton = ({isPrev, updateOrder}: StepButtonProps) => {
-	const { t } = useTranslation('common')
 	const { watch, setValue } = useFormContext<FormFields>()
-	const checkoutStep = watch('step')
-	const mobileStep = STEP_MAP.indexOf(checkoutStep)
-	const labelMap = ['address', 'invoice', 'shipping', 'payment', 'pay-now']
-	const targetStep = isPrev ? mobileStep - 1 : mobileStep + 1
-	const target = STEP_MAP[targetStep]
-	const handleClick = async () => {
-		if (targetStep === 4) {
-			return
-		}
-		if (targetStep < 2) {
-			await updateOrder(target)()
-			return
-		}
-		setValue('step', target)
-	}
+	const { t } = useTranslation('common');
+	const {step: checkoutStep, paymentMethod, billing: { email }} = watch()
+	const activeStep = STEP_MAP.indexOf(checkoutStep)
+	const [expandPrice, setExpandPrice] = useState(false)
 
-	const iconProps = isPrev ?
-		{ startIcon: <ArrowBackIos /> } :
-		{ endIcon: <ArrowForwardIos /> }
+	const checkoutComponent = [
+		<AddressForm />,
+		<>
+			<InvoiceForm />
+			<Divider sx={{margin: '5px 0'}} />
+			<CartCoupon />
+			<Divider sx={{margin: '5px 0'}} />
+			<CartShippingRate />
+			<Divider sx={{margin: '5px 0'}} />
+			<CartNote />
+		</>,
+		<>
+			<AccordionRecap title={email}>
+				<CartAddressRecap />
+			</AccordionRecap>
+			<AccordionRecap title={t('checkout.item-recap')}>
+				<CartRecap />
+			</AccordionRecap>
+			<Divider />
+			<PayPalCheckout />
+			<Box sx={{marginTop: paymentMethod === 'card' ? 0 : '32px', width: '100%'}}>
+				<PaymentButtons />
+			</Box>
+		</>
+	]
+
 	return (
-		<Grid size={{xs: mobileStep === 0 ? 12 : 6}}>
-			<Button fullWidth onClick={handleClick} {...iconProps}>
-				{t(`checkout.${labelMap[targetStep]}`)}
-			</Button>
-		</Grid>
+		<Box sx={{display: 'flex', flexDirection: 'column', height: '100%', padding: '16px 8px 160px'}}>
+			<Box sx={{textAlign: 'center', marginBottom: '8px'}}>
+				<Image
+					src={logo}
+					alt="Logo Bottega di Sguardi"
+					style={{ width: '60px', height: 'auto' }}
+				/>
+			</Box>
+			{checkoutComponent[activeStep]}
+			<Box
+				sx={{
+					backgroundColor: "#eeeeee",
+					position: "fixed",
+					width: '100%',
+					bottom: '50px',
+					padding: '8px',
+					left: 0,
+					zIndex: 1
+				}}
+			>
+				<IconButton
+					size="small"
+					onClick={() => setExpandPrice(!expandPrice)}
+					sx={{
+						position: 'absolute',
+						top: 0,
+						left: '50%',
+						transform: "translate(-50%, -50%)",
+						backgroundColor: "#ffffff",
+						border: "2px solid #eeeeee",
+						"&:hover": {
+							backgroundColor: "#ffffff",
+						}
+					}}
+				>
+					<ExpandMoreIcon
+						sx={{
+							transform: expandPrice ? "rotate(0deg)" : "rotate(180deg)",
+							transition: 'transform 0.3s ease'
+						}}
+					/>
+				</IconButton>
+				<PriceRecap isLoading={false} isCompact={!expandPrice} />
+			</Box>
+			<MobileStepper
+				variant="progress"
+				steps={3}
+				position="bottom"
+				activeStep={activeStep}
+				sx={{
+					backgroundColor: "#eeeeee"
+				}}
+				LinearProgressProps={{
+					sx: {
+						position: "fixed",
+						width: "100%",
+						top: 0,
+						left: 0
+					}
+				}}
+				nextButton={
+					<Button
+						sx={{padding: '8px 24px 8px 32px'}}
+						size="small"
+						onClick={updateOrder(STEP_MAP[activeStep + 1])}
+						disabled={checkoutStep === "PAYMENT"}
+					>
+						{t(`checkout.${(STEP_MAP[activeStep + 1] ?? "PAYMENT").toLowerCase()}`)}
+						<KeyboardArrowRight />
+					</Button>
+				}
+				backButton={
+					<Button
+						sx={{padding: '8px 32px 8px 24px'}}
+						size="small"
+						onClick={() => setValue('step', STEP_MAP[activeStep - 1])}
+						disabled={activeStep === 0}
+					>
+						<KeyboardArrowLeft />
+						{t(`checkout.${(STEP_MAP[activeStep - 1] ?? "ADDRESS").toLowerCase()}`)}
+					</Button>
+				}
+			/>
+		</Box>
 	)
 }
+
+const AccordionRecap = ({children, title}: {children: ReactNode, title: string}) => (
+	<Accordion
+		elevation={0}
+		sx={{
+			"&.Mui-expanded": {
+				margin: 0
+			}
+		}}
+	>
+		<AccordionSummary
+			sx={{
+				padding: 0,
+				"& .MuiAccordionSummary-content.Mui-expanded": {
+					margin: '12px 0'
+				},
+				"&.Mui-expanded": {
+					minHeight: '48px'
+				}
+			}}
+			expandIcon={<ExpandMoreIcon />}
+			aria-controls="panel1-content"
+			id="panel1-header"
+		>
+			<Typography sx={{fontWeight: 500}}>{title}</Typography>
+		</AccordionSummary>
+		<AccordionDetails sx={{padding: "8px 0"}}>
+			{children}
+		</AccordionDetails>
+	</Accordion>
+)
 
 export default CheckoutMobile

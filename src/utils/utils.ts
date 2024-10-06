@@ -231,10 +231,6 @@ export function calculateImageDarkness(imageUrl: string, callback: Function) {
     };
 }
 
-export const getCartItemPriceWithoutTax = (item: Item, isEU: boolean) => (isEU && item.cart_item_data.priceEU) ?
-    (Number(item.cart_item_data.priceEU) * Number(item.quantity.value) / 1.22) :
-    Number(item.totals.total)
-
 export const getCartItemPrice = (item: Item, isEU: boolean) => (isEU && item.cart_item_data.priceEU) ?
     parseFloat((Number(item.cart_item_data.priceEU) * Number(item.quantity.value)).toFixed(2)) :
     parseFloat((Number(item.totals.total) + Number(item.totals.tax)).toFixed(1))
@@ -269,16 +265,6 @@ export const getCartTotals = (cart?: Cart) => {
         total: parseFloat(total.toFixed(2)),
         totalTax: parseFloat(totalTax.toFixed(2))
     };
-}
-
-export interface PurchaseItem {
-    item_id: string
-    item_name: string
-    item_brand?: string
-    item_category?: string
-    item_variant?: string
-    price?: number
-    quantity?: number
 }
 
 export const gtagAddToCart = (item: Item, productId: number, variantId: number|"") => {
@@ -326,48 +312,7 @@ export const gtagConsent = (consent: {
     'ad_storage': Consent,
     'analytics_storage': Consent
 }) => {
-    window.gtag("consent", 'update', consent);
-}
-
-export const prepareOrderPayload = async (cart: any, customerData: any, api: any) => {
-    const { invoice, customerNote, ...addresses} = customerData
-    const selectedShipping = cart.shipping.packages.default.rates[cart.shipping.packages.default.chosen_method]
-    const isEu = (customerData?.shipping?.country ?? customerData?.billing?.country ) !== 'IT'
-    const line_items = await Promise.all(cart.items.map(prepareOrderLineItem(api, isEu)))
-    return ({
-        ...addresses,
-        line_items,
-        shipping_lines: [
-            {
-                method_id: selectedShipping?.method_id,
-                method_title: selectedShipping?.label,
-                total: (Number(selectedShipping?.cost) / 1.22 / 100) + '',
-            }
-        ],
-        coupon_lines:  cart.coupons[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : [],
-        customer_note: customerNote,
-        meta_data: [
-            { key: '_billing_choice_type', value: invoice.billingChoice },
-            { key: '_billing_invoice_type', value: invoice.invoiceType },
-            { key: '_billing_sdi_type', value: invoice.sdi },
-            { key: '_billing_vat_number', value: invoice.vat },
-            { key: '_billing_tax_code', value: invoice.tax },
-        ]
-    })
-}
-
-export const prepareOrderLineItem = (api: any, isEu: boolean) => async (item: Item) => {
-    const {data: product} = await api.get("products/" + item.id)
-    const itemPrice = isEu ?
-        product.meta_data.find((m: {key: string, value: string}) => m.key === '_europa_price')?.value ?? product.price :
-        product.price
-    const total = ((Number(itemPrice) * item.quantity.value) / 1.22) + ''
-    return {
-        product_id: item.meta.product_type === 'variation' ? item.meta.variation.parent_id : item.id,
-        variation_id: item.meta.product_type === 'variation' ? item.id : undefined,
-        quantity: item.quantity.value,
-        total,
-    }
+    window.gtag?.("consent", 'update', consent);
 }
 
 export const getInvoice = (customer?: LoggedCustomer) => ({

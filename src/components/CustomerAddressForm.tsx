@@ -1,7 +1,7 @@
 import {
 	FormControl,
 	FormHelperText,
-	Grid,
+	Grid2 as Grid,
 	InputLabel,
 	MenuItem,
 	Select,
@@ -23,12 +23,8 @@ import {useTranslation} from "next-i18next";
 type FormProps = {
 	isShipping?: boolean
 	countries: Country[]
-	focusProps?: {
-		onBlur: () => void
-		onFocus: () => void
-	}
 }
-const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => {
+const CustomerAddressForm = ({isShipping, countries}: FormProps) => {
 	const { control, formState: { errors }, setError } = useFormContext<Inputs>();
 	const type: 'billing' | 'shipping' = isShipping ? 'shipping' : 'billing';
 	const country = useWatch({name: `${type}.country`, control})
@@ -43,7 +39,6 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 				name="first_name"
 				label={t('form.name')}
 				setError={setError}
-				focusProps={focusProps}
 			/>
 			<TextInput
 				control={control}
@@ -52,7 +47,6 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 				name="last_name"
 				label={t('form.lastname')}
 				setError={setError}
-				focusProps={focusProps}
 			/>
 			<TextInput
 				control={control}
@@ -63,9 +57,8 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 				optional
 				md={12}
 				setError={setError}
-				focusProps={focusProps}
 			/>
-			<Grid item xs={12} md={hideState ? 12 : 6}>
+			<Grid size={{xs: 12, md: hideState ? 12 : 6}}>
 				<Controller
 					control={control}
 					name={`${type}.country`}
@@ -98,7 +91,7 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 				/>
 			</Grid>
 			{!hideState && (
-				<Grid item xs={12} md={6}>
+				<Grid size={{xs: 12, md: 6}}>
 					<Controller
 						control={control}
 						name={`${type}.state`}
@@ -139,7 +132,6 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 				label={t('form.address')}
 				md={12}
 				setError={setError}
-				focusProps={focusProps}
 			/>
 			<TextInput
 				control={control}
@@ -148,7 +140,6 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 				name="city"
 				label={t('form.city')}
 				setError={setError}
-				focusProps={focusProps}
 			/>
 			<TextInput
 				control={control}
@@ -157,7 +148,6 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 				name="postcode"
 				label={t('form.zip')}
 				setError={setError}
-				focusProps={focusProps}
 			/>
 			{type === 'billing' && (
 				<TextInput
@@ -168,7 +158,6 @@ const CustomerAddressForm = ({isShipping, countries, focusProps}: FormProps) => 
 					label={t('form.phone')}
 					md={12}
 					setError={setError}
-					focusProps={focusProps}
 				/>
 			)}
 		</Grid>
@@ -184,16 +173,12 @@ type TextInputProps = {
 	md?: number
 	optional?: boolean
 	setError: (name: (FieldPath<Inputs> | `root.${string}` | "root"), error: ErrorOption, options?: {shouldFocus: boolean}) => void
-	focusProps?: {
-		onBlur: () => void
-		onFocus: () => void
-	}
 }
 
-const TextInput = ({control, error, type, name, label, optional, md = 6, setError, focusProps}: TextInputProps) => {
+const TextInput = ({control, error, type, name, label, optional, md = 6, setError}: TextInputProps) => {
 	const { t } = useTranslation('common')
 	return (
-		<Grid item xs={12} md={md}>
+		<Grid size={{xs: 12, md}}>
 			<Controller
 				control={control}
 				name={`${type}.${name}` as keyof Inputs}
@@ -211,7 +196,6 @@ const TextInput = ({control, error, type, name, label, optional, md = 6, setErro
 						variant="outlined"
 						label={label}
 						helperText={<HelperText message={error} />}
-						{...focusProps}
 					/>
 				)}
 			/>

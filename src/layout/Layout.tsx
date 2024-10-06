@@ -56,6 +56,8 @@ export default function Layout({children, layout: {
                 {seo && parse(seo)}
             </Head>
 
+            <GoogleAnalytics />
+
             {mdUp ?
                 <NavBar left={menus.left} right={menus.right} categories={categories} breadcrumbs={breadcrumbs} /> : (<>
                 <NavBarMobile mobileMenu={menus.mobile} breadcrumbs={breadcrumbs} categories={categories} />
@@ -72,8 +74,6 @@ export default function Layout({children, layout: {
             <SearchModal categories={categories} />
             {cart ? children : <Loading />}
             <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={menus.mobile} />
-
-            <GoogleAnalytics />
         </>
     )
 }

@@ -38,12 +38,13 @@ export default async function handler(
 				throw new Error('Cart amount is 0')
 			}
 			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote)
+			console.log(orderPayload)
 			const { data: order } = await api.post("orders", {
 				...orderPayload,
 			})
 			const amount = Number(order.total)
 			if (amount === 0) {
-				await api.delete(`orders/${order.id}`, { force: true })
+				await api.delete(`/api/orders/${order.id}`, { force: true })
 				throw new Error('Order amount is 0')
 			}
 			const paypalOrder = await createOrder(amount, order.id)
@@ -103,8 +104,8 @@ const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: str
 		payment_method: 'paypal',
 		payment_method_title: 'PayPal',
 		payment_method_reference: 'paypal',
-		billing: mapAddress(cart.customer, 'billing'),
-		shipping: mapAddress(cart.customer, 'shipping'),
+		billing: mapAddress(cart.customer.billing_address, 'billing'),
+		shipping: mapAddress(cart.customer.shipping_address, 'shipping'),
 		line_items: await Promise.all(cart.items.map(prepareOrderLineItem(api, isEu))),
 		shipping_lines: [
 			{
@@ -115,18 +116,18 @@ const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: str
 		],
 		coupon_lines:  cart.coupons?.[0] ? [{ code: cart.coupons[0].coupon ?? '' }] : [],
 		customer_note: customerNote,
-		meta_data: [
-			{ key: '_billing_choice_type', value: invoice.billingChoice },
-			{ key: '_billing_invoice_type', value: invoice.invoiceType },
-			{ key: '_billing_sdi_type', value: invoice.sdi },
-			{ key: '_billing_vat_number', value: invoice.vat },
-			{ key: '_billing_tax_code', value: invoice.tax },
-		]
+		meta_data: invoice ? [
+			{ key: '_billing_choice_type', value: invoice.billingChoice ?? "" },
+			{ key: '_billing_invoice_type', value: invoice.invoiceType ?? "" },
+			{ key: '_billing_sdi_type', value: invoice.sdi ?? "" },
+			{ key: '_billing_vat_number', value: invoice.vat ?? "" },
+			{ key: '_billing_tax_code', value: invoice.tax ?? "" },
+		] : []
 	})
 }
 
-const mapAddress = (customer: any, type: 'billing' | 'shipping') =>
-	Object.fromEntries(Object.entries(customer).map(([key, value]) => [key.replace(`${type}_`, ''), value]))
+const mapAddress = (address: any, type: 'billing' | 'shipping') =>
+	Object.fromEntries(Object.entries(address).map(([key, value]) => [key.replace(`${type}_`, ''), value]))
 
 const prepareOrderLineItem = (api: any, isEu: boolean) => async (item: Item) => {
 	const {data: product} = await api.get("products/" + item.id)

@@ -2,7 +2,7 @@ import React, {ElementRef, RefObject, useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../redux/store";
 import {PayPalApplePayConfig, PayPalWithApplePay} from "./PayPalProvider";
-import {Cart} from "../types/cart-type";
+import {Cart, Shipping} from "../types/cart-type";
 import {ShippingData} from "../redux/layoutSlice";
 import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/utils";
 import {callCart, PaymentButtonProps} from "./AppleGooglePayButtons";
@@ -14,6 +14,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 	const buttonRef = useRef<ElementRef<'div'>>(null);
 	const dispatch = useDispatch<AppDispatch>();
 	const router = useRouter();
+	const countryCodes = shipping.countries.map(c => c.code);
 
 	const onClick = async () => {
 		if (!applePayConfig || !applePayConfig.isEligible || !window.paypal || !checkoutCart?.cart_key) {
@@ -41,7 +42,6 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					validationUrl: event.validationURL,
 				})
 				.then((payload) => {
-					console.log(event, payload);
 					session.completeMerchantValidation(payload.merchantSession);
 				})
 				.catch((err: any) => {
@@ -52,40 +52,45 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 
 		if (askForShipping) {
 			session.onshippingcontactselected = async (event) => {
-				const cart = await callCart(cartKey, '/v2/cart/update', "POST", { namespace: "update-customer"}, {
-					first_name: event.shippingContact.givenName,
-					last_name: event.shippingContact.familyName,
-					state: event.shippingContact.administrativeArea,
-					postcode: event.shippingContact.postalCode,
-					country: event.shippingContact.countryCode,
-					city: event.shippingContact.locality,
-					s_first_name: event.shippingContact.givenName,
-					s_last_name: event.shippingContact.familyName,
-					s_state: event.shippingContact.administrativeArea,
-					s_postcode: event.shippingContact.postalCode,
-					s_country: event.shippingContact.countryCode,
-					s_city: event.shippingContact.locality,
-				})
-				if (!cart.shipping?.packages.default.rates) {
-					console.error("No shipping rates returned from CoCart");
-					session.abort()
-					return
-				}
+				if (!event.shippingContact.countryCode || !countryCodes.includes(event.shippingContact.countryCode)) {
+					const countryError = new ApplePayError("shippingContactInvalid", "countryCode", "Shipping to the selected country is not available.");
 
-				session.completeShippingContactSelection({
-					newShippingMethods: Object.values(cart.shipping.packages.default.rates).map((rate) => ({
-						identifier: rate.key,
-						label: rate.label,
-						detail: rate.html,
-						amount: (Number(rate.cost) / 100).toString(),
-					})),
-					newLineItems: getLineItems(cart),
-					newTotal: {
-						label: "Bottega di Sguardi",
-						amount: getCartTotals(cart).total.toString(),
-					},
-				})
-				console.log("Shipping Contact Selected !!", event)
+					session.completeShippingContactSelection({
+						errors: [countryError],
+						newShippingMethods: [],
+						newTotal: { label: "Total", amount: "0.00", type: "final" },
+						newLineItems: [],
+					});
+				} else {
+					const cart = await callCart(cartKey, '/v2/cart/update', "POST", { namespace: "update-customer"}, {
+						first_name: event.shippingContact.givenName,
+						last_name: event.shippingContact.familyName,
+						state: event.shippingContact.administrativeArea,
+						postcode: event.shippingContact.postalCode,
+						country: event.shippingContact.countryCode,
+						city: event.shippingContact.locality,
+						s_first_name: event.shippingContact.givenName,
+						s_last_name: event.shippingContact.familyName,
+						s_state: event.shippingContact.administrativeArea,
+						s_postcode: event.shippingContact.postalCode,
+						s_country: event.shippingContact.countryCode,
+						s_city: event.shippingContact.locality,
+					})
+					if (!cart.shipping?.packages.default.rates) {
+						console.error("No shipping rates returned from CoCart");
+						session.abort()
+						return
+					}
+
+					session.completeShippingContactSelection({
+						newShippingMethods: mapShippingMethods(cart.shipping),
+						newLineItems: getLineItems(cart),
+						newTotal: {
+							label: "Bottega di Sguardi",
+							amount: getCartTotals(cart).total.toString(),
+						},
+					})
+				}
 			}
 
 			session.onshippingmethodselected = async (event) => {
@@ -104,7 +109,6 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 						amount: getCartTotals(cart).total.toString(),
 					},
 				})
-				console.log("Shipping Method Selected !!", event)
 			}
 		}
 
@@ -174,7 +178,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 				});
 				if (!askForShipping) {
 					dispatch(destroyCart());
-					router.push('/success')
+					router.push('/checkout/completed')
 				}
 			} catch (err) {
 				console.error(err);
@@ -207,7 +211,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 				display: 'block',
 				height: '48px',
 			},
-			locale: 'it',
+			locale: router.locale,
 			type: "pay"
 		})
 
@@ -252,6 +256,13 @@ apple-pay-button {
 	)
 }
 
+const mapShippingMethods = (shipping: Shipping) => Object.values(shipping.packages.default.rates).map((rate) => ({
+	identifier: rate.key,
+	label: rate.label,
+	detail: rate.html,
+	amount: (Number(rate.cost) / 100).toString(),
+}))
+
 const generatePaymentRequest = (applePayConfig: PayPalApplePayConfig, cart: Cart, shipping: ShippingData, askForShipping: boolean): ApplePayJS.ApplePayPaymentRequest => {
 	const totals = getCartTotals(cart)
 	return {
@@ -259,10 +270,9 @@ const generatePaymentRequest = (applePayConfig: PayPalApplePayConfig, cart: Cart
 		currencyCode: applePayConfig.currencyCode,
 		merchantCapabilities: applePayConfig.merchantCapabilities,
 		supportedNetworks: applePayConfig.supportedNetworks,
-		shippingMethods:  askForShipping ? undefined : undefined,
-		shippingType: askForShipping ? undefined : undefined,
+		shippingMethods:  (askForShipping && cart.shipping) ? mapShippingMethods(cart.shipping) : undefined,
+		shippingType: undefined,
 		shippingContactEditingMode: askForShipping ? 'available' : 'storePickup',
-		supportedCountries: shipping.countries.map(c => c.code),
 		billingContact: askForShipping ? undefined : {
 			phoneNumber: cart.customer.billing_address.billing_phone,
 			emailAddress: cart.customer.billing_address.billing_email,
@@ -303,8 +313,8 @@ const generatePaymentRequest = (applePayConfig: PayPalApplePayConfig, cart: Cart
 		lineItems: getLineItems(cart),
 		total: {
 			label: "Bottega di Sguardi",
-			amount: totals.total.toString(), // "10.00"
-			type: "final",
+			amount: totals.total.toString(),
+			type: askForShipping ? "pending" : "final",
 			paymentTiming: "immediate",
 		},
 	}

@@ -8,8 +8,7 @@ import {ShippingData} from "../redux/layoutSlice";
 import {InvoiceData} from "../types/woocommerce";
 import GooglePayButton from "./GooglePayButton";
 import ApplePayButton from "./ApplePayButton";
-import {Grid2} from "@mui/material";
-import useAuth from "../utils/useAuth";
+import {Box, Grid2 as Grid} from "@mui/material";
 
 type GooglePayButtonProps = {
 	item?: AddItemToCartPayload;
@@ -18,6 +17,7 @@ type GooglePayButtonProps = {
 	invoice?: InvoiceData
 	hideGooglePay?: boolean
 	hideApplePay?: boolean
+	buttonWidth?: string
 }
 
 export type PaymentButtonProps = {
@@ -28,7 +28,7 @@ export type PaymentButtonProps = {
 	invoice?: InvoiceData
 }
 
-const AppleGooglePayButtons = ({item, hideApplePay, hideGooglePay, ...props}: GooglePayButtonProps) => {
+const AppleGooglePayButtons = ({item, hideApplePay, hideGooglePay, buttonWidth: width, ...props}: GooglePayButtonProps) => {
 	const { cart } = useSelector((state: RootState) => state.cart);
 	const [checkoutCart, setCheckoutCart] = useState<Cart>();
 
@@ -47,10 +47,10 @@ const AppleGooglePayButtons = ({item, hideApplePay, hideGooglePay, ...props}: Go
 	}, [cart, item]);
 
 	return checkoutCart && (
-		<Grid2 container direction="column">
-			{!hideGooglePay && <GooglePayButton cart={checkoutCart} askForShipping={!!item} {...props} />}
-			{!hideApplePay && <ApplePayButton cart={checkoutCart} askForShipping={!!item} {...props} />}
-		</Grid2>
+		<>
+			{!hideGooglePay && <Box sx={{width}}><GooglePayButton cart={checkoutCart} askForShipping={!!item} {...props} /></Box>}
+				{!hideApplePay && <Box sx={{width}}><ApplePayButton cart={checkoutCart} askForShipping={!!item} {...props} /></Box>}
+		</>
 	)
 }
 

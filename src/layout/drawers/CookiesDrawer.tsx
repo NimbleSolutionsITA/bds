@@ -1,4 +1,4 @@
-import {Button, Container, Grid, Drawer, Typography} from "@mui/material";
+import {Button, Container, Grid2 as Grid, Drawer, Typography} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {closeCookiesDrawer} from "../../redux/layoutSlice";
 import {RootState} from "../../redux/store";
@@ -74,7 +74,7 @@ const CookiesDrawer = () => {
 					{t('cookie-policy.body')}
 				</Typography>
 				<Grid container spacing={2}>
-					<Grid item xs={12} md={6}>
+					<Grid size={{xs: 12, md: 6}}>
 						<Button
 							variant="outlined"
 							color="primary"
@@ -86,7 +86,7 @@ const CookiesDrawer = () => {
 							{t('cookie-policy.edit')}
 						</Button>
 					</Grid>
-					<Grid item xs={12} md={6}>
+					<Grid size={{xs: 12, md: 6}}>
 						<Button
 							onClick={handleAccept}
 							variant="contained"

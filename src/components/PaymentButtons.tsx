@@ -3,6 +3,7 @@ import AppleGooglePayButtons from "./AppleGooglePayButtons";
 import usePayPalCheckout from "./PayPalCheckoutProvider";
 import {useFormContext} from "react-hook-form";
 import {Button, CircularProgress} from "@mui/material";
+import {useTranslation} from "next-i18next";
 
 const PaymentButtons = () => {
 	const {onApprove, createOrder, shipping} = usePayPalCheckout();
@@ -43,6 +44,7 @@ const PaymentButtons = () => {
 const SubmitPayment = () => {
 	const { cardFieldsForm, fields } = usePayPalCardFields();
 	const { isPaying, setIsPaying} = usePayPalCheckout();
+	const { t } = useTranslation()
 
 	const handleClick = async () => {
 		if (!cardFieldsForm) {
@@ -65,11 +67,12 @@ const SubmitPayment = () => {
 
 	return (
 		<Button
+			fullWidth
 			disabled={isPaying}
 			onClick={handleClick}
 			startIcon={isPaying && <CircularProgress thickness={5} size={18} />}
 		>
-			Pay
+			{t('checkout.pay-with-card')}
 		</Button>
 	);
 };

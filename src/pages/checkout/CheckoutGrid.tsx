@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
-import {BillingData, InvoiceData, LoggedCustomer, ShippingData} from "../../types/woocommerce";
+import {BillingData, InvoiceData, ShippingData} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
 import CheckoutDesktop from "./CheckoutDesktop";
 import {useMediaQuery, useTheme} from "@mui/material";
@@ -8,12 +8,12 @@ import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../redux/store";
 import {updateCartCustomer} from "../../redux/cartSlice";
 import CheckoutMobile from "./CheckoutMobile";
-import {PaymentErrorDialog} from "./Payment";
 import useAuth from "../../utils/useAuth";
 import {BillingAddress, Customer, ShippingAddress} from "../../types/cart-type";
 import {PayPalCheckoutProvider} from "../../components/PayPalCheckoutProvider";
 import {ShippingData as WooShippingData} from "../../redux/layoutSlice";
 import {getCustomerMetaData, getInvoice} from "../../utils/utils";
+import PaymentErrorDialog from "./PaymentErrorDialog";
 
 export type CheckoutGridProps = {
 	shipping: WooShippingData

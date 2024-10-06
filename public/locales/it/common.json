@@ -177,7 +177,17 @@
     "go-to-invoice":"Vai alla fatturazione",
     "remove": "Rimuovi",
     "customer-notes": "Note per il corriere",
-    "invoice": "Fatturazione"
+    "invoice": "Fatturazione",
+    "pay-with-card": "Paga con carta di credito",
+    "item-recap": "Riepilogo carrello",
+    "addresses-recap": "Riepilogo spedizione e fatturazione",
+    "payment-method": "Metodo di pagamento",
+    "payment-methods": {
+      "card": "Carta di credito",
+      "paypal": "PayPal",
+      "applepay": "Apple Pay",
+      "googlepay": "Google Pay"
+    }
   },
   "form":{
     "name":"Nome",

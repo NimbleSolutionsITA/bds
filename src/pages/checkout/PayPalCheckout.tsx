@@ -1,8 +1,6 @@
 import {Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup} from "@mui/material";
 import {useTranslation} from "next-i18next";
-import {
-	PayPalCardFieldsForm, PayPalMessages,
-} from "@paypal/react-paypal-js";
+import { PayPalCardFieldsForm, PayPalMessages } from "@paypal/react-paypal-js";
 import {Controller, useFormContext} from "react-hook-form";
 import {FormFields, PAYMENT_METHODS} from "./CheckoutGrid";
 import {useSelector} from "react-redux";
@@ -22,9 +20,11 @@ const PayPalCheckout = () => {
 	})
 	const { paymentMethod } = watch()
 	return (
-		<Box sx={{display: 'flex', flexDirection: 'column', mt: '32px'}}>
+		<Box sx={{display: 'flex', flexDirection: 'column', mt: '16px'}}>
 			<FormControl>
-				<FormLabel>{t('select-payment')}</FormLabel>
+				<FormLabel sx={{fontWeight: 500, fontSie: '14px', color: "rgba(0, 0, 0, 0.87)", marginBottom: '8px'}}>
+					{t('checkout.payment-method')}: {t(`checkout.payment-methods.${paymentMethod}`)}
+				</FormLabel>
 				<Controller
 					rules={{ required: true }}
 					control={control}

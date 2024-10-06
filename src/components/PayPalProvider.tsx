@@ -9,6 +9,8 @@ import ApplePayPaymentToken = ApplePayJS.ApplePayPaymentToken;
 import ApplePayMerchantCapability = ApplePayJS.ApplePayMerchantCapability;
 import MerchantInfo = google.payments.api.MerchantInfo;
 import PaymentMethodSpecification = google.payments.api.PaymentMethodSpecification;
+import {useRouter} from "next/router";
+import {LOCALE} from "../utils/utils";
 
 export type PayPalGooglePayConfig = {
 	allowedPaymentMethods: PaymentMethodSpecification[]
@@ -87,13 +89,19 @@ export type PayPalWithGooglePay = PayPalNamespace & {
 
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 
+const LOCALES = {
+	it: "it_IT",
+	en: "en_US"
+}
+
 const PayPalProvider = ({ children }: PayPalProviderProps) => {
+	const { locale } = useRouter()
 	return PAYPAL_CLIENT_ID ? (
 		<PayPalScriptProvider options={{
 			clientId: PAYPAL_CLIENT_ID,
 			components: "buttons,applepay,googlepay,card-fields,messages",
 			currency: "EUR",
-
+			locale: LOCALES[locale as LOCALE]
 		}}>
 			<PayPalApplePayConfig/>
 			<PayPalGooglePayConfig />

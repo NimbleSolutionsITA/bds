@@ -263,6 +263,7 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 								<AppleGooglePayButtons
 									item={addCartItemPayload}
 									shipping={{classes: shipping, countries}}
+									buttonWidth="250px"
 								/>
 							</>
 						)}

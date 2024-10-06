@@ -34,7 +34,6 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	async function createOrder() {
 		try {
-			console.log("Creating order", cart, customerNote, invoice);
 			const response = await fetch("/api/orders", {
 				method: "POST",
 				headers: {
@@ -91,7 +90,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			}
 			dispatch(destroyCart());
 			gtagPurchase(wooOrder);
-			await router.push("/completed");
+			await router.push("/checkout/completed");
 		} catch (error) {
 			console.error(error);
 		}

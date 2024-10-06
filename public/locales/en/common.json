@@ -174,7 +174,17 @@
     "go-to-payment":"Proceed to Payment",
     "remove": "Remove",
     "customer-notes": "Special instructions for seller",
-    "invoice": "Invoice"
+    "invoice": "Invoice",
+    "pay-with-card": "Pay with credit card",
+    "item-recap": "Cart items",
+    "addresses-recap": "Shipping and billing addresses",
+    "payment-method": "Payment method",
+    "payment-methods": {
+      "card": "Credit Card",
+      "paypal": "PayPal",
+      "applepay": "Apple Pay",
+      "googlepay": "Google Pay"
+    }
   },
   "form":{
     "name":"First Name",

@@ -1,7 +1,6 @@
 import {SyntheticEvent, Dispatch, SetStateAction} from "react";
 import {Controller, useFormContext, useWatch} from "react-hook-form";
 import {Tabs, Tab, TextField, Switch, FormControlLabel} from "@mui/material";
-import {Country} from "../../types/woocommerce";
 import {FormFields} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
 import MotionPanel from "../../components/MotionPanel";
@@ -9,10 +8,7 @@ import {useTranslation} from "next-i18next";
 import CustomerAddressForm from "../../components/CustomerAddressForm";
 import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
-type AddressFormProps = {
-	setFocus?: Dispatch<SetStateAction<boolean>>
-}
-const AddressForm = ({setFocus}: AddressFormProps) => {
+const AddressForm = () => {
 	const { shipping: { countries }} = usePayPalCheckout()
 	const { control, formState: { errors }, setError, watch, setValue,  } = useFormContext<FormFields>();
 	const tab = watch('addressTab')
@@ -21,11 +17,6 @@ const AddressForm = ({setFocus}: AddressFormProps) => {
 	};
 	const { t } = useTranslation('common');
 	const hasShipping = useWatch({name: 'has_shipping', control});
-
-	const focusProps = {
-		onBlur: () => setFocus?.(false),
-		onFocus: () => setFocus?.(true)
-	}
 
 	return (
 		<div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
@@ -47,7 +38,6 @@ const AddressForm = ({setFocus}: AddressFormProps) => {
 						variant="outlined"
 						label="Email"
 						helperText={<HelperText message={errors.billing?.email?.message} />}
-						{...focusProps}
 					/>
 				)}
 			/>
@@ -71,14 +61,13 @@ const AddressForm = ({setFocus}: AddressFormProps) => {
 			</Tabs>
 			<div style={{position: 'relative'}}>
 				<MotionPanel active={!hasShipping || tab === 0}>
-					<CustomerAddressForm countries={countries} focusProps={focusProps} />
+					<CustomerAddressForm countries={countries} />
 				</MotionPanel>
 				{hasShipping && (
 					<MotionPanel active={tab === 1}>
 						<CustomerAddressForm
 							isShipping
 							countries={countries}
-							focusProps={focusProps}
 						/>
 					</MotionPanel>
 				)}
