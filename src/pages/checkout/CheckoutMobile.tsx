@@ -26,7 +26,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import PayPalCheckout from "./PayPalCheckout";
 import CartAddressRecap from "./CartAddressRecap";
 import PriceRecap from "./PriceRecap";
-import Logo from "./Logo";
 import logo from "../../images/bottega-di-sguardi-logo.png";
 import Image from "next/image";
 
@@ -40,32 +39,6 @@ const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
 	const activeStep = STEP_MAP.indexOf(checkoutStep)
 	const [expandPrice, setExpandPrice] = useState(false)
 
-	const checkoutComponent = [
-		<AddressForm />,
-		<>
-			<InvoiceForm />
-			<Divider sx={{margin: '5px 0'}} />
-			<CartCoupon />
-			<Divider sx={{margin: '5px 0'}} />
-			<CartShippingRate />
-			<Divider sx={{margin: '5px 0'}} />
-			<CartNote />
-		</>,
-		<>
-			<AccordionRecap title={email}>
-				<CartAddressRecap />
-			</AccordionRecap>
-			<AccordionRecap title={t('checkout.item-recap')}>
-				<CartRecap />
-			</AccordionRecap>
-			<Divider />
-			<PayPalCheckout />
-			<Box sx={{marginTop: paymentMethod === 'card' ? 0 : '32px', width: '100%'}}>
-				<PaymentButtons />
-			</Box>
-		</>
-	]
-
 	return (
 		<Box sx={{display: 'flex', flexDirection: 'column', height: '100%', padding: '16px 8px 160px'}}>
 			<Box sx={{textAlign: 'center', marginBottom: '8px'}}>
@@ -75,7 +48,33 @@ const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
 					style={{ width: '60px', height: 'auto' }}
 				/>
 			</Box>
-			{checkoutComponent[activeStep]}
+			{checkoutStep === "ADDRESS" && <AddressForm />}
+			{checkoutStep === "INVOICE" && (
+				<>
+					<InvoiceForm />
+					<Divider sx={{margin: '5px 0'}} />
+					<CartCoupon />
+					<Divider sx={{margin: '5px 0'}} />
+					<CartShippingRate />
+					<Divider sx={{margin: '5px 0'}} />
+					<CartNote />
+				</>
+			)}
+			{checkoutStep === "PAYMENT" && (
+				<>
+					<AccordionRecap title={email}>
+						<CartAddressRecap />
+					</AccordionRecap>
+					<AccordionRecap title={t('checkout.item-recap')}>
+						<CartRecap />
+					</AccordionRecap>
+					<Divider />
+					<PayPalCheckout />
+					<Box sx={{marginTop: paymentMethod === 'card' ? 0 : '32px', width: '100%'}}>
+						<PaymentButtons />
+					</Box>
+				</>
+			)}
 			<Box
 				sx={{
 					backgroundColor: "#eeeeee",
