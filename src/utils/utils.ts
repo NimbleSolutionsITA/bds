@@ -42,8 +42,8 @@ export const OPTICAL_CATEGORY = {
     en: 493
 }
 export const FRAGRANCES_CATEGORY = {
-    it: 15674,
-    en: 15676
+    it: 15787,
+    en: 15789
 }
 
 export const BOTTEGA_DI_SGUARDI_CATEGORY = {
