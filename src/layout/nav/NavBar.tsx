@@ -5,11 +5,11 @@ import {BreadCrumb, MenuItem, Menus} from "../../types/settings";
 import {WooProductCategory} from "../../types/woocommerce";
 import {
     DESIGNERS_CATEGORY,
-    DESIGNERS_SUB_PATH, FRAGRANCES_CATEGORY,
+    DESIGNERS_SUB_PATH,
     FRAGRANCES_SUB_PATH,
     OUR_PRODUCTION_SUB_PATH,
 } from "../../utils/endpoints";
-import {OUR_PRODUCTION_CATEGORIES} from "../../utils/utils";
+import {FRAGRANCES_CATEGORY, OUR_PRODUCTION_CATEGORIES} from "../../utils/utils";
 
 type NavBarProps = {
     left: MenuItem[]
@@ -37,7 +37,7 @@ const mapMenu = (categories: WooProductCategory[]) => (item: MenuItem): MenuItem
         child_items = category?.child_items?.map(categoryToMenu(DESIGNERS_SUB_PATH)) as MenuItem[]
     }
     else if (item.slug === FRAGRANCES_SUB_PATH) {
-        const category = categories.find(c => c.slug === FRAGRANCES_CATEGORY)
+        const category = categories.find(c => Object.values(FRAGRANCES_CATEGORY).includes(c.id))
         const items = category?.child_items?.sort((a, b) => a.menu_order - b.menu_order)
         groups = items?.map(c => c.slug)
         child_items = items?.map(item => item.child_items?.sort((a, b) => a.menu_order - b.menu_order).map(c => categoryToMenu(item.slug)(c))).flat() as MenuItem[]

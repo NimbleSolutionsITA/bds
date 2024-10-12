@@ -9,11 +9,11 @@ import NewsletterForm from "../../components/NewsletterForm";
 import {useTranslation} from "react-i18next";
 import {BaseLayoutProps, MenuItem, Menus} from "../../types/settings";
 import {
-	DESIGNERS_SUB_PATH, FRAGRANCES_CATEGORY,
+	DESIGNERS_SUB_PATH,
 	OUR_PRODUCTION_SUB_PATH,
 } from "../../utils/endpoints";
 import Link from "../../components/Link";
-import {getRelativePath} from "../../utils/utils";
+import {FRAGRANCES_CATEGORY, getRelativePath} from "../../utils/utils";
 import useClientSideRendering from "../../utils/useClientSideRendering";
 
 
@@ -35,7 +35,7 @@ const Footer = ({googlePlaces, categories, mobileMenu: [opticalMan, sunglassesMa
 		{ label: ourProduction.title, href: OUR_PRODUCTION_SUB_PATH },
 	]
 	const footerMenuRight = [
-		...(categories.find(c => c.slug === FRAGRANCES_CATEGORY)?.child_items?.map(ci => ({label: ci.name, href: ci.slug})) ?? []),
+		...(categories.find(c => Object.values(FRAGRANCES_CATEGORY).includes(c.id))?.child_items?.map(ci => ({label: ci.name, href: ci.slug})) ?? []),
 		{ label: store.title, href: store.url },
 		{ label: blog.title, href: blog.url },
 	]

@@ -6,7 +6,6 @@ import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProducts} from "../api/products";
-import {FRAGRANCES_CATEGORY as FRAGRANCES_CATEGORY_PATH, } from "../../src/utils/endpoints";
 import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
 import {cacheGetProductCategories} from "../../src/utils/cache";
 
@@ -52,7 +51,6 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
-		{ name: 'Fragranze', href: urlPrefix + '/'+FRAGRANCES_CATEGORY_PATH },
 		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+page+'/' + productCategory.slug },
 	]
 	return {

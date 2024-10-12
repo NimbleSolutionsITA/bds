@@ -3,7 +3,6 @@ import {IconButton, TextField, Typography} from "@mui/material";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {
 	DESIGNERS_CATEGORY,
-	DESIGNERS_SUB_PATH, FRAGRANCES_CATEGORY,
 	NEXT_API_ENDPOINT,
 	PRODUCT_SUB_PATH,
 } from "../../utils/endpoints";
@@ -16,13 +15,14 @@ import Box from "@mui/material/Box";
 import {useDispatch} from "react-redux";
 import {closeSearchDrawer} from "../../redux/layoutSlice";
 import {CloseIcon} from "next/dist/client/components/react-dev-overlay/internal/icons/CloseIcon";
+import {FRAGRANCES_CATEGORY} from "../../utils/utils";
 
 type Props = {
 	categories: WooProductCategory[]
 }
 
 const SearchLayout = ({categories}: Props) => {
-	const fragrances = categories.find(category => category.slug === FRAGRANCES_CATEGORY)?.child_items?.map(c => c.child_items?.map(ci => ({...ci, parent: c.slug}))).flat() ?? [] as WooProductCategory[]
+	const fragrances = categories.find(category => Object.values(FRAGRANCES_CATEGORY).includes(category.id))?.child_items?.map(c => c.child_items?.map(ci => ({...ci, parent: c.slug}))).flat() ?? [] as WooProductCategory[]
 	const designers = categories.find(category => category.slug === DESIGNERS_CATEGORY)?.child_items ?? []
 	const { locale } = useRouter()
 	const [search, setSearch] = useState('');

@@ -19,4 +19,3 @@ export const PRODUCT_SUB_PATH = 'products'
 export const INSTAGRAM_LINK = 'https://www.instagram.com/bottegadisguardi/'
 export const FACEBOOK_LINK = 'https://www.facebook.com/bottegadisguardi'
 export const DESIGNERS_CATEGORY = "eyewear"
-export const FRAGRANCES_CATEGORY = "fragrances"

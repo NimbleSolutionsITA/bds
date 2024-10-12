@@ -17,7 +17,7 @@ import LanguageButton from "../../../components/LanguageButton";
 import {Facebook, Instagram, PhoneEnabledSharp} from "@mui/icons-material";
 import {useRouter} from "next/router";
 import {IconButtonProps} from "@mui/material/IconButton/IconButton";
-import {OUR_PRODUCTION_CATEGORIES} from "../../../utils/utils";
+import {FRAGRANCES_CATEGORY, OUR_PRODUCTION_CATEGORIES} from "../../../utils/utils";
 import {useTranslation} from "next-i18next";
 import BottomBar from "../BottomBar";
 import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layoutSlice";
@@ -29,8 +29,7 @@ import AccordionNavButton from "../../../components/AccordionNavButton";
 import {UserMenu} from "../UserMenu";
 import {
     DESIGNERS_CATEGORY,
-    FACEBOOK_LINK,
-    FRAGRANCES_CATEGORY, INSTAGRAM_LINK,
+    FACEBOOK_LINK, INSTAGRAM_LINK,
     OUR_PRODUCTION_SUB_PATH
 } from "../../../utils/endpoints";
 
@@ -59,7 +58,7 @@ export default function NavBarMobile({
     const accordionCategories = [
         {id: designers.id, name: designers.title, slug: DESIGNERS_CATEGORY, child_items: categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items},
         {id: ourProduction.id, name: ourProduction.title, slug: OUR_PRODUCTION_SUB_PATH, child_items: categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items?.filter(c => [...OUR_PRODUCTION_CATEGORIES.it, ...OUR_PRODUCTION_CATEGORIES.en].includes(c.id))},
-        ...(categories.find(c => c.slug === FRAGRANCES_CATEGORY)?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? [])
+        ...(categories.find(c => Object.values(FRAGRANCES_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? [])
     ]
     return (
         <>

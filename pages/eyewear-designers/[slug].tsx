@@ -6,7 +6,7 @@ import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProducts} from "../api/products";
-import {DESIGNERS_SUB_PATH, DESIGNERS_CATEGORY} from "../../src/utils/endpoints";
+import {DESIGNERS_SUB_PATH} from "../../src/utils/endpoints";
 import {EYEWEAR_CATEGORY, LOCALE} from "../../src/utils/utils";
 import {cacheGetProductCategories} from "../../src/utils/cache";
 
