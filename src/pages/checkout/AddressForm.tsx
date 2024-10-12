@@ -1,9 +1,8 @@
-import {SyntheticEvent, Dispatch, SetStateAction} from "react";
+import {ReactNode, SyntheticEvent} from "react";
 import {Controller, useFormContext, useWatch} from "react-hook-form";
 import {Tabs, Tab, TextField, Switch, FormControlLabel} from "@mui/material";
 import {FormFields} from "./CheckoutGrid";
 import HelperText from "../../components/HelperText";
-import MotionPanel from "../../components/MotionPanel";
 import {useTranslation} from "next-i18next";
 import CustomerAddressForm from "../../components/CustomerAddressForm";
 import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
@@ -17,6 +16,7 @@ const AddressForm = () => {
 	};
 	const { t } = useTranslation('common');
 	const hasShipping = useWatch({name: 'has_shipping', control});
+	const tabs = hasShipping ? [0, 1] : [0]
 
 	return (
 		<div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
@@ -54,25 +54,47 @@ const AddressForm = () => {
 				value={hasShipping ? tab : 0}
 				onChange={handleChange}
 				variant="fullWidth"
-
 			>
-				<Tab label={hasShipping ? t('checkout.billing') : t('checkout.billing-shipping')} />
-				{hasShipping && <Tab label={t('checkout.shipping')} />}
+				{tabs.map((index) => (
+					<Tab
+						key={index}
+						label={t(`checkout.${index === 0 ? 'billing' : 'shipping'}`)}
+						id={`address-tab-${index}`}
+						aria-controls={`address-tabpanel-${index}`}
+					/>
+				))}
 			</Tabs>
 			<div style={{position: 'relative'}}>
-				<MotionPanel active={!hasShipping || tab === 0}>
-					<CustomerAddressForm countries={countries} />
-				</MotionPanel>
-				{hasShipping && (
-					<MotionPanel active={tab === 1}>
-						<CustomerAddressForm
-							isShipping
-							countries={countries}
-						/>
-					</MotionPanel>
-				)}
+				{tabs.map((index) => (
+					<CustomTabPanel key={index} value={tab} index={index}>
+						<CustomerAddressForm countries={countries} isShipping={index === 1} />
+					</CustomTabPanel>
+				))}
 			</div>
 		</div>
 	)
 }
+
+interface TabPanelProps {
+	children?: ReactNode;
+	index: number;
+	value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+	const { children, value, index, ...other } = props;
+
+	return (
+		<div
+			role="tabpanel"
+			hidden={value !== index}
+			id={`address-tabpanel-${index}`}
+			aria-labelledby={`address-tab-${index}`}
+			{...other}
+		>
+			{value === index && children}
+		</div>
+	);
+}
+
 export default AddressForm;

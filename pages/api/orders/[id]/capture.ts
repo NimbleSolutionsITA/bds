@@ -36,7 +36,15 @@ export default async function handler(
 			const orderId = responseData.payPalOrder.purchase_units[0].reference_id
 			responseData.success = responseData.payPalOrder.status === 'COMPLETED'
 			if (responseData.success && orderId) {
-				const { data: order} = await api.put(`orders/${orderId}`, { set_paid: true })
+				const { data: order} = await api.put(`orders/${orderId}`, {
+					set_paid: true,
+					transaction_id: paypalOrderId,
+					payment_data: [
+						{ key: "ppcp_paypal_order_id", value: paypalOrderId },
+						{ key: "ppcp_billing_token", value: "" },
+						{ key: "wc-ppcp-new-payment-method", value: false }
+					]
+				})
 				responseData.wooOrder = order
 			}
 		}

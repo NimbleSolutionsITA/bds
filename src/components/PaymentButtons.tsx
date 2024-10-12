@@ -6,7 +6,7 @@ import {Button, CircularProgress} from "@mui/material";
 import {useTranslation} from "next-i18next";
 
 const PaymentButtons = () => {
-	const {onApprove, createOrder, shipping} = usePayPalCheckout();
+	const {onApprove, createOrder, shipping, setError} = usePayPalCheckout();
 	const { watch } = useFormContext()
 	const { customerNote, invoice, paymentMethod } = watch()
 	return (
@@ -15,6 +15,7 @@ const PaymentButtons = () => {
 				<PayPalButtons
 					createOrder={createOrder}
 					onApprove={onApprove}
+					onError={(error) => setError(error.message as any)}
 					style={{
 						color: "black",
 						shape: "rect",

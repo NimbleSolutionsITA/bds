@@ -8,6 +8,9 @@ import {useFormContext} from "react-hook-form";
 import {gtagPurchase} from "../utils/utils";
 import {useRouter} from "next/router";
 import {destroyCart} from "../redux/cartSlice";
+import useAuth from "../utils/useAuth";
+import PaymentErrorDialog from "../pages/checkout/PaymentErrorDialog";
+import {boolean} from "@apimatic/schema";
 
 interface PayPalProviderProps {
 	children: React.ReactNode | React.ReactNode[];
@@ -18,14 +21,16 @@ interface PayPalProviderProps {
 const PayPalCheckoutContext = createContext({
 	createOrder: async () => { return ""},
 	onApprove: async (data: OnApproveData) => {},
-	onError: (error: any) => {},
+	setError: (error: string) => {},
 	shipping: {} as ShippingData,
+	isPaying: false,
 	setIsPaying: (isPaying: boolean) => {},
-	isPaying: false
 });
 
 export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps) => {
+	const [error, setError] = useState<string>();
 	const [isPaying, setIsPaying] = useState(false);
+	const { user } = useAuth();
 	const { cart } = useSelector((state: RootState) => state.cart);
 	const { watch } = useFormContext()
 	const { invoice, customerNote } = watch()
@@ -33,13 +38,14 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	const dispatch = useDispatch<AppDispatch>()
 
 	async function createOrder() {
+		setIsPaying(true);
 		try {
 			const response = await fetch("/api/orders", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ cart, customerNote, invoice }),
+				body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id }),
 			});
 
 			const orderData = await response.json();
@@ -47,11 +53,15 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				throw new Error(orderData.error);
 			}
 			return orderData.id;
-		} catch (error) {
-			console.error(error);
+		} catch (error: any) {
+			setError(error.message);
+		} finally {
+			setIsPaying(false);
 		}
 	}
+
 	async function onApprove(data: OnApproveData) {
+		setIsPaying(true);
 		try {
 			const response = await fetch(`/api/orders/${data.orderID}/capture`, {
 				method: "POST",
@@ -91,12 +101,15 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			dispatch(destroyCart());
 			gtagPurchase(wooOrder);
 			await router.push("/checkout/completed");
-		} catch (error) {
-			console.error(error);
+		} catch (error: any) {
+			setError(error.message);
+			setIsPaying(true);
+		} finally {
+			setIsPaying(false);
 		}
 	}
-	function onError(error: any) {
-		console.error(error);
+	function onError(error:  Record<string, any>) {
+		setError(error.message);
 	}
 	return (
 		<PayPalCardFieldsProvider
@@ -127,9 +140,10 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				},
 			} as Record<string, PayPalCardFieldsStyleOptions>}
 		>
-			<PayPalCheckoutContext.Provider value={{createOrder, onApprove, onError, shipping, isPaying, setIsPaying}}>
+			<PayPalCheckoutContext.Provider value={{createOrder, onApprove, setError, shipping, isPaying, setIsPaying}}>
 				{children}
 			</PayPalCheckoutContext.Provider>
+			<PaymentErrorDialog setError={setError} error={error} />
 		</PayPalCardFieldsProvider>
 	)
 }

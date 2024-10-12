@@ -15,73 +15,74 @@ import CallbackIntent = google.payments.api.CallbackIntent;
 import {useRouter} from "next/router";
 import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/utils";
 import TotalPriceStatus = google.payments.api.TotalPriceStatus;
+import useAuth from "../utils/useAuth";
+import usePayPalCheckout from "./PayPalCheckoutProvider";
 
 const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}: PaymentButtonProps) => {
 	const { googlePayConfig } = useSelector((state: RootState) => state.cart);
+	const { isPaying, setIsPaying, setError} = usePayPalCheckout();
+	const { user } = useAuth();
 	const [paymentsClient, setPaymentsClient] = useState<google.payments.api.PaymentsClient>();
 	const paypal = window.paypal as PayPalWithGooglePay;
 	const cartKey = cart.cart_key;
 	const dispatch = useDispatch<AppDispatch>();
 	const router = useRouter();
-	const [isPaying, setIsPaying] = useState(false)
 
 	const processPayment = useCallback(async (paymentData: PaymentData) => {
+		setIsPaying(true);
 		try {
-			if (!isPaying) {
-				setIsPaying(true)
-				if (!paypal.Googlepay) {
-					throw new Error("Google Pay not available");
-				}
-				const googlePay = new paypal.Googlepay();
-				console.log({ cart, invoice, customerNote, paymentData })
-				/* Create Order */
-				const {id} = await fetch(`/api/orders`, {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
+			if (!paypal.Googlepay) {
+				throw new Error("Google Pay not available");
+			}
+			const googlePay = new paypal.Googlepay();
+			/* Create Order */
+			const {id} = await fetch(`/api/orders`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					cart: {
+						...cart,
+						customer: askForShipping ? mapPaymentDataToCartCustomer(paymentData) : cart.customer
 					},
-					body: JSON.stringify({
-						cart: {
-							...cart,
-							customer: askForShipping ? mapPaymentDataToCartCustomer(paymentData) : cart.customer
-						},
-						invoice,
-						customerNote
-					}),
+					invoice,
+					customerNote,
+					customerId: user?.user_id,
+				}),
+			}).then((res) => res.json());
+			const {status} = await googlePay.confirmOrder({
+				orderId: id,
+				paymentMethodData: paymentData.paymentMethodData,
+			});
+			if (status === "APPROVED") {
+				/* Capture the Order */
+				const {wooOrder, payPalOrder} = await fetch(`/api/orders/${id}/capture`, {
+					method: "POST",
 				}).then((res) => res.json());
-				const {status} = await googlePay.confirmOrder({
-					orderId: id,
-					paymentMethodData: paymentData.paymentMethodData,
-				});
-				if (status === "APPROVED") {
-					/* Capture the Order */
-					const {wooOrder, payPalOrder} = await fetch(`/api/orders/${id}/capture`, {
-						method: "POST",
-					}).then((res) => res.json());
-					console.log(payPalOrder)
-					if (payPalOrder.status === "COMPLETED") {
-						gtagPurchase(wooOrder);
-						if (!askForShipping) {
-							dispatch(destroyCart());
-						}
-						router.push('/checkout/completed')
+				if (payPalOrder.status === "COMPLETED") {
+					gtagPurchase(wooOrder);
+					if (!askForShipping) {
+						dispatch(destroyCart());
 					}
-					return {transactionState: "SUCCESS"};
-				} else {
-					setIsPaying(false)
-					return {transactionState: "ERROR"};
+					router.push('/checkout/completed')
 				}
+				return {transactionState: "SUCCESS"};
+			} else {
+				return {transactionState: "ERROR"};
 			}
 		} catch (err: any) {
-			setIsPaying(false)
 			return {
 				transactionState: "ERROR",
 				error: {
 					message: err.message,
 				},
 			};
+		} finally {
+			setIsPaying(false);
 		}
-	}, [askForShipping, cart, customerNote, dispatch, invoice, isPaying, paypal.Googlepay, router])
+
+	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal.Googlepay, router, setIsPaying, user?.user_id])
 
 	useEffect(() => {
 		function onPaymentDataChanged(paymentData: IntermediatePaymentData): Promise<PaymentDataRequestUpdate> {
@@ -156,8 +157,9 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 			setPaymentsClient(paymentsClientObject)
 			return paymentsClientObject;
 		}
-		if (!googlePayConfig || paymentsClient) { return }
-		getGooglePaymentsClient();
+		if (googlePayConfig && !paymentsClient) {
+			getGooglePaymentsClient();
+		}
 
 	}, [askForShipping, cartKey, googlePayConfig, paymentsClient, processPayment])
 
@@ -202,7 +204,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				console.error(err);
 			});
 
-	}, [askForShipping, cart, googlePayConfig, paymentsClient, shipping.countries]);
+	}, [askForShipping, cart, googlePayConfig, paymentsClient, router.locale, shipping.countries]);
 
 	return <div id="google-pay-container" style={{width: '100%', height: "47px"}} />
 }

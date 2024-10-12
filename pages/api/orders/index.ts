@@ -30,18 +30,16 @@ export default async function handler(
 	}
 	try {
 		if (req.method === 'POST') {
-			const { cart, invoice = null, customerNote = null } = req.body
+			const { cart, invoice = null, customerNote = "", customerId = 0 } = req.body
 			if (!cart) {
 				throw new Error('Cart or customer data is missing')
 			}
 			if (Number(cart.totals.total) === 0) {
 				throw new Error('Cart amount is 0')
 			}
-			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote)
+			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId)
 			console.log(orderPayload)
-			const { data: order } = await api.post("orders", {
-				...orderPayload,
-			})
+			const { data: order } = await api.post("orders", orderPayload)
 			const amount = Number(order.total)
 			if (amount === 0) {
 				await api.delete(`/api/orders/${order.id}`, { force: true })
@@ -97,10 +95,12 @@ const createOrder = async (amount: number, orderId: string) => {
 	return await response.json();
 };
 
-const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: string) => {
+const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: string, customerId?: string) => {
 	const selectedShipping = cart.shipping?.packages.default.rates[cart.shipping.packages.default.chosen_method]
 	const isEu = getIsEU(cart.customer)
 	return ({
+		customer_id: customerId,
+		currency: "EUR",
 		payment_method: 'paypal',
 		payment_method_title: 'PayPal',
 		payment_method_reference: 'paypal',

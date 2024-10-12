@@ -8,9 +8,11 @@ import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/u
 import {callCart, PaymentButtonProps} from "./AppleGooglePayButtons";
 import {destroyCart} from "../redux/cartSlice";
 import {useRouter} from "next/router";
+import useAuth from "../utils/useAuth";
 
 const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, askForShipping}: PaymentButtonProps) => {
 	const { applePayConfig } = useSelector((state: RootState) => state.cart);
+	const { user } = useAuth();
 	const buttonRef = useRef<ElementRef<'div'>>(null);
 	const dispatch = useDispatch<AppDispatch>();
 	const router = useRouter();
@@ -121,7 +123,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					headers : {
 						'Content-Type': 'application/json'
 					},
-					body: JSON.stringify({ cart, customerNote, invoice })
+					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id })
 				})
 				if(!orderResponse.ok) {
 					throw new Error("error creating order")
