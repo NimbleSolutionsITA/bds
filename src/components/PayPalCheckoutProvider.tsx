@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from "react";
+import React, {createContext, useCallback, useContext, useState} from "react";
 import {OnApproveData, PayPalCardFieldsStyleOptions} from "@paypal/paypal-js";
 import {PayPalCardFieldsProvider} from "@paypal/react-paypal-js";
 import {ShippingData} from "../redux/layoutSlice";
@@ -11,6 +11,7 @@ import {destroyCart} from "../redux/cartSlice";
 import useAuth from "../utils/useAuth";
 import PaymentErrorDialog from "../pages/checkout/PaymentErrorDialog";
 import {boolean} from "@apimatic/schema";
+import {useMutation} from "@tanstack/react-query";
 
 interface PayPalProviderProps {
 	children: React.ReactNode | React.ReactNode[];
@@ -33,30 +34,36 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	const { user } = useAuth();
 	const { cart } = useSelector((state: RootState) => state.cart);
 	const { watch } = useFormContext()
-	const { invoice, customerNote } = watch()
+	const { invoice, customerNote, billing, shipping: shippingForm } = watch()
 	const router = useRouter();
 	const dispatch = useDispatch<AppDispatch>()
 
-	async function createOrder() {
-		setIsPaying(true);
-		try {
-			const response = await fetch("/api/orders", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id }),
-			});
+	const createOrder = useMutation({
+		mutationFn: async () => {
+			console.log(cart?.customer, billing, shippingForm)
+			setIsPaying(true);
+			try {
+				const response = await fetch("/api/orders", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id }),
+				});
 
-			const orderData = await response.json();
-			if (!orderData.success) {
-				throw new Error(orderData.error);
+				const orderData = await response.json();
+				if (!orderData.success) {
+					throw new Error(orderData.error);
+				}
+				return orderData.id;
+			} catch (error: any) {
+				setError(error.message);
 			}
-			return orderData.id;
-		} catch (error: any) {
-			setError(error.message);
+		},
+		onSuccess: (data) => {
+			console.log(data)
 		}
-	}
+	})
 
 	async function onApprove(data: OnApproveData) {
 		try {
@@ -107,7 +114,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	}
 	return (
 		<PayPalCardFieldsProvider
-			createOrder={createOrder}
+			createOrder={createOrder.mutateAsync}
 			onApprove={onApprove}
 			onError={onError}
 			style={{
@@ -134,7 +141,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				},
 			} as Record<string, PayPalCardFieldsStyleOptions>}
 		>
-			<PayPalCheckoutContext.Provider value={{createOrder, onApprove, setError, shipping, isPaying, setIsPaying}}>
+			<PayPalCheckoutContext.Provider value={{createOrder: createOrder.mutateAsync, onApprove, setError, shipping, isPaying, setIsPaying}}>
 				{children}
 			</PayPalCheckoutContext.Provider>
 			<PaymentErrorDialog setError={(value) => {
