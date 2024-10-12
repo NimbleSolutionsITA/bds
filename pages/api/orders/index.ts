@@ -101,9 +101,8 @@ const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: str
 	return ({
 		customer_id: customerId,
 		currency: "EUR",
-		payment_method: 'paypal',
+		payment_method: 'ppcp-gateway',
 		payment_method_title: 'PayPal',
-		payment_method_reference: 'paypal',
 		billing: mapAddress(cart.customer.billing_address, 'billing'),
 		shipping: mapAddress(cart.customer.shipping_address, 'shipping'),
 		line_items: await Promise.all(cart.items.map(prepareOrderLineItem(api, isEu))),

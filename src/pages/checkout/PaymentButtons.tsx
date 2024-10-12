@@ -1,9 +1,9 @@
 import {PayPalButtons, usePayPalCardFields} from "@paypal/react-paypal-js";
-import AppleGooglePayButtons from "./AppleGooglePayButtons";
-import usePayPalCheckout from "./PayPalCheckoutProvider";
 import {useFormContext} from "react-hook-form";
-import {Button, CircularProgress} from "@mui/material";
+import {Box, Button, CircularProgress} from "@mui/material";
 import {useTranslation} from "next-i18next";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
+import AppleGooglePayButtons from "../../components/AppleGooglePayButtons";
 
 const PaymentButtons = () => {
 	const {onApprove, createOrder, shipping, setError} = usePayPalCheckout();
@@ -11,10 +11,11 @@ const PaymentButtons = () => {
 	const { customerNote, invoice, paymentMethod } = watch()
 	return (
 		<>
-			{paymentMethod === 'paypal' && (
+			<Box sx={{display: paymentMethod === "paypal" ? "block" : "none" }}>
 				<PayPalButtons
 					createOrder={createOrder}
 					onApprove={onApprove}
+					onCancel={() => setError('The payment was cancelled')}
 					onError={(error) => setError(error.message as any)}
 					style={{
 						color: "black",
@@ -27,7 +28,7 @@ const PaymentButtons = () => {
 						position: 'top'
 					}}
 				/>
-			)}
+			</Box>
 			<AppleGooglePayButtons
 				shipping={shipping}
 				customerNote={customerNote}
@@ -35,16 +36,16 @@ const PaymentButtons = () => {
 				hideApplePay={paymentMethod !== 'applepay'}
 				hideGooglePay={paymentMethod !== 'googlepay'}
 			/>
-			{paymentMethod === 'card' && (
+			<Box sx={{display: paymentMethod === "card" ? "block" : "none" }}>
 				<SubmitPayment />
-			)}
+			</Box>
 		</>
 	)
 }
 
 const SubmitPayment = () => {
 	const { cardFieldsForm, fields } = usePayPalCardFields();
-	const { isPaying, setIsPaying} = usePayPalCheckout();
+	const { isPaying, setIsPaying, setError} = usePayPalCheckout();
 	const { t } = useTranslation()
 
 	const handleClick = async () => {
@@ -61,7 +62,8 @@ const SubmitPayment = () => {
 		}
 		setIsPaying(true);
 
-		cardFieldsForm.submit().catch(() => {
+		cardFieldsForm.submit().catch((error: any) => {
+			setError(error.message);
 			setIsPaying(false);
 		});
 	};

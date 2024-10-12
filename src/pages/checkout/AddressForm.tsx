@@ -17,6 +17,7 @@ const AddressForm = () => {
 	const { t } = useTranslation('common');
 	const hasShipping = useWatch({name: 'has_shipping', control});
 	const tabs = hasShipping ? [0, 1] : [0]
+	const currentTab = hasShipping ? tab : 0
 
 	return (
 		<div style={{width: '100%', height: '100%', display: 'flex', flexDirection: 'column'}}>
@@ -51,7 +52,7 @@ const AddressForm = () => {
 				)}
 			/>
 			<Tabs
-				value={hasShipping ? tab : 0}
+				value={currentTab}
 				onChange={handleChange}
 				variant="fullWidth"
 			>
@@ -65,11 +66,12 @@ const AddressForm = () => {
 				))}
 			</Tabs>
 			<div style={{position: 'relative'}}>
-				{tabs.map((index) => (
-					<CustomTabPanel key={index} value={tab} index={index}>
-						<CustomerAddressForm countries={countries} isShipping={index === 1} />
-					</CustomTabPanel>
-				))}
+				<CustomTabPanel value={currentTab} index={0}>
+					<CustomerAddressForm countries={countries} />
+				</CustomTabPanel>
+				<CustomTabPanel value={currentTab} index={1}>
+					<CustomerAddressForm countries={countries} isShipping />
+				</CustomTabPanel>
 			</div>
 		</div>
 	)

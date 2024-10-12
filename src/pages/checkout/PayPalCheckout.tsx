@@ -9,11 +9,13 @@ import ApplePay from "../../icons/payments/ApplePay";
 import GooglePay from "../../icons/payments/GooglePay";
 import PayPal from "../../icons/payments/PayPal";
 import CreditCard from "../../icons/payments/CreditCard";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
 const PayPalCheckout = () => {
 	const { applePayConfig, googlePayConfig } = useSelector((state: RootState) => state.cart);
 	const { t } = useTranslation();
 	const {  control, watch } = useFormContext<FormFields>();
+	const {isPaying} = usePayPalCheckout()
 	const availablePaymentMethods = PAYMENT_METHODS.filter(m => {
 		if (m === 'applepay' && (!applePayConfig?.isEligible || !window.ApplePaySession)) return false;
 		return !(m === 'googlepay' && !googlePayConfig?.isEligible);
@@ -21,7 +23,7 @@ const PayPalCheckout = () => {
 	const { paymentMethod } = watch()
 	return (
 		<Box sx={{display: 'flex', flexDirection: 'column', mt: '16px'}}>
-			<FormControl>
+			<FormControl disabled={isPaying}>
 				<FormLabel sx={{fontWeight: 500, fontSie: '14px', color: "rgba(0, 0, 0, 0.87)", marginBottom: '8px'}}>
 					{t('checkout.payment-method')}: {t(`checkout.payment-methods.${paymentMethod}`)}
 				</FormLabel>
@@ -44,11 +46,9 @@ const PayPalCheckout = () => {
 				/>
 			</FormControl>
 			<PayPalMessages />
-			{paymentMethod === "card" && (
-				<Box sx={{margin: "20px -6px 20px -6px"}}>
-					<PayPalCardFieldsForm />
-				</Box>
-			)}
+			<Box sx={{margin: "20px -6px 20px -6px", display: paymentMethod === "card" ? "block" : "none" }}>
+				<PayPalCardFieldsForm />
+			</Box>
 		</Box>
 	);
 };

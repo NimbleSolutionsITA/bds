@@ -16,6 +16,7 @@ const Logo = (props: IconButtonProps) => (
 			},
 			...props.sx
 		}}
+		{...props}
 	>
 		<Image
 			src={logo}

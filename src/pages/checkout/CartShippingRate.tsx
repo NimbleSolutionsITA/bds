@@ -14,10 +14,12 @@ import {
 import {selectShipping} from "../../redux/cartSlice";
 import PriceFormat from "../../components/PriceFormat";
 import {LocalShippingSharp, StorefrontSharp} from "@mui/icons-material";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
 const CartShippingRate = () => {
 	const { formState: { errors } } = useFormContext();
 	const { t } = useTranslation('common');
+	const {isPaying} = usePayPalCheckout()
 	const { cart, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch<AppDispatch>()
 	const shipping = cart?.shipping?.packages.default
@@ -42,8 +44,8 @@ const CartShippingRate = () => {
 						paddingLeft: '8px'
 					}
 				}}
-
-				startAdornment={loading ? <CircularProgress size={16} /> : <SelectStartAdornment methodId={selectedRate} />}
+				disabled={loading || isPaying}
+				startAdornment={(loading || isPaying) ? <CircularProgress size={16} /> : <SelectStartAdornment methodId={selectedRate} />}
 			>
 				{Object.values(shippingRates).filter(r => !hasFreeShipping || r.cost === '0').map((method) => (
 					<MenuItem key={method.key} value={method.key}>

@@ -9,7 +9,6 @@ import {
 } from "../types/woocommerce";
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
-import {LIQUIDES_IMAGINAIRES_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "./endpoints";
 import {Cart, Item} from "../types/cart-type";
 import {sendGTMEvent} from "@next/third-parties/google";
 
@@ -193,12 +192,11 @@ export function formatDistance(date: Date | number, locale: 'it'|'en') {
 }
 
 export function getProductMainCategory(product: BaseProduct): BaseCategory {
-    const fragrance = product.categories.find((category) => [
-        LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH, MAISON_GABRIELLA_CHIEFFO_SUB_PATH
-    ].includes(category.slug))
-    if (fragrance)
-        return fragrance;
-    return product.categories.find((category) => category.parent) ?? product.categories[0];
+
+    return product.categories.find((category) =>
+        category.parent &&
+        [...Object.values(EYEWEAR_CATEGORY), ...Object.values(FRAGRANCES_CATEGORY)].includes(category.parent as number)
+    ) ?? product.categories[0];
 }
 export const regExpEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 

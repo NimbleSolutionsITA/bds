@@ -9,7 +9,13 @@ import {
 import {Button, Container, Grid2 as Grid, Tooltip, Typography} from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
-import {EYEWEAR_CATEGORIES, findVariationFromAttributes, getDefaultProduct, sanitize} from "../../utils/utils";
+import {
+	EYEWEAR_CATEGORIES,
+	findVariationFromAttributes,
+	FRAGRANCES_CATEGORY,
+	getDefaultProduct,
+	sanitize
+} from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
 import React, {useEffect, useState} from "react";
@@ -27,7 +33,7 @@ import DHL from "../../icons/DHL";
 import GLS from "../../icons/GLS";
 import {useTranslation} from "next-i18next";
 import {Trans} from "react-i18next";
-import {DESIGNERS_SUB_PATH, LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../utils/endpoints";
+import {DESIGNERS_SUB_PATH} from "../../utils/endpoints";
 import SaveMoney from "../../icons/SaveMoney";
 import FastShipping from "../../icons/FastShipping";
 import EuShipping from "../../icons/EuShipping";
@@ -71,7 +77,7 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 	const dispatch = useDispatch<AppDispatch>();
 	const { t } = useTranslation('common');
     const cartQuantity = cart?.items?.find(v => [product.id, currentProduct.id].includes(v.id))?.quantity.value ?? 0;
-	const categoryLink = (category && ([LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH].includes(category.slug) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
+	const categoryLink = (category && (Object.values(FRAGRANCES_CATEGORY).includes(category.parent as number) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
 
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
 		const newAttributes = {...currentAttributes, [attribute]: slug};

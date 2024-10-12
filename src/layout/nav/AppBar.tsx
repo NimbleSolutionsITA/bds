@@ -10,7 +10,6 @@ import {MenuItem, Menus} from "../../types/settings";
 import {getRelativePath, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
 import {useTranslation} from "next-i18next";
-import {LIQUIDES_IMAGINAIRES_SUB_PATH, PROFUMUM_ROMA_SUB_PATH} from "../../utils/endpoints";
 
 type AppBarProps = {
     leftMenu: MenuItem[],

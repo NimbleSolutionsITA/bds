@@ -8,9 +8,11 @@ import Link from "next/link";
 import Minus from "../../layout/cart/Minus";
 import Plus from "../../layout/cart/Plus";
 import PriceFormat from "../../components/PriceFormat";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
 const CartRecap = () => {
 	const { cart } = useSelector((state: RootState) => state.cart);
+	const {isPaying} = usePayPalCheckout()
 	const isEU = getIsEU(cart?.customer)
 	const { t } = useTranslation('common');
 	return (
@@ -41,7 +43,7 @@ const CartRecap = () => {
 					<div
 						style={{width: 'calc(45% - 20px)', margin: '0 10px', display: 'flex', flexDirection: 'column'}}>
 						<Typography sx={{fontSize: '15px', fontWeight: 500, lineHeight: '16px'}}>
-							<Link href={'/products/' + item.slug}>{item.name}</Link>
+							{isPaying ? item.name : <Link href={'/products/' + item.slug}>{item.name}</Link>}
 						</Typography>
 						<Typography sx={{fontSize: '12px', lineHeight: '16px', marginBottom: '8px'}}>
 							{item.cart_item_data.category}

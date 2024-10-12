@@ -191,7 +191,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 		};
 
 		session.oncancel  = () => {
-			console.log("Apple Pay Cancelled !!")
+			console.error("Apple Pay Cancelled !!")
 		}
 
 		session.begin();

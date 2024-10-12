@@ -16,11 +16,9 @@ import {useRouter} from "next/router";
 import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/utils";
 import TotalPriceStatus = google.payments.api.TotalPriceStatus;
 import useAuth from "../utils/useAuth";
-import usePayPalCheckout from "./PayPalCheckoutProvider";
 
 const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}: PaymentButtonProps) => {
 	const { googlePayConfig } = useSelector((state: RootState) => state.cart);
-	const { isPaying, setIsPaying, setError} = usePayPalCheckout();
 	const { user } = useAuth();
 	const [paymentsClient, setPaymentsClient] = useState<google.payments.api.PaymentsClient>();
 	const paypal = window.paypal as PayPalWithGooglePay;
@@ -29,7 +27,6 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 	const router = useRouter();
 
 	const processPayment = useCallback(async (paymentData: PaymentData) => {
-		setIsPaying(true);
 		try {
 			if (!paypal.Googlepay) {
 				throw new Error("Google Pay not available");
@@ -78,11 +75,9 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 					message: err.message,
 				},
 			};
-		} finally {
-			setIsPaying(false);
 		}
 
-	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal.Googlepay, router, setIsPaying, user?.user_id])
+	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal.Googlepay, router, user?.user_id])
 
 	useEffect(() => {
 		function onPaymentDataChanged(paymentData: IntermediatePaymentData): Promise<PaymentDataRequestUpdate> {
@@ -111,7 +106,6 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 							s_city: paymentData.shippingAddress?.locality,
 						}).then(() => {
 							getResponse().then((data) => {
-								console.log(data)
 								resolve(data)
 							}).catch(reject)
 						})
@@ -121,7 +115,6 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 							key: paymentData.shippingOptionData?.id
 						}).then(() => {
 							getResponse().then((data) => {
-								console.log(data)
 								resolve(data)
 							}).catch(reject)
 						})

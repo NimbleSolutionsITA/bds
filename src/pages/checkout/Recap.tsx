@@ -9,11 +9,11 @@ import {useTranslation} from "next-i18next";
 import {BaseSyntheticEvent} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
-import PaymentButtons from "../../components/PaymentButtons";
 import CartRecap from "./CartRecap";
 import CartCoupon from "./CartCoupon";
 import CartShippingRate from "./CartShippingRate";
 import CartNote from "./CartNote";
+import PaymentButtons from "./PaymentButtons";
 
 type RecapProps = {
 	updateOrder: (step: Step) => (e?: (BaseSyntheticEvent | undefined)) => Promise<void>
@@ -55,8 +55,10 @@ const Recap = ({updateOrder}: RecapProps) => {
 			<Divider sx={{margin: '5px 0'}} />
 			<PriceRecap isLoading={loading} />
 			<Divider sx={{margin: '10px 0 20px'}} />
-			{checkoutStep === "PAYMENT" ?
-				<PaymentButtons /> :
+			<Box width="100%" display={checkoutStep === "PAYMENT" ? "block" : "none"}>
+				<PaymentButtons />
+			</Box>
+			<Box width="100%" display={checkoutStep === "PAYMENT" ? "none" : "block"}>
 				<Button
 					fullWidth
 					variant="contained"
@@ -65,8 +67,7 @@ const Recap = ({updateOrder}: RecapProps) => {
 				>
 					{t(buttonLabel[checkoutStep])}
 				</Button>
-			}
-
+			</Box>
 			<Payments />
 		</Box>
 	)

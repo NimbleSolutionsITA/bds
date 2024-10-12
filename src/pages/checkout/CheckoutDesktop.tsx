@@ -18,6 +18,7 @@ import {useTranslation} from "next-i18next";
 import {BaseSyntheticEvent} from "react";
 import InvoiceForm from "../../components/InvoiceForm";
 import { useFormContext } from "react-hook-form";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
 export type CheckoutDesktopProps = {
 	updateOrder: (onValidStep: StepType) => (e?: (BaseSyntheticEvent<object, any, any> | undefined)) => Promise<void>
@@ -29,6 +30,7 @@ const CheckoutDesktop = ({
     updateOrder,
 }: CheckoutDesktopProps) => {
 	const { t } = useTranslation('common')
+	const {isPaying} = usePayPalCheckout()
 	const { watch, setValue } = useFormContext<FormFields>()
 	const checkoutStep = watch('step')
 	const indexStep = STEP_MAP.indexOf(checkoutStep)
@@ -59,7 +61,7 @@ const CheckoutDesktop = ({
 						flexDirection: 'column'
 					}}
 				>
-					<Logo sx={{margin: '10px'}} />
+					<Logo sx={{margin: '10px'}} disabled={isPaying} />
 					<Stepper
 						alternativeLabel
 						activeStep={indexStep}
@@ -84,6 +86,7 @@ const CheckoutDesktop = ({
 											fontWeight: indexStep === index ? 500 : 300
 										}}
 										onClick={handleStepClick(index)}
+										disabled={isPaying}
 									>
 										{label}
 									</Button>
@@ -91,15 +94,16 @@ const CheckoutDesktop = ({
 							</Step>
 						))}
 					</Stepper>
-					{checkoutStep === 'ADDRESS' && (
+
+					<Box sx={{width: '100%', display: checkoutStep === 'ADDRESS' ? "block": "none"}}>
 						<AddressForm />
-					)}
-					{checkoutStep === 'INVOICE' && (
+					</Box>
+					<Box sx={{width: '100%', display: checkoutStep === 'INVOICE' ? "block": "none"}}>
 						<InvoiceForm />
-					)}
-					{checkoutStep === 'PAYMENT' && (
+					</Box>
+					<Box sx={{width: '100%', display: checkoutStep === 'PAYMENT' ? "block": "none"}}>
 						<Payment />
-					)}
+					</Box>
 				</div>
 			</Grid>
 			<Grid

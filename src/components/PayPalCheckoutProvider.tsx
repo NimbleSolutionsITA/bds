@@ -55,13 +55,10 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			return orderData.id;
 		} catch (error: any) {
 			setError(error.message);
-		} finally {
-			setIsPaying(false);
 		}
 	}
 
 	async function onApprove(data: OnApproveData) {
-		setIsPaying(true);
 		try {
 			const response = await fetch(`/api/orders/${data.orderID}/capture`, {
 				method: "POST",
@@ -103,9 +100,6 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			await router.push("/checkout/completed");
 		} catch (error: any) {
 			setError(error.message);
-			setIsPaying(true);
-		} finally {
-			setIsPaying(false);
 		}
 	}
 	function onError(error:  Record<string, any>) {
@@ -143,7 +137,10 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			<PayPalCheckoutContext.Provider value={{createOrder, onApprove, setError, shipping, isPaying, setIsPaying}}>
 				{children}
 			</PayPalCheckoutContext.Provider>
-			<PaymentErrorDialog setError={setError} error={error} />
+			<PaymentErrorDialog setError={(value) => {
+				setIsPaying(false)
+				setError(value)
+			}} error={error} />
 		</PayPalCardFieldsProvider>
 	)
 }

@@ -48,8 +48,12 @@ const AppleGooglePayButtons = ({item, hideApplePay, hideGooglePay, buttonWidth: 
 
 	return checkoutCart && (
 		<>
-			{!hideGooglePay && <Box sx={{width}}><GooglePayButton cart={checkoutCart} askForShipping={!!item} {...props} /></Box>}
-				{!hideApplePay && <Box sx={{width}}><ApplePayButton cart={checkoutCart} askForShipping={!!item} {...props} /></Box>}
+			<Box sx={{width, display: hideGooglePay ? "none": "block"}}>
+				<GooglePayButton cart={checkoutCart} askForShipping={!!item} {...props} />
+			</Box>
+			<Box sx={{width, display: hideApplePay ? "none": "block"}}>
+				<ApplePayButton cart={checkoutCart} askForShipping={!!item} {...props} />
+			</Box>
 		</>
 	)
 }

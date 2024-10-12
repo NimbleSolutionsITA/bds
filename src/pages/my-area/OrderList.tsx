@@ -6,19 +6,19 @@ import {
 	Chip,
 	Container,
 	Divider,
-	Grid,
+	Grid2 as Grid,
 	Typography
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import {ReactNode, SyntheticEvent, useEffect, useState} from "react";
+import {SyntheticEvent, useEffect, useState} from "react";
 import useAuth from "../../utils/useAuth";
 import {useTranslation} from "next-i18next";
 import {WooLineItem, WooOrder} from "../../types/woocommerce";
 import Image from "next/image";
 import PriceFormat from "../../components/PriceFormat";
-import Loading from "../../components/Loading";
 import {Trans} from "react-i18next";
 import {useRouter} from "next/router";
+import SplitField from "../../components/SplitField";
 
 const OrderList = () => {
 	const { orders, getOrders } = useAuth();
@@ -109,12 +109,12 @@ const OrderItem = ({expanded, handleChange, order}: OrderItemProps) => {
 			</AccordionSummary>
 			<AccordionDetails sx={{backgroundColor: 'divider', padding: '20px'}}>
 				<Grid container>
-					<Grid item xs={12}>
+					<Grid size={{xs: 12}}>
 						{order.line_items.map((item: any) => (
 							<CartItem key={item.id} item={item} />
 						))}
 					</Grid>
-					<Grid item xs={12}>
+					<Grid size={{xs: 12}}>
 						<SplitField label={t('subtotal')} value={order.total} />
 						<SplitField
 							label={`${t('checkout.shipping')} (${order.shipping_lines[0].method_title})`}
@@ -179,17 +179,6 @@ const CartItem = ({item}: {item: WooLineItem}) => {
 		</Box>
 	)
 }
-
-const SplitField = ({label, value, isLoading, labelWeight = 300, disabled = false, large = false}: {[key: string]: string|number|boolean|ReactNode, value: string | number}) => (
-	<Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%'}}>
-		<Typography component="div" sx={{margin: {xs: '2px 0', md: '5px 0'}, textTransform: 'capitalize', fontWeight: labelWeight as number, fontSize: large ? '16px' : undefined}}>
-			{label}
-		</Typography>
-		<Typography component="div" sx={{fontWeight: 500, margin: {xs: '2px 0', md: '5px 0'}, color: disabled ? '#909090' : '#000', fontSize: large ? '18px' : undefined}}>
-			{isLoading ? <Loading fontSize="16px" /> : <PriceFormat value={value} />}
-		</Typography>
-	</Box>
-)
 
 const OrderStatusChip = ({status}: {status: WooOrder['status']}) => {
 	const { t } = useTranslation();

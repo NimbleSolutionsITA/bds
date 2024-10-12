@@ -1,4 +1,4 @@
-import {ReactNode, useRef} from "react";
+import {ReactNode} from "react";
 import {Box, Divider, Typography} from "@mui/material";
 import Loading from "../../components/Loading";
 import PriceFormat from "../../components/PriceFormat";
@@ -10,7 +10,6 @@ import { getCartTotals} from "../../utils/utils";
 import {Cart} from "../../types/cart-type";
 
 const PriceRecap = ({ isLoading, isCompact = false }: { isLoading: boolean, isCompact?: boolean }) => {
-	const contentRef = useRef<HTMLDivElement>(null);
 	const {t} = useTranslation('common');
 	const { cart, loading } = useSelector((state: RootState) => state.cart);
 	const { subtotal, shipping, discount, total, totalTax } = getCartTotals(cart as Cart);
@@ -18,10 +17,9 @@ const PriceRecap = ({ isLoading, isCompact = false }: { isLoading: boolean, isCo
 	return (
 		<>
 			<div
-				ref={contentRef}
 				style={{
-					height: isCompact ? "0px" : `${contentRef?.current?.scrollHeight ?? 0}px`,
-					transition: 'height 0.5s ease',
+					maxHeight: isCompact ? 0 : '200px',
+					transition: 'max-height 1s ease',
 					overflow: "hidden"
 				}}
 			>

@@ -2,6 +2,7 @@ import {Button, Table, TableBody, TableCell, TableContainer, TableRow} from "@mu
 import {useTranslation} from "next-i18next";
 import {useFormContext} from "react-hook-form";
 import {FormFields} from "./CheckoutGrid";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
 const CartAddressRecap = () => {
 	const { watch, setValue } = useFormContext<FormFields>();
@@ -55,6 +56,7 @@ export const getAddressString = (address: any) => {
 }
 
 const EditButton = ({onClick}: {onClick: () => void}) => {
+	const {isPaying} = usePayPalCheckout()
 	const { t } = useTranslation('common')
 	return (
 		<Button
@@ -63,6 +65,7 @@ const EditButton = ({onClick}: {onClick: () => void}) => {
 			variant="text"
 			color="primary"
 			onClick={onClick}
+			disabled={isPaying}
 		>
 			{t('edit')}
 		</Button>

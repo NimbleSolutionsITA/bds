@@ -5,6 +5,7 @@ import {useTranslation} from "next-i18next";
 import {removeCoupon, setCoupon} from "../../redux/cartSlice";
 import {Button, CircularProgress, Grid2 as Grid, TextField} from "@mui/material";
 import {useFormContext} from "react-hook-form";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
 const CartCoupon = () => {
 	const { cart, loading } = useSelector((state: RootState) => state.cart);
@@ -13,6 +14,7 @@ const CartCoupon = () => {
 	const dispatch = useDispatch<AppDispatch>()
 	const [couponCode, setCouponCode] = useState(cart?.coupons && cart?.coupons.length > 0 ? cart?.coupons[0].coupon : '');
 	const { t } = useTranslation('common');
+	const {isPaying} = usePayPalCheckout()
 
 	const handleSetCoupon = () => {
 		hasCoupons ?
@@ -36,8 +38,8 @@ const CartCoupon = () => {
 				<Button
 					fullWidth
 					onClick={handleSetCoupon}
-					disabled={loading}
-					endIcon={(loading) && <CircularProgress size={16} />}
+					disabled={loading || isPaying}
+					endIcon={(loading|| isPaying) && <CircularProgress size={16} />}
 				>
 					{t(hasCoupons ? 'checkout.remove' : 'checkout.apply').toUpperCase()}
 				</Button>

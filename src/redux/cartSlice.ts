@@ -383,7 +383,7 @@ const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payl
 			localStorage.setItem('cart_key', response.data.cart_key as string)
 		}
 	} catch (error) {
-		console.log('cart error', error)
+		console.error('cart error', error)
 		response = await axios(getCoCartAxiosParams(url, method, params, payload));
 		localStorage.removeItem('cart_key');
 	}

@@ -6,7 +6,7 @@ import {
 } from "../types/woocommerce";
 import {Box, Button, Card, CardContent, CircularProgress, Typography} from "@mui/material";
 import {
-    EYEWEAR_CATEGORIES,
+     EYEWEAR_CATEGORY,
     findVariationFromAttributes,
     getDefaultProduct, getProductMainCategory,
     sanitize
@@ -34,7 +34,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     const { cart: { customer: { shipping_address: { shipping_country }} } = initialCart } = useSelector((state: RootState) => state.cart);
     const isEU = !!shipping_country && shipping_country !== 'IT'
     const isEyewear = product.categories.find(({id, parent }) =>
-        EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
+        parent && Object.values(EYEWEAR_CATEGORY).includes(parent as number)
     ) !== undefined;
     const imageRatio = isEyewear ? 45 : 130;
     const init = getDefaultProduct(product);

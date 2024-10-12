@@ -4,7 +4,7 @@ import {
 	AccordionDetails,
 	AccordionSummary,
 	Box,
-	Button,
+	Button, CircularProgress,
 	Divider, IconButton,
 	MobileStepper,
 	Typography
@@ -19,7 +19,6 @@ import {useTranslation} from "next-i18next";
 import CartCoupon from "./CartCoupon";
 import CartShippingRate from "./CartShippingRate";
 import CartNote from "./CartNote";
-import PaymentButtons from "../../components/PaymentButtons";
 import CartRecap from "./CartRecap";
 import {ReactNode, useState} from "react";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -28,6 +27,10 @@ import CartAddressRecap from "./CartAddressRecap";
 import PriceRecap from "./PriceRecap";
 import logo from "../../images/bottega-di-sguardi-logo.png";
 import Image from "next/image";
+import PaymentButtons from "./PaymentButtons";
+import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
+import {useSelector} from "react-redux";
+import {RootState} from "../../redux/store";
 
 const STEP_MAP = ['ADDRESS', 'INVOICE', 'PAYMENT'] as const
 
@@ -35,6 +38,8 @@ export type CheckoutMobile = CheckoutDesktopProps
 const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
 	const { watch, setValue } = useFormContext<FormFields>()
 	const { t } = useTranslation('common');
+	const {isPaying} = usePayPalCheckout()
+	const { loading } = useSelector((state: RootState) => state.cart);
 	const {step: checkoutStep, paymentMethod, billing: { email }} = watch()
 	const activeStep = STEP_MAP.indexOf(checkoutStep)
 	const [expandPrice, setExpandPrice] = useState(false)
@@ -48,33 +53,31 @@ const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
 					style={{ width: '60px', height: 'auto' }}
 				/>
 			</Box>
-			{checkoutStep === "ADDRESS" && <AddressForm />}
-			{checkoutStep === "INVOICE" && (
-				<>
-					<InvoiceForm />
-					<Divider sx={{margin: '5px 0'}} />
-					<CartCoupon />
-					<Divider sx={{margin: '5px 0'}} />
-					<CartShippingRate />
-					<Divider sx={{margin: '5px 0'}} />
-					<CartNote />
-				</>
-			)}
-			{checkoutStep === "PAYMENT" && (
-				<>
-					<AccordionRecap title={email}>
-						<CartAddressRecap />
-					</AccordionRecap>
-					<AccordionRecap title={t('checkout.item-recap')}>
-						<CartRecap />
-					</AccordionRecap>
-					<Divider />
-					<PayPalCheckout />
-					<Box sx={{marginTop: paymentMethod === 'card' ? 0 : '32px', width: '100%'}}>
-						<PaymentButtons />
-					</Box>
-				</>
-			)}
+			<Box sx={{width: '100%', display: checkoutStep === 'ADDRESS' ? "block": "none"}}>
+				<AddressForm />
+			</Box>
+			<Box sx={{width: '100%', display: checkoutStep === 'INVOICE' ? "block": "none"}}>
+				<InvoiceForm />
+				<Divider sx={{margin: '5px 0'}} />
+				<CartCoupon />
+				<Divider sx={{margin: '5px 0'}} />
+				<CartShippingRate />
+				<Divider sx={{margin: '5px 0'}} />
+				<CartNote />
+			</Box>
+			<Box sx={{width: '100%', display: checkoutStep === 'PAYMENT' ? "block": "none"}}>
+				<AccordionRecap title={email}>
+					<CartAddressRecap />
+				</AccordionRecap>
+				<AccordionRecap title={t('checkout.item-recap')}>
+					<CartRecap />
+				</AccordionRecap>
+				<Divider />
+				<PayPalCheckout />
+				<Box sx={{marginTop: paymentMethod === 'card' ? 0 : '32px', width: '100%'}}>
+					<PaymentButtons />
+				</Box>
+			</Box>
 			<Box
 				sx={{
 					backgroundColor: "#eeeeee",
@@ -131,7 +134,8 @@ const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
 						sx={{padding: '8px 24px 8px 32px'}}
 						size="small"
 						onClick={updateOrder(STEP_MAP[activeStep + 1])}
-						disabled={checkoutStep === "PAYMENT"}
+						disabled={checkoutStep === "PAYMENT" || isPaying || loading}
+						endIcon={(loading|| isPaying) && <CircularProgress size={12} />}
 					>
 						{t(`checkout.${(STEP_MAP[activeStep + 1] ?? "PAYMENT").toLowerCase()}`)}
 						<KeyboardArrowRight />
@@ -142,7 +146,8 @@ const CheckoutMobile = ({ updateOrder }: CheckoutMobile) => {
 						sx={{padding: '8px 32px 8px 24px'}}
 						size="small"
 						onClick={() => setValue('step', STEP_MAP[activeStep - 1])}
-						disabled={activeStep === 0}
+						disabled={activeStep === 0 || isPaying || loading}
+						endIcon={(loading|| isPaying) && <CircularProgress size={12} />}
 					>
 						<KeyboardArrowLeft />
 						{t(`checkout.${(STEP_MAP[activeStep - 1] ?? "ADDRESS").toLowerCase()}`)}
