@@ -17,7 +17,10 @@ import LanguageButton from "../../../components/LanguageButton";
 import {Facebook, Instagram, PhoneEnabledSharp} from "@mui/icons-material";
 import {useRouter} from "next/router";
 import {IconButtonProps} from "@mui/material/IconButton/IconButton";
-import {FRAGRANCES_CATEGORY, OUR_PRODUCTION_CATEGORIES} from "../../../utils/utils";
+import {
+    getDesignersCategories, getFragrancesCategories,
+    getOurProductionCategories,
+} from "../../../utils/utils";
 import {useTranslation} from "next-i18next";
 import BottomBar from "../BottomBar";
 import {closeSearchDrawer, openSearchDrawer} from "../../../redux/layoutSlice";
@@ -28,7 +31,7 @@ import NavButton from "../../../components/NavButton";
 import AccordionNavButton from "../../../components/AccordionNavButton";
 import {UserMenu} from "../UserMenu";
 import {
-    DESIGNERS_CATEGORY,
+    DESIGNERS_SUB_PATH,
     FACEBOOK_LINK, INSTAGRAM_LINK,
     OUR_PRODUCTION_SUB_PATH
 } from "../../../utils/endpoints";
@@ -56,9 +59,9 @@ export default function NavBarMobile({
     const appbarHeight = ref.current ? ref.current.clientHeight : 0 + 'px'
 
     const accordionCategories = [
-        {id: designers.id, name: designers.title, slug: DESIGNERS_CATEGORY, child_items: categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items},
-        {id: ourProduction.id, name: ourProduction.title, slug: OUR_PRODUCTION_SUB_PATH, child_items: categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items?.filter(c => [...OUR_PRODUCTION_CATEGORIES.it, ...OUR_PRODUCTION_CATEGORIES.en].includes(c.id))},
-        ...(categories.find(c => Object.values(FRAGRANCES_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? [])
+        {id: designers.id, name: designers.title, slug: DESIGNERS_SUB_PATH, child_items: getDesignersCategories(categories)},
+        {id: ourProduction.id, name: ourProduction.title, slug: OUR_PRODUCTION_SUB_PATH, child_items: getOurProductionCategories(categories)},
+        ...getFragrancesCategories(categories),
     ]
     return (
         <>

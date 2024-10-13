@@ -5,7 +5,7 @@ import {
     BaseVariation,
     Color, LoggedCustomer,
     Product,
-    Variation, WooOrder
+    Variation, WooOrder, WooProductCategory
 } from "../types/woocommerce";
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
@@ -66,6 +66,7 @@ export const OUR_PRODUCTION_CATEGORIES = {
     en: [BOTTEGA_DI_SGUARDI_CATEGORY.en, BOTTEGA_DI_SGUARDI_HORN_COLLECTION_CATEGORY.en, VIBES_365_CATEGORY.en]
 }
 
+
 export const SHOP_CATEGORIES = {
     optical: { it: 2796, en: 9604 },
     sunglasses: { it: 2990, en: 9602 }
@@ -78,6 +79,13 @@ export const EYEWEAR_CATEGORIES = [
     EYEWEAR_CATEGORY.it,
     EYEWEAR_CATEGORY.en,
 ];
+
+export const getDesignersCategories = (categories: WooProductCategory[]) =>
+    categories.find(c => Object.values(EYEWEAR_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? []
+export const getFragrancesCategories = (categories: WooProductCategory[]) =>
+    categories.find(c => Object.values(FRAGRANCES_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? []
+export const getOurProductionCategories = (categories: WooProductCategory[]) =>
+    getDesignersCategories(categories)?.filter(category => Object.values(OUR_PRODUCTION_CATEGORIES).flat().includes(category.id)) ?? []
 
 
 type RGB = [number, number, number];
