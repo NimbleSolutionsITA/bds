@@ -6,7 +6,7 @@ import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProducts} from "../api/products";
-import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
+import {FRAGRANCES_CATEGORY, getFragrancesCategories, LOCALE} from "../../src/utils/utils";
 import {cacheGetProductCategories} from "../../src/utils/cache";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
@@ -37,7 +37,8 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 	] = await Promise.all([
 		getCategoryPageProps(locale, slug)
 	]);
-	if (!productCategory || !Object.values(FRAGRANCES_CATEGORY).includes(productCategory.parent as number)) {
+	const fragranceBrands = getFragrancesCategories(layout.categories).map(({id}) => id)
+	if (!productCategory || fragranceBrands.includes(productCategory.id)) {
 		return {
 			notFound: true
 		}
