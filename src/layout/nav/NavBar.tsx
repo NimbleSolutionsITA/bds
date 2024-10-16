@@ -9,7 +9,7 @@ import {
     FRAGRANCES_SUB_PATH,
     OUR_PRODUCTION_SUB_PATH,
 } from "../../utils/endpoints";
-import {FRAGRANCES_CATEGORY, getOurProductionCategories, OUR_PRODUCTION_CATEGORIES} from "../../utils/utils";
+import {FRAGRANCES_CATEGORY, getOurProductionCategories} from "../../utils/utils";
 
 type NavBarProps = {
     left: MenuItem[]
@@ -34,7 +34,11 @@ const mapMenu = (categories: WooProductCategory[]) => (item: MenuItem): MenuItem
     if (item.slug === DESIGNERS_SUB_PATH) {
         groups = ['A-J', 'K-Z']
         const category = categories.find(c => c.slug === DESIGNERS_CATEGORY)
-        child_items = category?.child_items?.map(categoryToMenu(DESIGNERS_SUB_PATH)) as MenuItem[]
+        child_items = category?.child_items?.sort((a,b) => {
+            if (a.name < b.name) return -1
+            if (a.name > b.name) return 1
+            return 0
+        }).map(categoryToMenu(DESIGNERS_SUB_PATH)) as MenuItem[]
     }
     else if (item.slug === FRAGRANCES_SUB_PATH) {
         const category = categories.find(c => Object.values(FRAGRANCES_CATEGORY).includes(c.id))
