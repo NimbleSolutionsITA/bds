@@ -81,7 +81,11 @@ export const EYEWEAR_CATEGORIES = [
 ];
 
 export const getDesignersCategories = (categories: WooProductCategory[]) =>
-    categories.find(c => Object.values(EYEWEAR_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? []
+    categories.find(c => Object.values(EYEWEAR_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => {
+        if (a.name < b.name) return -1
+        if (a.name > b.name) return 1
+        return 0
+    }) ?? []
 export const getFragrancesCategories = (categories: WooProductCategory[]) =>
     categories.find(c => Object.values(FRAGRANCES_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => a.menu_order - b.menu_order) ?? []
 export const getOurProductionCategories = (categories: WooProductCategory[]) =>
