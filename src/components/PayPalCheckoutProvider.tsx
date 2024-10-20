@@ -122,6 +122,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				method: "PUT",
 			});
 		}
+		setOrderId(undefined);
 		setError(error.message);
 	}
 	return (
