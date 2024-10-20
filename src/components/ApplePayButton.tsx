@@ -123,7 +123,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					headers : {
 						'Content-Type': 'application/json'
 					},
-					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id })
+					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id, paymentMethod: 'PayPal - ApplePay' })
 				})
 				if(!orderResponse.ok) {
 					throw new Error("error creating order")
@@ -171,6 +171,14 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					} else {
 						errorMessage = JSON.stringify(payPalOrder);
 					}
+
+					await fetch(`/api/orders/${id}/abort`, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ isFailed: true }),
+					});
 
 					throw new Error(errorMessage);
 				}

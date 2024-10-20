@@ -30,14 +30,15 @@ export default async function handler(
 	}
 	try {
 		if (req.method === 'POST') {
-			const { cart, invoice = null, customerNote = "", customerId = 0 } = req.body
+			const { cart, invoice = null, customerNote = "", customerId = 0, paymentMethod = null } = req.body
 			if (!cart) {
 				throw new Error('Cart or customer data is missing')
 			}
-			if (Number(cart.totals.total) === 0) {
+			const cartAmount = Number(cart.totals.total) / 100
+			if (cartAmount === 0) {
 				throw new Error('Cart amount is 0')
 			}
-			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId)
+			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
 			console.log(orderPayload)
 			const { data: order } = await api.post("orders", orderPayload)
 			const amount = Number(order.total)
@@ -45,6 +46,7 @@ export default async function handler(
 				await api.delete(`/api/orders/${order.id}`, { force: true })
 				throw new Error('Order amount is 0')
 			}
+			console.log('ORDER', amount, "CART", cart.totals.total)
 			const paypalOrder = await createOrder(amount, order.id)
 			responseData.id = paypalOrder.id
 
@@ -95,14 +97,14 @@ const createOrder = async (amount: number, orderId: string) => {
 	return await response.json();
 };
 
-const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: string, customerId?: string) => {
+const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: string, customerId?: string, paymentMethod: string = "PayPal") => {
 	const selectedShipping = cart.shipping?.packages.default.rates[cart.shipping.packages.default.chosen_method]
 	const isEu = getIsEU(cart.customer)
 	return ({
 		customer_id: customerId,
 		currency: "EUR",
 		payment_method: 'ppcp-gateway',
-		payment_method_title: 'PayPal',
+		payment_method_title: paymentMethod,
 		billing: mapAddress(cart.customer.billing_address, 'billing'),
 		shipping: mapAddress(cart.customer.shipping_address, 'shipping'),
 		line_items: await Promise.all(cart.items.map(prepareOrderLineItem(api, isEu))),

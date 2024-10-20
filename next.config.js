@@ -9,6 +9,8 @@ if (!process.env.NEXT_PUBLIC_WP_SUBDOMAIN || !process.env.NEXT_PUBLIC_SITE_PROTO
   `)
 }
 
+const WORDPRESS_SITE_URL = `${process.env.NEXT_PUBLIC_SITE_PROTOCOL}://${WORDPRESS_HOSTNAME}`
+
 module.exports =  {
     reactStrictMode: false,
     swcMinify: true,
@@ -416,6 +418,21 @@ module.exports =  {
             {
                 source: "/lenti-blue-control-firenze",
                 destination: '/blog/lenti-blue-control-firenze',
+                permanent: true,
+            },
+            {
+                source: '/wc-inv/:path*',
+                destination: `${WORDPRESS_SITE_URL}/wc-inv/:path*`,
+                permanent: true,
+            },
+            {
+                source: '/wp-admin/:path*',
+                destination: `${WORDPRESS_SITE_URL}/wp-admin/:path*`,
+                permanent: true,
+            },
+            {
+                source: '/wp-login/:path*',
+                destination: `${WORDPRESS_SITE_URL}/wp-login/:path*`,
                 permanent: true,
             },
         ]

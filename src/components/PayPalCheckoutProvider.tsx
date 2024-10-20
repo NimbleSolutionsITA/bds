@@ -1,4 +1,4 @@
-import React, {createContext, useCallback, useContext, useState} from "react";
+import React, {createContext, useContext, useState} from "react";
 import {OnApproveData, PayPalCardFieldsStyleOptions} from "@paypal/paypal-js";
 import {PayPalCardFieldsProvider} from "@paypal/react-paypal-js";
 import {ShippingData} from "../redux/layoutSlice";
@@ -10,7 +10,6 @@ import {useRouter} from "next/router";
 import {destroyCart} from "../redux/cartSlice";
 import useAuth from "../utils/useAuth";
 import PaymentErrorDialog from "../pages/checkout/PaymentErrorDialog";
-import {boolean} from "@apimatic/schema";
 import {useMutation} from "@tanstack/react-query";
 
 interface PayPalProviderProps {
@@ -40,7 +39,6 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const createOrder = useMutation({
 		mutationFn: async () => {
-			console.log(cart?.customer, billing, shippingForm)
 			setIsPaying(true);
 			try {
 				const response = await fetch("/api/orders", {
@@ -99,6 +97,14 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				} else {
 					errorMessage = JSON.stringify(payPalOrder);
 				}
+
+				await fetch(`/api/orders/${wooOrder.id}/abort`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ isFailed: true }),
+				});
 
 				throw new Error(errorMessage);
 			}

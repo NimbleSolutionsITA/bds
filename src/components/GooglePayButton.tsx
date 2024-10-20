@@ -46,6 +46,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 					invoice,
 					customerNote,
 					customerId: user?.user_id,
+					paymentMethod: "PayPal - GooglePay",
 				}),
 			}).then((res) => res.json());
 			const {status} = await googlePay.confirmOrder({
@@ -66,6 +67,13 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				}
 				return {transactionState: "SUCCESS"};
 			} else {
+				await fetch(`/api/orders/${id}/abort`, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ isFailed: true }),
+				});
 				return {transactionState: "ERROR"};
 			}
 		} catch (err: any) {
