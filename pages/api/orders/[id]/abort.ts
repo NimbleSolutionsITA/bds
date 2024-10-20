@@ -1,9 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../../src/utils/endpoints";
-import {generateAccessToken} from "../index";
-
-const base = process.env.PAYPAL_API_URL;
 
 export type CreateOrderResponse = {
 	success: boolean
