@@ -19,7 +19,6 @@
     "@google-pay/button-react": "^3.1.0",
     "@mui/icons-material": "^6.1.4",
     "@mui/material": "^6.1.4",
-    "@next/font": "^14.2.15",
     "@next/third-parties": "^14.2.15",
     "@paypal/paypal-server-sdk": "^0.5.2",
     "@paypal/react-paypal-js": "^8.7.0",

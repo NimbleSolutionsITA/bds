@@ -53,6 +53,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				if (!orderData.success) {
 					throw new Error(orderData.error);
 				}
+				console.log(orderData)
 				setOrderId(orderData.wooId);
 				return orderData.id;
 			} catch (error: any) {
@@ -118,6 +119,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	}
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async (error:  Record<string, any>)=> {
+			console.log(orderId)
 			if (orderId) {
 				await fetch(`/api/orders/${orderId}/abort`, {
 					method: "PUT",
