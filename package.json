@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "postbuild": "next-sitemap",
-    "prod": "git pull && next build && PM2 restart BDS",
+    "prod": "git pull && next build",
     "start": "dotenv -c -- next start",
     "lint": "next lint",
     "https": "node server.js"

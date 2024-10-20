@@ -29,6 +29,7 @@ const PayPalCheckoutContext = createContext({
 
 export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps) => {
 	const [error, setError] = useState<string>();
+	const [orderId, setOrderId] = useState<string>();
 	const [isPaying, setIsPaying] = useState(false);
 	const { user } = useAuth();
 	const { cart } = useSelector((state: RootState) => state.cart);
@@ -48,11 +49,11 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 					},
 					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id }),
 				});
-
 				const orderData = await response.json();
 				if (!orderData.success) {
 					throw new Error(orderData.error);
 				}
+				setOrderId(orderData.wooId);
 				return orderData.id;
 			} catch (error: any) {
 				setError(error.message);
@@ -115,7 +116,12 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			setError(error.message);
 		}
 	}
-	function onError(error:  Record<string, any>) {
+	async function onError(error:  Record<string, any>) {
+		if (orderId) {
+			await fetch(`/api/orders/${orderId}/abort`, {
+				method: "PUT",
+			});
+		}
 		setError(error.message);
 	}
 	return (
