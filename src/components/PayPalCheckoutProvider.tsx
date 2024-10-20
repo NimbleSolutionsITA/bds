@@ -21,7 +21,7 @@ interface PayPalProviderProps {
 const PayPalCheckoutContext = createContext({
 	createOrder: async () => { return ""},
 	onApprove: async (data: OnApproveData) => {},
-	setError: (error: string) => {},
+	onError: (error: any) => {},
 	shipping: {} as ShippingData,
 	isPaying: false,
 	setIsPaying: (isPaying: boolean) => {},
@@ -53,15 +53,11 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				if (!orderData.success) {
 					throw new Error(orderData.error);
 				}
-				console.log(orderData)
 				setOrderId(orderData.wooId);
 				return orderData.id;
 			} catch (error: any) {
-				setError(error.message);
+				await onError(error);
 			}
-		},
-		onSuccess: (data) => {
-			console.log(data)
 		}
 	})
 
@@ -114,11 +110,13 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			gtagPurchase(wooOrder);
 			await router.push("/checkout/completed");
 		} catch (error: any) {
-			setError(error.message);
+			await onError(error);
 		}
 	}
+
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async (error:  Record<string, any>)=> {
+			console.log('orderId')
 			console.log(orderId)
 			if (orderId) {
 				await fetch(`/api/orders/${orderId}/abort`, {
@@ -158,7 +156,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				},
 			} as Record<string, PayPalCardFieldsStyleOptions>}
 		>
-			<PayPalCheckoutContext.Provider value={{createOrder: createOrder.mutateAsync, onApprove, setError, shipping, isPaying, setIsPaying}}>
+			<PayPalCheckoutContext.Provider value={{createOrder: createOrder.mutateAsync, onApprove, onError, shipping, isPaying, setIsPaying}}>
 				{children}
 			</PayPalCheckoutContext.Provider>
 			<PaymentErrorDialog setError={(value) => {

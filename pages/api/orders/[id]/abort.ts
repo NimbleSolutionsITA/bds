@@ -23,9 +23,13 @@ export default async function handler(
 	}
 	try {
 		if (req.method === 'PUT') {
-			res = await api.put(`orders/${req.query.id}`, {
-				status: req.body.isFailed ? 'failed' : 'cancelled'
-			})
+			if (req.body.isFailed) {
+				await api.put(`orders/${req.query.id}`, {
+					status: 'failed'
+				})
+			} else {
+				await api.delete(`orders/${req.query.id}`)
+			}
 		} else {
 			throw new Error('Method not allowed')
 		}

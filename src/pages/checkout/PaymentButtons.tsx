@@ -6,7 +6,7 @@ import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 import AppleGooglePayButtons from "../../components/AppleGooglePayButtons";
 
 const PaymentButtons = () => {
-	const {onApprove, createOrder, shipping, setError} = usePayPalCheckout();
+	const {onApprove, createOrder, shipping, onError} = usePayPalCheckout();
 	const { watch } = useFormContext()
 	const { customerNote, invoice, paymentMethod } = watch()
 	return (
@@ -15,8 +15,8 @@ const PaymentButtons = () => {
 				<PayPalButtons
 					createOrder={createOrder}
 					onApprove={onApprove}
-					onCancel={() => setError('The payment was cancelled')}
-					onError={(error) => setError(error.message as any)}
+					onCancel={onError}
+					onError={onError}
 					style={{
 						color: "black",
 						shape: "rect",
@@ -45,7 +45,7 @@ const PaymentButtons = () => {
 
 const SubmitPayment = () => {
 	const { cardFieldsForm, fields } = usePayPalCardFields();
-	const { isPaying, setIsPaying, setError} = usePayPalCheckout();
+	const { isPaying, setIsPaying, onError} = usePayPalCheckout();
 	const { t } = useTranslation()
 
 	const handleClick = async () => {
@@ -62,10 +62,7 @@ const SubmitPayment = () => {
 		}
 		setIsPaying(true);
 
-		cardFieldsForm.submit().catch((error: any) => {
-			setError(error.message);
-			setIsPaying(false);
-		});
+		cardFieldsForm.submit().catch(onError);
 	};
 
 	return (
