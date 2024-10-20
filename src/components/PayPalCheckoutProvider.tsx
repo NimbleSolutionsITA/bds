@@ -116,15 +116,17 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			setError(error.message);
 		}
 	}
-	async function onError(error:  Record<string, any>) {
-		if (orderId) {
-			await fetch(`/api/orders/${orderId}/abort`, {
-				method: "PUT",
-			});
+	const {mutateAsync: onError} = useMutation({
+		mutationFn: async (error:  Record<string, any>)=> {
+			if (orderId) {
+				await fetch(`/api/orders/${orderId}/abort`, {
+					method: "PUT",
+				});
+			}
+			setOrderId(undefined);
+			setError(error.message);
 		}
-		setOrderId(undefined);
-		setError(error.message);
-	}
+	})
 	return (
 		<PayPalCardFieldsProvider
 			createOrder={createOrder.mutateAsync}

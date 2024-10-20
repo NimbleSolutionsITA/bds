@@ -26,7 +26,7 @@ export default async function handler(
 	}
 	try {
 		if (req.method === 'PUT') {
-			await api.put(`orders/${req.query.id}`, {
+			res = await api.put(`orders/${req.query.id}`, {
 				status: req.body.isFailed ? 'failed' : 'cancelled'
 			})
 		} else {
