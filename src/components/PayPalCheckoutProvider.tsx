@@ -116,15 +116,13 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async (error:  Record<string, any>)=> {
-			console.log('orderId')
-			console.log(orderId)
 			if (orderId) {
 				await fetch(`/api/orders/${orderId}/abort`, {
 					method: "PUT",
 				});
 			}
 			setOrderId(undefined);
-			setError(error.message);
+			setError(error.message ?? "An error occurred");
 		}
 	})
 	return (
