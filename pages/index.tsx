@@ -7,16 +7,8 @@ import {AcfAdvancedLink, AcfImage, AcfProductCategory, BaseProduct} from "../src
 import {LOCALE} from "../src/utils/utils";
 import {cacheGetLayoutProps} from "../src/utils/cache";
 
-const SliderWithText = dynamic(() => import("../src/components/SliderWithText"));
-const ProductsCategorySlider = dynamic(() => import("../src/components/ProductsCategorySlider"));
-const BannerNewsletter = dynamic(() => import("../src/components/BannerNewsletter"));
+const Hero = dynamic(() => import("../src/pages/home/Hero"));
 const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
-const BannerDesigners = dynamic(() => import("../src/pages/home/BannerDesigners"));
-const BannerTop = dynamic(() => import("../src/pages/home/BannerTop"));
-const BannerBrands = dynamic(() => import("../src/pages/home/BannerBrands"));
-const BannerBottom = dynamic(() => import("../src/pages/home/BannerBottom"));
-const BannerBottom2 = dynamic(() => import("../src/pages/home/BannerBottom2"));
-const BannerTestimonials = dynamic(() => import("../src/pages/home/BannerTestimonials"));
 const BannerContact = dynamic(() => import("../src/pages/home/BannerContact"));
 
 export type HomeProps = PageBaseProps & {
@@ -104,17 +96,8 @@ export type HomeProps = PageBaseProps & {
 export default function Home({page, layout}: HomeProps) {
     return (
       <Layout layout={layout}>
-          <SliderWithText body={page.sliderWithText.body} images={page.sliderWithText.images} />
-          <ProductsCategorySlider {...page.selectionTop} />
-          <BannerBrands {...page.brands} />
-          <ProductsCategorySlider {...page.selectionBottom} />
-          <BannerDesigners designers={page.designers}/>
-          <BannerTop bannerTop={page.bannerTop} />
-          <BannerBottom bannerBottom={page.bannerBottom} />
-          <BannerBottom2 bannerBottom2={page.bannerBottom2} />
-          <BannerNewsletter body={page.newsletter.body} ctaText={page.newsletter.cta} />
+          <Hero images={page.sliderWithText.images} video="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" />
           <BannerShipping shipping={page.shipping} />
-          <BannerTestimonials reviews={layout.googlePlaces.main.reviews} />
           <BannerContact bannerContact={page.bannerContact}  />
       </Layout>
     );

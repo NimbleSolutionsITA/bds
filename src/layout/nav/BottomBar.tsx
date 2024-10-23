@@ -7,7 +7,7 @@ type BottomBarProps = {
 }
 
 export default function BottomBar({breadcrumbs}: BottomBarProps) {
-    return (
+    return breadcrumbs && (
         <Container sx={{
             display: 'flex',
             alignItems: 'center',
@@ -18,7 +18,7 @@ export default function BottomBar({breadcrumbs}: BottomBarProps) {
             marginBottom: { xs: 0, md: '5px' },
             backgroundColor: '#FFF',
         }}>
-            {breadcrumbs && <Breadcrumbs breadcrumbs={breadcrumbs} />}
+            <Breadcrumbs breadcrumbs={breadcrumbs} />
         </Container>
     )
 }

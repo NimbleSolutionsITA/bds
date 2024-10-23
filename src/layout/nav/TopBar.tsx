@@ -23,7 +23,7 @@ export default function TopBar() {
                 alignItems: 'center',
                 position: 'relative',
                 zIndex: (theme) => theme.zIndex.appBar,
-                minHeight: '60px'
+                minHeight: '40px'
             }}>
                 <div>
                     <LanguageButton color="#FFF" />
@@ -44,9 +44,9 @@ export default function TopBar() {
                     }}
                 >
                     <Trans i18nKey="shipping.lineb" components={[<b key={0} />]} />
-                    <Box sx={{fontSize: '16px', marginTop: '5px'}}>
+                    {/*<Box sx={{fontSize: '16px', marginTop: '5px'}}>
                         <Trans i18nKey="newsletter.promo-banner" components={[<b key={0} />]} />
-                    </Box>
+                    </Box>*/}
                 </div>
                 <div>
                     <UserMenu />
