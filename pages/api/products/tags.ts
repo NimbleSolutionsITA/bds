@@ -44,18 +44,10 @@ export const getProductTags = async (
 	lang?: string | string[] | undefined
 ): Promise<ProductTag[]> => {
 	let page = 1
-	let { data } = await api.get(
-		'products/tags',
-		{
-			per_page: 99,
-			page,
-			lang
-		}
-	)
-	let result = data
-	while (data.length === 99) {
-		page++
-		let { data } = await api.get(
+	let total = 99
+	let tags: ProductTag[] = []
+	while (total === 99) {
+		const { data } = await api.get(
 			'products/tags',
 			{
 				per_page: 99,
@@ -63,9 +55,10 @@ export const getProductTags = async (
 				lang
 			}
 		)
-		result = [...data, ...result]
+		tags.push(...data)
+		page++
 	}
-	return result.map((tag: ProductTag) => ({
+	return tags.map((tag: ProductTag) => ({
 		id: tag.id,
 		name: tag.name,
 		slug: tag.slug,
