@@ -11,6 +11,7 @@ import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {Cart, Item} from "../types/cart-type";
 import {sendGTMEvent} from "@next/third-parties/google";
+import {ReadonlyURLSearchParams} from "next/navigation";
 
 export const sanitize = (html: string) => {
   return sanitizeHtml(html, {
@@ -26,6 +27,12 @@ export const sanitize = (html: string) => {
   });
 }
 export type LOCALE = 'it' | 'en'
+
+export const PRODUCT_ATTRIBUTES = {
+    color: ['colore', 'color', 'lente', 'modello', 'montatura'] as const,
+    image:  ['montaturaLenti'] as const,
+    text: ['calibro', 'formato', 'calibro-ponte'] as const
+}
 
 export const EYEWEAR_CATEGORY = {
   it: 188,
@@ -143,11 +150,19 @@ export function closestColor(hex: string): Color {
   return closest;
 }
 
-export function getDefaultProduct(product: BaseProduct | Product): {
+export function getVariationFromParams(product: BaseProduct | Product, params: ReadonlyURLSearchParams): BaseVariation | undefined {
+    return product.variations?.find(variation => variation.attributes?.every(attribute => {
+        let type = (attribute.id as string).replace('pa_', '');
+        return params.has(type) && params.get(type) === attribute.option
+    })) as BaseVariation;
+}
+
+
+export function getDefaultProduct(product: BaseProduct | Product, variation?: BaseVariation): {
     defaultProduct: BaseVariation | Variation,
     defaultAttributes: { [key in AttributeType]?: string }
 } {
-    const defaultProduct = product.variations[0] ?? {
+    const defaultProduct = variation ?? product.variations[0] ?? {
         id: product.id,
         stock_status: product.stock_status,
         stock_quantity: product.stock_quantity,
@@ -167,6 +182,7 @@ export function getDefaultProduct(product: BaseProduct | Product): {
         obj[key === 'montatura-lenti' ? 'montaturaLenti': key] = item.option;
         return obj;
     }, {} as {[key: string]: string}) : {};
+    //console.log({ defaultProduct, defaultAttributes })
 
     return { defaultProduct, defaultAttributes };
 }

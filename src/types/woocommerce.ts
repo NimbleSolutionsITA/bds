@@ -1,4 +1,4 @@
-import {LOCALE} from "../utils/utils";
+import {LOCALE, PRODUCT_ATTRIBUTES} from "../utils/utils";
 
 export type Product = Omit<BaseProduct, 'image' | 'variations' | 'categories'> & {
 	type: "simple" | "variable" | "grouped";
@@ -19,13 +19,21 @@ export type ProductCategory = BaseCategory & { bottomText: string | null }
 
 export type Variation = Omit<BaseVariation, 'image'> & { image: ImageDetailed }
 
-export type ColorAttribute = 'colore'|'lente'|'modello'|'montatura'
+export type ColorAttribute = typeof PRODUCT_ATTRIBUTES.color[number]
 
-export type ImageAttribute = 'montaturaLenti'
+export type ImageAttribute = typeof PRODUCT_ATTRIBUTES.image[number]
 
-export type BaseAttribute = 'calibro'|'formato'
+export type BaseAttribute = typeof PRODUCT_ATTRIBUTES.text[number]
 
 export type AttributeType = BaseAttribute|ImageAttribute|ColorAttribute
+
+export type BaseAttributes = {
+	[key in BaseAttribute]: TextAttribute[]
+} & {
+	[key in ColorAttribute]: Color[]
+} & {
+	[key in ImageAttribute]: ImageColor[]
+}
 
 export interface ImageDetailed {
 	url: string;
@@ -48,11 +56,13 @@ export interface Color {
 	slug: string;
 	name: string;
 	code: string;
-	type?: 'colore'|'lente'|'modello'|'montatura';
-}export interface Attribute {
+	type?: ColorAttribute;
+}
+
+export interface Attribute {
 	slug: string;
 	name: string;
-	type?: 'calibro'|'formato'|'calibro-ponte'
+	type?: BaseAttribute
 }
 
 export interface ImageColor {
@@ -119,16 +129,6 @@ export type WooProductCategory = BaseCategory & Category & {
 	menu_order: number;
 	link: string;
 	child_items?: WooProductCategory[]
-}
-
-export type BaseAttributes = {
-	colore?: Color[];
-	lente?: Color[];
-	modello?: Color[];
-	montatura?: Color[];
-	montaturaLenti?: ImageColor[];
-	calibro?: TextAttribute[];
-	formato?: TextAttribute[];
 }
 
 export type BaseCategory = {

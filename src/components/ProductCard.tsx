@@ -6,9 +6,9 @@ import {
 } from "../types/woocommerce";
 import {Box, Button, Card, CardContent, CircularProgress, Typography} from "@mui/material";
 import {
-     EYEWEAR_CATEGORY,
+    EYEWEAR_CATEGORY,
     findVariationFromAttributes,
-    getDefaultProduct, getProductMainCategory,
+    getDefaultProduct, getProductMainCategory, PRODUCT_ATTRIBUTES,
     sanitize
 } from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
@@ -37,23 +37,25 @@ const ProductCard = ({ product }: ProductCardProps) => {
         parent && Object.values(EYEWEAR_CATEGORY).includes(parent as number)
     ) !== undefined;
     const imageRatio = isEyewear ? 45 : 130;
-    const init = getDefaultProduct(product);
-    const defaultProduct = init.defaultProduct as BaseVariation;
-    const {defaultAttributes} = init;
-
+    const { defaultProduct, defaultAttributes} = getDefaultProduct(product);
     const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
-    const [currentProduct, setCurrentProduct] = useState(defaultProduct);
+    const [currentProduct, setCurrentProduct] = useState(defaultProduct as BaseVariation);
     const [currentImage, setCurrentImage] = useState<string>(currentProduct.image);
     const category = getProductMainCategory(product);
 
     const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
         const newAttributes = {...currentAttributes, [attribute]: slug};
-        await setCurrentAttributes(newAttributes)
+        setCurrentAttributes(newAttributes)
         const newProduct = findVariationFromAttributes(product, newAttributes) as BaseVariation ?? defaultProduct
         setCurrentProduct(newProduct)
         setCurrentImage(newProduct.image ?? product.image ?? placeholder)
     }
     const hasAttributes = Object.keys(product.attributes).length > 0
+    const colorAttribute = [...PRODUCT_ATTRIBUTES.color, ...PRODUCT_ATTRIBUTES.image].find(c => product.attributes[c]?.length > 1)
+    const selectedColor = colorAttribute && product.attributes[colorAttribute]?.find(c => c.slug === currentAttributes[colorAttribute])
+
+    const urlParams = new URLSearchParams(currentAttributes);
+    const url = `/${PRODUCT_SUB_PATH}/${product.slug}?${urlParams.toString().replace("montaturaLenti", "montatura-lenti")}`
 
     return (
         <Card
@@ -61,7 +63,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             sx={{width: '100%', height: 'auto'}}
             elevation={0}
         >
-            <Link href={`/${PRODUCT_SUB_PATH}/${product.slug}`}>
+            <Link href={url}>
                 <Box sx={{width: '100%', paddingBottom: imageRatio+'%', position: 'relative'}}>
                     <Image
                         src={currentImage}
@@ -89,7 +91,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     borderTop: '1px solid',
                     borderBottom: '1px solid'
                 }}>
-                    <Link prefetch={false} href={`/${PRODUCT_SUB_PATH}/${product.slug}`} style={{textDecoration: 'none', width: '100%'}}>
+                    <Link prefetch={false} href={url} style={{textDecoration: 'none', width: '100%'}}>
                         <Typography
                             variant="h3"
                             sx={{
@@ -98,7 +100,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
                                 width: '100%',
                                 fontWeight: '300 !important'
                             }}
-                            dangerouslySetInnerHTML={{ __html: sanitize(product.name)}}
+                            dangerouslySetInnerHTML={{
+                                __html: sanitize(product.name + (selectedColor ? ' ' + selectedColor?.name : ''))
+                        }}
                         />
                     </Link>
                 </div>

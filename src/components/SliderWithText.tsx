@@ -1,4 +1,4 @@
-import {Grid} from "@mui/material";
+import {Grid2 as Grid} from "@mui/material";
 import React from "react";
 import HtmlBlock from "./HtmlBlock";
 import FullPageSlider from "./FullPageSlider";
@@ -17,7 +17,7 @@ const SliderWithText = ({body, images}: SliderWithTextProps) => {
 				flexDirection: {xs: 'column-reverse', lg: 'row'},
 			}}
 		>
-			<Grid item xs={12} lg={4}>
+			<Grid size={{xs: 12, lg: 4}}>
 				<HtmlBlock html={body} sx={{
 					margin: {
 						xs: '5% 10%',
@@ -25,7 +25,7 @@ const SliderWithText = ({body, images}: SliderWithTextProps) => {
 					}
 				}} />
 			</Grid>
-			<Grid item xs={12} lg={8} sx={{width: '100%'}}>
+			<Grid size={{xs: 12, lg: 8}} sx={{width: '100%'}}>
 				<FullPageSlider images={images} />
 			</Grid>
 		</Grid>

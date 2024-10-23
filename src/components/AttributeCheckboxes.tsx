@@ -1,9 +1,7 @@
 import {
 	AttributeType,
-	BaseAttribute,
 	BaseProduct,
 	Color,
-	ColorAttribute,
 	ImageColor,
 	Product,
 	TextAttribute
@@ -11,6 +9,7 @@ import {
 import {CheckboxProps} from "@mui/material/Checkbox/Checkbox";
 import {Box, Checkbox, Typography} from "@mui/material";
 import Image from "next/image";
+import {PRODUCT_ATTRIBUTES} from "../utils/utils";
 type AttributeCheckboxesProps = {
 	product: Product | BaseProduct
 	currentAttributes: {  [key in AttributeType]?: string }
@@ -21,63 +20,55 @@ export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAtt
 	const boxStyle = {display: 'flex', gap: '5px', flexWrap: 'wrap' as const, marginBottom: extended ? '20px' : 0}
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 70px)'}}>
-			{['colore', 'color', 'lente', 'modello', 'montatura'].map((attribute) => {
-				const attributes = product.attributes[attribute as ColorAttribute];
-				return Array.isArray(attributes) ? (
-					<div key={attribute} style={boxStyle}>
-						{extended && (
-							<AttributeTitle attribute={attribute} value={currentAttributes[attribute as ColorAttribute]} />
-						)}
-						{attributes.map((color) => (
-							<ColorBox
-								title={attribute + ' - ' + color.name }
-								productColor={color}
-								key={color.slug}
-								checked={currentAttributes[attribute as ColorAttribute] === color.slug}
-								onChange={() => handleClickAttribute(attribute as ColorAttribute, color.slug)}
-							/>
-						))}
-					</div>
-				) : null
-			})}
-			{Array.isArray(product.attributes.montaturaLenti) ? (
-				<div key="montaturaLenti" style={boxStyle}>
-					{extended && (
-						<AttributeTitle attribute="montaturaLenti" value={currentAttributes.montaturaLenti} />
-					)}
-					{product.attributes.montaturaLenti.map((color) => (
-						<ImageBox
-							title={'montatura lenti' + ' - ' + color.name }
-							productColor={color}
-							key={color.slug}
-							checked={currentAttributes.montaturaLenti === color.slug}
-							onChange={() => handleClickAttribute('montaturaLenti', color.slug)}
-						/>
-					))}
-				</div>
-			) : null}
-			{['calibro', 'formato', 'calibro-ponte'].map((attributeName) => {
-				const attributes = product.attributes[attributeName as BaseAttribute];
+			{Object.values(PRODUCT_ATTRIBUTES).map((attributes) => attributes.map((attributeName) => {
+				const attributes = product.attributes[attributeName];
 				return Array.isArray(attributes) ? (
 					<div key={attributeName} style={boxStyle}>
 						{extended && (
-							<AttributeTitle attribute={attributeName} value={currentAttributes[attributeName as BaseAttribute]} />
+							<AttributeTitle attribute={attributeName} value={currentAttributes[attributeName]} />
 						)}
-						{attributes.map((attribute) => (
-							<TextBox
-								title={attributeName + ' - ' + attribute.name }
-								attribute={attribute}
-								key={attribute.slug}
-								checked={currentAttributes[attributeName as BaseAttribute] === attribute.slug}
-								onChange={() => handleClickAttribute(attributeName as BaseAttribute, attribute.slug)}
-							/>
-						))}
+						{attributes.map((attribute) => {
+							if (PRODUCT_ATTRIBUTES.color.includes(attributeName as any)) {
+								return (
+									<ColorBox
+										title={attributeName + ' - ' + attribute.name }
+										productColor={attribute as Color}
+										key={attribute.slug}
+										checked={currentAttributes[attributeName] === attribute.slug}
+										onChange={() => handleClickAttribute(attributeName, attribute.slug)}
+									/>
+								)
+							}
+							if (PRODUCT_ATTRIBUTES.image.includes(attributeName as any)) {
+								return (
+									<ImageBox
+										title={attributeName + ' - ' + attribute.name }
+										productColor={attribute as ImageColor}
+										key={attribute.slug}
+										checked={currentAttributes[attributeName] === attribute.slug}
+										onChange={() => handleClickAttribute(attributeName, attribute.slug)}
+									/>
+								)
+							}
+							if (PRODUCT_ATTRIBUTES.text.includes(attributeName as any)) {
+								return (
+									<TextBox
+										title={attributeName + ' - ' + attribute.name }
+										attribute={attribute}
+										key={attribute.slug}
+										checked={currentAttributes[attributeName] === attribute.slug}
+										onChange={() => handleClickAttribute(attributeName, attribute.slug)}
+									/>
+								)
+							}
+						})}
 					</div>
 				) : null
-			})}
+			}))}
 		</div>
 	)
 }
+
 const AttributeTitle = ({attribute, value}: {attribute: string, value?: string}) => (
 	<Typography sx={{fontSize: '18px', width: '100%', textTransform: 'capitalize', marginBorrom: '5px'}}>
 		<b>{attribute}:</b> {value}

@@ -11,9 +11,8 @@ import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
 import {
 	EYEWEAR_CATEGORIES,
-	findVariationFromAttributes,
 	FRAGRANCES_CATEGORY,
-	getDefaultProduct,
+	getDefaultProduct, getVariationFromParams,
 	sanitize
 } from "../../utils/utils";
 import Link from "../../components/Link";
@@ -33,11 +32,13 @@ import DHL from "../../icons/DHL";
 import GLS from "../../icons/GLS";
 import {useTranslation} from "next-i18next";
 import {Trans} from "react-i18next";
-import {DESIGNERS_SUB_PATH} from "../../utils/endpoints";
+import {DESIGNERS_SUB_PATH, PRODUCT_SUB_PATH} from "../../utils/endpoints";
 import SaveMoney from "../../icons/SaveMoney";
 import FastShipping from "../../icons/FastShipping";
 import EuShipping from "../../icons/EuShipping";
 import AppleGooglePayButtons from "../../components/AppleGooglePayButtons";
+import {useSearchParams} from "next/navigation";
+import {useRouter} from "next/router";
 
 type ProductViewProps = {
 	product: Product
@@ -58,33 +59,28 @@ const removeDuplicates = (array: ImageDetailed[]) => {
 }
 
 const ProductView = ({product, category, shipping, countries}: ProductViewProps) => {
+	const params = useSearchParams();
 	const { cart: { customer: { shipping_address: { shipping_country }} } = initialCart } = useSelector((state: RootState) => state.cart);
 	const isEU = !!shipping_country && shipping_country !== 'IT'
-	const init = getDefaultProduct(product);
+	const init = getDefaultProduct(product, getVariationFromParams(product, params));
 	const isEyewear = product.categories.find(({id, parent }) =>
 		EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
 	) !== undefined;
-	const { cart, cartDrawerOpen } = useSelector((state: RootState) => state.cart);
+	const { cart } = useSelector((state: RootState) => state.cart);
 	const defaultProduct = init.defaultProduct as Variation;
 	const {defaultAttributes} = init;
 	const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
 	const [currentProduct, setCurrentProduct] = useState(defaultProduct);
-
-	const galleryImages = removeDuplicates([...product.gallery, ...product.variations.map(v => v.image)])
-
-
-	const [galleryIndex, setGalleryIndex] = useState(galleryImages.findIndex(v => v.url === defaultProduct.image.url) ?? 0);
+	const router = useRouter();
+	const galleryImages = removeDuplicates([product.image, ...product.gallery, ...product.variations.map(v => v.image)])
 	const dispatch = useDispatch<AppDispatch>();
 	const { t } = useTranslation('common');
     const cartQuantity = cart?.items?.find(v => [product.id, currentProduct.id].includes(v.id))?.quantity.value ?? 0;
 	const categoryLink = (category && (Object.values(FRAGRANCES_CATEGORY).includes(category.parent as number) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
 
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
-		const newAttributes = {...currentAttributes, [attribute]: slug};
-		await setCurrentAttributes(newAttributes)
-		const newProduct = findVariationFromAttributes(product, newAttributes) as Variation ?? defaultProduct
-		setCurrentProduct(newProduct)
-		setGalleryIndex(galleryImages.findIndex(v => v.url === newProduct.image?.url) ?? 0)
+		const routeParams = new URLSearchParams({...currentAttributes, [attribute]: slug});
+		await router.push({pathname: `/${PRODUCT_SUB_PATH}/${product.slug}`, query: routeParams.toString().replace('montaturaLenti', 'montatura-lenti')}, undefined, {shallow: true});
 	}
 
 	const cartItem = {
@@ -112,12 +108,6 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 		}
 	}
 
-	useEffect(() => {
-		setCurrentAttributes(defaultAttributes)
-		setCurrentProduct(defaultProduct)
-	}, [product.id]);
-
-
 	return (
 		<Container key={product.id}>
 			<Grid container spacing={5}>
@@ -125,7 +115,7 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 					<Carousel
 						animation="slide"
 						autoPlay={false}
-						index={galleryIndex}
+						index={galleryImages.findIndex(v => v.url === defaultProduct.image.url) ?? 0}
 						sx={{
 							/*minHeight: isEyewear ? '100%' : undefined,
 							maxHeight: isEyewear ? '1000px' : undefined,*/
@@ -254,7 +244,7 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 						</>
 					)}
 					<div style={{display: 'flex', gap: '20px', marginTop: '20px', flexWrap: 'wrap'}}>
-						{currentProduct.stock_status === 'instock'  && (
+						{currentProduct.stock_status === 'instock' && currentProduct.price && (
 							<>
 								<Button
 									onClick={handleAddToCart}
