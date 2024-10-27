@@ -63,11 +63,18 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	async function onApprove(data: OnApproveData, actions?: OnApproveActions) {
 		try {
-			const { wooOrder, payPalOrder } = await captureOrder(data.orderID);
+			const response = await fetch(`/api/orders/${data.orderID}/capture`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			const r = await response.json();
+			const { wooOrder, payPalOrder, success } = r
 			const transaction = payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0];
-			const errorDetail = transaction?.status_details?.reason
-
-			if (errorDetail || !transaction || transaction.status !== "COMPLETED") {
+			const errorDetail = payPalOrder.details?.[0]?.description;
+			console.log(r)
+			if (!success && errorDetail || !transaction || transaction.status !== "COMPLETED") {
 				if (actions && transaction?.status === "DECLINED" && !transaction.final_capture) {
 					actions.restart();
 					return;
@@ -80,13 +87,15 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				} else {
 					errorMessage = JSON.stringify(payPalOrder);
 				}
-				await fetch(`/api/orders/${wooOrder.id}/abort`, {
-					method: "PUT",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ isFailed: true }),
-				});
+				if (wooOrder && wooOrder.id) {
+					await fetch(`/api/orders/${wooOrder.id}/abort`, {
+						method: "PUT",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ isFailed: true }),
+					});
+				}
 				throw new Error(errorMessage);
 			}
 			else if (transaction && transaction.status === "COMPLETED") {
@@ -99,30 +108,16 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 		}
 	}
 
-	const captureOrder = async (orderId: string) => {
-		const response = await fetch(`/api/orders/${orderId}/capture`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
-
-		const orderData = await response.json();
-		if (!orderData.success) {
-			throw new Error(orderData.error);
-		}
-		return orderData;
-	}
-
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async (error:  Record<string, any>)=> {
+			console.log(error.details)
 			if (orderId) {
 				await fetch(`/api/orders/${orderId}/abort`, {
 					method: "PUT",
 				});
 			}
 			setOrderId(undefined);
-			setError(error.message ?? "An error occurred");
+			setError(error.message ?? error.details?.[0]?.description ?? "An error occurred");
 		}
 	})
 	return (

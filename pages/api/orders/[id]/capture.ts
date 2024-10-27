@@ -35,7 +35,7 @@ export default async function handler(
 				throw new Error('Paypal Order ID is missing')
 			}
 			responseData.payPalOrder = await captureOrder(paypalOrderId)
-			const orderId = responseData.payPalOrder.purchase_units[0].reference_id
+			const orderId = responseData.payPalOrder?.purchase_units?.[0]?.reference_id
 
 			responseData.success = responseData.payPalOrder.status === 'COMPLETED'
 			if (responseData.success && orderId &&
