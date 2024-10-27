@@ -123,7 +123,6 @@ const PAGES_TO_EXCLUDE = [
     'shop',
     'donna',
     'uomo',
-
     'checkout',
     'checkout-3',
     'checkout-2',

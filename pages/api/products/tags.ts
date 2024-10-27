@@ -57,6 +57,7 @@ export const getProductTags = async (
 		)
 		tags.push(...data)
 		page++
+		total = data.length
 	}
 	return tags.map((tag: ProductTag) => ({
 		id: tag.id,

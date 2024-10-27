@@ -40,7 +40,6 @@ export default async function handler(
 				throw new Error('Cart amount is 0')
 			}
 			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
-			console.log(orderPayload)
 			const { data: order } = await api.post("orders", orderPayload)
 			responseData.wooId = order.id
 			const amount = Number(order.total)

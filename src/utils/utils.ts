@@ -182,7 +182,6 @@ export function getDefaultProduct(product: BaseProduct | Product, variation?: Ba
         obj[key === 'montatura-lenti' ? 'montaturaLenti': key] = item.option;
         return obj;
     }, {} as {[key: string]: string}) : {};
-    //console.log({ defaultProduct, defaultAttributes })
 
     return { defaultProduct, defaultAttributes };
 }
