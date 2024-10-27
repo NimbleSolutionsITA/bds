@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useState} from "react";
-import {OnApproveData, PayPalCardFieldsStyleOptions} from "@paypal/paypal-js";
+import {OnApproveActions, OnApproveData, PayPalCardFieldsStyleOptions} from "@paypal/paypal-js";
 import {PayPalCardFieldsProvider} from "@paypal/react-paypal-js";
 import {ShippingData} from "../redux/layoutSlice";
 import {useDispatch, useSelector} from "react-redux";
@@ -61,41 +61,25 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 		}
 	})
 
-	async function onApprove(data: OnApproveData) {
+	async function onApprove(data: OnApproveData, actions?: OnApproveActions) {
 		try {
-			const response = await fetch(`/api/orders/${data.orderID}/capture`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
+			const { wooOrder, payPalOrder } = await captureOrder(data.orderID);
+			const transaction = payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0];
+			const errorDetail = transaction?.status_details?.reason
 
-			const orderData = await response.json();
-			if (!orderData.success) {
-				throw new Error(orderData.error);
-			}
-			const { wooOrder, payPalOrder } = orderData;
-			// Three cases to handle:
-			//   (1) Recoverable INSTRUMENT_DECLINED -> call actions.restart()
-			//   (2) Other non-recoverable errors -> Show a failure message
-			//   (3) Successful transaction -> Show confirmation or thank you message
-
-			const transaction =
-				payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0] ||
-				payPalOrder?.purchase_units?.[0]?.payments?.authorizations?.[0];
-			const errorDetail = payPalOrder?.details?.[0];
-
-			if (errorDetail || !transaction || transaction.status === "DECLINED") {
-				// (2) Other non-recoverable errors -> Show a failure message
+			if (errorDetail || !transaction || transaction.status !== "COMPLETED") {
+				if (actions && transaction?.status === "DECLINED" && !transaction.final_capture) {
+					actions.restart();
+					return;
+				}
 				let errorMessage;
 				if (transaction) {
 					errorMessage = `Transaction ${transaction.status}: ${transaction.id}`;
 				} else if (errorDetail) {
-					errorMessage = `${errorDetail.description} (${payPalOrder.debug_id})`;
+					errorMessage = `${errorDetail} (${payPalOrder.debug_id})`;
 				} else {
 					errorMessage = JSON.stringify(payPalOrder);
 				}
-
 				await fetch(`/api/orders/${wooOrder.id}/abort`, {
 					method: "PUT",
 					headers: {
@@ -103,15 +87,31 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 					},
 					body: JSON.stringify({ isFailed: true }),
 				});
-
 				throw new Error(errorMessage);
 			}
-			dispatch(destroyCart());
-			gtagPurchase(wooOrder);
-			await router.push("/checkout/completed");
+			else if (transaction && transaction.status === "COMPLETED") {
+				dispatch(destroyCart());
+				gtagPurchase(wooOrder);
+				await router.push("/checkout/completed");
+			}
 		} catch (error: any) {
 			await onError(error);
 		}
+	}
+
+	const captureOrder = async (orderId: string) => {
+		const response = await fetch(`/api/orders/${orderId}/capture`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+
+		const orderData = await response.json();
+		if (!orderData.success) {
+			throw new Error(orderData.error);
+		}
+		return orderData;
 	}
 
 	const {mutateAsync: onError} = useMutation({

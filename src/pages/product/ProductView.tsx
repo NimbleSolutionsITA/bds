@@ -17,7 +17,7 @@ import {
 } from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import {addCartItem, initialCart} from "../../redux/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {AttributeCheckboxes} from "../../components/AttributeCheckboxes";
