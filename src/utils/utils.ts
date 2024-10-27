@@ -344,7 +344,7 @@ export const getInvoice = (customer?: LoggedCustomer) => ({
     vat: getCustomerMetaData('vat', '', customer),
     tax: getCustomerMetaData('tax', '', customer),
     sdi: getCustomerMetaData('sdi', '', customer),
-    billingChoice: getCustomerMetaData('billing_choice', 'invoice', customer),
+    billingChoice: getCustomerMetaData('billing_choice', 'receipt', customer),
     invoiceType: getCustomerMetaData('invoice_type', 'private', customer)
 })
 
