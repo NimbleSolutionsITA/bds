@@ -22,7 +22,7 @@ export default function Designer({
   productCategory, products, layout
 }: DesignerProps) {
 	return (
-		<Layout layout={layout}>
+		<Layout key={productCategory.slug} layout={layout}>
 			<DesignerTop
 				name={productCategory.name}
 				gallery={productCategory.acf.gallery}
@@ -49,7 +49,6 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		categories: slug,
 		lang: locale,
 	})
-	console.log(slug, products)
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },

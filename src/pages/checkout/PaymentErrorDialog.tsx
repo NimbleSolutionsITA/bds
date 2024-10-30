@@ -10,9 +10,9 @@ import {Button} from "@mui/material";
 
 const PaymentErrorDialog = ({ error, setError}: {error?: string, setError: Dispatch<SetStateAction<string|undefined>>}) => {
 	const { t } = useTranslation('common')
-	return (
+	return error && (
 		<Dialog
-			open={!!error}
+			open={true}
 			onClose={() => setError(undefined)}
 			aria-labelledby="stripe-payment-error"
 		>

@@ -19,7 +19,7 @@ export type FragranceProps = PageBaseProps & {
 }
 export default function Fragrance({ productCategory, products, layout }: FragranceProps) {
 	return (
-		<Layout layout={layout}>
+		<Layout key={productCategory.slug} layout={layout}>
 			<FragranceTop
 				name={productCategory.name}
 				gallery={productCategory.acf.gallery}
@@ -80,7 +80,7 @@ export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
 	}))).flat();
 
 	return {
-		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
+		paths: process.env.DISABLE_DYNAMIC_BUILD === "true" ? [] : paths,
 		fallback: 'blocking',
 	};
 }

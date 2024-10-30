@@ -45,20 +45,12 @@ export const getProductCategories = async (
 	lang?: string | string[] | undefined,
 	parent?: number | undefined
 ): Promise<WooProductCategory[]> => {
-	let page = 1
-	let { data } = await api.get(
-		'products/categories',
-		{
-			per_page: 99,
-			page,
-			parent,
-			lang
-		}
-	)
-	let result = data
-	while (data.length === 99) {
-		page++
-		let { data } = await api.get(
+	let page = 1;
+	let total = 99
+	let categories: WooProductCategory[] = []
+
+	while (total === 99) {
+		const {data} = await api.get(
 			'products/categories',
 			{
 				per_page: 99,
@@ -66,10 +58,14 @@ export const getProductCategories = async (
 				parent,
 				lang
 			}
-		)
-		result = [...data, ...result]
+		);
+		categories.push(...data);
+		page++;
+		total  = data.length
 	}
-	return result
+
+	return categories;
+
 }
 
 export const getProductCategory = async (

@@ -15,9 +15,11 @@ module.exports =  {
     reactStrictMode: false,
     swcMinify: true,
     images: {
-        domains: [
-            'www.' + WORDPRESS_HOSTNAME,
-            WORDPRESS_HOSTNAME,
+        remotePatterns:[
+            {
+                protocol: 'https',
+                hostname: WORDPRESS_HOSTNAME,
+            },
         ],
         loader: 'default',
     },

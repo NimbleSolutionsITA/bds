@@ -51,7 +51,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         setCurrentImage(newProduct.image ?? product.image ?? placeholder)
     }
     const hasAttributes = Object.keys(product.attributes).length > 0
-    const colorAttribute = [...PRODUCT_ATTRIBUTES.color, ...PRODUCT_ATTRIBUTES.image].find(c => product.attributes[c]?.length > 1)
+    const colorAttribute = [...PRODUCT_ATTRIBUTES.color, ...PRODUCT_ATTRIBUTES.image].find(c => product.attributes[c]?.length > 0)
     const selectedColor = colorAttribute && product.attributes[colorAttribute]?.find(c => c.slug === currentAttributes[colorAttribute])
 
     const urlParams = new URLSearchParams(currentAttributes);

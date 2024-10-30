@@ -89,8 +89,8 @@ export const EYEWEAR_CATEGORIES = [
 
 export const getDesignersCategories = (categories: WooProductCategory[]) =>
     categories.find(c => Object.values(EYEWEAR_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => {
-        if (a.name < b.name) return -1
-        if (a.name > b.name) return 1
+        if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+        if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
         return 0
     }) ?? []
 export const getFragrancesCategories = (categories: WooProductCategory[]) =>
@@ -182,7 +182,6 @@ export function getDefaultProduct(product: BaseProduct | Product, variation?: Ba
         obj[key === 'montatura-lenti' ? 'montaturaLenti': key] = item.option;
         return obj;
     }, {} as {[key: string]: string}) : {};
-    //console.log({ defaultProduct, defaultAttributes })
 
     return { defaultProduct, defaultAttributes };
 }
@@ -345,7 +344,7 @@ export const getInvoice = (customer?: LoggedCustomer) => ({
     vat: getCustomerMetaData('vat', '', customer),
     tax: getCustomerMetaData('tax', '', customer),
     sdi: getCustomerMetaData('sdi', '', customer),
-    billingChoice: getCustomerMetaData('billing_choice', 'invoice', customer),
+    billingChoice: getCustomerMetaData('billing_choice', 'receipt', customer),
     invoiceType: getCustomerMetaData('invoice_type', 'private', customer)
 })
 

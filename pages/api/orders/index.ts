@@ -40,7 +40,6 @@ export default async function handler(
 				throw new Error('Cart amount is 0')
 			}
 			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
-			console.log(orderPayload)
 			const { data: order } = await api.post("orders", orderPayload)
 			responseData.wooId = order.id
 			const amount = Number(order.total)
@@ -102,6 +101,7 @@ const createOrder = async (amount: number, orderId: string) => {
 const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: string, customerId?: string, paymentMethod: string = "PayPal") => {
 	const selectedShipping = cart.shipping?.packages.default.rates[cart.shipping.packages.default.chosen_method]
 	const isEu = getIsEU(cart.customer)
+
 	return ({
 		customer_id: customerId,
 		currency: "EUR",
@@ -124,7 +124,8 @@ const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: str
 			{ key: '_billing_invoice_type', value: invoice.invoiceType ?? "" },
 			{ key: '_billing_sdi_type', value: invoice.sdi ?? "" },
 			{ key: '_billing_vat_number', value: invoice.vat ?? "" },
-			{ key: '_billing_tax_code', value: invoice.tax ?? "" },
+			{ key: '_billing_tax_code', value: invoice.tax ?? (cart.customer.billing_address.billing_country === 'IT' ? "" :
+					`${cart.customer.billing_address.billing_first_name}${cart.customer.billing_address.billing_last_name}`.slice(0,11).toUpperCase()) },
 		] : []
 	})
 }

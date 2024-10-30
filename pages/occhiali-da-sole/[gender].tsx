@@ -59,17 +59,13 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: LOC
 }
 
 export const getStaticPaths = async ({ locales }: { locales: LOCALE[] }) => {
-	const genders = ['uomo', 'donna'];
-
-	const paths = locales.flatMap(locale =>
-		genders.map(gender => ({
-			params: { gender },
-			locale,
-		})),
-	);
-
 	return {
-		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
+		paths: locales.flatMap(locale =>
+			['uomo', 'donna'].map(gender => ({
+				params: { gender },
+				locale,
+			})),
+		),
 		fallback: false,
 	};
 };

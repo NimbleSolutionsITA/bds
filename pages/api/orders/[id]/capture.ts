@@ -25,6 +25,8 @@ export default async function handler(
 ) {
 	const responseData: CreateOrderResponse = {
 		success: false,
+		wooOrder: null,
+		payPalOrder: null
 	}
 	try {
 		if (req.method === 'POST') {
@@ -33,9 +35,12 @@ export default async function handler(
 				throw new Error('Paypal Order ID is missing')
 			}
 			responseData.payPalOrder = await captureOrder(paypalOrderId)
-			const orderId = responseData.payPalOrder.purchase_units[0].reference_id
+			const orderId = responseData.payPalOrder?.purchase_units?.[0]?.reference_id
+
 			responseData.success = responseData.payPalOrder.status === 'COMPLETED'
-			if (responseData.success && orderId) {
+			if (responseData.success && orderId &&
+				responseData.payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0].status === 'COMPLETED') {
+
 				const { data: order} = await api.put(`orders/${orderId}`, {
 					set_paid: true,
 					transaction_id: paypalOrderId,
