@@ -7,7 +7,7 @@ import HtmlBlock from "../../src/components/HtmlBlock";
 import {getProducts} from "../api/products";
 import React from "react";
 import dynamic from "next/dynamic";
-import {FRAGRANCES_CATEGORY, LOCALE} from "../../src/utils/utils";
+import {FRAGRANCES_CATEGORY, getFragrancesCategories, LOCALE} from "../../src/utils/utils";
 import {cacheGetLayoutProps, cacheGetProductCategories} from "../../src/utils/cache";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
@@ -48,6 +48,12 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
     const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
 
     if (productCategory) {
+        const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({id}) => id)
+        if (!productCategory || fragranceBrands.includes(productCategory.id)) {
+            return {
+                notFound: true
+            }
+        }
         const products = await getProducts({
             categories: productCategory.slug,
             lang: locale,

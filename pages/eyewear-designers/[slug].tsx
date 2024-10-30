@@ -22,7 +22,7 @@ export default function Designer({
   productCategory, products, layout
 }: DesignerProps) {
 	return (
-		<Layout layout={layout}>
+		<Layout key={productCategory.slug} layout={layout}>
 			<DesignerTop
 				name={productCategory.name}
 				gallery={productCategory.acf.gallery}

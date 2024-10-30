@@ -2,7 +2,7 @@ import {BaseProduct, WooProductCategory} from "../../types/woocommerce";
 import {IconButton, TextField, Typography} from "@mui/material";
 import {useInfiniteQuery} from "@tanstack/react-query";
 import {
-	DESIGNERS_CATEGORY,
+	DESIGNERS_CATEGORY, DESIGNERS_SUB_PATH,
 	NEXT_API_ENDPOINT,
 	PRODUCT_SUB_PATH,
 } from "../../utils/endpoints";
@@ -27,7 +27,6 @@ const SearchLayout = ({categories}: Props) => {
 	const { locale } = useRouter()
 	const [search, setSearch] = useState('');
 	const { t } = useTranslation('common');
-	const router = useRouter()
 	const dispatch = useDispatch()
 
 	const eyewar = useInfiniteQuery({
@@ -79,10 +78,6 @@ const SearchLayout = ({categories}: Props) => {
 	const designersList = designers.filter((d => d.name.toLowerCase().includes(search.toLowerCase())))
 	const fragrancesList = fragrances.filter((f => f && f.name.toLowerCase().includes(search.toLowerCase())))
 	const onClose = () => dispatch(closeSearchDrawer())
-	const handleClick = (route: string) => {
-		router.push(route)
-		onClose()
-	}
 	return (
 		<div style={{textAlign: 'center', position: 'relative'}}>
 			<IconButton
@@ -141,7 +136,7 @@ const ChipList = ({query, list, title}: {query: any, list: any, title: string}) 
 						<Chip
 							key={category.slug}
 							tag={{name: category.name}}
-							onClick={() => handleClick(`/${category.parent}/${category.slug}`)}
+							onClick={() => handleClick(`/${title === 'designers' ? DESIGNERS_SUB_PATH : category.parent}/${category.slug}`)}
 						/>
 					))}
 				</Box>
