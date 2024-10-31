@@ -266,7 +266,6 @@ export const getIsEU = (customer?: Cart['customer']) => {
 
     country = (!country || country === '') ?
         'IT' : country
-
     return country !== 'IT'
 }
 

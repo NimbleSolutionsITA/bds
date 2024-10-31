@@ -73,7 +73,6 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			const { wooOrder, payPalOrder, success } = r
 			const transaction = payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0];
 			const errorDetail = payPalOrder.details?.[0]?.description;
-			console.log(r)
 			if (!success && errorDetail || !transaction || transaction.status !== "COMPLETED") {
 				if (actions && transaction?.status === "DECLINED" && !transaction.final_capture) {
 					actions.restart();
@@ -110,7 +109,6 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async (error:  Record<string, any>)=> {
-			console.log(error.details)
 			if (orderId) {
 				await fetch(`/api/orders/${orderId}/abort`, {
 					method: "PUT",

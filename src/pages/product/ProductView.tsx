@@ -12,13 +12,13 @@ import ZoomableImage from "../../components/ZoomableImage";
 import {
 	EYEWEAR_CATEGORIES,
 	FRAGRANCES_CATEGORY,
-	getDefaultProduct, getVariationFromParams,
+	getDefaultProduct, getIsEU, getVariationFromParams,
 	sanitize
 } from "../../utils/utils";
 import Link from "../../components/Link";
 import HtmlBlock from "../../components/HtmlBlock";
 import React, {useState} from "react";
-import {addCartItem, initialCart} from "../../redux/cartSlice";
+import {addCartItem} from "../../redux/cartSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {AttributeCheckboxes} from "../../components/AttributeCheckboxes";
 import InStock from "../../icons/InStock";
@@ -60,13 +60,12 @@ const removeDuplicates = (array: ImageDetailed[]) => {
 
 const ProductView = ({product, category, shipping, countries}: ProductViewProps) => {
 	const params = useSearchParams();
-	const { cart: { customer: { shipping_address: { shipping_country }} } = initialCart } = useSelector((state: RootState) => state.cart);
-	const isEU = !!shipping_country && shipping_country !== 'IT'
+	const { cart } = useSelector((state: RootState) => state.cart);
+	const isEU = getIsEU(cart?.customer)
 	const init = getDefaultProduct(product, getVariationFromParams(product, params));
 	const isEyewear = product.categories.find(({id, parent }) =>
 		EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
 	) !== undefined;
-	const { cart } = useSelector((state: RootState) => state.cart);
 	const defaultProduct = init.defaultProduct as Variation;
 	const {defaultAttributes} = init;
 	const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);

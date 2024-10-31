@@ -8,12 +8,12 @@ import {Box, Button, Card, CardContent, CircularProgress, Typography} from "@mui
 import {
     EYEWEAR_CATEGORY,
     findVariationFromAttributes,
-    getDefaultProduct, getProductMainCategory, PRODUCT_ATTRIBUTES,
+    getDefaultProduct, getIsEU, getProductMainCategory, PRODUCT_ATTRIBUTES,
     sanitize
 } from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
 import {useDispatch, useSelector} from "react-redux";
-import {addCartItem, initialCart} from "../redux/cartSlice";
+import {addCartItem} from "../redux/cartSlice";
 import Image from "next/image";
 import Link from "./Link";
 import placeholder from "../images/placeholder.jpg";
@@ -31,9 +31,9 @@ type ProductCardProps = {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-    const { cart: { customer: { shipping_address: { shipping_country }} } = initialCart } = useSelector((state: RootState) => state.cart);
-    const isEU = !!shipping_country && shipping_country !== 'IT'
-    const isEyewear = product.categories.find(({id, parent }) =>
+    const { cart } = useSelector((state: RootState) => state.cart);
+    const isEU = getIsEU(cart?.customer);
+    const isEyewear = product.categories.find(({parent }) =>
         parent && Object.values(EYEWEAR_CATEGORY).includes(parent as number)
     ) !== undefined;
     const imageRatio = isEyewear ? 45 : 130;
