@@ -23,7 +23,7 @@ const Hero = ({images, video}: HeroProps) => {
 			) : (
 				<FullPageSlider images={images} />
 			)}
-			<Box position="absolute" bottom="10%" width="100%" display="flex" justifyContent="center" gap={{xs: '10px', md: "50px"}} padding="20px">
+			<Box position="absolute" bottom="10%" width="100%" display="flex" justifyContent="center" gap={{xs: '10px', md: "50px"}} padding="20px" zIndex={1}>
 				<Button component={Link} href="/occhiali-da-sole">
 					Occhiali da sole
 				</Button>

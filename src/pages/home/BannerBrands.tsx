@@ -5,7 +5,25 @@ import React from "react";
 import Link from "../../components/Link";
 import Image from "next/image";
 
-const BannerBrands = ({isActive, left, center, title, right}: HomeProps['page']['brands']) => isActive ? (
+const BannerBrands = ({isActive, left, center, title, right}: {
+	isActive: boolean
+	title: string
+	left: {
+		title: string
+		photo: AcfImage
+		link: AcfAdvancedLink
+	},
+	center: {
+		title: string
+		photo: AcfImage
+		link: AcfAdvancedLink
+	},
+	right: {
+		title: string
+		photo: AcfImage
+		link: AcfAdvancedLink
+	}
+}) => isActive ? (
 	<div>
 		{title && (
 			<Typography variant="h1" component="div" sx={{margin: '20px 0 30px', textAlign: 'center'}}>

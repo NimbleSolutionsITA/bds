@@ -4,7 +4,14 @@ import {WhatsApp, Email} from "@mui/icons-material";
 import {HomeProps} from "../../../pages";
 
 type BannerContactProps = {
-	bannerContact: HomeProps['page']['bannerContact']
+	bannerContact: {
+		title: string
+		subtitle: string
+		subtitle2: string
+		whatsapp1: string
+		whatsapp2: string
+		email: string
+	}
 }
 
 const BannerContact = ({bannerContact: { title, subtitle, subtitle2, email, whatsapp2, whatsapp1}}: BannerContactProps) => {

@@ -9,9 +9,13 @@ import {useTranslation} from "next-i18next";
 import Link from "next/link";
 import {DESIGNERS_SUB_PATH} from "../../utils/endpoints";
 import {calculateImageDarkness} from "../../utils/utils";
+import {AcfProductCategory} from "../../types/woocommerce";
 
 type BannerDesignersProps = {
-	designers: HomeProps['page']['designers']
+	designers: {
+		slider: AcfProductCategory[]
+		body: string
+	}
 }
 
 const BannerDesigners = ({designers}: BannerDesignersProps) => {

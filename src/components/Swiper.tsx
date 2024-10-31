@@ -6,9 +6,10 @@ import { Pagination } from 'swiper/modules';
 
 type SwiperProps = {
 	children: ReactNode[];
+	noPagination?: boolean;
 }
 
-export default function SwiperMulti({ children }: SwiperProps) {
+export default function SwiperMulti({ children, noPagination }: SwiperProps) {
 	return (
 		<>
 			<Swiper
@@ -24,7 +25,7 @@ export default function SwiperMulti({ children }: SwiperProps) {
 
 				}}
 				loop
-				modules={[Pagination]}
+				modules={noPagination ? [] : [Pagination]}
 				className="mySwiper"
 			>
 				{children.map((child, index) => (

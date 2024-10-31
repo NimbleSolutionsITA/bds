@@ -1,9 +1,20 @@
 import {HomeProps} from "../../../pages";
 import {Box, Button, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
+import {AcfAdvancedLink, AcfImage} from "../../types/woocommerce";
 
 type BannerBottomProps = {
-	bannerBottom: HomeProps['page']['bannerBottom']
+	bannerBottom: {
+		leftColumn: {
+			body: string
+			cta: AcfAdvancedLink
+		}
+		imageCenter: AcfImage
+		rightColumn: {
+			body: string
+			cta: AcfAdvancedLink
+		}
+	}
 }
 
 const BannerBottom = ({bannerBottom}: BannerBottomProps) => (

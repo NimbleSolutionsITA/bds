@@ -2,9 +2,14 @@ import {HomeProps} from "../../../pages";
 import {Box, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
 import Image from "next/image";
+import {AcfImage} from "../../types/woocommerce";
 
 type BannerTopProps = {
-	bannerTop: HomeProps['page']['bannerTop']
+	bannerTop: {
+		imageLeft: AcfImage
+		body: string
+		imageRight: AcfImage
+	}
 }
 
 const BannerTop = ({bannerTop}: BannerTopProps) => {

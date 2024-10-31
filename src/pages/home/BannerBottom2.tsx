@@ -3,9 +3,16 @@ import {Box, Button, Grid} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
 import React from "react";
 import Link from "../../components/Link";
+import {AcfAdvancedLink, AcfImage} from "../../types/woocommerce";
 
 type BannerBottom2Props = {
-	bannerBottom2: HomeProps['page']['bannerBottom2']
+	bannerBottom2: {
+		leftColumn: {
+			body: string
+			cta: AcfAdvancedLink
+		}
+		image: AcfImage
+	}
 }
 
 const BannerBottom2 = ({bannerBottom2: {leftColumn, image}}: BannerBottom2Props) => (
