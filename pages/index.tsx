@@ -12,6 +12,7 @@ const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsS
 const BannerShop = dynamic(() => import("../src/pages/home/BannerShop"));
 const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
 const BannerFragrances = dynamic(() => import("../src/pages/home/BannerFragrances"));
+const BannerPress = dynamic(() => import("../src/pages/home/BannerPress"));
 const OurProductionBanner = dynamic(() => import("../src/pages/home/OurProductionBanner"));
 
 export type ProdSelection = {
@@ -49,6 +50,15 @@ export type HeroProps = {
     buttonTextColor: string
 }
 
+export type Press = {
+    title: string
+    background: string
+    quotes: {
+        body: string
+        author: string
+    }[]
+}
+
 export type HomeProps = PageBaseProps & {
     page: {
         hero: HeroProps
@@ -57,6 +67,7 @@ export type HomeProps = PageBaseProps & {
         ourProduction: OurProduction
         selectionBottom: ProdSelection
         fragrances: BannerGallery
+        press: Press
         shipping: {
             bodyLeft: string
             bodyRight: string
@@ -74,6 +85,7 @@ export default function Home({page, layout}: HomeProps) {
           <OurProductionBanner {...page.ourProduction} />
           <HomeProductsSlider {...page.selectionBottom} />
           <BannerFragrances {...page.fragrances} />
+          <BannerPress {...page.press} />
           <BannerShipping shipping={page.shipping} />
       </Layout>
     );
@@ -101,6 +113,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
         ourProduction,
         selectionBottom,
         fragrances,
+        press,
         shipping,
     } } = page;
 
@@ -122,6 +135,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
                 },
                 selectionBottom,
                 fragrances,
+                press,
                 shipping,
             },
             layout: {
