@@ -1,40 +1,62 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
-import {getPageProps} from "../src/utils/wordpress_api";
+import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
 import {PageBaseProps} from "../src/types/settings";
-import {BaseProduct} from "../src/types/woocommerce";
-import {LOCALE} from "../src/utils/utils";
+import {AcfImage, BaseProduct, WooProductCategory} from "../src/types/woocommerce";
+import {EYEWEAR_CATEGORY, LOCALE} from "../src/utils/utils";
 import {cacheGetLayoutProps} from "../src/utils/cache";
 
 const Hero = dynamic(() => import("../src/pages/home/Hero"));
 const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsSlider"));
+const BannerShop = dynamic(() => import("../src/pages/home/BannerShop"));
 const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
+const BannerFragrances = dynamic(() => import("../src/pages/home/BannerFragrances"));
+const OurProductionBanner = dynamic(() => import("../src/pages/home/OurProductionBanner"));
+
+export type ProdSelection = {
+    isActive: boolean
+    title: string
+    sunglasses: BaseProduct[]
+    optical: BaseProduct[]
+}
+export type BannerBase = {
+    isActive: boolean
+    title: string
+    body: string
+    ctaText: string
+}
+export type Banner = BannerBase & {
+    image: AcfImage
+}
+export type BannerGallery = BannerBase & {
+    gallery: string[]
+}
+
+export type OurProduction = {
+    title: string
+    categories: {
+        category: WooProductCategory
+        image: AcfImage
+    }[]
+}
+
+export type HeroProps = {
+    video: string
+    images: string[]
+    buttonVariant: "contained"| "outlined"
+    buttonColor: string
+    buttonTextColor: string
+}
 
 export type HomeProps = PageBaseProps & {
     page: {
-        hero: {
-            video: string
-            images: string[]
-        }
-        selectionTop: {
-            isActive: boolean
-            title: string
-            sunglasses: BaseProduct[]
-            optical: BaseProduct[]
-        }
-        shop: {
-            isActive: boolean
-            title: string
-            body: string
-            ctaText: string
-        }
-        selectionBottom: {
-            isActive: boolean
-            title: string
-            sunglasses: BaseProduct[]
-            optical: BaseProduct[]
-        }
+        hero: HeroProps
+        selectionTop: ProdSelection
+        shop: Banner,
+        ourProduction: OurProduction
+        selectionBottom: ProdSelection
+        fragrances: BannerGallery
         shipping: {
             bodyLeft: string
             bodyRight: string
@@ -44,24 +66,14 @@ export type HomeProps = PageBaseProps & {
 }
 
 export default function Home({page, layout}: HomeProps) {
-    console.log(page.shop)
     return (
       <Layout layout={layout}>
-          <Hero images={page.hero.images} video={page.hero.video} />
-          {page.selectionTop.isActive && (
-              <HomeProductsSlider
-                  sunglasses={page.selectionTop.sunglasses}
-                  optical={page.selectionTop.optical}
-                  title={page.selectionTop.title}
-              />
-          )}
-          {page.selectionBottom.isActive && (
-              <HomeProductsSlider
-                  sunglasses={page.selectionBottom.sunglasses}
-                  optical={page.selectionBottom.optical}
-                  title={page.selectionBottom.title}
-              />
-          )}
+          <Hero {...page.hero} />
+          <HomeProductsSlider {...page.selectionTop} />
+          <BannerShop {...page.shop} />
+          <OurProductionBanner {...page.ourProduction} />
+          <HomeProductsSlider {...page.selectionBottom} />
+          <BannerFragrances {...page.fragrances} />
           <BannerShipping shipping={page.shipping} />
       </Layout>
     );
@@ -84,22 +96,33 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
 
     const { acf: {
         hero,
-        shipping,
-        bannerContact,
         selectionTop,
         shop,
+        ourProduction,
         selectionBottom,
+        fragrances,
+        shipping,
     } } = page;
 
     return {
         props: {
             page: {
                 hero,
-                shipping,
-                bannerContact,
                 selectionTop,
-                shop,
-                selectionBottom
+                shop: {
+                    ...shop,
+                    image: mapAcfImage(shop.image)
+                },
+                ourProduction: {
+                    ...ourProduction,
+                    categories: ourProduction.categories.map((p: any) => ({
+                        category: layoutProps.categories.find(c => Object.values(EYEWEAR_CATEGORY).includes(c.id))?.child_items?.find(c => c.id === Number(p.category)) ?? null,
+                        image: mapAcfImage(p.image),
+                    }))
+                },
+                selectionBottom,
+                fragrances,
+                shipping,
             },
             layout: {
                 ...layoutProps,

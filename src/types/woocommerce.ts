@@ -38,7 +38,7 @@ export type BaseAttributes = {
 export interface ImageDetailed {
 	url: string;
 	alt: string;
-	width: number;
+	width: string;
 	height: number;
 	variation?: number;
 }
@@ -101,8 +101,8 @@ export interface AcfImage {
 	url: string;
 	title: string;
 	alt: string;
-	width: string;
-	height: string;
+	width: number;
+	height: number;
 }
 
 export interface DefaultAttribute {

@@ -7,7 +7,7 @@ import {
 	AcfImage,
 	ACFListArticle, Article,
 	Category,
-	Image,
+	Image, ImageDetailed,
 	ListArticle,
 	Page, PostCategory, Product,
 	WooProductCategory,
@@ -299,7 +299,7 @@ export const mapImage = ({id, src, name, alt}: Image) => ({
 	id, src, name, alt
 })
 
-export const mapAcfImage = ({id, url, title, alt, width, height}: AcfImage) => ({
+export const mapAcfImage = ({id, url, title, alt, width, height}: AcfImage): AcfImage => ({
 	id, url, title, alt, width, height
 })
 

@@ -2,13 +2,9 @@ import FullPageSlider from "../../components/FullPageSlider";
 import React from "react";
 import {Box, Button} from "@mui/material";
 import Link from "../../components/Link";
+import {HeroProps} from "../../../pages";
 
-type HeroProps = {
-	video?: string
-	images: string[]
-}
-
-const Hero = ({images, video}: HeroProps) => {
+const Hero = ({images, video, buttonVariant, buttonTextColor, buttonColor}: HeroProps) => {
 	return (
 		<Box position="relative">
 			{video ? (
@@ -24,10 +20,10 @@ const Hero = ({images, video}: HeroProps) => {
 				<FullPageSlider images={images} />
 			)}
 			<Box position="absolute" bottom="10%" width="100%" display="flex" justifyContent="center" gap={{xs: '10px', md: "50px"}} padding="20px" zIndex={1}>
-				<Button component={Link} href="/occhiali-da-sole">
+				<Button sx={{color: buttonTextColor, backgroundColor: buttonColor, borderColor: buttonColor}} variant={buttonVariant} component={Link} href="/occhiali-da-sole">
 					Occhiali da sole
 				</Button>
-				<Button component={Link} href="/occhiali-da-sole">
+				<Button sx={{color: buttonTextColor, backgroundColor: buttonColor, borderColor: buttonColor}} variant={buttonVariant} component={Link} href="/occhiali-da-sole">
 					Occhiali da vista
 				</Button>
 			</Box>
