@@ -7,7 +7,7 @@ import {
 	AcfImage,
 	ACFListArticle, Article,
 	Category,
-	Image, ImageDetailed,
+	Image,
 	ListArticle,
 	Page, PostCategory, Product,
 	WooProductCategory,

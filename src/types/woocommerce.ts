@@ -38,7 +38,7 @@ export type BaseAttributes = {
 export interface ImageDetailed {
 	url: string;
 	alt: string;
-	width: string;
+	width: number;
 	height: number;
 	variation?: number;
 }
