@@ -49,7 +49,8 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
 
     if (productCategory) {
         const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({id}) => id)
-        if (!productCategory || fragranceBrands.includes(productCategory.id)) {
+        console.log(fragranceBrands, productCategory.id)
+        if (!productCategory || !fragranceBrands.includes(productCategory.id)) {
             return {
                 notFound: true
             }

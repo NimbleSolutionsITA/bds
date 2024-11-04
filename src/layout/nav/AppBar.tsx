@@ -21,9 +21,7 @@ export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
         <MuiAppBar
             position="sticky"
             elevation={0}
-            sx={{
-                height: '90px',
-        }}
+            sx={{ height: '90px' }}
             color="secondary"
         >
             <Container sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
@@ -86,7 +84,7 @@ const NavButton = ({item, isRight = false}: {item: MenuItem, isRight?: boolean})
         </motion.div>
     ) : undefined
 
-    const buttonLinkProps = (isRight && item.child_items) ? { } : { component: Link, href: getRelativePath(item.url) }
+    const buttonLinkProps = !item.child_items ? { } : { component: Link, href: getRelativePath(item.url) }
     return (
         <motion.div
             initial={false}

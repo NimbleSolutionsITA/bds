@@ -1,4 +1,4 @@
-import {Box, Button, Hidden, Typography} from "@mui/material";
+import {Box, Button, Typography, useMediaQuery, useTheme} from "@mui/material";
 import Link from "./Link";
 import {WooProductCategory} from "../types/woocommerce";
 import {sanitize} from "../utils/utils";
@@ -14,61 +14,64 @@ const boxProps = {
 	textAlign: 'center',
 	padding: '10px'
 }
-const CategoryListBox = ({ category, index, subpath = DESIGNERS_SUB_PATH }: { category: WooProductCategory, index: number, subpath?: string }) => (
-	<div
-		key={category.id}
-		style={{
-			display: "flex",
-			flexDirection: index % 2 === 0 ? "row" : "row-reverse",
-		}}
-	>
-		<Hidden mdUp>
+const CategoryListBox = ({ category, index, subpath }: { category: WooProductCategory, index: number, subpath?: string }) => {
+	const theme = useTheme();
+	const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
+	return (
+		<div
+			key={category.id}
+			style={{
+				display: "flex",
+				flexDirection: index % 2 === 0 ? "row" : "row-reverse",
+			}}
+		>
+			{mdUp ? (
+				<Box
+					component={Link}
+					href={subpath ? `/${subpath}/${category.slug}` : `/${category.slug}`}
+					sx={{
+						width: '50%',
+						height: '50vw',
+						backgroundImage: `url(${category.image?.src})`,
+						...boxProps
+					}}
+				/>
+			) : (
+				<Box
+					sx={{
+						width: '100%',
+						height: '100vw',
+						backgroundImage: `url(${category.image?.src})`,
+						...boxProps
+					}}
+				>
+					<CategoryButton name={category.name} slug={category.slug} color="#fff" subpath={subpath} />
+				</Box>
+			)}
 			<Box
-				sx={{
-					width: '100%',
-					height: '100vw',
-					backgroundImage: `url(${category.image?.src})`,
-					...boxProps
-				}}
-			>
-				<CategoryButton name={category.name} slug={category.slug} color="#fff" subpath={subpath} />
-			</Box>
-		</Hidden>
-		<Hidden mdDown>
-			<Box
-				component={Link}
-				href={`/${subpath}/${category.slug}`}
 				sx={{
 					width: '50%',
 					height: '50vw',
-					backgroundImage: `url(${category.image?.src})`,
-					...boxProps
+					backgroundColor: index % 2 === 0 ? '#fff' : '#d1dcdf',
+					justifyContent: 'center',
+					alignItems: 'center',
+					display: {
+						xs: 'none',
+						md: 'flex'
+					},
 				}}
-			/>
-		</Hidden>
-		<Box
-			sx={{
-				width: '50%',
-				height: '50vw',
-				backgroundColor: index % 2 === 0 ? '#fff' : '#d1dcdf',
-				justifyContent: 'center',
-				alignItems: 'center',
-				display: {
-					xs: 'none',
-					md: 'flex'
-				},
-			}}
-		>
-			<CategoryButton name={category.name} slug={category.slug} subpath={subpath} />
-		</Box>
-	</div>
-)
+			>
+				<CategoryButton name={category.name} slug={category.slug} subpath={subpath} />
+			</Box>
+		</div>
+	)
+}
 
-const CategoryButton = ({name, slug, color = '#000', subpath}: {name: string, slug: string, color?: string, subpath: string}) => (
+const CategoryButton = ({name, slug, color = '#000', subpath}: {name: string, slug: string, color?: string, subpath?: string}) => (
 	<Button
 		variant="text"
 		component={Link}
-		href={`/${subpath}/${slug}`}
+		href={subpath ? `/${subpath}/${slug}` : `/${slug}`}
 		sx={{
 			color,
 			backgroundColor: {

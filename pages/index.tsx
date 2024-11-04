@@ -7,8 +7,9 @@ import {AcfImage, BaseProduct, WooProductCategory} from "../src/types/woocommerc
 import {EYEWEAR_CATEGORY, LOCALE} from "../src/utils/utils";
 import {cacheGetLayoutProps} from "../src/utils/cache";
 
-const Hero = dynamic(() => import("../src/pages/home/Hero"));
-const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsSlider"));
+const Hero = dynamic(() => import("../src/pages/home/Hero"), { ssr: true });
+const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsSlider"), { ssr: true });
+
 const BannerShop = dynamic(() => import("../src/pages/home/BannerShop"));
 const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
 const BannerFragrances = dynamic(() => import("../src/pages/home/BannerFragrances"));
@@ -46,8 +47,7 @@ export type HeroProps = {
     video: string
     images: string[]
     buttonVariant: "contained"| "outlined"
-    buttonColor: string
-    buttonTextColor: string
+    buttonColor: "primary" | "secondary"
 }
 
 export type Press = {

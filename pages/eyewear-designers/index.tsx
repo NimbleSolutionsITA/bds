@@ -16,7 +16,7 @@ export default function Index({ layout }: DesignersProps) {
     const designers = layout.categories.find(c => c.slug === DESIGNERS_CATEGORY)?.child_items
     return (
       <Layout layout={layout}>
-          {designers && <DesignersList designers={designers} />}
+          {designers && <DesignersList designers={designers} subpath={DESIGNERS_SUB_PATH} />}
       </Layout>
     );
 }

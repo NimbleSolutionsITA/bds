@@ -40,7 +40,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 	] = await Promise.all([
 		getCategoryPageProps(locale, slug)
 	]);
-	if (!productCategory) {
+	if (!productCategory || !OUR_PRODUCTION_CATEGORIES[locale].includes(productCategory.id)) {
 		return {
 			notFound: true
 		}
