@@ -16,8 +16,8 @@ export default function SwiperMulti({ children }: SwiperProps) {
 				spaceBetween={20}
 				breakpoints={{
 					600: { slidesPerView: 2 },
-					900: { slidesPerView: 3 },
-					1536: { slidesPerView: 4 },
+					900: { slidesPerView: children.length > 2 ? 3 : 2 },
+					1536: { slidesPerView: children.length > 3 ? 4 : children.length },
 				}}
 				pagination={{
 					clickable: true,
