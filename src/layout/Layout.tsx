@@ -23,6 +23,7 @@ import LogInDrawer from "./drawers/LogInDrawer";
 import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
 import CartErrorModal from "./cart/CartErrorModal";
 import Loading from "../components/Loading";
+import WhatsAppButton from "../components/WhatsAppButton";
 
 type LayoutProps = {
     children: React.ReactNode,
@@ -63,6 +64,7 @@ export default function Layout({children, layout: {
                 <NavBarMobile mobileMenu={menus.mobile} breadcrumbs={breadcrumbs} categories={categories} />
                 <ShippingBannerMobile />
             </>)}
+            <WhatsAppButton />
             <CookiesDrawer />
             <InStockNotifierDrawer />
             <NewsletterDrawer />
