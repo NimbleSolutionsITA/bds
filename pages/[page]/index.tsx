@@ -48,8 +48,9 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
     const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
 
     if (productCategory) {
-        const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({id}) => id)
+        const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({parent}) => parent)
         if (!productCategory || fragranceBrands.includes(productCategory.id)) {
+            console.log(fragranceBrands)
             return {
                 notFound: true
             }
