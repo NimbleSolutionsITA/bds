@@ -1,11 +1,11 @@
 import {AcfArticle, Shortcode} from "../../pages/blog/[post]";
-import ProductsSlider from "./ProductsSlider";
 import HtmlBlock from "./HtmlBlock";
 import ProductCard from "./ProductCard";
 import Swiper from "./Swiper";
 import React from "react";
 
 const ArticleContent = ({ article }: {article: AcfArticle}) => {// Function to replace shortcodes with components
+	console.log(article.acf.shortcodes);
 	const renderContentWithComponents = (content: string, shortcodes: AcfArticle['acf']['shortcodes']) => {
 		const regex = /\[\[(.*?)]]/g; // Match [[tagname]]
 		const elements = [];
@@ -26,7 +26,7 @@ const ArticleContent = ({ article }: {article: AcfArticle}) => {// Function to r
 			if (shortcodeData) {
 				elements.push(
 					<Swiper key={tagName}>
-						{shortcodeData.products.map((product) =>
+						{shortcodeData.products?.map((product) =>
 							product && <ProductCard product={product} key={product.id} />
 						)}
 					</Swiper>
