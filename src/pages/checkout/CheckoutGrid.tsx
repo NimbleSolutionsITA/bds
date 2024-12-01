@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {FormProvider, useForm} from "react-hook-form";
 import {BillingData, InvoiceData, ShippingData} from "../../types/woocommerce";
 import {SubmitErrorHandler, SubmitHandler} from "react-hook-form/dist/types/form";
@@ -62,8 +62,9 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 		paymentMethod: 'card',
 		step: "ADDRESS"
  	} as FormFields
+	const defaultStep = getDefaultStep(defaultValues)
 	const methods = useForm<FormFields>({
-		defaultValues: Object.assign(defaultValues, { step: getDefaultStep(defaultValues) }),
+		defaultValues: Object.assign(defaultValues, { step: defaultStep }),
 		reValidateMode: 'onSubmit',
 	});
 	const { handleSubmit , setValue } = methods
@@ -76,16 +77,14 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 			dispatch(updateCartCustomer({
 				...data.billing,
 				ship_to_different_address: data.has_shipping,
-				...(data.has_shipping ? {
-					s_first_name: data.shipping.first_name,
-					s_last_name: data.shipping.last_name,
-					s_address_1: data.shipping.address_1,
-					s_city: data.shipping.city,
-					s_state: data.shipping.state,
-					s_postcode: data.shipping.postcode,
-					s_country: data.shipping.country,
-					s_company: data.shipping.company,
-				} : {}),
+				s_first_name: data.has_shipping ? data.shipping.first_name : "",
+				s_last_name: data.has_shipping ? data.shipping.last_name : "",
+				s_address_1: data.has_shipping ? data.shipping.address_1 : "",
+				s_city: data.has_shipping ? data.shipping.city : "",
+				s_state: data.has_shipping ? data.shipping.state : "",
+				s_postcode: data.has_shipping ? data.shipping.postcode : "",
+				s_country: data.has_shipping ? data.shipping.country : "",
+				s_company: data.has_shipping ? data.shipping.company : "",
 			}))
 			if (loggedIn) {
 				updateCustomer({
@@ -113,6 +112,12 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 	}
 
 	const updateOrder = (onValidStep: Step) => handleSubmit(onValid(onValidStep), onInvalid);
+
+	useEffect(() => {
+		if (defaultStep !== 'ADDRESS') {
+			handleSubmit(onValid(defaultStep))()
+		}
+	}, []);
 
 	return (
 		<FormProvider {...methods}>

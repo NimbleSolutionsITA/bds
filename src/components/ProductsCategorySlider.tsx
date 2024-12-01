@@ -10,7 +10,8 @@ type ProductsSliderProps = {
 	title?: string
 	isActive?: boolean
 }
-const ProductsCategorySlider = ({products, title, isActive}: ProductsSliderProps) => {
+const ProductsCategorySlider = ({products: allProds, title, isActive}: ProductsSliderProps) => {
+	const products = allProds.filter(p => p)
 	const categories = products
 		.map((product) => product.categories)
 		.flat()

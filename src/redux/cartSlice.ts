@@ -3,9 +3,7 @@ import { Cart } from "../types/cart-type";
 import {WORDPRESS_SITE_URL} from "../utils/endpoints";
 import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
 import {gtagAddToCart} from "../utils/utils";
-import ApplePayMerchantCapability = ApplePayJS.ApplePayMerchantCapability;
 import {PayPalApplePayConfig, PayPalGooglePayConfig} from "../components/PayPalProvider";
-import CallbackIntent = google.payments.api.CallbackIntent;
 
 type CoCartError = {error: string, message: string}
 
@@ -26,14 +24,6 @@ const initialState: CartState = {
 	initLoading: false,
 	cartDrawerOpen: false,
 	customerNote: ""
-}
-
-
-export const initialCart = {
-	customer: {
-		billing_address: { billing_email: "" },
-		shipping_address: { shipping_country: "IT" }
-	}
 }
 
 export const fetchCartData = createAsyncThunk('cart/fetchData', async (params, thunkAPI) => {
@@ -420,10 +410,6 @@ const initCartData = async () => {
 			`/v2/cart/coupons`,
 			"DELETE",
 		);
-		cart = await callCartData('/v2/cart', "GET")
-	}
-	if ((cart.item_count ?? 0) > 0 && !cart.shipping?.packages?.default?.chosen_method) {
-		await callCartData('/v2/cart/update', "POST", { country: "IT" }, {namespace: 'update-customer'});
 		cart = await callCartData('/v2/cart', "GET")
 	}
 	return cart
