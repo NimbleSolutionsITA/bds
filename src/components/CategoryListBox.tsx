@@ -2,7 +2,6 @@ import {Box, Button, Typography, useMediaQuery, useTheme} from "@mui/material";
 import Link from "./Link";
 import {WooProductCategory} from "../types/woocommerce";
 import {sanitize} from "../utils/utils";
-import {DESIGNERS_SUB_PATH} from "../utils/endpoints";
 
 const boxProps = {
 	backgroundColor: '#000',
@@ -14,15 +13,23 @@ const boxProps = {
 	textAlign: 'center',
 	padding: '10px'
 }
-const CategoryListBox = ({ category, index, subpath }: { category: WooProductCategory, index: number, subpath?: string }) => {
+const CategoryListBox = ({ category, index, subpath, showCompactView }: { category: WooProductCategory, index: number, subpath?: string, showCompactView: boolean }) => {
 	const theme = useTheme();
 	const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
 	return (
-		<div
+		<Box
+			component="div"
 			key={category.id}
-			style={{
+			sx={{
 				display: "flex",
-				flexDirection: index % 2 === 0 ? "row" : "row-reverse",
+				flexDirection: {
+					xs: Math.floor(index / 2) % 2 === 0 ? "row" : "row-reverse",
+					md: Math.floor(index / 5) % 2 === 0 ? "row" : "row-reverse"
+				},
+				width: {
+					xs: showCompactView ? '50%' : '100%',
+					md: showCompactView ? '20%' : '100%'
+				},
 			}}
 		>
 			{mdUp ? (
@@ -31,7 +38,7 @@ const CategoryListBox = ({ category, index, subpath }: { category: WooProductCat
 					href={subpath ? `/${subpath}/${category.slug}` : `/${category.slug}`}
 					sx={{
 						width: '50%',
-						height: '50vw',
+						height: showCompactView ? '10vw' : '50vw',
 						backgroundImage: `url(${category.image?.src})`,
 						...boxProps
 					}}
@@ -40,18 +47,18 @@ const CategoryListBox = ({ category, index, subpath }: { category: WooProductCat
 				<Box
 					sx={{
 						width: '100%',
-						height: '100vw',
+						height: showCompactView ? '50vw' : '100vw',
 						backgroundImage: `url(${category.image?.src})`,
 						...boxProps
 					}}
 				>
-					<CategoryButton name={category.name} slug={category.slug} color="#fff" subpath={subpath} />
+					<CategoryButton name={category.name} slug={category.slug} color="#fff" subpath={subpath} showCompactView={showCompactView} />
 				</Box>
 			)}
 			<Box
 				sx={{
 					width: '50%',
-					height: '50vw',
+					height: showCompactView ? '10vw' : '50vw',
 					backgroundColor: index % 2 === 0 ? '#fff' : '#d1dcdf',
 					justifyContent: 'center',
 					alignItems: 'center',
@@ -61,19 +68,20 @@ const CategoryListBox = ({ category, index, subpath }: { category: WooProductCat
 					},
 				}}
 			>
-				<CategoryButton name={category.name} slug={category.slug} subpath={subpath} />
+				<CategoryButton name={category.name} slug={category.slug} subpath={subpath} showCompactView={showCompactView} />
 			</Box>
-		</div>
+		</Box>
 	)
 }
 
-const CategoryButton = ({name, slug, color = '#000', subpath}: {name: string, slug: string, color?: string, subpath?: string}) => (
+const CategoryButton = ({name, slug, color = '#000', subpath, showCompactView}: {name: string, slug: string, color?: string, subpath?: string, showCompactView: boolean}) => (
 	<Button
 		variant="text"
 		component={Link}
 		href={subpath ? `/${subpath}/${slug}` : `/${slug}`}
 		sx={{
 			color,
+			textAlign: 'center',
 			backgroundColor: {
 				xs: 'rgba(0,0,0,0.2)',
 				md: 'transparent'
@@ -82,6 +90,7 @@ const CategoryButton = ({name, slug, color = '#000', subpath}: {name: string, sl
 	>
 		<Typography
 			variant="h1"
+			sx={showCompactView ? {fontSize: '16px'} : {}}
 			component="div"
 			dangerouslySetInnerHTML={{__html: sanitize(name)}}
 		/>

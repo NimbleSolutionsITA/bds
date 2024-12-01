@@ -11,9 +11,10 @@ type DesignersListProps = {
 const DesignersList = ({ designers, subpath }: DesignersListProps) => {
 	const [searchTerm, setSearchTerm] = useState("");
 	const { t } = useTranslation('common');
+	const showCompactView = designers.length > 5;
 	return (
 		<>
-			{designers.length > 5 && (
+			{showCompactView && (
 				<Container maxWidth="md" sx={{textAlign: 'center', padding: '24px 0 64px'}}>
 					<TextField
 						label={t('search')}
@@ -25,17 +26,20 @@ const DesignersList = ({ designers, subpath }: DesignersListProps) => {
 					/>
 				</Container>
 			)}
-			{designers.filter((category) => {
-				const pattern = new RegExp(searchTerm, 'i');
-				return pattern.test(category.name);
-			}).map((designer, index) =>
-				<CategoryListBox
-					key={designer.id}
-					category={designer}
-					index={index}
-					subpath={subpath}
-				/>
-			)}
+			<div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'center'}}>
+				{designers.filter((category) => {
+					const pattern = new RegExp(searchTerm, 'i');
+					return pattern.test(category.name);
+				}).map((designer, index) =>
+					<CategoryListBox
+						key={designer.id}
+						category={designer}
+						index={index}
+						subpath={subpath}
+						showCompactView={showCompactView}
+					/>
+				)}
+			</div>
 		</>
 	)
 }
