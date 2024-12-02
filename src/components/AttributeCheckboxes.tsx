@@ -10,16 +10,18 @@ import {CheckboxProps} from "@mui/material/Checkbox/Checkbox";
 import {Box, Checkbox, Typography} from "@mui/material";
 import Image from "next/image";
 import {PRODUCT_ATTRIBUTES} from "../utils/utils";
+import {CSSProperties} from "react";
 type AttributeCheckboxesProps = {
 	product: Product | BaseProduct
 	currentAttributes: {  [key in AttributeType]?: string }
 	handleClickAttribute: (attribute: AttributeType, slug: string) => void
-	extended?: boolean
+	extended?: boolean,
+	boxStyles?: CSSProperties
 }
-export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAttribute, extended }: AttributeCheckboxesProps) => {
+export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAttribute, extended, boxStyles }: AttributeCheckboxesProps) => {
 	const boxStyle = {display: 'flex', gap: '5px', flexWrap: 'wrap' as const, marginBottom: extended ? '20px' : 0}
 	return (
-		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 70px)'}}>
+		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 70px)', ...boxStyles}}>
 			{Object.values(PRODUCT_ATTRIBUTES).map((attributes) => attributes.map((attributeName) => {
 				const attributes = product.attributes[attributeName];
 				return Array.isArray(attributes) ? (

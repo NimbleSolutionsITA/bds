@@ -5,6 +5,7 @@ import {OurProduction} from "../../../pages";
 import {DESIGNERS_SUB_PATH} from "../../utils/endpoints";
 
 const OurProductionBanner = ({title, categories}: OurProduction) => {
+	console.log(categories)
 	return (
 		<Container maxWidth="lg" sx={{marginY: "32px"}}>
 			<Typography variant="h1" component="h2">{title}</Typography>

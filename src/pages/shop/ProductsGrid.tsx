@@ -120,7 +120,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 					{data?.pages[0]?.length > 0 ? (
 						<Grid container spacing={3}>
 							{data?.pages.map(products => products.map((product: BaseProduct) => (
-								<Grid component="div" size={{xs: 12, sm: 6, md: 4, xl: 3}} key={product.id}>
+								<Grid component="div" size={{xs: 6, sm: 6, md: 4, xl: 3}} key={product.id}>
 									<ProductCard product={product} />
 								</Grid>
 							)))}

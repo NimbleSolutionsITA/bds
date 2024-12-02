@@ -9,23 +9,25 @@ import {closeSearchDrawer, openSearchDrawer} from "../../redux/layoutSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {Trans} from "react-i18next";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {UserMenu} from "./UserMenu";
+import Marquee from "react-fast-marquee";
 
 export default function TopBar() {
     const { searchDrawerOpen } = useSelector((state: RootState) => state.layout);
     const dispatch = useDispatch()
+    const topBannerPromos = ['lineb', 'line1b', 'line2b']
+
     return (
         <Box sx={{backgroundColor: '#000', zIndex: 1100}}>
             <Container sx={{
                 display: 'flex',
-                justifyContent: 'space-between',
                 alignItems: 'center',
                 position: 'relative',
                 zIndex: (theme) => theme.zIndex.appBar,
                 minHeight: '40px'
             }}>
-                <div>
+                <div style={{display: 'flex'}}>
                     <LanguageButton color="#FFF" />
                     <IconButton size="small" component="a" target="_blank" href={FACEBOOK_LINK} sx={{color: '#FFF'}}>
                         <Facebook fontSize="small" />
@@ -36,19 +38,24 @@ export default function TopBar() {
                 </div>
                 <div
                     style={{
-                        position: 'absolute',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
                         color: '#FFF',
-                        textAlign: 'center'
+                        textAlign: 'center',
+                        flexGrow: 1,
+                        width: 0
                     }}
                 >
-                    <Trans i18nKey="shipping.lineb" components={[<b key={0} />]} />
+                    <Marquee>
+                        {topBannerPromos.map((key, index) => (
+                            <div key={key} style={{margin: '0 100px'}}>
+                                <Trans i18nKey={`shipping.${key}`} components={[<b key={0} />]} />
+                            </div>
+                        ))}
+                    </Marquee>
                     {/*<Box sx={{fontSize: '16px', marginTop: '5px'}}>
                         <Trans i18nKey="newsletter.promo-banner" components={[<b key={0} />]} />
                     </Box>*/}
                 </div>
-                <div>
+                <div style={{display: 'flex'}}>
                     <UserMenu />
                     <IconButton onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}>
                         <SearchIcon sx={{color: '#FFF'}} />

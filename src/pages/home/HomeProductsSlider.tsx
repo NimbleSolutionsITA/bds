@@ -1,9 +1,8 @@
 import {Box, Container, Typography} from "@mui/material";
 import React from "react";
-import {BaseProduct} from "../../types/woocommerce";
 import ProductCard from "../../components/ProductCard";
 import Swiper from "../../components/Swiper";
-import {HomeProps, ProdSelection} from "../../../pages";
+import {ProdSelection} from "../../../pages";
 
 const HomeProductsSlider = ({optical, sunglasses, title, isActive}: ProdSelection) => isActive ? (
 	<Container maxWidth="xl" sx={{margin: '40px auto', textAlign: 'center'}}>

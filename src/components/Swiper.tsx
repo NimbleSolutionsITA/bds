@@ -16,7 +16,7 @@ export default function SwiperMulti({ children, noPagination }: SwiperProps) {
 				slidesPerView={1}
 				spaceBetween={20}
 				breakpoints={{
-					600: { slidesPerView: 2 },
+					0: { slidesPerView: 2 },
 					900: { slidesPerView: children.length > 2 ? 3 : 2 },
 					1536: { slidesPerView: children.length > 3 ? 4 : children.length },
 				}}

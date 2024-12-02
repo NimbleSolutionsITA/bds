@@ -133,14 +133,12 @@
   },
   "shop":"{{address}} SHOP",
   "shipping":{
-    "line": "SHIPPING IN ITALY WITHIN 24/48h AND IN EUROPE within 24/72h",
-    "line1":"FREE SHIPPING for orders over €150",
-    "line2":"SHIPPING IN ITALY within 24/48 hours",
-    "line3":"SHIPPING IN EUROPE within 2/3 days",
-    "lineb": "Shipping in Italy within 24/48h and in Europe within 24/72h",
-    "line1b":"<0>Free shipping</0> for orders over 150€.",
-    "line2b":"<0>Shipping in Italy</0> with DHL or GLS within 24/48 hours",
-    "line3b":"<0>Shipping in Europe</0> with DHL or GLS within 2/3 days"
+    "line": "FREE SHIPPING EU over 150€",
+    "line1":"DELIVERY EXPRESS ITA (24-48h)",
+    "line2":"DELIVERY EXPRESS EU (2-4 days)",
+    "lineb":"<0>FREE SHIPPING EU</0> over 150€.",
+    "line1b":"<0>DELIVERY EXPRESS ITA</0> 24/48h",
+    "line2b":"<0>DELIVERY EXPRESS EU</0> 2-4 days"
   },
   "sorting": {
     "price-desc": "Price: Low to High",

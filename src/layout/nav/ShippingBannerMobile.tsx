@@ -11,7 +11,6 @@ const ShippingBannerMobile = () => {
 	const shippingPromos = [
 		<Trans key="line1" i18nKey="shipping.line1b" components={[<b key={0} />]} />,
 		<Trans key="line2" i18nKey="shipping.line2b" components={[<b key={0} />]} />,
-		<Trans key="line2" i18nKey="shipping.line3b" components={[<b key={0} />]} />,
 		<Trans key="line3" i18nKey="newsletter.promo-banner" components={[<b key={0} />]} />
 	]
 	const [index, setIndex] = useState(0);

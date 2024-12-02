@@ -4,7 +4,7 @@ import {
     BaseProduct,
     BaseVariation,
 } from "../types/woocommerce";
-import {Box, Button, Card, CardContent, CircularProgress, Typography} from "@mui/material";
+import {Box, Button, Card, CardContent, CircularProgress, Typography, useMediaQuery, useTheme} from "@mui/material";
 import {
     EYEWEAR_CATEGORY,
     findVariationFromAttributes,
@@ -56,6 +56,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
     const urlParams = new URLSearchParams(currentAttributes);
     const url = `/${PRODUCT_SUB_PATH}/${product.slug}?${urlParams.toString().replace("montaturaLenti", "montatura-lenti")}`
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
         <Card
@@ -82,12 +84,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         <Typography sx={{textDecoration: 'none'}} dangerouslySetInnerHTML={{ __html: sanitize(category.name)}} />
                     </Link>
                 )}
-                <div style={{
+                <Box style={{
                     margin: '10px 0',
                     padding: '10px 0',
                     display: 'flex',
                     alignItems: 'center',
-                    height: '90px',
+                    height: isMobile ? "50px" : '90px',
                     borderTop: '1px solid',
                     borderBottom: '1px solid'
                 }}>
@@ -96,7 +98,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
                             variant="h3"
                             sx={{
                                 fontFamily: 'Ogg Roman',
-                                fontSize: '24px',
+                                fontSize: {
+                                    xs: '16px',
+                                    sm: '24px'
+                                },
                                 width: '100%',
                                 fontWeight: '300 !important'
                             }}
@@ -105,21 +110,28 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         }}
                         />
                     </Link>
-                </div>
+                </Box>
                 <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     width: '100%',
-                    zIndex: 2
+                    zIndex: 2,
+                    flexDirection: isMobile ? 'column' : 'row'
                 }}>
                     {hasAttributes ? (
                         <AttributeCheckboxes
                             product={product}
                             currentAttributes={currentAttributes}
                             handleClickAttribute={handleClickAttribute}
+                            boxStyles={
+                                isMobile ? {
+                                    width: 'auto',
+                                    marginBottom: "8px"
+                                } : {}
+                            }
                         />
-                    ) : (
+                    ) : (!isMobile &&
                         <ActionButton product={product} currentProduct={currentProduct} category={category} />
                     )}
                     <Typography fontSize="20px">
@@ -131,7 +143,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         }
                     </Typography>
                 </div>
-                {hasAttributes && (
+                {hasAttributes && !isMobile &&(
                     <ActionButton product={product} currentProduct={currentProduct} category={category} />
                 )}
             </CardContent>
@@ -195,7 +207,7 @@ const ActionButton = ({ currentProduct, product, category }: ActionButtonProps) 
             sx={{
                 minWidth: '90px',
                 fontSize: '12px',
-                padding: '10px'
+                padding: '10px',
             }}
         >
             {t(inStock  ? 'addToCart' : 'upon-request')}
