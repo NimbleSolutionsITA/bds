@@ -7,7 +7,7 @@ import {useTranslation} from "react-i18next";
 import NewsletterForm from "../../components/NewsletterForm";
 
 const NewsletterDrawer = () => {
-	const { newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
+	const { newsletterDrawerOpen } = {newsletterDrawerOpen: true} // useSelector((state: RootState) => state.layout);
 	const dispatch = useDispatch()
 	const { t } = useTranslation('common');
 
@@ -39,7 +39,7 @@ const NewsletterDrawer = () => {
 				<IconButton onClick={() => dispatch(closeNewsletterDrawer())} sx={{position: 'absolute', right: '20px', top: '2px', padding: '4px'}}>
 					<CloseSharp />
 				</IconButton>
-				<Typography sx={{fontFamily: 'Ogg Roman', fontSize: '22px'}}>
+				<Typography sx={{fontFamily: 'Ogg Roman', fontSize: '22px', marginTop: '20px'}}>
 					{t('newsletter.title')}
 				</Typography>
 				<Typography sx={{margin: '25px 0'}}>

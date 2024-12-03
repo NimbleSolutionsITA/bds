@@ -9,7 +9,7 @@ import {closeSearchDrawer, openSearchDrawer} from "../../redux/layoutSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
 import {Trans} from "react-i18next";
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {UserMenu} from "./UserMenu";
 import Marquee from "react-fast-marquee";
 

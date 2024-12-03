@@ -1,15 +1,17 @@
-import {Button, CircularProgress, TextField, Typography} from "@mui/material";
+import {Button, CircularProgress, FormControlLabel, TextField, Typography} from "@mui/material";
 import {useState} from "react";
 import {Trans, useTranslation} from "react-i18next";
 import MailchimpSubscribe, {EmailFormFields} from "react-mailchimp-subscribe"
 import {regExpEmail} from "../utils/utils";
 import Link from "./Link";
 import HtmlBlock from "./HtmlBlock";
+import Checkbox from "./Checkbox";
 
 const NewsletterForm = () => {
 	const [email, setEmail] = useState<string>('')
 	const { t } = useTranslation('common');
 	const [emailError, setEmailError] = useState<string | null>(null)
+	const [consentChecked, setConsentChecked] = useState<boolean>(true);
 	const submit = (subscribe: (data: EmailFormFields) => void) => {
 		if (!email) {
 			setEmailError('email is required')
@@ -37,12 +39,21 @@ const NewsletterForm = () => {
 						helperText={emailError ?? (message && <HtmlBlock html={message.toString()} />)}
 						error={!!emailError}
 					/>
-
-					<Typography sx={{fontStyle: 'italic', fontSize: '13px', lineHeight: '1.3', marginTop: '10px'}}>
-						<Trans i18nKey="newsletter.consentText" components={[<Link key={0} href="/privacy-policy" />]} />
-					</Typography>
+					<Checkbox
+						checkboxProps={{
+							checked: consentChecked,
+							onChange: (e) => setConsentChecked(e.target.checked)
+						}}
+						formControlLabelProps={{
+							label: (
+								<Typography sx={{fontStyle: 'italic', fontSize: '13px', lineHeight: '1.3', marginTop: '10px'}}>
+									<Trans i18nKey="newsletter.consentText" components={[<Link key={0} href="/privacy-policy" />]} />
+								</Typography>
+							)
+						}}
+					/>
 					<Button
-						disabled={status === 'sending'}
+						disabled={status === 'sending' || !consentChecked}
 						startIcon={status === 'sending' ? <CircularProgress /> : undefined  }
 						onClick={() => submit(subscribe)}
 						variant="contained"

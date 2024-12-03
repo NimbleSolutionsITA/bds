@@ -1,11 +1,13 @@
 import React from "react";
 import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
-import {getPageProps, mapAcfImage} from "../src/utils/wordpress_api";
+import {getPageProps, getPosts, mapAcfImage} from "../src/utils/wordpress_api";
 import {PageBaseProps} from "../src/types/settings";
-import {AcfImage, BaseProduct, WooProductCategory} from "../src/types/woocommerce";
+import {AcfImage, Article, BaseProduct, WooProductCategory} from "../src/types/woocommerce";
 import {EYEWEAR_CATEGORY, LOCALE} from "../src/utils/utils";
-import {cacheGetLayoutProps} from "../src/utils/cache";
+import {cacheGetLayoutProps, cacheGetPostAttributes} from "../src/utils/cache";
+import ArticlesRow from "../src/components/ArticlesRow";
+import {Container} from "@mui/material";
 
 const Hero = dynamic(() => import("../src/pages/home/Hero"), { ssr: true });
 const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsSlider"), { ssr: true });
@@ -73,6 +75,11 @@ export type HomeProps = PageBaseProps & {
             bodyRight: string
             bodyCenter: string
         }
+        postsByCategory: {
+            type: string
+            id: number
+            posts: Article[]
+        }[],
     }
 }
 
@@ -85,7 +92,11 @@ export default function Home({page, layout}: HomeProps) {
           <OurProductionBanner {...page.ourProduction} />
           <HomeProductsSlider {...page.selectionBottom} />
           <BannerFragrances {...page.fragrances} />
-          <BannerPress {...page.press} />
+          <Container>
+              {page.postsByCategory.map(({type, posts, id}) => (
+                  <ArticlesRow key={type} postsByCategory={{type, posts, id}} />
+              ))}
+          </Container>
           <BannerShipping shipping={page.shipping} />
       </Layout>
     );
@@ -94,10 +105,12 @@ export default function Home({page, layout}: HomeProps) {
 export async function getStaticProps({ locale }: { locales: string[], locale: LOCALE}) {
     const [
         {ssrTranslations, ...layoutProps},
-        { seo, page }
+        { seo, page },
+        {  categories },
     ] = await Promise.all([
         cacheGetLayoutProps(locale),
-        getPageProps('home', locale)
+        getPageProps('home', locale),
+        cacheGetPostAttributes(locale)
     ]);
 
     if (!page) {
@@ -105,6 +118,13 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
             notFound: true
         }
     }
+    const postsByCategory = (await Promise.all(categories.map(category =>
+        getPosts(locale, 1, 4, undefined, [category.id])
+    ))).map(({posts}, index) => ({
+        type: categories[index].name,
+        id: categories[index].id,
+        posts
+    }));
 
     const { acf: {
         hero,
@@ -137,6 +157,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
                 fragrances,
                 press,
                 shipping,
+                postsByCategory,
             },
             layout: {
                 ...layoutProps,

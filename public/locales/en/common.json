@@ -1,4 +1,5 @@
-  {
+{
+  "ourProduction": "Our production",
   "cards": "Credit cards",
   "liquides-imaginaires":"Liquides Imaginaries",
   "profumum-roma":"Profumum Roma",
@@ -124,7 +125,7 @@
     "emailValid":"Enter a valid email address"
   },
   "newsletter":{
-    "title":"Subscribe to the newsletter",
+    "title":"Sign up for 10% off your first order",
     "body":"Subscribe to our newsletter to get updates on exclusive previews of collections, exceptional events, and seasonal offers.",
     "consentText":"By subscribing to the newsletter, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes.",
     "cta":"Notify me",

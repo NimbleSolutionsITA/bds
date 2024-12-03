@@ -1,4 +1,5 @@
 {
+  "ourProduction": "Nostra produzione",
   "cards": "Carte di credito",
   "liquides-imaginaires":"Liquides Imaginaries",
   "profumum-roma":"Profumum Roma",
@@ -134,7 +135,7 @@
     "emailValid":"Inserisci un indirizzo email valido"
   },
   "newsletter":{
-    "title":"Iscriviti alla newsletter",
+    "title":"Iscriviti per avere il 10% di sconto sul tuo primo ordine",
     "body":"Abbonati alla nostra newsletter per ottenere aggiornamenti su esclusive anteprime di collezioni, eventi eccezionali e offerte di stagione.",
     "consentText":"Abbonandoti alla newsletter, confermi di aver letto la <0>Privacy Policy</0> e acconsenti al trattamento dei tuoi dati personali per finalità di marketing.",
     "promo-text": "<0>Iscriviti alla newsletter</0> e avrai il <0>10% di sconto</0> sul tuo primo ordine!",
