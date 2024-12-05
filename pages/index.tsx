@@ -15,7 +15,6 @@ const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsS
 const BannerShop = dynamic(() => import("../src/pages/home/BannerShop"));
 const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
 const BannerFragrances = dynamic(() => import("../src/pages/home/BannerFragrances"));
-const BannerPress = dynamic(() => import("../src/pages/home/BannerPress"));
 const OurProductionBanner = dynamic(() => import("../src/pages/home/OurProductionBanner"));
 
 export type ProdSelection = {
@@ -93,9 +92,7 @@ export default function Home({page, layout}: HomeProps) {
           <HomeProductsSlider {...page.selectionBottom} />
           <BannerFragrances {...page.fragrances} />
           <Container>
-              {page.postsByCategory.map(({type, posts, id}) => (
-                  <ArticlesRow key={type} postsByCategory={{type, posts, id}} />
-              ))}
+              <ArticlesRow postsByCategory={page.postsByCategory[0]} />
           </Container>
           <BannerShipping shipping={page.shipping} />
       </Layout>

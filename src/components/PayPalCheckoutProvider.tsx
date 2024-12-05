@@ -118,6 +118,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			setError(error.message ?? error.details?.[0]?.description ?? "An error occurred");
 		}
 	})
+
 	return (
 		<PayPalCardFieldsProvider
 			createOrder={createOrder.mutateAsync}

@@ -10,7 +10,7 @@ const OurProductionBanner = ({title, categories}: OurProduction) => {
 	return (
 		<Container maxWidth="lg" sx={{marginY: "32px"}}>
 			<Typography variant="h1" component="h2">{title}</Typography>
-			<Grid container spacing={5} sx={{display: {xs: "none", md: "block"}}}>
+			<Grid container spacing={5} sx={{display: {xs: "none", md: "flex"}}}>
 				{categories.map(({category, image}) => (
 					<Grid size={{xs: 12, md: 4}} key={category.slug}>
 						<Box sx={{marginY: "32px", width: '100%', paddingBottom: "100%", backgroundImage: `url(${image.url})`, backgroundSize: "cover", backgroundPosition: "center center"}}/>

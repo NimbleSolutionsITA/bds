@@ -7,7 +7,7 @@ import {useTranslation} from "react-i18next";
 import NewsletterForm from "../../components/NewsletterForm";
 
 const NewsletterDrawer = () => {
-	const { newsletterDrawerOpen } = {newsletterDrawerOpen: true} // useSelector((state: RootState) => state.layout);
+	const { newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
 	const dispatch = useDispatch()
 	const { t } = useTranslation('common');
 
