@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useState} from "react";
+import React, {createContext, useContext, useEffect, useState} from "react";
 import {OnApproveActions, OnApproveData, PayPalCardFieldsStyleOptions} from "@paypal/paypal-js";
 import {PayPalCardFieldsProvider} from "@paypal/react-paypal-js";
 import {ShippingData} from "../redux/layoutSlice";
@@ -31,10 +31,11 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	const [error, setError] = useState<string>();
 	const [orderId, setOrderId] = useState<string>();
 	const [isPaying, setIsPaying] = useState(false);
+	const [checkoutCompleted, setCheckoutCompleted] = useState(false);
 	const { user } = useAuth();
 	const { cart } = useSelector((state: RootState) => state.cart);
 	const { watch } = useFormContext()
-	const { invoice, customerNote, billing, shipping: shippingForm } = watch()
+	const { invoice, customerNote } = watch()
 	const router = useRouter();
 	const dispatch = useDispatch<AppDispatch>()
 
@@ -81,7 +82,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			if (success) {
 				dispatch(destroyCart());
 				gtagPurchase(wooOrder);
-				await router.push("/checkout/completed");
+				setCheckoutCompleted(true);
 			} else {
 				await onError(new Error(error ?? "An error occurred"));
 			}
@@ -102,6 +103,12 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			setError(error.message ?? error.details?.[0]?.description ?? "An error occurred");
 		}
 	})
+	// Redirect when checkout is completed
+	useEffect(() => {
+		if (checkoutCompleted) {
+			router.push("/checkout/completed");
+		}
+	}, [checkoutCompleted, router]);
 
 	return (
 		<PayPalCardFieldsProvider
