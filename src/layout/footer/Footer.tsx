@@ -23,7 +23,7 @@ type FooterProps = {
 	categories: BaseLayoutProps['categories']
 }
 
-const Footer = ({googlePlaces, categories, mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, designers, ourProduction, fragrances, store, blog]}: FooterProps) => {
+const Footer = ({googlePlaces, categories, mobileMenu: [opticalMan, sunglassesMan, opticalWoman, sunglassesWoman, designers, ourProduction, store, blog]}: FooterProps) => {
 	const { t } = useTranslation('common');
 	const isClientSide = useClientSideRendering()
 	const footerMenuLeft = [

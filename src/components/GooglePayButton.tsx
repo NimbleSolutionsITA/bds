@@ -49,31 +49,49 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 					paymentMethod: "PayPal - GooglePay",
 				}),
 			}).then((res) => res.json());
+
 			const {status} = await googlePay.confirmOrder({
 				orderId: id,
 				paymentMethodData: paymentData.paymentMethodData,
 			});
+
 			if (status === "APPROVED") {
 				/* Capture the Order */
-				const {wooOrder, payPalOrder} = await fetch(`/api/orders/${id}/capture`, {
+				const response = await fetch(`/api/orders/${id}/capture`, {
 					method: "POST",
-				}).then((res) => res.json());
-				if (payPalOrder.status === "COMPLETED") {
-					gtagPurchase(wooOrder);
-					if (!askForShipping) {
-						dispatch(destroyCart());
-					}
-					router.push('/checkout/completed')
-				}
-				return {transactionState: "SUCCESS"};
-			} else {
-				await fetch(`/api/orders/${id}/abort`, {
-					method: "PUT",
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ isFailed: true }),
 				});
+
+				if (!response.ok) {
+					return {
+						transactionState: "ERROR",
+						error: {
+							message: `Server error: ${response.statusText}`
+						},
+					};
+				}
+
+				const orderData = await response.json();
+
+				if (!orderData.success) {
+					return {
+						transactionState: "ERROR",
+						error: {
+							message: orderData.error ?? `Server error: ${response.statusText}`
+						},
+					};
+				}
+				const { wooOrder } = orderData;
+
+				gtagPurchase(wooOrder);
+				if (!askForShipping) {
+					dispatch(destroyCart());
+				}
+				router.push('/checkout/completed')
+				return {transactionState: "SUCCESS"};
+			} else {
 				return {transactionState: "ERROR"};
 			}
 		} catch (err: any) {

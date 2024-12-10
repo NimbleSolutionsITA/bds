@@ -222,13 +222,9 @@ export const googlePlaces = {
 		],
 		"current_opening_hours": {
 			"weekday_text": [
-				"lunedì: 16:00–20:00",
-				"martedì: 09:30–13:30, 16:00–20:00",
-				"mercoledì: 09:30–13:30, 16:00–20:00",
-				"giovedì: 09:30–13:30, 16:00–20:00",
-				"venerdì: 09:30–13:30, 16:00–20:00",
-				"sabato: 09:30–13:30, 16:00–20:00",
-				"domenica: Chiuso"
+				"lun: 14:30–20:00",
+				"mar-sab: 09:30–13:30, 16:00–20:00",
+				"dom: Chiuso"
 			]
 		},
 		"url": "https://maps.google.com/?cid=2010653055074119830",
@@ -369,13 +365,9 @@ export const googlePlaces = {
 		],
 		"current_opening_hours": {
 			"weekday_text": [
-				"lunedì: 14:30–19:30",
-				"martedì: 10:30–19:30",
-				"mercoledì: 10:30–19:30",
-				"giovedì: 10:30–19:30",
-				"venerdì: 10:30–19:30",
-				"sabato: 10:30–19:30",
-				"domenica: 14:30–20:00"
+				"lun: 10:30–19:30",
+				"mar - sab : 10:30–19:30",
+				"dom: 14:30–20:00"
 			]
 		},
 		"url": "https://maps.google.com/?cid=8566543080284360235",

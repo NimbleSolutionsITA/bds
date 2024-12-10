@@ -136,7 +136,7 @@ const mapAddress = (address: any, type: 'billing' | 'shipping') =>
 const prepareOrderLineItem = (api: any, isEu: boolean) => async (item: Item) => {
 	const {data: product} = await api.get("products/" + item.id)
 	const itemPrice = isEu ?
-		product.meta_data.find((m: {key: string, value: string}) => m.key === '_europa_price')?.value ?? product.price :
+		getProductEuPrice(product) :
 		product.price
 	const total = ((Number(itemPrice) * item.quantity.value) / 1.22) + ''
 	return {
@@ -145,6 +145,18 @@ const prepareOrderLineItem = (api: any, isEu: boolean) => async (item: Item) => 
 		quantity: item.quantity.value,
 		total,
 	}
+}
+
+const getProductEuPrice = (product: {meta_data: {key: string, value: string}[], price: string}) => {
+	let euPrice = product.price
+	const hasEuPrice = product.meta_data.find((m: {
+		key: string,
+		value: string
+	}) => m.key === '_europa_price_method')?.value === 'manual'
+	if (hasEuPrice) {
+		euPrice = product.meta_data.find((m: { key: string, value: string }) => m.key === '_europa_price')?.value ?? product.price
+	}
+	return euPrice
 }
 
 /**

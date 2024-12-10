@@ -74,7 +74,7 @@ export default function Layout({children, layout: {
             <CartDrawer shipping={shipping} categories={categories} />
             <CartErrorModal />
             <SearchModal categories={categories} />
-            {cart ? children : <Loading />}
+            {children}
             <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={menus.mobile} />
         </>
     )

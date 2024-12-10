@@ -23,8 +23,8 @@ export default async function handler(
 	}
 	try {
 		if (req.method === 'PUT') {
-			const order = await api.get(`orders/${req.query.id}`)
-			if (order.status !== "processing") {
+			const {data: order} = await api.get(`orders/${req.query.id}`)
+			if (order.status === "pending") {
 				if (req.body.isFailed) {
 					await api.put(`orders/${req.query.id}`, {
 						status: 'failed'

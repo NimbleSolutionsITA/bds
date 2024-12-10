@@ -9,7 +9,6 @@ export type CreateOrderResponse = {
 	success: boolean
 	error?: string
 	wooOrder?: any
-	payPalOrder?: any
 }
 
 const api = new WooCommerceRestApi({
@@ -26,7 +25,6 @@ export default async function handler(
 	const responseData: CreateOrderResponse = {
 		success: false,
 		wooOrder: null,
-		payPalOrder: null
 	}
 	try {
 		if (req.method === 'POST') {
@@ -34,14 +32,13 @@ export default async function handler(
 			if (!paypalOrderId) {
 				throw new Error('Paypal Order ID is missing')
 			}
-			responseData.payPalOrder = await captureOrder(paypalOrderId)
-			const orderId = responseData.payPalOrder?.purchase_units?.[0]?.reference_id
+			const captureData = await captureOrder(paypalOrderId)
+			const purchaseUnit = captureData?.purchase_units?.[0]
+			const capture = purchaseUnit?.payments?.captures?.[0]
+			const wooOrderId = purchaseUnit?.reference_id
 
-			responseData.success = responseData.payPalOrder.status === 'COMPLETED'
-			if (responseData.success && orderId &&
-				responseData.payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0].status === 'COMPLETED') {
-
-				const { data: order} = await api.put(`orders/${orderId}`, {
+			if (wooOrderId && capture?.status === 'COMPLETED') {
+				const { data: order} = await api.put(`orders/${wooOrderId}`, {
 					set_paid: true,
 					transaction_id: paypalOrderId,
 					payment_data: [
@@ -50,7 +47,17 @@ export default async function handler(
 						{ key: "wc-ppcp-new-payment-method", value: false }
 					]
 				})
+				responseData.success = true
 				responseData.wooOrder = order
+			} else {
+				if (wooOrderId) {
+					await api.put(`orders/${wooOrderId}`, {
+						status: 'failed'
+					})
+				}
+				responseData.error = captureData.details?.[0]?.description ?? (capture ?
+					`Transaction ${capture.status}: ${capture.id}` :
+					'Payment capture was not successful.');
 			}
 		}
 	} catch (error) {
@@ -80,6 +87,10 @@ const captureOrder = async (orderID: string) => {
 			Authorization: `Bearer ${accessToken}`
 		},
 	});
+
+	if (!response.ok) {
+		throw new Error(`Failed to capture order: ${response.statusText}`);
+	}
 
 	return await response.json();
 };

@@ -40,6 +40,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const createOrder = useMutation({
 		mutationFn: async () => {
+			setOrderId(undefined);
 			setIsPaying(true);
 			try {
 				const response = await fetch("/api/orders", {
@@ -69,38 +70,20 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 					"Content-Type": "application/json",
 				},
 			});
-			const r = await response.json();
-			const { wooOrder, payPalOrder, success } = r
-			const transaction = payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0];
-			const errorDetail = payPalOrder.details?.[0]?.description;
-			if (!success && errorDetail || !transaction || transaction.status !== "COMPLETED") {
-				if (actions && transaction?.status === "DECLINED" && !transaction.final_capture) {
-					actions.restart();
-					return;
-				}
-				let errorMessage;
-				if (transaction) {
-					errorMessage = `Transaction ${transaction.status}: ${transaction.id}`;
-				} else if (errorDetail) {
-					errorMessage = `${errorDetail} (${payPalOrder.debug_id})`;
-				} else {
-					errorMessage = JSON.stringify(payPalOrder);
-				}
-				if (wooOrder && wooOrder.id) {
-					await fetch(`/api/orders/${wooOrder.id}/abort`, {
-						method: "PUT",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({ isFailed: true }),
-					});
-				}
-				throw new Error(errorMessage);
+
+			if (!response.ok) {
+				await onError(new Error(`Server error: ${response.statusText}`));
 			}
-			else if (transaction && transaction.status === "COMPLETED") {
+			setOrderId(undefined);
+
+			const { wooOrder, success, error = null } = await response.json();
+
+			if (success) {
 				dispatch(destroyCart());
 				gtagPurchase(wooOrder);
 				await router.push("/checkout/completed");
+			} else {
+				await onError(new Error(error ?? "An error occurred"));
 			}
 		} catch (error: any) {
 			await onError(error);
@@ -109,6 +92,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async (error:  Record<string, any>)=> {
+			console.log(error, orderId)
 			if (orderId) {
 				await fetch(`/api/orders/${orderId}/abort`, {
 					method: "PUT",

@@ -126,7 +126,9 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id, paymentMethod: 'PayPal - ApplePay' })
 				})
 				if(!orderResponse.ok) {
-					throw new Error("error creating order")
+					session.completePayment({
+						status: window.ApplePaySession.STATUS_FAILURE,
+					});
 				}
 
 				const { id } = await orderResponse.json()
@@ -150,38 +152,19 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					},
 				});
 
+				if (!response.ok) {
+					session.completePayment({
+						status: window.ApplePaySession.STATUS_FAILURE,
+					});
+				}
+
 				const orderData = await response.json();
 
 				if (!orderData.success) {
 					throw new Error(orderData.error);
 				}
-				const { wooOrder, payPalOrder } = orderData;
-				const transaction =
-					payPalOrder?.purchase_units?.[0]?.payments?.captures?.[0] ||
-					payPalOrder?.purchase_units?.[0]?.payments?.authorizations?.[0];
-				const errorDetail = payPalOrder?.details?.[0];
+				const { wooOrder } = orderData;
 
-				if (errorDetail || !transaction || transaction.status === "DECLINED") {
-					// (2) Other non-recoverable errors -> Show a failure message
-					let errorMessage;
-					if (transaction) {
-						errorMessage = `Transaction ${transaction.status}: ${transaction.id}`;
-					} else if (errorDetail) {
-						errorMessage = `${errorDetail.description} (${payPalOrder.debug_id})`;
-					} else {
-						errorMessage = JSON.stringify(payPalOrder);
-					}
-
-					await fetch(`/api/orders/${id}/abort`, {
-						method: "PUT",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({ isFailed: true }),
-					});
-
-					throw new Error(errorMessage);
-				}
 				gtagPurchase(wooOrder);
 				session.completePayment({
 					status: window.ApplePaySession.STATUS_SUCCESS,
