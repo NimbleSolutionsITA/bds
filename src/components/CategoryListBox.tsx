@@ -23,8 +23,8 @@ const CategoryListBox = ({ category, index, subpath, showCompactView }: { catego
 			sx={{
 				display: "flex",
 				flexDirection: {
-					xs: Math.floor(index / 2) % 2 === 0 ? "row" : "row-reverse",
-					md: Math.floor(index / (showCompactView ? 5 : 2)) % 2 === 0 ? "row" : "row-reverse"
+					xs: index % 2 === 0 ? "row" : "row-reverse",
+					md: Math.floor(index / (showCompactView ? 5 : 1)) % 2 === 0 ? "row" : "row-reverse"
 				},
 				width: {
 					xs: showCompactView ? '50%' : '100%',

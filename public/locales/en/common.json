@@ -126,11 +126,12 @@
   },
   "newsletter":{
     "title":"Sign up for 10% off your first order",
+    "subtitle": "Not valid on fragrances and limited editions.",
     "body":"Subscribe to our newsletter to get updates on exclusive previews of collections, exceptional events, and seasonal offers.",
     "consentText":"By subscribing to the newsletter, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes.",
     "cta":"Notify me",
     "promo-text": "<0>Subscribe to our newsletter</0> and get <0>10% discount</0> on next order!",
-    "promo-banner": "<0>10% discount on all models</0> with promo code SCONTO10"
+    "promo-banner": "<0>10% discount on all models</0> with promo code SCONTO10 (not valid on fragrances and limited editions)."
   },
   "shop":"{{address}} SHOP",
   "shipping":{

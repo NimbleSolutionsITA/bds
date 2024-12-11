@@ -1,5 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit'
 import {Country, ShippingClass} from "../types/woocommerce";
+import Cookies from "js-cookie";
 
 export type ShippingData = {
 	classes: ShippingClass[],
@@ -54,6 +55,7 @@ export const layoutSlice = createSlice({
 			state.cookiesDrawerOpen = true
 		},
 		closeCookiesDrawer: (state) => {
+			Cookies.set('is_cookies_seen', 'true');
 			state.cookiesDrawerOpen = false
 		},
 		openSearchDrawer: (state) => {
@@ -75,6 +77,7 @@ export const layoutSlice = createSlice({
 			state.newsletterDrawerOpen = true
 		},
 		closeNewsletterDrawer: (state) => {
+			Cookies.set('is_newsletter_seen', 'true');
 			state.newsletterDrawerOpen = false
 		},
 		closeLogInDrawer: (state) => {

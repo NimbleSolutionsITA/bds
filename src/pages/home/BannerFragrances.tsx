@@ -19,7 +19,7 @@ const BannerFragrances = ({isActive, title, body, ctaText, gallery}: BannerGalle
 				<Grid size={{xs: 12, md: 5}}>
 					<Typography variant="h1" component="h2">{title}</Typography>
 					<HtmlBlock html={body} />
-					<Button sx={{marginTop: 3}} component={Link} variant="outlined" href="/negozio-ottica-firenze">
+					<Button sx={{marginTop: 3}} component={Link} variant="outlined" href="/fragranze">
 						{ctaText}
 					</Button>
 				</Grid>

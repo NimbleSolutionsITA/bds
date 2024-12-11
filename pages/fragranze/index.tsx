@@ -30,7 +30,7 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
 		getPageProps(FRAGRANCES_SUB_PATH, locale)
 	]);
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
-	console.log(layoutProps.categories)
+
 	return {
 		props: {
 			ourProductionCategories:

@@ -42,6 +42,9 @@ const NewsletterDrawer = () => {
 				<Typography sx={{fontFamily: 'Ogg Roman', fontSize: '22px', marginTop: '20px'}}>
 					{t('newsletter.title')}
 				</Typography>
+				<Typography sx={{fontStyle: "italic", marginTop: "5px"}}>
+					{t('newsletter.subtitle')}
+				</Typography>
 				<Typography sx={{margin: '25px 0'}}>
 					{t('newsletter.body')}
 				</Typography>
