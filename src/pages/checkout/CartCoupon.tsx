@@ -44,6 +44,9 @@ const CartCoupon = () => {
 					{t(hasCoupons ? 'checkout.remove' : 'checkout.apply').toUpperCase()}
 				</Button>
 			</Grid>
+			<Grid size={{xs: 12}}>
+				<span style={{fontStyle: "italic", color: "#333333", fontSize: "12px"}}>{t("newsletter.subtitle")}</span>
+			</Grid>
 		</Grid>
 	)
 }
