@@ -47,6 +47,7 @@ const CookiesDrawer = () => {
 	return (
 		<Drawer
 			anchor="right"
+			sx={{zIndex: 1300}}
 			PaperProps={{
 				sx: {
 					padding: '20px 0',

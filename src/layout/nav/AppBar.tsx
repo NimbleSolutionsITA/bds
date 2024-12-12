@@ -84,7 +84,6 @@ const NavButton = ({item, isRight = false}: {item: MenuItem, isRight?: boolean})
         </motion.div>
     ) : undefined
 
-    const buttonLinkProps = !item.child_items ? { } : { component: Link, href: getRelativePath(item.url) }
     return (
         <motion.div
             initial={false}
@@ -106,7 +105,8 @@ const NavButton = ({item, isRight = false}: {item: MenuItem, isRight?: boolean})
                         }
                     }}
                     endIcon={EndIcon}
-                    {...buttonLinkProps}
+                    component={Link}
+                    href={getRelativePath(item.url)}
                 >
                     {item.title}
                 </Button>
