@@ -1,7 +1,6 @@
 import {BaseAttributes, BaseProduct, Color, ImageColor, TextAttribute} from "../../types/woocommerce";
-import {Box, Container, Grid, MenuItem, Select} from "@mui/material";
+import {Box, Container, Grid2 as Grid, MenuItem, Select} from "@mui/material";
 import ProductCard from "../../components/ProductCard";
-import {useEffect} from "react";
 import {useTranslation} from "next-i18next";
 import usePageState from "../../redux/usePageState";
 
@@ -120,7 +119,7 @@ const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
 			</div>
 			<Grid container spacing={3}>
 				{sortedAndFilteredProducts.map((product) => (
-					<Grid item xs={12} sm={6} md={4} xl={3} key={product.id}>
+					<Grid size={{xs:6, md: 4, xl: 3}} key={product.id}>
 						<ProductCard product={product} />
 					</Grid>
 				))}

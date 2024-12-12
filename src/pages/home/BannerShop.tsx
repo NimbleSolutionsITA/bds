@@ -26,9 +26,16 @@ const BannerShop = ({isActive, title, body, ctaText, image}: HomeProps['page']['
 						sx={{
 							width: '100%',
 							height: '100%',
+							paddingBottom: {
+								xs: '60%',
+								md: '0',
+							},
 							backgroundImage: `url(${image.url})`,
 							backgroundRepeat: 'no-repeat',
-							backgroundSize: 'contain',
+							backgroundSize: {
+								xs: 'cover',
+								md: 'contain',
+							},
 							backgroundPosition: 'center right',
 						}}
 					/>

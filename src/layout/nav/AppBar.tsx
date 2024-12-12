@@ -6,7 +6,7 @@ import logo from '../../images/bottega-di-sguardi-logo.png'
 import Image from "next/image";
 import {motion, Variants} from "framer-motion";
 import {KeyboardArrowDown} from "@mui/icons-material";
-import {MenuItem, Menus} from "../../types/settings";
+import {MenuItem} from "../../types/settings";
 import {getRelativePath, sanitize} from "../../utils/utils";
 import Link from "../../components/Link";
 import {useTranslation} from "next-i18next";

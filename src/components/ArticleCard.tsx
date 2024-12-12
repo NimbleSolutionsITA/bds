@@ -72,8 +72,10 @@ const ArticleCard = ({article, isVertical, isSidebar}: ArticleCardProps) => {
 						}}
 					/>
 				</Link>
+				{/*
 				<TextLine text={`By ${article.author.displayName}, ${formattedDate}`} />
 				<TextLine text={t('minutes-read', {count: article.minutesRead})} />
+				*/}
 			</CardContent>
 
 		</Card>

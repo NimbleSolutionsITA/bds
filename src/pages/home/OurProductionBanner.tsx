@@ -11,7 +11,7 @@ const OurProductionBanner = ({title, categories}: OurProduction) => {
 		<Container maxWidth="lg" sx={{marginY: "32px"}}>
 			<Typography variant="h1" component="h2">{title}</Typography>
 			<Grid container spacing={5} sx={{display: {xs: "none", md: "flex"}}}>
-				{categories.map(({category, image}) => (
+				{categories.map(({category, image}) => category && (
 					<Grid size={{xs: 12, md: 4}} key={category.slug}>
 						<Box sx={{marginY: "32px", width: '100%', paddingBottom: "100%", backgroundImage: `url(${image.url})`, backgroundSize: "cover", backgroundPosition: "center center"}}/>
 						<Button fullWidth variant="outlined" component={Link} href={`/${DESIGNERS_SUB_PATH}/${category.slug}`}>
