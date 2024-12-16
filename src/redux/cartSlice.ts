@@ -127,7 +127,9 @@ type UpdateCartCustomer = {
 export const updateCartCustomer = createAsyncThunk('cart/updateCartCustomer', async (payload: UpdateCartCustomer, thunkAPI) => {
 	try {
 		await callCartData('/v2/cart/update', "POST", payload, {namespace: 'update-customer'});
-		return await callCartData('/v2/cart', "GET")
+		const shipping_address_1 = payload.s_address_1;
+		const cartData = await callCartData('/v2/cart', "GET")
+		return shipping_address_1 ? {...cartData, customer: {...cartData.customer, shipping_address: {...cartData.customer.shipping_address, shipping_address_1}} } : cartData
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
 			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',

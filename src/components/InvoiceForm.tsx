@@ -1,7 +1,7 @@
 import {
 	FormControl,
 	FormHelperText,
-	Grid,
+	Grid2 as Grid,
 	InputLabel,
 	MenuItem,
 	Select,
@@ -13,7 +13,6 @@ import {
 	ErrorOption,
 	FieldPath,
 	useFormContext,
-	useWatch
 } from "react-hook-form";
 import {Inputs} from "../pages/checkout/CheckoutGrid";
 import HelperText from "../components/HelperText";
@@ -22,7 +21,7 @@ import {useTranslation} from "next-i18next";
 const InvoiceForm = () => {
 	const { control, formState: { errors }, setError, watch } = useFormContext<Inputs>();
 	const { t } = useTranslation('common')
-	const invoiceType = watch('invoice.invoiceType')
+	const {invoiceType, billingChoice} = watch('invoice')
 	return (
 		<Grid container spacing={2} paddingY={2}>
 			<SelectInput
@@ -47,7 +46,7 @@ const InvoiceForm = () => {
 					label={t('form.vat')}
 					md={12}
 					setError={setError}
-					optional
+					optional={billingChoice === "receipt"}
 				/>
 			)}
 			<TextInput
@@ -57,7 +56,7 @@ const InvoiceForm = () => {
 				label={t('form.tax')}
 				md={12}
 				setError={setError}
-				optional
+				optional={billingChoice === "receipt" || invoiceType !== 'private'}
 			/>
 			{invoiceType !== 'private' && (
 				<TextInput
@@ -67,7 +66,7 @@ const InvoiceForm = () => {
 					label={t('form.sdi')}
 					md={12}
 					setError={setError}
-					optional
+					optional={billingChoice === "receipt"}
 				/>
 			)}
 		</Grid>
@@ -86,13 +85,14 @@ type TextInputProps = {
 
 const TextInput = ({control, error, name, label, optional, md = 6, setError}: TextInputProps) => {
 	const { t } = useTranslation('common')
+	console.log(name, optional)
 	return (
-		<Grid item xs={12} md={md}>
+		<Grid size={{xs: 12, md}}>
 			<Controller
 				control={control}
 				name={`invoice.${name}` as keyof Inputs}
-				rules={optional ? {} : {
-					required: t('validation.required', {field: label}),
+				rules={{
+					required: optional ? false : t('validation.required', {field: label}),
 				}}
 				render={({ field }) => (
 					<TextField
@@ -122,7 +122,7 @@ type SelectInputProps = {
 const SelectInput = ({options, name, control, setError, error}: SelectInputProps) => {
 	const { t } = useTranslation('common')
 	return (
-		<Grid item xs={12} md={6}>
+		<Grid size={{xs: 12, md:6}}>
 			<Controller
 				control={control}
 				name={`invoice.${name}`}

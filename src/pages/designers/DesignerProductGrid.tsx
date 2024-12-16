@@ -7,9 +7,6 @@ import usePageState from "../../redux/usePageState";
 type DesignerProductGridProps = {
 	products: BaseProduct[]
 }
-type Filters = {
-	[Property in keyof BaseAttributes]: string | undefined
-}
 type SortOption = "price-asc" | "price-desc" | "name-asc" | "name-desc"
 const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
 	const { filters, sortOption, setState } = usePageState({
