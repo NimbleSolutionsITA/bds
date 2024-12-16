@@ -127,9 +127,8 @@ type UpdateCartCustomer = {
 export const updateCartCustomer = createAsyncThunk('cart/updateCartCustomer', async (payload: UpdateCartCustomer, thunkAPI) => {
 	try {
 		await callCartData('/v2/cart/update', "POST", payload, {namespace: 'update-customer'});
-		const shipping_address_1 = payload.s_address_1;
 		const cartData = await callCartData('/v2/cart', "GET")
-		return shipping_address_1 ? {...cartData, customer: {...cartData.customer, shipping_address: {...cartData.customer.shipping_address, shipping_address_1}} } : cartData
+		return {...(payload.s_address_1 ? getCartData(cartData, payload.s_address_1) : cartData), ship_to_different_address: payload.ship_to_different_address}
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
 			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
@@ -240,7 +239,7 @@ export const cartSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(fetchCartData.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(fetchCartData.rejected, (state, {payload}) => {
@@ -252,7 +251,7 @@ export const cartSlice = createSlice({
 		});
 		builder.addCase(addCartItem.fulfilled, (state, action) => {
 			state.cartDrawerOpen = true
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(addCartItem.rejected, (state, {payload}) => {
@@ -274,7 +273,7 @@ export const cartSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(updateCartItem.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(updateCartItem.rejected, (state, {payload}) => {
@@ -285,7 +284,7 @@ export const cartSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(deleteCartItem.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(deleteCartItem.rejected, (state, {payload}) => {
@@ -296,7 +295,7 @@ export const cartSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(selectShipping.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(selectShipping.rejected, (state, {payload}) => {
@@ -307,7 +306,7 @@ export const cartSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(setCoupon.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(setCoupon.rejected, (state, {payload}) => {
@@ -318,7 +317,7 @@ export const cartSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(removeCoupon.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(removeCoupon.rejected, (state, {payload}) => {
@@ -329,7 +328,7 @@ export const cartSlice = createSlice({
 			state.initLoading = true;
 		});
 		builder.addCase(initCart.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.initLoading = false;
 		});
 		builder.addCase(initCart.rejected, (state, {payload}) => {
@@ -340,7 +339,7 @@ export const cartSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(destroyCart.fulfilled, (state, action) => {
-			state.cart = action.payload
+			state.cart = getCartData(action.payload, state.cart?.customer?.shipping_address?.shipping_address_1 ?? '')
 			state.loading = false;
 		});
 		builder.addCase(destroyCart.rejected, (state, {payload}) => {
@@ -382,6 +381,17 @@ const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payl
 
 	return response.data;
 };
+
+const getCartData = (cart: Cart, address: string) => ({
+	...cart,
+	customer: {
+		...cart.customer,
+		shipping_address: {
+			...cart.customer.shipping_address,
+			shipping_address_1: address
+		}
+	}
+})
 
 export const getCoCartAxiosParams = (url: string, method: 'GET' | 'POST' | 'DELETE', params?: {[key: string]: any,}, payload?: {[key: string]: any}, cartKey?: string, guestMode = false):  AxiosRequestConfig<{}> => {
 	const key = localStorage.getItem('cocart_key');

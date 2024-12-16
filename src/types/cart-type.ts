@@ -17,6 +17,7 @@ export interface Cart {
 	removed_items?: any[]
 	cross_sells?: any[]
 	notices?: any[],
+	ship_to_different_address?: boolean
 }
 
 export type Item = {

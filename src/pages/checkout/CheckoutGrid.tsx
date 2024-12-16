@@ -47,7 +47,7 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 	const { customer: loggedCustomer, updateCustomer ,loggedIn } = useAuth();
 	const dispatch = useDispatch<AppDispatch>()
 	const defaultValues = {
-		has_shipping: getCustomerMetaData('has_shipping', false, loggedCustomer),
+		has_shipping: getCustomerMetaData('has_shipping', cart?.ship_to_different_address ?? false, loggedCustomer),
 		billing: Object.keys(cart?.customer.billing_address ?? {}).reduce((acc, key) => {
 			const newKey = key.substring(8) as keyof BillingData
 			return {...acc, [newKey]: cart?.customer.billing_address[key as keyof BillingAddress]};

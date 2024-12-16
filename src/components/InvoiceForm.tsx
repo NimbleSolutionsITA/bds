@@ -85,7 +85,6 @@ type TextInputProps = {
 
 const TextInput = ({control, error, name, label, optional, md = 6, setError}: TextInputProps) => {
 	const { t } = useTranslation('common')
-	console.log(name, optional)
 	return (
 		<Grid size={{xs: 12, md}}>
 			<Controller
