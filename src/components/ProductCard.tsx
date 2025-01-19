@@ -97,7 +97,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         <Typography
                             variant="h3"
                             sx={{
-                                fontFamily: 'Ogg Roman',
                                 fontSize: {
                                     xs: '16px',
                                     sm: '24px'
@@ -134,14 +133,14 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     ) : (!isMobile &&
                         <ActionButton product={product} currentProduct={currentProduct} category={category} />
                     )}
-                    <Typography fontSize="20px">
+                    <Link href={url} component={Typography} fontSize="20px" sx={{textDecoration: "none", cursor: "pointer"}}>
                         {currentProduct.price ?
                             <PriceFormat
                                 value={parseFloat(isEU ? (currentProduct.price_eu ?? currentProduct.price) : currentProduct.price as string)}
                                 decimalScale={0}
                             /> : '-'
                         }
-                    </Typography>
+                    </Link>
                 </div>
                 {hasAttributes && !isMobile &&(
                     <ActionButton product={product} currentProduct={currentProduct} category={category} />

@@ -11,6 +11,7 @@ import {Box, Checkbox, Typography} from "@mui/material";
 import Image from "next/image";
 import {PRODUCT_ATTRIBUTES} from "../utils/utils";
 import {CSSProperties} from "react";
+import {useTranslation} from "next-i18next";
 type AttributeCheckboxesProps = {
 	product: Product | BaseProduct
 	currentAttributes: {  [key in AttributeType]?: string }
@@ -20,6 +21,7 @@ type AttributeCheckboxesProps = {
 }
 export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAttribute, extended, boxStyles }: AttributeCheckboxesProps) => {
 	const boxStyle = {display: 'flex', gap: '5px', flexWrap: 'wrap' as const, marginBottom: extended ? '20px' : 0}
+	const { t } = useTranslation()
 	return (
 		<div style={{display: 'flex', flexDirection: 'column', gap: '5px', width: 'calc(100% - 70px)', ...boxStyles}}>
 			{Object.values(PRODUCT_ATTRIBUTES).map((attributes) => attributes.map((attributeName) => {
@@ -27,7 +29,7 @@ export const AttributeCheckboxes = ({ product, currentAttributes, handleClickAtt
 				return Array.isArray(attributes) ? (
 					<div key={attributeName} style={boxStyle}>
 						{extended && (
-							<AttributeTitle attribute={attributeName} value={currentAttributes[attributeName]} />
+							<AttributeTitle attribute={t(`attributes.pa_${attributeName}`)} value={currentAttributes[attributeName]} />
 						)}
 						{attributes.map((attribute) => {
 							if (PRODUCT_ATTRIBUTES.color.includes(attributeName as any)) {

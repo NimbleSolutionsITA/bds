@@ -1,7 +1,8 @@
-import {Box, Grid, Typography} from "@mui/material";
+import {Box, Grid2 as Grid, Typography} from "@mui/material";
 import {sanitize} from "../utils/utils";
 import Carousel from "react-material-ui-carousel";
 import Image from "next/image";
+import ReadMoreText from "./ReadMoreText";
 
 type DesignerTopProps = {
 	name: string
@@ -11,7 +12,7 @@ type DesignerTopProps = {
 const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
 	return (
 		<Grid container sx={{flexDirection: {xs: 'column-reverse', md: 'row'}}}>
-			<Grid item xs={12} md={5} sx={{alignItems: 'center', display: 'flex'}}>
+			<Grid size={{xs: 12, md: 12}} sx={{alignItems: 'center', display: 'flex'}}>
 				<div style={{margin: '0 10%', textAlign: 'center', width: '100%'}}>
 					<Typography
 						variant="h1"
@@ -19,14 +20,10 @@ const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
 						sx={{width: '100%'}}
 						dangerouslySetInnerHTML={{__html: sanitize(name)}}
 					/>
-					<Typography
-						component="div"
-						sx={{width: '100%'}}
-						dangerouslySetInnerHTML={{__html: sanitize(description)}}
-					/>
+					<ReadMoreText text={description}/>
 				</div>
 			</Grid>
-			<Grid item xs={12} md={7}>
+			{/*<Grid size={{xs: 12, md: 7}}>
 				<Carousel
 					animation="slide"
 					indicators={false}
@@ -51,7 +48,7 @@ const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
 						</Box>
 					))}
 				</Carousel>
-			</Grid>
+			</Grid>*/}
 		</Grid>
 	)
 }

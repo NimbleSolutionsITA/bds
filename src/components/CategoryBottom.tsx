@@ -6,7 +6,7 @@ type DesignersBottomProps = {
 	bottomText: string
 }
 const CategoryBottom = ({bottomText}: DesignersBottomProps) => (
-	<Container>
+	<Container sx={{ visibility: "hidden", height: 0, overflow: "hidden" }}>
 		<Divider sx={{marginBottom: '40px'}} />
 		<HtmlBlock html={bottomText} />
 	</Container>

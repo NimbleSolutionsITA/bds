@@ -8,7 +8,7 @@ type SeoFooterProps = {
 }
 const SeoFooter = ({category}: SeoFooterProps) => {
 	return (
-		<Container maxWidth="lg" sx={{marginBottom: '40px'}}>
+		<Container maxWidth="lg" sx={{ marginBottom: "40px", visibility: "hidden", height: 0, overflow: "hidden" }}>
 			{category.bottomText && (
 				<HtmlBlock html={category.bottomText}/>
 			)}

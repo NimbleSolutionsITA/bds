@@ -24,9 +24,17 @@ const BannerFragrances = ({isActive, title, body, ctaText, gallery}: BannerGalle
 					</Button>
 				</Grid>
 				<Grid size={{xs: 12, md: 7}}>
-					<Carousel animation="slide" autoPlay={true} navButtonsAlwaysInvisible indicators={false} sx={{height: '100%'}}>
+					<Carousel animation="slide" autoPlay={true} navButtonsAlwaysInvisible indicators={false}>
 						{gallery.map((url) => (
-							<Image key={url} src={url} alt="carousel" width={700} height={300} layout="responsive" />
+							<Image
+								key={url}
+								src={url}
+								alt="carousel"
+								width={1024}
+								height={768}
+								objectFit={"cover"}
+								layout={"responsive"}
+							/>
 						))}
 					</Carousel>
 				</Grid>
