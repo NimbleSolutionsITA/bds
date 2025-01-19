@@ -133,13 +133,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
                     ) : (!isMobile &&
                         <ActionButton product={product} currentProduct={currentProduct} category={category} />
                     )}
-                    <Link href={url} component={Typography} fontSize="20px" sx={{textDecoration: "none", cursor: "pointer"}}>
-                        {currentProduct.price ?
-                            <PriceFormat
-                                value={parseFloat(isEU ? (currentProduct.price_eu ?? currentProduct.price) : currentProduct.price as string)}
-                                decimalScale={0}
-                            /> : '-'
-                        }
+                    <Link href={url} fontSize="20px" sx={{textDecoration: "none"}}>
+                        <Typography fontSize="20px" sx={{textDecoration: "none", cursor: "pointer"}}>
+                            {currentProduct.price ?
+                                <PriceFormat
+                                    value={parseFloat(isEU ? (currentProduct.price_eu ?? currentProduct.price) : currentProduct.price as string)}
+                                    decimalScale={0}
+                                /> : '-'
+                            }
+                        </Typography>
                     </Link>
                 </div>
                 {hasAttributes && !isMobile &&(
