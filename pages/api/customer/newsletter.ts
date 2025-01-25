@@ -26,15 +26,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 			if (response.status === 200) {
 				const subscriberInfo = await response.json();
-				return res.status(200).json({ subscribed: true, subscriberInfo });
+				return res.status(200).json({ subscribed: true, subscriberInfo, error: null });
 			} else if ([401, 404].includes(response.status)) {
-				return res.status(200).json({ subscribed: false });
+				return res.status(200).json({ subscribed: false, error: "unauthorized" });
 			} else {
 				const data = await response.json();
-				return res.status(response.status).json({ error: data });
+				return res.status(response.status).json({ subscribed: false, error: data });
 			}
 		} catch (error) {
-			return res.status(500).json({ error: (error as Error).message || 'Internal Server Error' });
+			return res.status(500).json({ subscribed: false, error: (error as Error).message || 'Internal Server Error' });
 		}
 	} else if (req.method === 'DELETE') {
 		// Unsubscribe email address
