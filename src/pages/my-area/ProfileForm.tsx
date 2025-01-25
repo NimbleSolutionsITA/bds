@@ -5,18 +5,17 @@ import Loading from "../../components/Loading";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {LoggedCustomer} from "../../types/woocommerce";
-import MailchimpSubscribe, {EmailFormFields} from "react-mailchimp-subscribe";
 
 export default function ProfileForm() {
-	const { customer, updateCustomer, isUpdating: loading, unsubscribeNewsletter, newsletterStatus } = useAuth();
-	const onValid = (subscribe: (data: EmailFormFields) => void) => (data: any) => {
+	const { customer, updateCustomer, isUpdating: loading, unsubscribeNewsletter, newsletterStatus, subscribeNewsletter } = useAuth();
+	const onValid = (data: any) => {
 		let { editPassword, passwordConfirm, password, newsletter, ...customerData } = data
 		if (editPassword && password && password === passwordConfirm) {
 			customerData.password = password
 		}
 		if (newsletterStatus !== newsletter) {
 			newsletter ?
-				subscribe({ EMAIL: customerData.email }) :
+			subscribeNewsletter(customerData.email) :
 				unsubscribeNewsletter()
 		}
 		updateCustomer(customerData)
@@ -41,91 +40,86 @@ function Form({customer, onValid, loading, newsletterStatus}: {customer: LoggedC
 	)
 	return (
 		<Container maxWidth="xs">
-			<MailchimpSubscribe
-				url={process.env.NEXT_PUBLIC_MAILCHIMP || ''}
-				render={({ subscribe, status, message }) => (
-					<form
-						onSubmit={profileForm.handleSubmit(onValid(subscribe))}
-						style={{display: 'flex', flexDirection: 'column', maxWidth: '550px', margin: '20px auto'}}
-					>
+			<form
+				onSubmit={profileForm.handleSubmit(onValid)}
+				style={{display: 'flex', flexDirection: 'column', maxWidth: '550px', margin: '20px auto'}}
+			>
+				<TextField
+					fullWidth
+					variant="outlined"
+					label={t("name")}
+					type="text"
+					autoComplete="given-name"
+					required
+					sx={{mt: '20px'}}
+					{...profileForm.register('first_name')}
+				/>
+				<TextField
+					fullWidth
+					variant="outlined"
+					label={t("lastname")}
+					type="text"
+					autoComplete="family-name"
+					required
+					sx={{mt: '20px'}}
+					{...profileForm.register('last_name')}
+				/>
+				<TextField
+					fullWidth
+					variant="outlined"
+					label={"Email"}
+					type="email"
+					autoComplete="username"
+					required
+					sx={{mt: '20px'}}
+					{...profileForm.register('email')}
+				/>
+				<FormControlLabel
+					sx={{ m: '20px 0 20px auto' }}
+					control={<Switch {...profileForm.register('editPassword')} />}
+					label={t("edit-password")}
+					labelPlacement="start"
+				/>
+				{profileForm.watch('editPassword') && (
+					<>
 						<TextField
 							fullWidth
 							variant="outlined"
-							label={t("name")}
-							type="text"
-							autoComplete="given-name"
+							label="Password"
+							type="password"
+							autoComplete="new-password"
 							required
-							sx={{mt: '20px'}}
-							{...profileForm.register('first_name')}
+							sx={{m: '20px 0 10px'}}
+							{...profileForm.register('password')}
 						/>
 						<TextField
 							fullWidth
 							variant="outlined"
-							label={t("lastname")}
-							type="text"
-							autoComplete="family-name"
+							label={t("confirm-password")}
+							type="password"
+							autoComplete="new-password"
 							required
-							sx={{mt: '20px'}}
-							{...profileForm.register('last_name')}
+							sx={{m: '20px 0 30px'}}
+							{...profileForm.register('passwordConfirm')}
 						/>
-						<TextField
-							fullWidth
-							variant="outlined"
-							label={"Email"}
-							type="email"
-							autoComplete="username"
-							required
-							sx={{mt: '20px'}}
-							{...profileForm.register('email')}
-						/>
-						<FormControlLabel
-							sx={{ m: '20px 0 20px auto' }}
-							control={<Switch {...profileForm.register('editPassword')} />}
-							label={t("edit-password")}
-							labelPlacement="start"
-						/>
-						{profileForm.watch('editPassword') && (
-							<>
-								<TextField
-									fullWidth
-									variant="outlined"
-									label="Password"
-									type="password"
-									autoComplete="new-password"
-									required
-									sx={{m: '20px 0 10px'}}
-									{...profileForm.register('password')}
-								/>
-								<TextField
-									fullWidth
-									variant="outlined"
-									label={t("confirm-password")}
-									type="password"
-									autoComplete="new-password"
-									required
-									sx={{m: '20px 0 30px'}}
-									{...profileForm.register('passwordConfirm')}
-								/>
-							</>
-						)}
-						<FormControlLabel
-							sx={{ m: '20px 0 20px auto' }}
-							control={<Switch {...profileForm.register('newsletter')} />}
-							label={t("newsletter.title")}
-							labelPlacement="start"
-						/>
-						<Button
-							endIcon={loading ? <CircularProgress size="20px" /> : undefined}
-							sx={{mt: '20px'}}
-							fullWidth
-							type="submit"
-							disabled={loading}
-						>
-							{t('save')}
-						</Button>
-					</form>
+					</>
 				)}
-			/>
+				<FormControlLabel
+					sx={{ m: '20px 0 20px auto' }}
+					control={<Switch {...profileForm.register('newsletter')} />}
+					label={t("newsletter.title")}
+					labelPlacement="start"
+				/>
+				<Button
+					endIcon={loading ? <CircularProgress size="20px" /> : undefined}
+					sx={{mt: '20px'}}
+					fullWidth
+					type="submit"
+					disabled={loading}
+				>
+					{t('save')}
+				</Button>
+			</form>
 		</Container>
 	);
 }

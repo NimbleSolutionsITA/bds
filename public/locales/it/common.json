@@ -140,7 +140,8 @@
     "body":"Abbonati alla nostra newsletter per ottenere aggiornamenti su esclusive anteprime di collezioni, eventi eccezionali e offerte di stagione.",
     "consentText":"Abbonandoti alla newsletter, confermi di aver letto la <0>Privacy Policy</0> e acconsenti al trattamento dei tuoi dati personali per finalità di marketing.",
     "promo-text": "<0>Iscriviti alla newsletter</0> e avrai il <0>10% di sconto</0> sul tuo primo ordine!",
-    "promo-banner": "sconto del <0>10% su tutti gli occhiali</0> con codice SCONTO10 (non valido su profumi e limited edition)"
+    "promo-banner": "sconto del <0>10% su tutti gli occhiali</0> con codice SCONTO10 (non valido su profumi e limited edition)",
+    "success": "Congratulazioni, sei iscritto alla nostra newsletter!"
   },
   "shop":"NEGOZIO {{address}}",
   "shipping":{

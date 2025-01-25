@@ -131,7 +131,8 @@
     "consentText":"By subscribing to the newsletter, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes.",
     "cta":"Notify me",
     "promo-text": "<0>Subscribe to our newsletter</0> and get <0>10% discount</0> on next order!",
-    "promo-banner": "<0>10% discount on all models</0> with promo code SCONTO10 (not valid on fragrances and limited editions)."
+    "promo-banner": "<0>10% discount on all models</0> with promo code SCONTO10 (not valid on fragrances and limited editions).",
+    "success": "Congratulations, you are now subscribed to our newsletter!"
   },
   "shop":"{{address}} SHOP",
   "shipping":{

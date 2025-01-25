@@ -5,8 +5,10 @@ import {regExpEmail} from "../utils/utils";
 import Link from "./Link";
 import HtmlBlock from "./HtmlBlock";
 import Checkbox from "./Checkbox";
+import useAuth from "../utils/useAuth";
 
 const NewsletterForm = () => {
+	const { subscribeNewsletter } = useAuth()
 	const [email, setEmail] = useState<string>('')
 	const { t } = useTranslation('common');
 	const [emailError, setEmailError] = useState<string | null>(null)
@@ -23,14 +25,10 @@ const NewsletterForm = () => {
 			setEmailError('Invalid email address')	
 		}
 		setEmailError(null)
-			const response = await fetch(`/api/customer/newsletter?email=${email}`);
-			if (response.status !== 200) {
-				setMessage
-			}
-			const { subscribed, error } = await response.json()
+			const { subscribed, error } = await subscribeNewsletter(email)
 			if (subscribed) {
 				setStatus('success')
-				setMessage('subscribed')
+				setMessage(t('newsletter.success'))
 			}
 			else if (error) {
 				setMessage(error)

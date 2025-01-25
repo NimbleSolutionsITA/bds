@@ -28,9 +28,46 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 				const subscriberInfo = await response.json();
 				return res.status(200).json({ subscribed: true, subscriberInfo, error: null });
 			} else if ([401, 404].includes(response.status)) {
+				const subscriberInfo = await response.json();
 				return res.status(200).json({ subscribed: false, error: "unauthorized" });
 			} else {
 				const data = await response.json();
+				return res.status(response.status).json({ subscribed: false, error: data });
+			}
+		} catch (error) {
+			return res.status(500).json({ subscribed: false, error: (error as Error).message || 'Internal Server Error' });
+		}
+	} else if (req.method === "POST") {
+		// Check subscription status
+		const { email } = req.body;
+
+		if (!email || typeof email !== 'string') {
+			return res.status(400).json({ error: 'Email address is required' });
+		}
+
+		const url = `https://us5.api.mailchimp.com/3.0/lists/${listId}/members`;
+
+		try {
+			const response = await fetch(url, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Basic ${Buffer.from(`user:${apiKey}`).toString('base64')}`,
+				},
+				body: JSON.stringify({
+				  email_address: email,
+				  status: 'subscribed',
+				}),
+			});
+
+			if (response.status === 200) {
+				const subscriberInfo = await response.json();
+				return res.status(200).json({ subscribed: true, subscriberInfo, error: null });
+			} else if ([401, 404].includes(response.status)) {
+				return res.status(200).json({ subscribed: false, error: "unauthorized" });
+			} else {
+				const data = await response.json()
+				console.log(data)
 				return res.status(response.status).json({ subscribed: false, error: data });
 			}
 		} catch (error) {

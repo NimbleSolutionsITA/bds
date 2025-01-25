@@ -30,6 +30,7 @@ interface AuthData {
 	getOrders: () => void
 	logOut: () => Promise<any>;
 	unsubscribeNewsletter: () => void;
+	subscribeNewsletter: (email: string) => Promise<{ subscribed: boolean, error: string | null }>;
 	logIn: (variables: any) => Promise<any>;
 	logInError: Error | null;
 	logInLoading: boolean;
@@ -44,6 +45,7 @@ const DEFAULT_STATE: AuthData = {
 	error: null,
 	newsletterStatus: false,
 	unsubscribeNewsletter: async () => {},
+	subscribeNewsletter: async () => ({subscribed: false, error: null}),
 	logOut: async () => null as unknown as Promise<any>,
 	updateCustomer: () => {},
 	getOrders: () => {},
@@ -140,6 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const getNewsletterStatusQuery = useQuery({
 		queryKey: ['check-newsletter', user?.user_id],
 		queryFn: async () => {
+			if (!user?.email) return false;
 			const response = await fetch(`/api/customer/newsletter?email=${user?.email}`, {
 				method: 'GET',
 				headers: {
@@ -168,6 +171,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				throw new Error('Network response was not ok');
 			}
 			return response.json();
+		},
+		onSuccess: async () => {
+			await getNewsletterStatusQuery.refetch();
+		}
+	})
+	const subscribeNewsletter = useMutation({
+		mutationFn: async (email: string) => {
+			const response = await fetch(`/api/customer/newsletter`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ email })
+			});
+			const {subscribed, error} = await response.json();
+			return {subscribed, error: error?.title};
 		},
 		onSuccess: async () => {
 			await getNewsletterStatusQuery.refetch();
@@ -223,7 +242,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		logIn,
 		logInError,
 		logInLoading,
-		unsubscribeNewsletter: unsubscribeNewsletter.mutate
+		unsubscribeNewsletter: unsubscribeNewsletter.mutate,
+		subscribeNewsletter: subscribeNewsletter.mutateAsync
 	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
