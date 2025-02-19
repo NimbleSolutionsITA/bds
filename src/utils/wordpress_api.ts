@@ -214,7 +214,8 @@ export const getAllProductsIds = async () => {
 	let page: number = 1;
 
 	while (true) {
-		const response = await fetch(`${WORDPRESS_API_ENDPOINT}/product?per_page=100&page=${page}`);
+		const response = await fetch(`${WORDPRESS_API_ENDPOINT}/product?per_page=10&page=${page}&_fields=lang,slug`);
+		console.log(response);
 		if (!response.ok) {
 			if (response.status === 400) {
 				break;
