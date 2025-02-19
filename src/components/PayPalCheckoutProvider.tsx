@@ -40,7 +40,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	const dispatch = useDispatch<AppDispatch>()
 
 	const createOrder = useMutation({
-		mutationFn: async () => {
+		mutationFn: async (paymentMethod: string) => {
 			setOrderId(undefined);
 			setIsPaying(true);
 			try {
@@ -49,7 +49,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id }),
+					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id, paymentMethod }),
 				});
 				const orderData = await response.json();
 				if (!orderData.success) {
@@ -110,9 +110,12 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 		}
 	}, [checkoutCompleted, router]);
 
+	const createCardOrder = async () => await createOrder.mutateAsync('PayPal - carta di credito')
+	const createPayPalOrder = async () => await createOrder.mutateAsync('PayPal')
+
 	return (
 		<PayPalCardFieldsProvider
-			createOrder={createOrder.mutateAsync}
+			createOrder={createCardOrder}
 			onApprove={onApprove}
 			onError={onError}
 			style={{
@@ -139,7 +142,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				},
 			} as Record<string, PayPalCardFieldsStyleOptions>}
 		>
-			<PayPalCheckoutContext.Provider value={{createOrder: createOrder.mutateAsync, onApprove, onError, shipping, isPaying, setIsPaying}}>
+			<PayPalCheckoutContext.Provider value={{createOrder: createPayPalOrder, onApprove, onError, shipping, isPaying, setIsPaying}}>
 				{children}
 			</PayPalCheckoutContext.Provider>
 			<PaymentErrorDialog setError={(value) => {

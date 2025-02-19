@@ -37,7 +37,6 @@ export default async function handler(
 			throw new Error('Method not allowed')
 		}
 	} catch (error) {
-		console.error(error)
 		responseData.success = false
 		if (typeof error === "string") {
 			responseData.error = error

@@ -3,6 +3,7 @@ import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 import {getIsEU} from "../../../src/utils/utils";
 import {Cart, Item} from "../../../src/types/cart-type";
+import {WooOrder} from "../../../src/types/woocommerce";
 
 const base = process.env.PAYPAL_API_URL;
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
@@ -31,7 +32,8 @@ export default async function handler(
 	}
 	try {
 		if (req.method === 'POST') {
-			const { cart, invoice = null, customerNote = "", customerId = 0, paymentMethod = null } = req.body
+			const { cart, invoice = null, customerNote = "", customerId = 0, paymentMethod } = req.body
+
 			if (!cart) {
 				throw new Error('Cart or customer data is missing')
 			}
@@ -48,7 +50,7 @@ export default async function handler(
 				throw new Error('Order amount is 0')
 			}
 			console.log('ORDER', amount, "CART", cart.totals.total)
-			const paypalOrder = await createOrder(amount, order.id)
+			const paypalOrder = await createOrder(order, paymentMethod)
 			responseData.id = paypalOrder.id
 
 			responseData.success = true
@@ -71,21 +73,92 @@ export default async function handler(
  * Create an order to start the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
  */
-const createOrder = async (amount: number, orderId: string) => {
+const createOrder = async (order: WooOrder, paymentMethod: string) => {
+	const { billing, shipping, line_items, id, total, shipping_lines, shipping_total, discount_total, shipping_tax, discount_tax } = order
 	const accessToken = await generateAccessToken();
+	const requiredFields = [
+		'first_name',
+		'last_name',
+		'address_1',
+		'city',
+		'country',
+		'postcode'
+	] as const;
+	const shippingAddress = requiredFields.every(field => shipping[field]) ? shipping : billing;
+	const discountTotal = Number(discount_total) + Number(discount_tax);
+	const shippingTotal = Number(shipping_total) + Number(shipping_tax);
+	const itemTotal = Number(order.total) - shippingTotal + discountTotal;
 	const payload = {
 		intent: "CAPTURE",
 		purchase_units: [
 			{
-				reference_id: orderId,
+				reference_id: id,
 				amount: {
 					currency_code: "EUR",
-					value: amount + '',
+					value: total,
+					breakdown: {
+						item_total: {
+							currency_code: "EUR",
+							value: itemTotal + "",
+						},
+						shipping: {
+							currency_code: "EUR",
+							value: shippingTotal + "",
+						},
+						discount: {
+							currency_code: "EUR",
+							value: discountTotal + "",
+						}
+					}
 				},
+				items: line_items.map((item) => ({
+					name: item.name,
+					sku: item.sku,
+					unit_amount: {
+						currency_code: "EUR",
+						value: (Number(item.subtotal) + Number(item.subtotal_tax)) + "",
+					},
+					quantity: item.quantity + ""
+
+				})),
+				shipping: {
+					type: shipping_lines[0].method_id === "local_pickup" ? "PICKUP_IN_STORE" : "SHIPPING",
+					name: {
+						full_name: `${shippingAddress.first_name} ${shippingAddress.last_name}`,
+					},
+					email_address: billing.email,
+					address: {
+						address_line_1: shippingAddress.address_1,
+						address_line_2: shippingAddress.address_2,
+						admin_area_2: shippingAddress.city,
+						admin_area_1: shippingAddress.state,
+						postal_code: shippingAddress.postcode,
+						country_code: shippingAddress.country
+					}
+				}
 			},
 		],
+		...(["PayPal", "PayPal - carta di credito"].includes(paymentMethod) ? {
+			payment_source: paymentMethod === "PayPal" ? {
+				paypal: {
+					experience_context: {
+						brand_name: "Bottega di Sguardi",
+						shipping_preference: "SET_PROVIDED_ADDRESS",
+						user_action: "PAY_NOW"
+					}
+				}
+			} : {
+				card: {
+					attributes: {
+						customer: {
+							email_address: billing.email,
+						}
+					}
+				}
+			}
+		} : {})
 	};
-
+	console.log(payload.payment_source)
 	const response = await fetch(`${base}/v2/checkout/orders`, {
 		headers: {
 			"Content-Type": "application/json",

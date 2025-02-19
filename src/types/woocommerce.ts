@@ -307,6 +307,8 @@ export type WooLineItem = {
 		display_key: string;
 		display_value: string;
 	}[]
+	sku: string;
+	price: string;
 }
 
 export type WPPage = {
