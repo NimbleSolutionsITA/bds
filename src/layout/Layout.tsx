@@ -11,7 +11,7 @@ import Head from "next/head";
 import parse from "html-react-parser";
 import InStockNotifierDrawer from "./drawers/InStockNotifierDrawer";
 import CookiesDrawer from "./drawers/CookiesDrawer";
-import {openCookiesDrawer, openNewsletterDrawer} from "../redux/layoutSlice";
+import {openNewsletterDrawer} from "../redux/layoutSlice";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
@@ -30,6 +30,8 @@ type LayoutProps = {
     layout: BaseLayoutProps
 }
 
+
+
 export default function Layout({children, layout: {
     seo, breadcrumbs, googlePlaces, menus, shipping, categories
 }}: LayoutProps) {
@@ -39,14 +41,6 @@ export default function Layout({children, layout: {
     const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
     const { cart} = useSelector((state: RootState) => state.cart);
     const { cookiesDrawerOpen, newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
-
-    useEffect(() => {
-        const cookiesSeen = Cookies.get('is_cookies_seen');
-        if (!cookiesSeen) {
-            // 'firstAccess' cookie doesn't exist. Setting the cookie and opening the CookiesDrawer.
-            dispatch(openCookiesDrawer());
-        }
-    }, [])
 
     useEffect(() => {
         const cookiesSeen = Cookies.get('is_cookies_seen');
