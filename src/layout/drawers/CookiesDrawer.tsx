@@ -28,18 +28,6 @@ const CookiesDrawer = () => {
 		dispatch(closeCookiesDrawer())
 	}
 	const handleGoToSettings = () => {
-		setLocalStorage('cookie_consent', {
-			analytics: false,
-			profiling: false,
-			usage: false,
-			storage: false
-		})
-		gtagConsent({
-			'ad_user_data': 'denied',
-			'ad_personalization': 'denied',
-			'ad_storage': 'denied',
-			'analytics_storage': 'denied'
-		})
 		dispatch(closeCookiesDrawer())
 		return push('/cookie-settings')
 	}

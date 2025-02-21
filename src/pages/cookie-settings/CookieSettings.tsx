@@ -1,6 +1,6 @@
 'use client;'
 
-import {Button, Container, Drawer, FormControlLabel, Grid, Switch, SxProps, Theme, Typography} from "@mui/material";
+import {Button, Container, Drawer, FormControlLabel, Grid2 as Grid, Switch, SxProps, Theme, Typography} from "@mui/material";
 import React, {useEffect, useState} from "react";
 import {useTranslation} from "next-i18next";
 import {getLocalStorage, setLocalStorage} from "../../utils/storage-helper";
@@ -127,7 +127,7 @@ const CookieSettings = () => {
 				{t('cookies.usage-body')}
 			</Typography>
 			<Grid container spacing={2} sx={{margin: '20px 0 40px'}}>
-				<Grid item xs={6} md={3}>
+				<Grid size={{xs: 6, md: 3}}>
 					<Button
 						variant="outlined"
 						color="primary"
@@ -139,7 +139,7 @@ const CookieSettings = () => {
 						{t('cookies.save')}
 					</Button>
 				</Grid>
-				<Grid item xs={6} md={3}>
+				<Grid size={{xs: 6, md: 3}}>
 					<Button
 						onClick={() => handleSaveSettings(true)}
 						variant="contained"
