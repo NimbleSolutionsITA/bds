@@ -87,7 +87,7 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 	const shippingAddress = requiredFields.every(field => shipping[field]) ? shipping : billing;
 	const discountTotal = Number(discount_total) + Number(discount_tax);
 	const shippingTotal = Number(shipping_total) + Number(shipping_tax);
-	const itemTotal = Number(order.total) - shippingTotal + discountTotal;
+	const itemTotal = line_items.reduce((sum, item) => sum + (Number(item.subtotal) + Number(item.subtotal_tax)), 0);
 	const payload = {
 		intent: "CAPTURE",
 		purchase_units: [
@@ -116,7 +116,7 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 					sku: item.sku,
 					unit_amount: {
 						currency_code: "EUR",
-						value: (Number(item.subtotal) + Number(item.subtotal_tax)) + "",
+						value: ((Number(item.subtotal) + Number(item.subtotal_tax)) / item.quantity).toFixed(2) + "",
 					},
 					quantity: item.quantity + ""
 
