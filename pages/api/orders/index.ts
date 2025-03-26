@@ -85,9 +85,10 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 		'postcode'
 	] as const;
 	const shippingAddress = requiredFields.every(field => shipping[field]) ? shipping : billing;
-	const discountTotal = Number(discount_total) + Number(discount_tax);
+
 	const shippingTotal = Number(shipping_total) + Number(shipping_tax);
 	const itemTotal = line_items.reduce((sum, item) => sum + (Number(item.subtotal) + Number(item.subtotal_tax)), 0);
+	const discountTotal = itemTotal + shippingTotal - Number(total);
 	const payload = {
 		intent: "CAPTURE",
 		purchase_units: [
@@ -158,7 +159,7 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 			}
 		} : {})
 	};
-	console.log(payload.payment_source)
+
 	const response = await fetch(`${base}/v2/checkout/orders`, {
 		headers: {
 			"Content-Type": "application/json",

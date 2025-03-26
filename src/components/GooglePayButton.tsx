@@ -103,7 +103,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 			};
 		}
 
-	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal.Googlepay, router, user?.user_id])
+	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal?.Googlepay, router, user?.user_id])
 
 	useEffect(() => {
 		function onPaymentDataChanged(paymentData: IntermediatePaymentData): Promise<PaymentDataRequestUpdate> {
