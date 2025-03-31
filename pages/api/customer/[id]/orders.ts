@@ -26,7 +26,7 @@ export default async function handler(
 		try {
 			const id = req.query.id as string;
 			const {data} = await api.get(`orders`, {
-				// customer: id
+				customer: id
 			})
 
 			responseData.success = true
