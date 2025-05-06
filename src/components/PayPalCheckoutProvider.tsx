@@ -33,9 +33,9 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	const [isPaying, setIsPaying] = useState(false);
 	const [checkoutCompleted, setCheckoutCompleted] = useState(false);
 	const { user } = useAuth();
-	const { cart } = useSelector((state: RootState) => state.cart);
+	const { cart, customerNote } = useSelector((state: RootState) => state.cart);
 	const { watch } = useFormContext()
-	const { invoice, customerNote } = watch()
+	const { invoice } = watch()
 	const router = useRouter();
 	const dispatch = useDispatch<AppDispatch>()
 

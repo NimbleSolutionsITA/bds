@@ -158,7 +158,7 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 							email_address: billing.email,
 						},
 						verification: {
-							method: "SCA_ALWAYS"
+							method: "SCA_WHEN_REQUIRED"
 						}
 					}
 				}
