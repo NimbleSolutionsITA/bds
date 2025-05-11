@@ -227,6 +227,9 @@ export const getAllProductsIds = async () => {
 			}
 
 			const products: WPPage[] = await response.json();
+
+			console.log('products found', products.length)
+
 			if (products.length === 0) {
 				hasMore = false;
 			} else {
