@@ -210,33 +210,40 @@ export const getAllPagesIds = async () => {
 }
 
 export const getAllProductsIds = async () => {
+	const perPage = 100; // Increase from 10 to 100
 	let pages: WPPage[] = [];
-	let page: number = 1;
+	let page = 1;
+	let hasMore = true;
 
-	while (true) {
-		const response = await fetch(`${WORDPRESS_API_ENDPOINT}/product?per_page=10&page=${page}&_fields=lang,slug`);
-		if (!response.ok) {
-			if (response.status === 400) {
-				break;
-			} else {
+	try {
+		while (hasMore) {
+			const response = await fetch(
+				`${WORDPRESS_API_ENDPOINT}/product?per_page=${perPage}&page=${page}&_fields=id,lang,slug`
+			);
+
+			if (!response.ok) {
+				if (response.status === 400) break;
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
+
+			const products: WPPage[] = await response.json();
+			if (products.length === 0) {
+				hasMore = false;
+			} else {
+				pages = pages.concat(products);
+				page++;
+
+				// Early exit if we have enough products (optional)
+				if (pages.length >= 500) break;
+			}
 		}
-
-		const products: WPPage[] = await response.json();
-		pages = pages.concat(products);
-
-		if (products.length === 0) {
-			break;
-		}
-
-		page++;
+	} catch (error) {
+		console.error('Error fetching product IDs:', error);
+		// Return partial results rather than failing completely
 	}
 
 	return pages.map(page => ({
-		params: {
-			slug: page.slug,
-		},
+		params: { slug: page.slug },
 		locale: page.lang
 	}));
 }
