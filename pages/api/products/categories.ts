@@ -71,17 +71,19 @@ export const getProductCategories = async (
 export const getProductCategory = async (
 	lang?: string | string[] | undefined,
 	slug?: string | string[] | undefined
-): Promise<WooProductCategory> => {
-	let { data } = await api.get(
-		'products/categories',
-		{
-			per_page: 1,
-			slug,
-			lang
-		}
-	)
-	if (data.length === 0) {
-		throw new Error("Category not found")
+): Promise<WooProductCategory | null> => {
+	try {
+		let { data } = await api.get(
+			'products/categories',
+			{
+				per_page: 1,
+				slug,
+				lang
+			}
+		)
+		return data.length > 0 ? data[0] : null;
+	} catch (error) {
+		console.error('Error fetching product category:', error);
+		return null;
 	}
-	return data[0]
 }

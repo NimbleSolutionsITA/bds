@@ -32,55 +32,71 @@ export default function Fragrance({ productCategory, products, layout }: Fragran
 }
 
 export async function getStaticProps({ locale, params: {page, slug} }: { locales: string[], locale: 'it' | 'en', params: { slug: string, page: string }}) {
-	const [
-		{ productCategory, layout: {ssrTranslations, ...layout} }
-	] = await Promise.all([
-		getCategoryPageProps(locale, slug)
-	]);
-	const fragranceBrands = getFragrancesCategories(layout.categories).map(({id}) => id)
-	if (!productCategory || fragranceBrands.includes(productCategory.id)) {
-		return {
-			notFound: true
+	try {
+		const [
+			{ productCategory, layout: {ssrTranslations, ...layout} }
+		] = await Promise.all([
+			getCategoryPageProps(locale, slug)
+		]);
+		const fragranceBrands = getFragrancesCategories(layout.categories).map(({id}) => id)
+		if (!productCategory || fragranceBrands.includes(productCategory.id)) {
+			return {
+				notFound: true
+			}
 		}
-	}
-	const products = await getAllProducts({
-		categories: slug,
-		lang: locale,
-		per_page: '99',
-		fragrances: true
-	})
-	const urlPrefix = locale === 'it' ? '' : '/' + locale;
-	const breadcrumbs = [
-		{ name: 'Home', href: urlPrefix + '/' },
-		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+page+'/' + productCategory.slug },
-	]
-	return {
-		props: {
-			layout: {
-				...layout,
-				breadcrumbs,
+		const products = await getAllProducts({
+			categories: slug,
+			lang: locale,
+			per_page: '99',
+			fragrances: true
+		})
+		const urlPrefix = locale === 'it' ? '' : '/' + locale;
+		const breadcrumbs = [
+			{ name: 'Home', href: urlPrefix + '/' },
+			{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+page+'/' + productCategory.slug },
+		]
+		return {
+			props: {
+				layout: {
+					...layout,
+					breadcrumbs,
+				},
+				productCategory,
+				products,
+				...ssrTranslations
 			},
-			productCategory,
-			products,
-			...ssrTranslations
-		},
-		revalidate: 10
+			revalidate: 10
+		}
+	} catch (error) {
+		console.error('Error fetching category:', error);
+		return { notFound: true };
 	}
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
 	const productCategories = await cacheGetProductCategories();
-	const paths = locales.map(locale => productCategories.filter(({parent}) => {
-		if (!parent) return false
-		const parentCat = productCategories.find(category => category.id === parent)?.parent as number
-		return parentCat === FRAGRANCES_CATEGORY[locale];
-	}).map(({slug, parent}: WooProductCategory) => ({
-		params: { slug, page: productCategories.find(({id}) => id === parent)?.slug },
-		locale
-	}))).flat();
+	const validPaths = [];
+
+	for (const locale of locales) {
+		const fragranceCategories = productCategories.filter(({parent}) => {
+			if (!parent) return false;
+			const parentCat = productCategories.find(category => category.id === parent)?.parent as number;
+			return parentCat === FRAGRANCES_CATEGORY[locale];
+		});
+
+		for (const category of fragranceCategories) {
+			const parentCategory = productCategories.find(({id}) => id === category.parent);
+			if (parentCategory) {
+				validPaths.push({
+					params: { slug: category.slug, page: parentCategory.slug },
+					locale
+				});
+			}
+		}
+	}
 
 	return {
-		paths: process.env.DISABLE_DYNAMIC_BUILD === "true" ? [] : paths,
+		paths: process.env.DISABLE_DYNAMIC_BUILD === "true" ? [] : validPaths,
 		fallback: 'blocking',
 	};
 }
