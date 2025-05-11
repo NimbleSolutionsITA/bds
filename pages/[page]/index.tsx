@@ -44,62 +44,69 @@ export default function GenericPage({page, layout, fragrancePage}: GenericPagePr
 }
 
 export async function getStaticProps({ locale, params: { page: slug } }: { locale: LOCALE, params: {page: string}}) {
-    const { ssrTranslations, ...layoutProps } = await cacheGetLayoutProps(locale);
-    const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
+    try {
+        const { ssrTranslations, ...layoutProps } = await cacheGetLayoutProps(locale);
+        const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
 
-    if (productCategory) {
-        const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({parent}) => parent)
-        if (!productCategory || fragranceBrands.includes(productCategory.id)) {
+        if (productCategory) {
+            const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({parent}) => parent)
+            if (!productCategory || fragranceBrands.includes(productCategory.id)) {
+                return {
+                    notFound: true
+                }
+            }
+            const products = await getProducts({
+                categories: productCategory.slug,
+                lang: locale,
+                per_page: '99',
+                fragrances: true
+            })
+            const urlPrefix = locale === 'it' ? '' : '/' + locale;
+            const breadcrumbs = [
+                { name: 'Home', href: urlPrefix + '/' },
+                { name: productCategory, href: urlPrefix + '/'+ productCategory.slug }
+            ]
             return {
-                notFound: true
+                props: {
+                    layout: {
+                        ...layoutProps,
+                        breadcrumbs,
+                    },
+                    fragrancePage: {
+                        productCategory,
+                        products
+                    },
+                    ...ssrTranslations
+                },
+                revalidate: 10
             }
         }
-        const products = await getProducts({
-            categories: productCategory.slug,
-            lang: locale,
-            per_page: '99',
-            fragrances: true
-        })
+
+        const { page, seo } = await getPageProps(slug, locale)
+
         const urlPrefix = locale === 'it' ? '' : '/' + locale;
-        const breadcrumbs = [
-            { name: 'Home', href: urlPrefix + '/' },
-            { name: productCategory, href: urlPrefix + '/'+ productCategory.slug }
-        ]
-        return {
+        return page ? {
             props: {
+                page,
                 layout: {
+                    seo,
                     ...layoutProps,
-                    breadcrumbs,
-                },
-                fragrancePage: {
-                    productCategory,
-                    products
+                    breadcrumbs: [
+                        { name: 'Home', href: urlPrefix + '/' },
+                        { name: page.title, href: urlPrefix + '/' + page.slug },
+                    ]
                 },
                 ...ssrTranslations
             },
             revalidate: 10
+        } : {
+            notFound: true,
         }
-    }
-
-    const { page, seo } = await getPageProps(slug, locale)
-
-    const urlPrefix = locale === 'it' ? '' : '/' + locale;
-    return page ? {
-        props: {
-            page,
-            layout: {
-                seo,
-                ...layoutProps,
-                breadcrumbs: [
-                    { name: 'Home', href: urlPrefix + '/' },
-                    { name: page.title, href: urlPrefix + '/' + page.slug },
-                ]
-            },
-            ...ssrTranslations
-        },
-        revalidate: 10
-    } : {
-        notFound: true,
+    } catch (error) {
+        console.error('Error in getStaticProps:', error);
+        return {
+            notFound: true
+        };
     }
 }
 
