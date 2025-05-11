@@ -237,15 +237,12 @@ export const getAllProductsIds = async () => {
 		}
 	} catch (error) {
 		console.error('Error fetching product IDs:', error);
-		// Return partial results rather than failing completely
 	}
 
-	const result = pages.map(page => ({
+	return pages.map(page => ({
 		params: { slug: page.slug },
 		locale: page.lang
 	}));
-
-	return result;
 }
 
 export const getAllPostIds = async () => {
