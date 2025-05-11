@@ -228,16 +228,11 @@ export const getAllProductsIds = async () => {
 
 			const products: WPPage[] = await response.json();
 
-			console.log('products found', products.length, 'page', page);
-
 			if (products.length === 0) {
 				hasMore = false;
 			} else {
 				pages = pages.concat(products);
 				page++;
-
-				// Early exit if we have enough products (optional)
-				if (pages.length >= 500) break;
 			}
 		}
 	} catch (error) {
@@ -249,8 +244,6 @@ export const getAllProductsIds = async () => {
 		params: { slug: page.slug },
 		locale: page.lang
 	}));
-
-	console.log(result)
 
 	return result;
 }
