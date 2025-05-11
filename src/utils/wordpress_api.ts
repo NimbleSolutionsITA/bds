@@ -228,7 +228,7 @@ export const getAllProductsIds = async () => {
 
 			const products: WPPage[] = await response.json();
 
-			console.log('products found', products.length)
+			console.log('products found', products.length, 'page', page);
 
 			if (products.length === 0) {
 				hasMore = false;
@@ -245,10 +245,14 @@ export const getAllProductsIds = async () => {
 		// Return partial results rather than failing completely
 	}
 
-	return pages.map(page => ({
+	const result = pages.map(page => ({
 		params: { slug: page.slug },
 		locale: page.lang
 	}));
+
+	console.log(result)
+
+	return result;
 }
 
 export const getAllPostIds = async () => {
