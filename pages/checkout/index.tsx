@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment, useEffect} from "react";
 import {getCheckoutPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {Backdrop, CircularProgress} from "@mui/material";
@@ -25,7 +25,8 @@ export default function Index({
      shipping
 }: CheckoutProps) {
 	const { loginChecked, loggedIn } = useAuth()
-	const { cart: { cart, initLoading }, layout: { logInDrawerOpen } } = useSelector((state: RootState) => state);
+	const { cart, initLoading } = useSelector((state: RootState) => state.cart);
+	const logInDrawerOpen = useSelector((state: RootState) => state.layout.logInDrawerOpen);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
 	const router = useRouter();
