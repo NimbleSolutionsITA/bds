@@ -11,6 +11,7 @@ import {destroyCart} from "../redux/cartSlice";
 import useAuth from "../utils/useAuth";
 import PaymentErrorDialog from "../pages/checkout/PaymentErrorDialog";
 import {useMutation} from "@tanstack/react-query";
+import * as Sentry from "@sentry/nextjs";
 
 interface PayPalProviderProps {
 	children: React.ReactNode | React.ReactNode[];
@@ -21,7 +22,7 @@ interface PayPalProviderProps {
 const PayPalCheckoutContext = createContext({
 	createOrder: async () => { return ""},
 	onApprove: async (data: OnApproveData) => {},
-	onError: (error: any) => {},
+	onError: (data: {error: any, step?: string}) => {},
 	shipping: {} as ShippingData,
 	isPaying: false,
 	setIsPaying: (isPaying: boolean) => {},
@@ -58,7 +59,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				setOrderId(orderData.wooId);
 				return orderData.id;
 			} catch (error: any) {
-				await onError(error);
+				await onError({error, step: 'createOrder'});
 			}
 		}
 	})
@@ -73,7 +74,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			});
 
 			if (!response.ok) {
-				await onError(new Error(`Server error: ${response.statusText}`));
+				await onError({error: new Error(`Server error: ${response.statusText}`), step: 'onApprove'});
 			}
 			setOrderId(undefined);
 
@@ -84,21 +85,32 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				gtagPurchase(wooOrder);
 				setCheckoutCompleted(true);
 			} else {
-				await onError(new Error(error ?? "An error occurred"));
+				await onError({error: new Error(error ?? "An error occurred"), step: 'onApprove'});
 			}
 		} catch (error: any) {
-			await onError(error);
+			await onError({error, step: 'onApprove'});
 		}
 	}
 
 	const {mutateAsync: onError} = useMutation({
-		mutationFn: async (error:  Record<string, any>)=> {
-			console.log(error, orderId)
+		mutationFn: async ({error, step}: { error: Record<string, any>, step?: string })=> {
 			if (orderId) {
 				await fetch(`/api/orders/${orderId}/abort`, {
 					method: "PUT",
 				});
 			}
+			Sentry.setTag("area", "checkout");
+			if (step) {
+				Sentry.setTag('step', step);
+			}
+			Sentry.setContext("checkout", {
+				orderId,
+				user: user?.user_id,
+				cart,
+				customerNote,
+				invoice,
+			});
+			Sentry.captureException(error);
 			setOrderId(undefined);
 			setError(error.message ?? error.details?.[0]?.description ?? "An error occurred");
 		}
@@ -112,12 +124,13 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const createCardOrder = async () => await createOrder.mutateAsync('PayPal - carta di credito')
 	const createPayPalOrder = async () => await createOrder.mutateAsync('PayPal')
+	const onCardError = (error: Record<string, any>) => onError({error, step: 'onCardError'});
 
 	return (
 		<PayPalCardFieldsProvider
 			createOrder={createCardOrder}
 			onApprove={onApprove}
-			onError={onError}
+			onError={onCardError}
 			style={{
 				'input': {
 					'font-size': '14px',

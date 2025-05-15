@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import {WORDPRESS_SITE_URL} from "../../../../src/utils/endpoints";
 import {generateAccessToken} from "../index";
-
+import * as Sentry from "@sentry/nextjs";
 const base = process.env.PAYPAL_API_URL;
 
 export type CreateOrderResponse = {
@@ -58,10 +58,25 @@ export default async function handler(
 				responseData.error = captureData.details?.[0]?.description ?? (capture ?
 					`Transaction ${capture.status}: ${capture.id}` :
 					'Payment capture was not successful.');
+				Sentry.setTag("area", "checkout");
+				Sentry.setTag("step", "capture_order");
+				Sentry.setContext("paypal_capture", {
+					paypalOrderId: req.query.id,
+					responseData
+				});
+				Sentry.captureException(responseData.error);
+
 			}
 		}
 	} catch (error) {
 		console.error(error)
+		Sentry.setTag("area", "checkout");
+		Sentry.setTag("step", "capture_order");
+		Sentry.setContext("paypal_capture", {
+			paypalOrderId: req.query.id,
+			responseData
+		});
+		Sentry.captureException(error);
 		responseData.success = false
 		if (typeof error === "string") {
 			responseData.error = error

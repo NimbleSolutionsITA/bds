@@ -15,8 +15,8 @@ const PaymentButtons = () => {
 				<PayPalButtons
 					createOrder={createOrder}
 					onApprove={onApprove}
-					onCancel={onError}
-					onError={onError}
+					onCancel={(error) => onError({error, step: 'onCancelPaypalButton'})}
+					onError={(error) => onError({error, step: 'onErrorPaypalButton'})}
 					style={{
 						color: "black",
 						shape: "rect",
@@ -62,7 +62,7 @@ const SubmitPayment = () => {
 		}
 		setIsPaying(true);
 
-		cardFieldsForm.submit().catch(onError);
+		cardFieldsForm.submit().catch((error) => onError({error, step: 'onCardFieldsFormSubmit'}));
 	};
 
 	return (
