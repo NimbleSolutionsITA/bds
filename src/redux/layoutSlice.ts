@@ -9,7 +9,7 @@ export type ShippingData = {
 
 type LayoutState = {
 	newsletterDrawerOpen: boolean
-	cookiesDrawerOpen: boolean
+	cookiesModalOpen: boolean
 	searchDrawerOpen: boolean
 	logInDrawerOpen: boolean
 	signUpDrawerOpen: boolean
@@ -32,7 +32,7 @@ type LayoutState = {
 
 const initialState: LayoutState = {
 	newsletterDrawerOpen: false,
-	cookiesDrawerOpen: false,
+	cookiesModalOpen: false,
 	searchDrawerOpen: false,
 	logInDrawerOpen: false,
 	signUpDrawerOpen: false,
@@ -51,12 +51,12 @@ export const layoutSlice = createSlice({
 	name: 'layout',
 	initialState,
 	reducers: {
-		openCookiesDrawer: (state) => {
-			state.cookiesDrawerOpen = true
+		openCookiesModal: (state) => {
+			state.cookiesModalOpen = true
 		},
-		closeCookiesDrawer: (state) => {
+		closeCookiesModal: (state) => {
 			Cookies.set('is_cookies_seen', 'true');
-			state.cookiesDrawerOpen = false
+			state.cookiesModalOpen = false
 		},
 		openSearchDrawer: (state) => {
 			state.searchDrawerOpen = true
@@ -121,8 +121,8 @@ export const layoutSlice = createSlice({
 
 // Action creators are generated for each case reducer function
 export const {
-	openCookiesDrawer,
-	closeCookiesDrawer,
+	openCookiesModal,
+	closeCookiesModal,
 	openNewsletterDrawer,
 	closeNewsletterDrawer,
 	openInStockNotifierDrawer,

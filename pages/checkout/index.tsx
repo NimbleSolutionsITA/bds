@@ -5,7 +5,6 @@ import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../src/redux/store";
 import Head from "next/head";
-import GoogleAnalytics from "../../src/components/GoogleAnalytics";
 import {useRouter} from "next/router";
 import LogInDrawer from "../../src/layout/drawers/LogInDrawer";
 import useAuth from "../../src/utils/useAuth";
@@ -14,6 +13,7 @@ import CartErrorModal from "../../src/layout/cart/CartErrorModal";
 import PayPalProvider from "../../src/components/PayPalProvider";
 import {initCart} from "../../src/redux/cartSlice";
 import {LOCALE} from "../../src/utils/utils";
+import GoogleAnalytics from "../../src/layout/Analytics/GoogleAnalytics";
 
 const CheckoutGrid = dynamic(() => import("../../src/pages/checkout/CheckoutGrid"));
 

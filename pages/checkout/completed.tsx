@@ -2,7 +2,6 @@ import {useRouter} from "next/router";
 import React from "react";
 import {getSSRTranslations} from "../../src/utils/wordpress_api";
 import Head from "next/head";
-import GoogleAnalytics from "../../src/components/GoogleAnalytics";
 import { Box, Button, Container, IconButton, Typography} from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,6 +9,7 @@ import logo from "../../src/images/bottega-di-sguardi-logo.png";
 import {CheckCircleOutlineSharp} from "@mui/icons-material";
 import {useTranslation} from "next-i18next";
 import {LOCALE} from "../../src/utils/utils";
+import GoogleAnalytics from "../../src/layout/Analytics/GoogleAnalytics";
 
 export default function CheckoutResult() {
 	const { t } = useTranslation('common')

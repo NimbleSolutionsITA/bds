@@ -261,13 +261,50 @@
       "body": "Please check your email. A password reset link has been sent to you."
     }
   },
-    "order-status": {
-      "processing": "Processing",
-      "completed": "Completed",
-      "cancelled": "Cancelled",
-      "refunded": "Refunded",
-      "failed": "Failed",
-      "on-hold": "On hold",
-      "pending": "Pending"
-    }
+  "order-status": {
+    "processing": "Processing",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "refunded": "Refunded",
+    "failed": "Failed",
+    "on-hold": "On hold",
+    "pending": "Pending"
+  },
+  "consent": {
+    "title": "Manage your cookie preferences",
+    "description": "We use cookies to improve your experience, deliver personalized content, analyze traffic, and show targeted ads. You can manage your preferences or accept all cookies.",
+    "acceptAll": "Accept all",
+    "saveSettings": "Save settings",
+    "manageTitle": "Consent management",
+    "functionalTitle": "Functional cookies (required)",
+    "functionalDescription": "These cookies are essential for the website to function properly and cannot be disabled. They are usually set in response to actions such as setting privacy preferences, logging in, or filling out forms. Includes: PayPal Checkout, WordPress CMS, security, and load balancing.",
+    "adUserDataTitle": "User data for advertising purposes",
+    "adUserDataDescription": "Allows data collection and sharing with advertising providers for performance measurement and ad delivery. Technologies involved: Google Ads, Facebook Pixel, Google Merchant Center.",
+    "adPersonalizationTitle": "Ad personalization",
+    "adPersonalizationDescription": "Enables personalized ads based on your interests and browsing behavior. Includes remarketing and audience building via Google Ads and Facebook Ads.",
+    "analyticsTitle": "Measurement and analytics",
+    "analyticsDescription": "These cookies help us understand how visitors interact with the website by collecting and reporting anonymous information. Technologies used: Google Analytics, Facebook Pixel, Google Tag Manager.",
+    "personalizationTitle": "Personalized experience",
+    "personalizationDescription": "These cookies allow the site to remember choices you make (such as language or region) and provide enhanced, personalized features. Includes client-side tools like Sentry for user experience monitoring."
+  },
+  "privacyPolicy.title": "Privacy Policy",
+  "privacyPolicy.intro": "This policy describes how we collect, use and protect your personal data in accordance with the General Data Protection Regulation (GDPR - EU Regulation 2016/679).",
+  "privacyPolicy.controllerTitle": "Data Controller",
+  "privacyPolicy.controller": "The data controller is Bottega Di Sguardi Srl, registered office at Via di Parione, 54/R\n50123 Florence (FI), Italy. Email: info@bottegadisguardi.com",
+  "privacyPolicy.dataCollectedTitle": "Personal data collected",
+  "privacyPolicy.dataCollected": "We collect data such as name, email, IP address, browsing data, shopping preferences, and any data provided during purchase or registration. Some data is collected via cookies, analytics tools, and marketing tags.",
+  "privacyPolicy.purposeTitle": "Purpose of processing",
+  "privacyPolicy.purpose": "Your data is used to: complete orders, provide customer support, statistical analysis (Google Analytics, Facebook Pixel), personalized advertising (Google Ads, Facebook), error monitoring (Sentry), security and user experience enhancement.",
+  "privacyPolicy.legalBasisTitle": "Legal basis",
+  "privacyPolicy.legalBasis": "The processing is based on consent (Art. 6.1.a GDPR), performance of a contract (Art. 6.1.b), legal obligations (Art. 6.1.c), and legitimate interest (Art. 6.1.f).",
+  "privacyPolicy.dataSharingTitle": "Data recipients",
+  "privacyPolicy.dataSharing": "Your data may be shared with external service providers, such as payment processors (e.g., PayPal), analytics services (Google, Meta), and ad platforms, in compliance with data protection laws.",
+  "privacyPolicy.retentionTitle": "Data retention",
+  "privacyPolicy.retention": "Your data will be retained for as long as necessary to fulfill the purposes for which it was collected, in compliance with legal obligations.",
+  "privacyPolicy.rightsTitle": "Your rights",
+  "privacyPolicy.rights": "You have the right to access, rectify, erase, restrict or object to processing, and the right to data portability. You may also withdraw consent at any time.",
+  "privacyPolicy.cookiesTitle": "Use of cookies",
+  "privacyPolicy.cookies": "We use technical, analytics, and marketing cookies. You can manage your preferences through the cookie banner or the dedicated section.",
+  "privacyPolicy.managePreferences": "To manage your cookie preferences:",
+  "privacyPolicy.openCookieSettings": "Open cookie settings"
 }
