@@ -15,13 +15,15 @@ const FragrancesBottom = dynamic(() => import("../../src/components/CategoryBott
 
 export type FragranceProps = PageBaseProps & {
 	productCategory: WooProductCategory,
+	parentCategory: WooProductCategory,
 	products: BaseProduct[],
 }
-export default function Fragrance({ productCategory, products, layout }: FragranceProps) {
+export default function Fragrance({ productCategory, parentCategory, products, layout }: FragranceProps) {
 	return (
 		<Layout key={productCategory.slug} layout={layout}>
 			<FragranceTop
 				name={productCategory.name}
+				brand={parentCategory.name}
 				gallery={productCategory.acf.gallery}
 				description={productCategory.description}
 			/>
@@ -51,8 +53,11 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 			fragrances: true
 		})
 		const urlPrefix = locale === 'it' ? '' : '/' + locale;
+		const productCategories = await cacheGetProductCategories();
+		const parentCategory = productCategories.find(({id}) => id === productCategory.parent)
 		const breadcrumbs = [
 			{ name: 'Home', href: urlPrefix + '/' },
+			{ name: parentCategory?.name, href: urlPrefix + '/'+page },
 			{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+page+'/' + productCategory.slug },
 		]
 		return {
@@ -62,6 +67,7 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 					breadcrumbs,
 				},
 				productCategory,
+				parentCategory,
 				products,
 				...ssrTranslations
 			},

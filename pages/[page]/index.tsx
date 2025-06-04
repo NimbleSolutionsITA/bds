@@ -1,6 +1,6 @@
 import {Container} from "@mui/material";
 import {PageBaseProps} from "../../src/types/settings";
-import {getAllPagesIds, getPageProps} from "../../src/utils/wordpress_api";
+import {getAllPagesIds, getCategoryPageProps, getPageProps} from "../../src/utils/wordpress_api";
 import Layout from "../../src/layout/Layout";
 import {BaseProduct, Page, WooProductCategory} from "../../src/types/woocommerce";
 import HtmlBlock from "../../src/components/HtmlBlock";
@@ -49,6 +49,7 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
         const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
 
         if (productCategory) {
+            const { layout: { seo }} = await getCategoryPageProps(locale, slug)
             const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({parent}) => parent)
             if (!productCategory || fragranceBrands.includes(productCategory.id)) {
                 return {
@@ -64,11 +65,12 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
             const urlPrefix = locale === 'it' ? '' : '/' + locale;
             const breadcrumbs = [
                 { name: 'Home', href: urlPrefix + '/' },
-                { name: productCategory, href: urlPrefix + '/'+ productCategory.slug }
+                { name: productCategory.name, href: urlPrefix + '/'+ productCategory.slug }
             ]
             return {
                 props: {
                     layout: {
+                        seo,
                         ...layoutProps,
                         breadcrumbs,
                     },
