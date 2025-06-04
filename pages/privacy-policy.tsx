@@ -2,7 +2,17 @@ import {PageBaseProps} from "../src/types/settings";
 import Layout from "../src/layout/Layout";
 import {LOCALE} from "../src/utils/utils";
 import {cacheGetLayoutProps} from "../src/utils/cache";
-import {Button, Container, Grid2 as Grid, Typography} from "@mui/material";
+import {
+	Button,
+	Container,
+	Grid2 as Grid,
+	Table,
+	Typography,
+	TableBody,
+	TableHead,
+	TableRow,
+	TableCell, TableContainer, Paper
+} from "@mui/material";
 import {useTranslation} from "next-i18next";
 import {openCookiesModal} from "../src/redux/layoutSlice";
 import {useDispatch} from "react-redux";
@@ -58,6 +68,111 @@ export default function PrivacyPolicyPage({layout}: GenericPageProps) {
 						<Button sx={{mt: 2}} variant="contained" onClick={() => dispatch(openCookiesModal())}>
 							{t("privacyPolicy.openCookieSettings")}
 						</Button>
+					</Grid>
+					<Grid size={{xs: 12}}>
+						{/* Cookie Necessari */}
+						<Typography fontWeight="500" variant="h2" gutterBottom>
+							{t("privacyPolicy.cookieTables.necessary.title")}
+						</Typography>
+						<Typography>
+							{t("privacyPolicy.cookieTables.necessary.description")}
+						</Typography>
+						<TableContainer component={Paper} sx={{ mb: 6}} elevation={0}>
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.name")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.purpose")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.duration")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.provider")}</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									<TableRow>
+										<TableCell>session_id</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.necessary.purpose.session")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.session")}</TableCell>
+										<TableCell>bottegadisguardi.com</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>csrf_token</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.necessary.purpose.csrf")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.session")}</TableCell>
+										<TableCell>bottegadisguardi.com</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>pll_language</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.necessary.purpose.language")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.1year")}</TableCell>
+										<TableCell>bottegadisguardi.com</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>newsletter_optin</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.necessary.purpose.newsletter")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.1year")}</TableCell>
+										<TableCell>bottegadisguardi.com</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>_sentry_breadcrumb</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.advertising.purpose.sentry")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.session")}</TableCell>
+										<TableCell>Sentry</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
+						</TableContainer>
+
+						{/* Cookie Pubblicitari */}
+						<Typography variant="h4" fontWeight="500" gutterBottom>
+							{t("privacyPolicy.cookieTables.advertising.title")}
+						</Typography>
+						<Typography>
+							{t("privacyPolicy.cookieTables.advertising.description")}
+						</Typography>
+						<TableContainer component={Paper} sx={{ mb: 6}} elevation={0}>
+							<Table>
+								<TableHead>
+									<TableRow>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.name")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.purpose")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.duration")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.columns.provider")}</TableCell>
+									</TableRow>
+								</TableHead>
+								<TableBody>
+									<TableRow>
+										<TableCell>_fbp</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.advertising.purpose.facebook")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.3months")}</TableCell>
+										<TableCell>Facebook</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>_ga</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.advertising.purpose.analytics")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.2years")}</TableCell>
+										<TableCell>Google</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>ads/ga-audiences</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.advertising.purpose.googleAds")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.session")}</TableCell>
+										<TableCell>Google Ads</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>google_pay_token</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.advertising.purpose.googlePay")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.session")}</TableCell>
+										<TableCell>Google Pay</TableCell>
+									</TableRow>
+									<TableRow>
+										<TableCell>apple_pay_session</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.advertising.purpose.applePay")}</TableCell>
+										<TableCell>{t("privacyPolicy.cookieTables.duration.session")}</TableCell>
+										<TableCell>Apple Pay</TableCell>
+									</TableRow>
+								</TableBody>
+							</Table>
+						</TableContainer>
 					</Grid>
 				</Grid>
 			</Container>

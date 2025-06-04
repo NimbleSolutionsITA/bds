@@ -222,7 +222,7 @@ export const googlePlaces = {
 		],
 		"current_opening_hours": {
 			"weekday_text": [
-				"lun: 14:30–20:00",
+				"lun: 16:00–20:00",
 				"mar-sab: 09:30–13:30, 16:00–20:00",
 				"dom: Chiuso"
 			]
@@ -365,9 +365,8 @@ export const googlePlaces = {
 		],
 		"current_opening_hours": {
 			"weekday_text": [
-				"lun: 10:30–19:30",
-				"mar - sab : 10:30–19:30",
-				"dom: 14:30–20:00"
+				"lun - sab : 10:30–19:30",
+				"dom: 14:30–19:30"
 			]
 		},
 		"url": "https://maps.google.com/?cid=8566543080284360235",

@@ -10,7 +10,6 @@ import {
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {Cart, Item} from "../types/cart-type";
-import {sendGTMEvent} from "@next/third-parties/google";
 import {ReadonlyURLSearchParams} from "next/navigation";
 
 export const sanitize = (html: string) => {
@@ -293,7 +292,8 @@ export const getCartTotals = (cart?: Cart) => {
 }
 
 export const gtagAddToCart = (item: Item, productId: number, variantId: number|"") => {
-    sendGTMEvent({
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
         event: "add_to_cart",
         ecommerce: {
             items: [{
@@ -327,7 +327,8 @@ export const gtagPurchase = (order: WooOrder) => {
             })
         }
     }
-    sendGTMEvent(event)
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push(event)
 };
 
 type Consent = 'granted' | 'denied'

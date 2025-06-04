@@ -287,24 +287,63 @@
     "personalizationTitle": "Personalized experience",
     "personalizationDescription": "These cookies allow the site to remember choices you make (such as language or region) and provide enhanced, personalized features. Includes client-side tools like Sentry for user experience monitoring."
   },
-  "privacyPolicy.title": "Privacy Policy",
-  "privacyPolicy.intro": "This policy describes how we collect, use and protect your personal data in accordance with the General Data Protection Regulation (GDPR - EU Regulation 2016/679).",
-  "privacyPolicy.controllerTitle": "Data Controller",
-  "privacyPolicy.controller": "The data controller is Bottega Di Sguardi Srl, registered office at Via di Parione, 54/R\n50123 Florence (FI), Italy. Email: info@bottegadisguardi.com",
-  "privacyPolicy.dataCollectedTitle": "Personal data collected",
-  "privacyPolicy.dataCollected": "We collect data such as name, email, IP address, browsing data, shopping preferences, and any data provided during purchase or registration. Some data is collected via cookies, analytics tools, and marketing tags.",
-  "privacyPolicy.purposeTitle": "Purpose of processing",
-  "privacyPolicy.purpose": "Your data is used to: complete orders, provide customer support, statistical analysis (Google Analytics, Facebook Pixel), personalized advertising (Google Ads, Facebook), error monitoring (Sentry), security and user experience enhancement.",
-  "privacyPolicy.legalBasisTitle": "Legal basis",
-  "privacyPolicy.legalBasis": "The processing is based on consent (Art. 6.1.a GDPR), performance of a contract (Art. 6.1.b), legal obligations (Art. 6.1.c), and legitimate interest (Art. 6.1.f).",
-  "privacyPolicy.dataSharingTitle": "Data recipients",
-  "privacyPolicy.dataSharing": "Your data may be shared with external service providers, such as payment processors (e.g., PayPal), analytics services (Google, Meta), and ad platforms, in compliance with data protection laws.",
-  "privacyPolicy.retentionTitle": "Data retention",
-  "privacyPolicy.retention": "Your data will be retained for as long as necessary to fulfill the purposes for which it was collected, in compliance with legal obligations.",
-  "privacyPolicy.rightsTitle": "Your rights",
-  "privacyPolicy.rights": "You have the right to access, rectify, erase, restrict or object to processing, and the right to data portability. You may also withdraw consent at any time.",
-  "privacyPolicy.cookiesTitle": "Use of cookies",
-  "privacyPolicy.cookies": "We use technical, analytics, and marketing cookies. You can manage your preferences through the cookie banner or the dedicated section.",
-  "privacyPolicy.managePreferences": "To manage your cookie preferences:",
-  "privacyPolicy.openCookieSettings": "Open cookie settings"
+  "privacyPolicy": {
+    "title": "Privacy Policy",
+    "intro": "This policy describes how we collect, use and protect your personal data in accordance with the General Data Protection Regulation (GDPR - EU Regulation 2016/679).",
+    "controllerTitle": "Data Controller",
+    "controller": "The data controller is Bottega Di Sguardi Srl, registered office at Via di Parione, 54/R\n50123 Florence (FI), Italy. Email: info@bottegadisguardi.com",
+    "dataCollectedTitle": "Personal data collected",
+    "dataCollected": "We collect data such as name, email, IP address, browsing data, shopping preferences, and any data provided during purchase or registration. Some data is collected via cookies, analytics tools, and marketing tags.",
+    "purposeTitle": "Purpose of processing",
+    "purpose": "Your data is used to: complete orders, provide customer support, statistical analysis (Google Analytics, Facebook Pixel), personalized advertising (Google Ads, Facebook), error monitoring (Sentry), security and user experience enhancement.",
+    "legalBasisTitle": "Legal basis",
+    "legalBasis": "The processing is based on consent (Art. 6.1.a GDPR), performance of a contract (Art. 6.1.b), legal obligations (Art. 6.1.c), and legitimate interest (Art. 6.1.f).",
+    "dataSharingTitle": "Data recipients",
+    "dataSharing": "Your data may be shared with external service providers, such as payment processors (e.g., PayPal), analytics services (Google, Meta), and ad platforms, in compliance with data protection laws.",
+    "retentionTitle": "Data retention",
+    "retention": "Your data will be retained for as long as necessary to fulfill the purposes for which it was collected, in compliance with legal obligations.",
+    "rightsTitle": "Your rights",
+    "rights": "You have the right to access, rectify, erase, restrict or object to processing, and the right to data portability. You may also withdraw consent at any time.",
+    "cookiesTitle": "Use of cookies",
+    "cookies": "We use technical, analytics, and marketing cookies. You can manage your preferences through the cookie banner or the dedicated section.",
+    "managePreferences": "To manage your cookie preferences:",
+    "openCookieSettings": "Open cookie settings",
+    "cookieTables": {
+      "columns": {
+        "name": "Cookie Name",
+        "purpose": "Purpose",
+        "duration": "Duration",
+        "provider": "Provider"
+      },
+      "duration": {
+        "session": "Session",
+        "1year": "1 year",
+        "3months": "3 months",
+        "2years": "2 years"
+      },
+      "necessary": {
+        "title": "Necessary Cookies",
+        "description": "These cookies are essential for the website to function properly and cannot be switched off in our systems.",
+        "purpose": {
+          "session": "Maintains the user's session during navigation.",
+          "csrf": "Protects against CSRF attacks.",
+          "language": "Stores the user's selected language.",
+          "newsletter": "Stores the user's preference for newsletter subscription."
+        }
+      },
+      "advertising": {
+        "title": "Advertising Cookies",
+        "description": "These cookies are used to deliver advertisements more relevant to the user's interests.",
+        "purpose": {
+          "facebook": "Used by Facebook to deliver a series of advertisement products.",
+          "analytics": "Used by Google Analytics to distinguish users.",
+          "googleAds": "Used by Google Ads to re-engage visitors.",
+          "sentry": "Used for monitoring and diagnosing user experience errors.",
+          "googlePay": "Used to manage and track payments made through Google Pay.",
+          "applePay": "Used to manage and track payments made through Apple Pay."
+        }
+        }
+      }
+    }
+  }
 }

@@ -292,24 +292,62 @@
     "personalizationTitle": "Esperienza personalizzata",
     "personalizationDescription": "Questi cookie permettono al sito di ricordare scelte che fai (come la lingua o la regione) e offrono funzionalità avanzate e personalizzate. Includono strumenti di tracciamento lato client come Sentry per il monitoraggio dell’esperienza utente."
   },
-  "privacyPolicy.title": "Informativa sulla Privacy",
-  "privacyPolicy.intro": "La presente informativa descrive come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali in conformità al Regolamento Generale sulla Protezione dei Dati (GDPR - Regolamento UE 2016/679).",
-  "privacyPolicy.controllerTitle": "Titolare del Trattamento",
-  "privacyPolicy.controller": "Il titolare del trattamento è Bottega di Sguardi Srl, con sede legale in Via di Parione, 54/R\n50123 Firenze (FI), Italia. Email: info@bottegadisguardi.com",
-  "privacyPolicy.dataCollectedTitle": "Dati personali raccolti",
-  "privacyPolicy.dataCollected": "Raccogliamo dati come nome, email, indirizzo IP, dati di navigazione, preferenze di acquisto, ed eventuali informazioni fornite durante l’acquisto o la registrazione. Alcuni dati sono raccolti tramite cookie, strumenti di analisi e tag di marketing.",
-  "privacyPolicy.purposeTitle": "Finalità del trattamento",
-  "privacyPolicy.purpose": "I tuoi dati vengono utilizzati per: completare ordini, fornire assistenza clienti, analisi statistiche (Google Analytics, Facebook Pixel), pubblicità personalizzata (Google Ads, Facebook), rilevazione errori (Sentry), sicurezza e miglioramento della tua esperienza.",
-  "privacyPolicy.legalBasisTitle": "Base giuridica del trattamento",
-  "privacyPolicy.legalBasis": "Il trattamento dei dati si basa sul consenso (art. 6.1.a GDPR), sull'esecuzione di un contratto (art. 6.1.b), sull’adempimento di obblighi legali (art. 6.1.c) e sul legittimo interesse del titolare (art. 6.1.f).",
-  "privacyPolicy.dataSharingTitle": "Destinatari dei dati",
-  "privacyPolicy.dataSharing": "I tuoi dati possono essere condivisi con fornitori di servizi esterni, come processori di pagamento (es. PayPal), servizi di analisi (Google, Meta), e piattaforme pubblicitarie, nel rispetto delle normative di protezione dei dati.",
-  "privacyPolicy.retentionTitle": "Periodo di conservazione",
-  "privacyPolicy.retention": "I tuoi dati saranno conservati per il tempo necessario a raggiungere le finalità per cui sono stati raccolti, nel rispetto degli obblighi di legge.",
-  "privacyPolicy.rightsTitle": "I tuoi diritti",
-  "privacyPolicy.rights": "Hai diritto di accedere, rettificare, cancellare, limitare o opporti al trattamento, oltre al diritto alla portabilità dei dati. Puoi anche revocare il consenso in qualsiasi momento.",
-  "privacyPolicy.cookiesTitle": "Uso dei cookie",
-  "privacyPolicy.cookies": "Utilizziamo cookie tecnici, analitici e di marketing. Puoi gestire le tue preferenze attraverso il banner dei cookie o la sezione dedicata.",
-  "privacyPolicy.managePreferences": "Per modificare le tue preferenze sui cookie:",
-  "privacyPolicy.openCookieSettings": "Apri impostazioni cookie"
+  "privacyPolicy": {
+    "title": "Informativa sulla Privacy",
+    "intro": "La presente informativa descrive come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali in conformità al Regolamento Generale sulla Protezione dei Dati (GDPR - Regolamento UE 2016/679).",
+    "controllerTitle": "Titolare del Trattamento",
+    "controller": "Il titolare del trattamento è Bottega di Sguardi Srl, con sede legale in Via di Parione, 54/R\n50123 Firenze (FI), Italia. Email: info@bottegadisguardi.com",
+    "dataCollectedTitle": "Dati personali raccolti",
+    "dataCollected": "Raccogliamo dati come nome, email, indirizzo IP, dati di navigazione, preferenze di acquisto, ed eventuali informazioni fornite durante l’acquisto o la registrazione. Alcuni dati sono raccolti tramite cookie, strumenti di analisi e tag di marketing.",
+    "purposeTitle": "Finalità del trattamento",
+    "purpose": "I tuoi dati vengono utilizzati per: completare ordini, fornire assistenza clienti, analisi statistiche (Google Analytics, Facebook Pixel), pubblicità personalizzata (Google Ads, Facebook), rilevazione errori (Sentry), sicurezza e miglioramento della tua esperienza.",
+    "legalBasisTitle": "Base giuridica del trattamento",
+    "legalBasis": "Il trattamento dei dati si basa sul consenso (art. 6.1.a GDPR), sull'esecuzione di un contratto (art. 6.1.b), sull’adempimento di obblighi legali (art. 6.1.c) e sul legittimo interesse del titolare (art. 6.1.f).",
+    "dataSharingTitle": "Destinatari dei dati",
+    "dataSharing": "I tuoi dati possono essere condivisi con fornitori di servizi esterni, come processori di pagamento (es. PayPal), servizi di analisi (Google, Meta), e piattaforme pubblicitarie, nel rispetto delle normative di protezione dei dati.",
+    "retentionTitle": "Periodo di conservazione",
+    "retention": "I tuoi dati saranno conservati per il tempo necessario a raggiungere le finalità per cui sono stati raccolti, nel rispetto degli obblighi di legge.",
+    "rightsTitle": "I tuoi diritti",
+    "rights": "Hai diritto di accedere, rettificare, cancellare, limitare o opporti al trattamento, oltre al diritto alla portabilità dei dati. Puoi anche revocare il consenso in qualsiasi momento.",
+    "cookiesTitle": "Uso dei cookie",
+    "cookies": "Utilizziamo cookie tecnici, analitici e di marketing. Puoi gestire le tue preferenze attraverso il banner dei cookie o la sezione dedicata.",
+    "managePreferences": "Per modificare le tue preferenze sui cookie:",
+    "openCookieSettings": "Apri impostazioni cookie",
+    "cookieTables": {
+      "columns": {
+        "name": "Nome del cookie",
+        "purpose": "Finalità",
+        "duration": "Durata",
+        "provider": "Fornitore"
+      },
+      "duration": {
+        "session": "Sessione",
+        "1year": "1 anno",
+        "3months": "3 mesi",
+        "2years": "2 anni"
+      },
+      "necessary": {
+        "title": "Cookie Necessari",
+        "description": "Questi cookie sono essenziali per il corretto funzionamento del sito web e non possono essere disattivati nei nostri sistemi.",
+        "purpose": {
+          "session": "Mantiene attiva la sessione dell'utente durante la navigazione.",
+          "csrf": "Protegge contro attacchi CSRF.",
+          "language": "Memorizza la lingua selezionata dall'utente.",
+          "newsletter": "Memorizza la preferenza dell'utente per l'iscrizione alla newsletter."
+        }
+      },
+      "advertising": {
+        "title": "Cookie Pubblicitari",
+        "description": "Questi cookie sono utilizzati per fornire annunci pubblicitari più pertinenti agli interessi dell'utente.",
+        "purpose": {
+          "facebook": "Utilizzato da Facebook per fornire una serie di prodotti pubblicitari.",
+          "analytics": "Utilizzato da Google Analytics per distinguere gli utenti.",
+          "googleAds": "Utilizzato da Google Ads per reindirizzare i visitatori.",
+          "sentry": "Utilizzato per il monitoraggio e la diagnostica degli errori nell’esperienza utente.",
+          "googlePay": "Utilizzato per gestire e tracciare i pagamenti effettuati tramite Google Pay.",
+          "applePay": "Utilizzato per gestire e tracciare i pagamenti effettuati tramite Apple Pay."
+        }
+      }
+    }
+  }
 }
