@@ -8,7 +8,7 @@ import {ShippingData} from "../redux/layoutSlice";
 import {InvoiceData} from "../types/woocommerce";
 import GooglePayButton from "./GooglePayButton";
 import ApplePayButton from "./ApplePayButton";
-import {Box, Grid2 as Grid} from "@mui/material";
+import {Box} from "@mui/material";
 
 type GooglePayButtonProps = {
 	item?: AddItemToCartPayload;
@@ -27,6 +27,8 @@ export type PaymentButtonProps = {
 	customerNote?: string
 	invoice?: InvoiceData
 }
+
+const DISABLE_BUTTONS = process.env.NEXT_PUBLIC_DISABLE_APPLE_GOOGLE_PAY_PAYMENTS === "true";
 
 const AppleGooglePayButtons = ({item, hideApplePay, hideGooglePay, buttonWidth: width, ...props}: GooglePayButtonProps) => {
 	const { cart } = useSelector((state: RootState) => state.cart);
@@ -48,10 +50,10 @@ const AppleGooglePayButtons = ({item, hideApplePay, hideGooglePay, buttonWidth: 
 
 	return checkoutCart && (
 		<>
-			<Box sx={{width, display: hideGooglePay ? "none": "block"}}>
+			<Box sx={{width, display: (hideGooglePay || DISABLE_BUTTONS) ? "none": "block"}}>
 				<GooglePayButton cart={checkoutCart} askForShipping={!!item} {...props} />
 			</Box>
-			<Box sx={{width, display: hideApplePay ? "none": "block"}}>
+			<Box sx={{width, display: (hideApplePay || DISABLE_BUTTONS) ? "none": "block"}}>
 				<ApplePayButton cart={checkoutCart} askForShipping={!!item} {...props} />
 			</Box>
 		</>

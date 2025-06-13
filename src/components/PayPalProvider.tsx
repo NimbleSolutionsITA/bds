@@ -94,6 +94,8 @@ const LOCALES = {
 	en: "en_US"
 }
 
+console.log(PAYPAL_CLIENT_ID)
+
 const PayPalProvider = ({ children }: PayPalProviderProps) => {
 	const { locale } = useRouter()
 	return PAYPAL_CLIENT_ID ? (

@@ -46,7 +46,8 @@ export default function AppBar({leftMenu, rightMenu}: AppBarProps) {
                     <Image
                         src={logo}
                         alt="Logo Bottega di Sguardi"
-                        style={{ width: '80px', height: 'auto' }}
+                        width={80}
+                        height={80}
                     />
                 </IconButton>
                 <Box

@@ -77,16 +77,30 @@ export const getLayoutProps = async (locale: LOCALE) => {
 		ssrTranslations
 	}
 }
+
 export const getPageProps = async (slug: string, locale: LOCALE, parent?: number) => {
-	const page: WPPage = (await fetch(
-		`${ WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
-	)
-		.then(response => response.json()))[0]
-	if (!page) {
-		return {page: false as const, seo: null}
+	try {
+		const response = await fetch(
+			`${WORDPRESS_API_ENDPOINT}/pages?slug=${slug}&lang=${locale}${parent ? `&parent=${parent}`: ''}`
+		);
+
+		if (!response.ok) {
+			return {page: false as const, seo: null};
+		}
+
+		const data = await response.json();
+		const page: WPPage = data[0];
+
+		if (!page) {
+			return {page: false as const, seo: null};
+		}
+
+		const seo = page?.link ? await getSeo(page.link) : null;
+		return { page: mapPage(page), seo };
+	} catch (error) {
+		console.error('Error fetching page:', error);
+		return {page: false as const, seo: null};
 	}
-	const seo = page?.link ? await getSeo(page.link) : null
-	return { page: mapPage(page), seo }
 }
 
 export const getSeo = async (link: string) => {

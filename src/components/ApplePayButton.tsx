@@ -9,6 +9,7 @@ import {callCart, PaymentButtonProps} from "./AppleGooglePayButtons";
 import {destroyCart} from "../redux/cartSlice";
 import {useRouter} from "next/router";
 import useAuth from "../utils/useAuth";
+import * as Sentry from "@sentry/nextjs";
 
 const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, askForShipping}: PaymentButtonProps) => {
 	const { applePayConfig } = useSelector((state: RootState) => state.cart);
@@ -19,13 +20,17 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 	const countryCodes = shipping.countries.map(c => c.code);
 
 	const onClick = async () => {
+		Sentry.setTag("area", "checkout");
+		Sentry.setTag("step", "applepay_click");
 		if (!applePayConfig || !applePayConfig.isEligible || !window.paypal || !checkoutCart?.cart_key) {
 			console.error("Apple Pay or PayPal not available");
+			Sentry.captureMessage("Apple Pay or PayPal not available", { level: "error" });
 			return;
 		}
 		const cartKey = checkoutCart.cart_key;
 		const { Applepay } = window.paypal as PayPalWithApplePay;
 		if (!Applepay) {
+			Sentry.captureMessage("Apple Pay not available", { level: "error" });
 			console.error("Apple Pay not available");
 			return;
 		}
@@ -33,12 +38,14 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 
 		if (!checkoutCart || parseFloat(checkoutCart.totals.total.toString()) === 0) {
 			console.error("No cart returned from CoCart");
+			Sentry.captureMessage("Empty cart at Apple Pay", { level: "error" });
 			return
 		}
 		const paymentRequest: ApplePayJS.ApplePayPaymentRequest = generatePaymentRequest(applePayConfig, checkoutCart, shipping, askForShipping);
 		let session = new window.ApplePaySession(4, paymentRequest) as ApplePaySession;
 
 		session.onvalidatemerchant = (event) => {
+			Sentry.setTag("step", "applepay_validate_merchant");
 			applepay
 				.validateMerchant({
 					validationUrl: event.validationURL,
@@ -48,6 +55,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 				})
 				.catch((err: any) => {
 					console.error(err);
+					Sentry.captureException(err);
 					session.abort();
 				});
 		};
@@ -56,6 +64,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 			session.onshippingcontactselected = async (event) => {
 				if (!event.shippingContact.countryCode || !countryCodes.includes(event.shippingContact.countryCode)) {
 					const countryError = new ApplePayError("shippingContactInvalid", "countryCode", "Shipping to the selected country is not available.");
+					Sentry.captureMessage("Shipping country not supported", { level: "warning" });
 
 					session.completeShippingContactSelection({
 						errors: [countryError],
@@ -64,57 +73,71 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 						newLineItems: [],
 					});
 				} else {
-					const cart = await callCart(cartKey, '/v2/cart/update', "POST", { namespace: "update-customer"}, {
-						first_name: event.shippingContact.givenName,
-						last_name: event.shippingContact.familyName,
-						state: event.shippingContact.administrativeArea,
-						postcode: event.shippingContact.postalCode,
-						country: event.shippingContact.countryCode,
-						city: event.shippingContact.locality,
-						s_first_name: event.shippingContact.givenName,
-						s_last_name: event.shippingContact.familyName,
-						s_state: event.shippingContact.administrativeArea,
-						s_postcode: event.shippingContact.postalCode,
-						s_country: event.shippingContact.countryCode,
-						s_city: event.shippingContact.locality,
+					try {
+						const cart = await callCart(cartKey, '/v2/cart/update', "POST", { namespace: "update-customer"}, {
+							first_name: event.shippingContact.givenName,
+							last_name: event.shippingContact.familyName,
+							state: event.shippingContact.administrativeArea,
+							postcode: event.shippingContact.postalCode,
+							country: event.shippingContact.countryCode,
+							city: event.shippingContact.locality,
+							s_first_name: event.shippingContact.givenName,
+							s_last_name: event.shippingContact.familyName,
+							s_state: event.shippingContact.administrativeArea,
+							s_postcode: event.shippingContact.postalCode,
+							s_country: event.shippingContact.countryCode,
+							s_city: event.shippingContact.locality,
+						})
+						if (!cart.shipping?.packages.default.rates) {
+							console.error("No shipping rates returned from CoCart");
+							Sentry.captureMessage("No shipping rates from CoCart", { level: "error" });
+							session.abort()
+							return
+						}
+
+						session.completeShippingContactSelection({
+							newShippingMethods: mapShippingMethods(cart.shipping),
+							newLineItems: getLineItems(cart),
+							newTotal: {
+								label: "Bottega di Sguardi",
+								amount: getCartTotals(cart).total.toString(),
+							},
+						})
+					}
+					catch (error) {
+						Sentry.captureException(error);
+						session.abort();
+					}
+				}
+			}
+
+			session.onshippingmethodselected = async (event) => {
+				try {
+					await callCart(cartKey, '/v1/shipping-methods', "POST", undefined, {
+						key: event.shippingMethod.identifier
 					})
-					if (!cart.shipping?.packages.default.rates) {
-						console.error("No shipping rates returned from CoCart");
+					const cart = await callCart(cartKey)
+					if (!cart.totals?.total) {
+						Sentry.captureMessage("Missing cart total after shipping method selection", { level: "error" });
+						console.error("No total returned from CoCart");
 						session.abort()
 						return
 					}
-
-					session.completeShippingContactSelection({
-						newShippingMethods: mapShippingMethods(cart.shipping),
-						newLineItems: getLineItems(cart),
+					session.completeShippingMethodSelection({
 						newTotal: {
 							label: "Bottega di Sguardi",
 							amount: getCartTotals(cart).total.toString(),
 						},
 					})
-				}
-			}
-
-			session.onshippingmethodselected = async (event) => {
-				await callCart(cartKey, '/v1/shipping-methods', "POST", undefined, {
-					key: event.shippingMethod.identifier
-				})
-				const cart = await callCart(cartKey)
-				if (!cart.totals?.total) {
-					console.error("No total returned from CoCart");
+				} catch (error) {
+					Sentry.captureException(error);
 					session.abort()
-					return
 				}
-				session.completeShippingMethodSelection({
-					newTotal: {
-						label: "Bottega di Sguardi",
-						amount: getCartTotals(cart).total.toString(),
-					},
-				})
 			}
 		}
 
 		session.onpaymentauthorized = async (event) => {
+			Sentry.setTag("step", "applepay_authorize");
 			try {
 				const cart = askForShipping ? await callCart(cartKey, '/v2/cart', "GET") : checkoutCart
 				/* Create Order on the Server Side */
@@ -175,6 +198,13 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 				}
 			} catch (err) {
 				console.error(err);
+				Sentry.setContext("checkout", {
+					userId: user?.user_id,
+					invoice,
+					customerNote,
+					cartKey,
+				});
+				Sentry.captureException(err);
 				session.completePayment({
 					status: window.ApplePaySession.STATUS_FAILURE,
 				});
@@ -182,6 +212,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 		};
 
 		session.oncancel  = () => {
+			Sentry.captureMessage("Apple Pay Cancelled", { level: "info" });
 			console.error("Apple Pay Cancelled !!")
 		}
 

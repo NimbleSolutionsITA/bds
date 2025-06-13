@@ -6,10 +6,14 @@ import ReadMoreText from "./ReadMoreText";
 
 type DesignerTopProps = {
 	name: string
+	brand?: string
 	gallery: string[]
 	description: string
 }
-const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
+const CategoryTop = ({name, brand, description}: DesignerTopProps) => {
+	const title = brand
+		? brand + " - " + name
+		: name;
 	return (
 		<Grid container sx={{flexDirection: {xs: 'column-reverse', md: 'row'}}}>
 			<Grid size={{xs: 12, md: 12}} sx={{alignItems: 'center', display: 'flex'}}>
@@ -18,7 +22,7 @@ const CategoryTop = ({name, gallery, description}: DesignerTopProps) => {
 						variant="h1"
 						className="title"
 						sx={{width: '100%'}}
-						dangerouslySetInnerHTML={{__html: sanitize(name)}}
+						dangerouslySetInnerHTML={{__html: sanitize(title)}}
 					/>
 					<ReadMoreText text={description}/>
 				</div>

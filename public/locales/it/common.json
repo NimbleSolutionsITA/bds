@@ -274,5 +274,80 @@
     "failed": "Fallito",
     "on-hold": "In attesa",
     "pending": "In sospeso"
+  },
+  "consent": {
+    "title": "Gestisci le tue preferenze sui cookie",
+    "description": "Utilizziamo i cookie per migliorare la tua esperienza, offrire contenuti personalizzati, analizzare il traffico e fornire pubblicità mirata. Puoi gestire le tue preferenze o accettare tutti i cookie.",
+    "acceptAll": "Accetta tutti",
+    "saveSettings": "Salva impostazioni",
+    "manageTitle": "Gestione dei consensi",
+    "functionalTitle": "Cookie funzionali (necessari)",
+    "functionalDescription": "Questi cookie sono essenziali per il corretto funzionamento del sito e non possono essere disattivati nei nostri sistemi. Vengono solitamente impostati solo in risposta ad azioni da te compiute, come l'impostazione delle preferenze sulla privacy, l'accesso o la compilazione di moduli. Inclusi: PayPal Checkout, CMS WordPress, sicurezza e bilanciamento del carico.",
+    "adUserDataTitle": "Dati dell’utente per finalità pubblicitarie",
+    "adUserDataDescription": "Consente la raccolta e la condivisione dei dati con fornitori pubblicitari per la misurazione delle performance e la pubblicazione di annunci. Tecnologie coinvolte: Google Ads, Facebook Pixel, Google Merchant Center.",
+    "adPersonalizationTitle": "Personalizzazione degli annunci",
+    "adPersonalizationDescription": "Permette la personalizzazione degli annunci in base ai tuoi interessi e alla tua attività di navigazione. Questo include il remarketing e la creazione di audience simili tramite Google Ads e Facebook Ads.",
+    "analyticsTitle": "Misurazione e analisi",
+    "analyticsDescription": "Questi cookie ci aiutano a capire come i visitatori interagiscono con il sito web, raccogliendo e riportando informazioni in forma anonima. Tecnologie utilizzate: Google Analytics, Facebook Pixel, Google Tag Manager.",
+    "personalizationTitle": "Esperienza personalizzata",
+    "personalizationDescription": "Questi cookie permettono al sito di ricordare scelte che fai (come la lingua o la regione) e offrono funzionalità avanzate e personalizzate. Includono strumenti di tracciamento lato client come Sentry per il monitoraggio dell’esperienza utente."
+  },
+  "privacyPolicy": {
+    "title": "Informativa sulla Privacy",
+    "intro": "La presente informativa descrive come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali in conformità al Regolamento Generale sulla Protezione dei Dati (GDPR - Regolamento UE 2016/679).",
+    "controllerTitle": "Titolare del Trattamento",
+    "controller": "Il titolare del trattamento è Bottega di Sguardi Srl, con sede legale in Via di Parione, 54/R\n50123 Firenze (FI), Italia. Email: info@bottegadisguardi.com",
+    "dataCollectedTitle": "Dati personali raccolti",
+    "dataCollected": "Raccogliamo dati come nome, email, indirizzo IP, dati di navigazione, preferenze di acquisto, ed eventuali informazioni fornite durante l’acquisto o la registrazione. Alcuni dati sono raccolti tramite cookie, strumenti di analisi e tag di marketing.",
+    "purposeTitle": "Finalità del trattamento",
+    "purpose": "I tuoi dati vengono utilizzati per: completare ordini, fornire assistenza clienti, analisi statistiche (Google Analytics, Facebook Pixel), pubblicità personalizzata (Google Ads, Facebook), rilevazione errori (Sentry), sicurezza e miglioramento della tua esperienza.",
+    "legalBasisTitle": "Base giuridica del trattamento",
+    "legalBasis": "Il trattamento dei dati si basa sul consenso (art. 6.1.a GDPR), sull'esecuzione di un contratto (art. 6.1.b), sull’adempimento di obblighi legali (art. 6.1.c) e sul legittimo interesse del titolare (art. 6.1.f).",
+    "dataSharingTitle": "Destinatari dei dati",
+    "dataSharing": "I tuoi dati possono essere condivisi con fornitori di servizi esterni, come processori di pagamento (es. PayPal), servizi di analisi (Google, Meta), e piattaforme pubblicitarie, nel rispetto delle normative di protezione dei dati.",
+    "retentionTitle": "Periodo di conservazione",
+    "retention": "I tuoi dati saranno conservati per il tempo necessario a raggiungere le finalità per cui sono stati raccolti, nel rispetto degli obblighi di legge.",
+    "rightsTitle": "I tuoi diritti",
+    "rights": "Hai diritto di accedere, rettificare, cancellare, limitare o opporti al trattamento, oltre al diritto alla portabilità dei dati. Puoi anche revocare il consenso in qualsiasi momento.",
+    "cookiesTitle": "Uso dei cookie",
+    "cookies": "Utilizziamo cookie tecnici, analitici e di marketing. Puoi gestire le tue preferenze attraverso il banner dei cookie o la sezione dedicata.",
+    "managePreferences": "Per modificare le tue preferenze sui cookie:",
+    "openCookieSettings": "Apri impostazioni cookie",
+    "cookieTables": {
+      "columns": {
+        "name": "Nome del cookie",
+        "purpose": "Finalità",
+        "duration": "Durata",
+        "provider": "Fornitore"
+      },
+      "duration": {
+        "session": "Sessione",
+        "1year": "1 anno",
+        "3months": "3 mesi",
+        "2years": "2 anni"
+      },
+      "necessary": {
+        "title": "Cookie Necessari",
+        "description": "Questi cookie sono essenziali per il corretto funzionamento del sito web e non possono essere disattivati nei nostri sistemi.",
+        "purpose": {
+          "session": "Mantiene attiva la sessione dell'utente durante la navigazione.",
+          "csrf": "Protegge contro attacchi CSRF.",
+          "language": "Memorizza la lingua selezionata dall'utente.",
+          "newsletter": "Memorizza la preferenza dell'utente per l'iscrizione alla newsletter."
+        }
+      },
+      "advertising": {
+        "title": "Cookie Pubblicitari",
+        "description": "Questi cookie sono utilizzati per fornire annunci pubblicitari più pertinenti agli interessi dell'utente.",
+        "purpose": {
+          "facebook": "Utilizzato da Facebook per fornire una serie di prodotti pubblicitari.",
+          "analytics": "Utilizzato da Google Analytics per distinguere gli utenti.",
+          "googleAds": "Utilizzato da Google Ads per reindirizzare i visitatori.",
+          "sentry": "Utilizzato per il monitoraggio e la diagnostica degli errori nell’esperienza utente.",
+          "googlePay": "Utilizzato per gestire e tracciare i pagamenti effettuati tramite Google Pay.",
+          "applePay": "Utilizzato per gestire e tracciare i pagamenti effettuati tramite Apple Pay."
+        }
+      }
+    }
   }
 }

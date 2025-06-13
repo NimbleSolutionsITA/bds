@@ -11,14 +11,17 @@ import PayPal from "../../icons/payments/PayPal";
 import CreditCard from "../../icons/payments/CreditCard";
 import usePayPalCheckout from "../../components/PayPalCheckoutProvider";
 
+
+const DISABLE_BUTTONS = process.env.NEXT_PUBLIC_DISABLE_APPLE_GOOGLE_PAY_PAYMENTS === "true";
+
 const PayPalCheckout = () => {
 	const { applePayConfig, googlePayConfig } = useSelector((state: RootState) => state.cart);
 	const { t } = useTranslation();
 	const {  control, watch } = useFormContext<FormFields>();
 	const {isPaying} = usePayPalCheckout()
 	const availablePaymentMethods = PAYMENT_METHODS.filter(m => {
-		if (m === 'applepay' && (!applePayConfig?.isEligible || !window.ApplePaySession)) return false;
-		return !(m === 'googlepay' && !googlePayConfig?.isEligible);
+		if (m === 'applepay' && (!applePayConfig?.isEligible || !window.ApplePaySession || DISABLE_BUTTONS)) return false;
+		return !(m === 'googlepay' && (!googlePayConfig?.isEligible || DISABLE_BUTTONS))
 	})
 	const { paymentMethod } = watch()
 	return (

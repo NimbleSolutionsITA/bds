@@ -4,6 +4,7 @@ import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
 import {getIsEU} from "../../../src/utils/utils";
 import {Cart, Item} from "../../../src/types/cart-type";
 import {WooOrder} from "../../../src/types/woocommerce";
+import * as Sentry from "@sentry/nextjs";
 
 const base = process.env.PAYPAL_API_URL;
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
@@ -30,6 +31,7 @@ export default async function handler(
 	const responseData: CreateOrderResponse = {
 		success: false,
 	}
+	let orderPayload = {}
 	try {
 		if (req.method === 'POST') {
 			const { cart, invoice = null, customerNote = "", customerId = 0, paymentMethod } = req.body
@@ -41,7 +43,7 @@ export default async function handler(
 			if (cartAmount === 0) {
 				throw new Error('Cart amount is 0')
 			}
-			const orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
+			orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
 			const { data: order } = await api.post("orders", orderPayload)
 			responseData.wooId = order.id
 			const amount = Number(order.total)
@@ -58,6 +60,14 @@ export default async function handler(
 		}
 	} catch (error) {
 		console.error(error)
+		Sentry.setTag("area", "checkout");
+		Sentry.setTag("step", "create_order");
+		Sentry.setContext("paypal_create", {
+			orderPayload,
+			body: req.body,
+			responseData
+		});
+		Sentry.captureException(error);
 		responseData.success = false
 		if (typeof error === "string") {
 			responseData.error = error

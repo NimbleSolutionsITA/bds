@@ -7,6 +7,7 @@ import {AppDispatch} from "../redux/store";
 import axios from "axios";
 import {WORDPRESS_SITE_URL} from "./endpoints";
 import {closeLogInDrawer} from "../redux/layoutSlice";
+import * as Sentry from "@sentry/nextjs";
 
 export interface User {
 	user_id: string;
@@ -224,6 +225,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			}
 		}
 	}, [logIn, loginChecked]);
+
+	useEffect(() => {
+		if (user?.user_id) {
+			Sentry.setUser({
+				id: user.user_id,
+				email: user.email,
+				username: user.display_name,
+			});
+		} else {
+			Sentry.setUser(null);
+		}
+	}, [user]);
 
 	const value = {
 		loggedIn,

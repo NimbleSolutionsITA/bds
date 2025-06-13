@@ -16,6 +16,7 @@ import {useRouter} from "next/router";
 import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/utils";
 import TotalPriceStatus = google.payments.api.TotalPriceStatus;
 import useAuth from "../utils/useAuth";
+import * as Sentry from "@sentry/nextjs";
 
 const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}: PaymentButtonProps) => {
 	const { googlePayConfig } = useSelector((state: RootState) => state.cart);
@@ -27,6 +28,8 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 	const router = useRouter();
 
 	const processPayment = useCallback(async (paymentData: PaymentData) => {
+		Sentry.setTag("area", "checkout");
+		Sentry.setTag("step", "googlepay_process_payment");
 		try {
 			if (!paypal.Googlepay) {
 				throw new Error("Google Pay not available");
@@ -55,6 +58,8 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				paymentMethodData: paymentData.paymentMethodData,
 			});
 
+			Sentry.setTag("step", "googlepay_confirm_order");
+
 			if (status === "APPROVED") {
 				/* Capture the Order */
 				const response = await fetch(`/api/orders/${id}/capture`, {
@@ -65,6 +70,13 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				});
 
 				if (!response.ok) {
+					Sentry.setContext("checkout", {
+						userId: user?.user_id,
+						invoice,
+						customerNote,
+						cartKey,
+					});
+					Sentry.captureException(`Server error: ${response.statusText}`);
 					return {
 						transactionState: "ERROR",
 						error: {
@@ -76,6 +88,13 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				const orderData = await response.json();
 
 				if (!orderData.success) {
+					Sentry.setContext("checkout", {
+						userId: user?.user_id,
+						invoice,
+						customerNote,
+						cartKey,
+					});
+					Sentry.captureException(`Server error: ${response.statusText}`);
 					return {
 						transactionState: "ERROR",
 						error: {
@@ -92,9 +111,23 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				router.push('/checkout/completed')
 				return {transactionState: "SUCCESS"};
 			} else {
+				Sentry.setContext("checkout", {
+					userId: user?.user_id,
+					invoice,
+					customerNote,
+					cartKey,
+				});
+				Sentry.captureException(`Status error: ${status}`);
 				return {transactionState: "ERROR"};
 			}
 		} catch (err: any) {
+			Sentry.setContext("checkout", {
+				userId: user?.user_id,
+				invoice,
+				customerNote,
+				cartKey,
+			});
+			Sentry.captureException(err);
 			return {
 				transactionState: "ERROR",
 				error: {
@@ -119,6 +152,8 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				}
 			}
 			return new Promise(function (resolve, reject) {
+				Sentry.setTag("area", "checkout");
+				Sentry.setTag("step", "googlepay_onPaymentDataChanged");
 				if (askForShipping) {
 					if (["INITIALIZE", "SHIPPING_ADDRESS"].includes(paymentData.callbackTrigger)) {
 						callCart(cartKey, '/v2/cart/update', "POST", { namespace: "update-customer"}, {
@@ -133,7 +168,16 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 						}).then(() => {
 							getResponse().then((data) => {
 								resolve(data)
-							}).catch(reject)
+							}).catch(error => {
+								Sentry.setContext("checkout", {
+									userId: user?.user_id,
+									invoice,
+									customerNote,
+									cartKey,
+								});
+								Sentry.captureException(error);
+								reject(error)
+							})
 						})
 					}
 					else if (paymentData.callbackTrigger === "SHIPPING_OPTION") {
@@ -142,7 +186,16 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 						}).then(() => {
 							getResponse().then((data) => {
 								resolve(data)
-							}).catch(reject)
+							}).catch(error => {
+								Sentry.setContext("checkout", {
+									userId: user?.user_id,
+									invoice,
+									customerNote,
+									cartKey,
+								});
+								Sentry.captureException(error);
+								reject(error)
+							})
 						})
 					}
 				}
@@ -153,11 +206,20 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 		}
 		function onPaymentAuthorized(paymentData: PaymentData): Promise<PaymentAuthorizationResult> {
 			return new Promise(function (resolve, reject) {
+				Sentry.setTag("area", "checkout");
+				Sentry.setTag("step", "googlepay_onPaymentAuthorized");
 				processPayment(paymentData)
 					.then(function (data) {
 						resolve({ transactionState: "SUCCESS" });
 					})
 					.catch(function (errDetails) {
+						Sentry.setContext("checkout", {
+							userId: user?.user_id,
+							invoice,
+							customerNote,
+							cartKey,
+						});
+						Sentry.captureException(errDetails);
 						resolve({ transactionState: "ERROR" });
 					});
 			});
@@ -220,6 +282,15 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				}
 			})
 			.catch(function (err) {
+				Sentry.setTag("area", "checkout");
+				Sentry.setTag("step", "googlepay_addButton");
+				Sentry.setContext("checkout", {
+					userId: user?.user_id,
+					invoice,
+					customerNote,
+					cartKey,
+				});
+				Sentry.captureException(err);
 				console.error(err);
 			});
 

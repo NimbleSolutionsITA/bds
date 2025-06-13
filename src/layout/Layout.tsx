@@ -10,20 +10,19 @@ import {useMediaQuery, useTheme} from "@mui/material";
 import Head from "next/head";
 import parse from "html-react-parser";
 import InStockNotifierDrawer from "./drawers/InStockNotifierDrawer";
-import CookiesDrawer from "./drawers/CookiesDrawer";
 import {openNewsletterDrawer} from "../redux/layoutSlice";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
 import SearchModal from "./drawers/SearchModal";
 import {AppDispatch, RootState} from "../redux/store";
-import GoogleAnalytics from "../components/GoogleAnalytics";
 import SignUpDrawer from "./drawers/SignUpDrawer";
 import LogInDrawer from "./drawers/LogInDrawer";
 import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
 import CartErrorModal from "./cart/CartErrorModal";
 import Loading from "../components/Loading";
 import WhatsAppButton from "../components/WhatsAppButton";
+import GoogleAnalytics from "./Analytics/GoogleAnalytics";
 
 type LayoutProps = {
     children: React.ReactNode,
@@ -40,15 +39,14 @@ export default function Layout({children, layout: {
     const theme = useTheme();
     const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
     const { cart} = useSelector((state: RootState) => state.cart);
-    const { cookiesDrawerOpen, newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
+    const { cookiesModalOpen, newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
 
     useEffect(() => {
-        const cookiesSeen = Cookies.get('is_cookies_seen');
         const newsletterSeen = Cookies.get('is_newsletter_seen');
-        if (cookiesSeen && !cookiesDrawerOpen && !newsletterDrawerOpen && !newsletterSeen) {
+        if (!cookiesModalOpen && !newsletterDrawerOpen && !newsletterSeen) {
             dispatch(openNewsletterDrawer());
         }
-    }, [cookiesDrawerOpen])
+    }, [cookiesModalOpen, dispatch, newsletterDrawerOpen])
 
     return (
         <>
@@ -56,6 +54,7 @@ export default function Layout({children, layout: {
                  Set HTML language attribute
                 <meta httpEquiv="content-language" content={locale} />
                 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+                <meta name="google-site-verification" content="naCuv5Smbv41i9JsZ1jkeY1XjWAH7_68WlvqcyDuxUI" />
                 {seo && parse(seo)}
             </Head>
 
@@ -67,7 +66,6 @@ export default function Layout({children, layout: {
                 <ShippingBannerMobile />
             </>)}
             <WhatsAppButton />
-            <CookiesDrawer />
             <InStockNotifierDrawer />
             <NewsletterDrawer />
             <LogInDrawer />

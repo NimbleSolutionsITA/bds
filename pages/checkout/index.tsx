@@ -1,11 +1,10 @@
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment, useEffect} from "react";
 import {getCheckoutPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {Backdrop, CircularProgress} from "@mui/material";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../../src/redux/store";
 import Head from "next/head";
-import GoogleAnalytics from "../../src/components/GoogleAnalytics";
 import {useRouter} from "next/router";
 import LogInDrawer from "../../src/layout/drawers/LogInDrawer";
 import useAuth from "../../src/utils/useAuth";
@@ -14,6 +13,7 @@ import CartErrorModal from "../../src/layout/cart/CartErrorModal";
 import PayPalProvider from "../../src/components/PayPalProvider";
 import {initCart} from "../../src/redux/cartSlice";
 import {LOCALE} from "../../src/utils/utils";
+import GoogleAnalytics from "../../src/layout/Analytics/GoogleAnalytics";
 
 const CheckoutGrid = dynamic(() => import("../../src/pages/checkout/CheckoutGrid"));
 
@@ -25,7 +25,8 @@ export default function Index({
      shipping
 }: CheckoutProps) {
 	const { loginChecked, loggedIn } = useAuth()
-	const { cart: { cart, initLoading }, layout: { logInDrawerOpen } } = useSelector((state: RootState) => state);
+	const { cart, initLoading } = useSelector((state: RootState) => state.cart);
+	const logInDrawerOpen = useSelector((state: RootState) => state.layout.logInDrawerOpen);
 	const dispatch = useDispatch<AppDispatch>()
 	const {locale} = useRouter()
 	const router = useRouter();
