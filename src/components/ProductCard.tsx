@@ -75,6 +75,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                         onError={() => setCurrentImage(placeholder.src)}
                         placeholder="blur"
                         blurDataURL={blur.blurDataURL}
+                        sizes="(max-width: 640px) 100vw, 410px"
                     />
                 </Box>
             </Link>

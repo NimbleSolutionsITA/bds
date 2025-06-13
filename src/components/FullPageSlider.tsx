@@ -55,6 +55,7 @@ const FullPageSlider = ({images, disableFullPage}: {images: string[], disableFul
 						alt="Bottega di Sguardi home slider image"
 						fill
 						style={{objectFit: 'cover', objectPosition: 'center center'}}
+						sizes="100vw"
 					/>
 				</Box>
 			))}
