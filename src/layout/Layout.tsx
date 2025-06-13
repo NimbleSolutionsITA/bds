@@ -54,6 +54,7 @@ export default function Layout({children, layout: {
                  Set HTML language attribute
                 <meta httpEquiv="content-language" content={locale} />
                 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+                <meta name="google-site-verification" content="E0nlVF4jMJ5GQVkfAujm0MXJIJPRflJpCowlUQbOhFw" />
                 {seo && parse(seo)}
             </Head>
 

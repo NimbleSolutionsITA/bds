@@ -177,7 +177,7 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 				<Grid component="div" size={{xs: 12, md: isEyewear ? 5 : 7, lg: isEyewear ? 5 : 8, xl: isEyewear ? 5 : 9}}>
 					<Typography
 						variant="h1"
-						dangerouslySetInnerHTML={{__html: sanitize(product.name)}}
+						dangerouslySetInnerHTML={{__html: sanitize(`${category ? category.name + ' - ' : ''} ${product.name}`)}}
 						sx={{
 							fontFamily: 'Ogg Roman',
 							fontSize: '50px',
