@@ -2,7 +2,6 @@ import React, {useEffect} from "react";
 import NavBar from "./nav/NavBar";
 import NavBarMobile from "./nav/mobile/NavBarMobile";
 import {BaseLayoutProps} from "../types/settings";
-import Footer from "./footer/Footer";
 import {useDispatch, useSelector} from "react-redux";
 import CartDrawer from "./cart/CartDrawer";
 import NewsletterDrawer from "./drawers/NewsletterDrawer";
@@ -14,21 +13,22 @@ import {openNewsletterDrawer} from "../redux/layoutSlice";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
-import SearchModal from "./drawers/SearchModal";
 import {AppDispatch, RootState} from "../redux/store";
 import SignUpDrawer from "./drawers/SignUpDrawer";
 import LogInDrawer from "./drawers/LogInDrawer";
 import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
 import CartErrorModal from "./cart/CartErrorModal";
-import Loading from "../components/Loading";
 import WhatsAppButton from "../components/WhatsAppButton";
 import GoogleAnalytics from "./Analytics/GoogleAnalytics";
+import dynamic from "next/dynamic";
 
 type LayoutProps = {
     children: React.ReactNode,
     layout: BaseLayoutProps
 }
 
+const SearchModal = dynamic(() => import("./drawers/SearchModal"), { ssr: false })
+const Footer = dynamic(() => import("./footer/Footer"), { ssr: false })
 
 
 export default function Layout({children, layout: {
@@ -38,7 +38,6 @@ export default function Layout({children, layout: {
     const dispatch = useDispatch<AppDispatch>()
     const theme = useTheme();
     const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
-    const { cart} = useSelector((state: RootState) => state.cart);
     const { cookiesModalOpen, newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
 
     useEffect(() => {
@@ -74,7 +73,7 @@ export default function Layout({children, layout: {
             <CartDrawer shipping={shipping} categories={categories} />
             <CartErrorModal />
             <SearchModal categories={categories} />
-            {cart ? children : <Loading />}
+            {children}
             <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={menus.mobile} />
         </>
     )

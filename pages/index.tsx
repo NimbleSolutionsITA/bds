@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
 import {getPageProps, getPosts, mapAcfImage} from "../src/utils/wordpress_api";
@@ -10,12 +10,12 @@ import ArticlesRow from "../src/components/ArticlesRow";
 import {Container} from "@mui/material";
 
 const Hero = dynamic(() => import("../src/pages/home/Hero"), { ssr: true });
-const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsSlider"), { ssr: true });
 
-const BannerShop = dynamic(() => import("../src/pages/home/BannerShop"));
-const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"));
-const BannerFragrances = dynamic(() => import("../src/pages/home/BannerFragrances"));
-const OurProductionBanner = dynamic(() => import("../src/pages/home/OurProductionBanner"));
+const HomeProductsSlider = dynamic(() => import("../src/pages/home/HomeProductsSlider"), { ssr: false });
+const BannerShop = dynamic(() => import("../src/pages/home/BannerShop"), { ssr: false });
+const BannerShipping = dynamic(() => import("../src/pages/home/BannerShipping"), { ssr: false });
+const BannerFragrances = dynamic(() => import("../src/pages/home/BannerFragrances"), { ssr: false });
+const OurProductionBanner = dynamic(() => import("../src/pages/home/OurProductionBanner"), { ssr: false });
 
 export type ProdSelection = {
     isActive: boolean
@@ -83,19 +83,26 @@ export type HomeProps = PageBaseProps & {
 }
 
 export default function Home({page, layout}: HomeProps) {
+    const [showRest, setShowRest] = useState(false);
+
     return (
-      <Layout layout={layout}>
-          <Hero {...page.hero} />
-          <HomeProductsSlider {...page.selectionTop} />
-          <BannerShop {...page.shop} />
-          <OurProductionBanner {...page.ourProduction} />
-          <HomeProductsSlider {...page.selectionBottom} />
-          <BannerFragrances {...page.fragrances} />
-          <Container>
-              <ArticlesRow postsByCategory={page.postsByCategory[0]} />
-          </Container>
-          <BannerShipping shipping={page.shipping} />
-      </Layout>
+        <Layout layout={layout}>
+            <Hero {...page.hero} onLoadComplete={() => setShowRest(true)} />
+
+            {showRest && (
+                <>
+                    <HomeProductsSlider {...page.selectionTop} />
+                    <BannerShop {...page.shop} />
+                    <OurProductionBanner {...page.ourProduction} />
+                    <HomeProductsSlider {...page.selectionBottom} />
+                    <BannerFragrances {...page.fragrances} />
+                    <Container>
+                        <ArticlesRow postsByCategory={page.postsByCategory[0]} />
+                    </Container>
+                    <BannerShipping shipping={page.shipping} />
+                </>
+            )}
+        </Layout>
     );
 }
 

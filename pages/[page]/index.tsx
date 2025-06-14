@@ -10,9 +10,9 @@ import dynamic from "next/dynamic";
 import {FRAGRANCES_CATEGORY, getFragrancesCategories, LOCALE} from "../../src/utils/utils";
 import {cacheGetLayoutProps, cacheGetProductCategories} from "../../src/utils/cache";
 
-const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
-const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
-const FragrancesBottom = dynamic(() => import("../../src/components/CategoryBottom"))
+const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"), { ssr: true })
+const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"), { ssr: true })
+const FragrancesBottom = dynamic(() => import("../../src/components/CategoryBottom"), { ssr: false })
 
 export type GenericPageProps = PageBaseProps & {
     fragrancePage?: {
