@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Image from "next/image";
 import Carousel from "react-material-ui-carousel";
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useRef} from "react";
 
 type FullPageSliderProps = {
 	images: string[];
@@ -11,12 +11,21 @@ type FullPageSliderProps = {
 
 const FullPageSlider = ({ images, disableFullPage, onLoadComplete }: FullPageSliderProps) => {
 	const [loadedCount, setLoadedCount] = useState(0);
+	const imgRefs = useRef<HTMLImageElement[]>([]);
+
+	useEffect(() => {
+		// On mount, check if any images were already cached & complete
+		imgRefs.current.forEach(img => {
+			if (img?.complete) {
+				setLoadedCount(c => c + 1);
+			}
+		});
+	}, []);
 
 	useEffect(() => {
 		if (images.length === 0) {
 			onLoadComplete?.();
-		}
-		if (loadedCount === images.length) {
+		} else if (loadedCount >= images.length) {
 			onLoadComplete?.();
 		}
 	}, [loadedCount, images.length, onLoadComplete]);
@@ -57,7 +66,7 @@ const FullPageSlider = ({ images, disableFullPage, onLoadComplete }: FullPageSli
 			}}
 			IndicatorIcon={<div />}
 		>
-			{images.map((image) => (
+			{images.map((image, index) => (
 				<Box
 					key={image}
 					sx={{
@@ -75,6 +84,9 @@ const FullPageSlider = ({ images, disableFullPage, onLoadComplete }: FullPageSli
 						fill
 						style={{ objectFit: 'cover', objectPosition: 'center center' }}
 						sizes="100vw"
+						ref={(node) => {
+							if (node) imgRefs.current[index] = node;
+						}}
 						onLoad={() => setLoadedCount(c => c + 1)}
 					/>
 				</Box>

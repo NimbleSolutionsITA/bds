@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import dynamic from "next/dynamic";
 import Layout from "../src/layout/Layout";
 import {getPageProps, getPosts, mapAcfImage} from "../src/utils/wordpress_api";
@@ -83,20 +83,13 @@ export type HomeProps = PageBaseProps & {
 }
 
 export default function Home({page, layout}: HomeProps) {
-    const hasHeroLoadedRef = useRef(false);
-    const [heroReady, setHeroReady] = useState(hasHeroLoadedRef.current);
-
-    const handleHeroLoadComplete = () => {
-        hasHeroLoadedRef.current = true;
-        setHeroReady(true);
-    };
-
+    const [showRest, setShowRest] = useState(false);
 
     return (
         <Layout layout={layout}>
-            <Hero {...page.hero} onLoadComplete={handleHeroLoadComplete} />
+            <Hero {...page.hero} onLoadComplete={() => setShowRest(true)} />
 
-            {heroReady && (
+            {showRest && (
                 <>
                     <HomeProductsSlider {...page.selectionTop} />
                     <BannerShop {...page.shop} />
