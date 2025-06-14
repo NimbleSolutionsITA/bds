@@ -14,6 +14,7 @@ type LayoutState = {
 	logInDrawerOpen: boolean
 	signUpDrawerOpen: boolean
 	forgotPasswordDrawerOpen: boolean
+	consentReady: boolean
 	inStockNotifierDrawer: {
 		open: boolean
 		productId: number | null
@@ -37,6 +38,7 @@ const initialState: LayoutState = {
 	logInDrawerOpen: false,
 	signUpDrawerOpen: false,
 	forgotPasswordDrawerOpen: false,
+	consentReady: false,
 	inStockNotifierDrawer: {
 		open: false,
 		productId: null,
@@ -116,6 +118,9 @@ export const layoutSlice = createSlice({
 		setShippingData: (state, { payload }: PayloadAction<ShippingData>) => {
 			state.shipping = payload
 		},
+		setConsentReady: (state) => {
+			state.consentReady = true
+		}
 	},
 })
 
@@ -136,7 +141,8 @@ export const {
 	closeSignUpDrawer,
 	openForgotPasswordDrawer,
 	closeForgotPasswordDrawer,
-	setShippingData
+	setShippingData,
+	setConsentReady
 } = layoutSlice.actions
 
 export default layoutSlice.reducer

@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useRef} from "react";
 import NavBar from "./nav/NavBar";
 import NavBarMobile from "./nav/mobile/NavBarMobile";
 import {BaseLayoutProps} from "../types/settings";
@@ -9,7 +9,7 @@ import {useMediaQuery, useTheme} from "@mui/material";
 import Head from "next/head";
 import parse from "html-react-parser";
 import InStockNotifierDrawer from "./drawers/InStockNotifierDrawer";
-import {openNewsletterDrawer} from "../redux/layoutSlice";
+import {openNewsletterDrawer, setConsentReady} from "../redux/layoutSlice";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
@@ -19,7 +19,7 @@ import LogInDrawer from "./drawers/LogInDrawer";
 import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
 import CartErrorModal from "./cart/CartErrorModal";
 import WhatsAppButton from "../components/WhatsAppButton";
-import GoogleAnalytics from "./Analytics/GoogleAnalytics";
+import GoogleAnalytics, {COOKIE_CONSENT_NAME} from "./Analytics/GoogleAnalytics";
 import dynamic from "next/dynamic";
 
 type LayoutProps = {
@@ -38,14 +38,23 @@ export default function Layout({children, layout: {
     const dispatch = useDispatch<AppDispatch>()
     const theme = useTheme();
     const mdUp = useMediaQuery(() => theme.breakpoints.up('md'));
-    const { cookiesModalOpen, newsletterDrawerOpen } = useSelector((state: RootState) => state.layout);
+    const drawerTimeout = useRef<NodeJS.Timeout | null>(null);
+    const { cookiesModalOpen, newsletterDrawerOpen, consentReady } = useSelector((state: RootState) => state.layout);
 
     useEffect(() => {
         const newsletterSeen = Cookies.get('is_newsletter_seen');
-        if (!cookiesModalOpen && !newsletterDrawerOpen && !newsletterSeen) {
-            dispatch(openNewsletterDrawer());
+        if (consentReady && !newsletterDrawerOpen && !newsletterSeen) {
+            drawerTimeout.current = setTimeout(() => {
+                dispatch(openNewsletterDrawer());
+            }, 3000);
         }
-    }, [cookiesModalOpen, dispatch, newsletterDrawerOpen])
+        // Cleanup timeout on unmount
+        return () => {
+            if (drawerTimeout.current) {
+                clearTimeout(drawerTimeout.current);
+            }
+        };
+    }, [consentReady, cookiesModalOpen, dispatch, newsletterDrawerOpen])
 
     return (
         <>

@@ -1,13 +1,14 @@
 'use client'
 
 import { GoogleTagManager } from '@next/third-parties/google';
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import Cookies from "js-cookie";
 import {usePathname, useSearchParams} from "next/navigation";
 import CookieDrawer from "./CookieDrawer";
 import CookieModal from "./CookieModal";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../../redux/store";
+import {setConsentReady} from "../../redux/layoutSlice";
 
 const TAG_MANAGER_ID = process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID as string;
 export const COOKIE_CONSENT_NAME = 'BDS_consent_v2';
@@ -31,6 +32,8 @@ export default function GoogleAnalytics() {
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [consentListeners, setConsentListeners] = useState<any[]>([]);
 	const cookieModalOpen = useSelector<RootState>(state => state.layout.cookiesModalOpen) as boolean;
+	const drawerTimeout = useRef<NodeJS.Timeout | null>(null);
+	const dispatch = useDispatch();
 
 	const onConsentChange = (consent: OptionalConsent) => {
 		const newConsent = {
@@ -43,6 +46,7 @@ export default function GoogleAnalytics() {
 			callback(newConsent);
 		});
 		Cookies.set(COOKIE_CONSENT_NAME, JSON.stringify(newConsent), { path: '/', sameSite: 'Lax' });
+		dispatch(setConsentReady());
 		setDrawerOpen(false);
 	};
 
@@ -51,8 +55,19 @@ export default function GoogleAnalytics() {
 			setConsentListeners([...consentListeners, callback]);
 		};
 		if (!Cookies.get(COOKIE_CONSENT_NAME)) {
-			setDrawerOpen(true)
+			drawerTimeout.current = setTimeout(() => {
+				setDrawerOpen(true)
+			}, 3000)
+		} else {
+			dispatch(setConsentReady());
 		}
+
+		// Cleanup timeout on unmount
+		return () => {
+			if (drawerTimeout.current) {
+				clearTimeout(drawerTimeout.current);
+			}
+		};
 	}, []);
 
 	useEffect(() => {
