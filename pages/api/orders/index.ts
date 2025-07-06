@@ -14,7 +14,7 @@ export type CreateOrderResponse = {
 	success: boolean
 	id?: string
 	error?: string
-	wooId?: number
+	wooOrder?: WooOrder
 }
 
 const api = new WooCommerceRestApi({
@@ -45,7 +45,7 @@ export default async function handler(
 			}
 			orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
 			const { data: order } = await api.post("orders", orderPayload)
-			responseData.wooId = order.id
+			responseData.wooOrder = order
 			const amount = Number(order.total)
 			if (amount === 0) {
 				await api.delete(`/api/orders/${order.id}`, { force: true })

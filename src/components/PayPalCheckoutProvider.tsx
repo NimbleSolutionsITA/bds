@@ -12,6 +12,7 @@ import useAuth from "../utils/useAuth";
 import PaymentErrorDialog from "../pages/checkout/PaymentErrorDialog";
 import {useMutation} from "@tanstack/react-query";
 import * as Sentry from "@sentry/nextjs";
+import {WooOrder} from "../types/woocommerce";
 
 interface PayPalProviderProps {
 	children: React.ReactNode | React.ReactNode[];
@@ -30,9 +31,9 @@ const PayPalCheckoutContext = createContext({
 
 export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps) => {
 	const [error, setError] = useState<string>();
-	const [orderId, setOrderId] = useState<string>();
+	const [wooOrder, setWooOrder] = useState<WooOrder>();
 	const [isPaying, setIsPaying] = useState(false);
-	const [checkoutCompleted, setCheckoutCompleted] = useState(false);
+	const [completed, setCompleted] = useState<{query?: {pending: boolean}}>();
 	const { user } = useAuth();
 	const { cart, customerNote } = useSelector((state: RootState) => state.cart);
 	const { watch } = useFormContext()
@@ -42,7 +43,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const createOrder = useMutation({
 		mutationFn: async (paymentMethod: string) => {
-			setOrderId(undefined);
+			setWooOrder(undefined);
 			setIsPaying(true);
 			try {
 				const response = await fetch("/api/orders", {
@@ -56,7 +57,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				if (!orderData.success) {
 					throw new Error(orderData.error);
 				}
-				setOrderId(orderData.wooId);
+				setWooOrder(orderData.wooOrder);
 				return orderData.id;
 			} catch (error: any) {
 				await onError({error, step: 'createOrder'});
@@ -76,16 +77,24 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			if (!response.ok) {
 				await onError({error: new Error(`Server error: ${response.statusText}`), step: 'onApprove'});
 			}
-			setOrderId(undefined);
 
-			const { wooOrder, success, error = null } = await response.json();
-
+			const { status, success, error = null } = await response.json();
 			if (success) {
+				if (wooOrder) {
+					gtagPurchase(wooOrder);
+				}
 				dispatch(destroyCart());
-				gtagPurchase(wooOrder);
-				setCheckoutCompleted(true);
+				setCompleted({})
+				await router.push("/checkout/completed");
 			} else {
-				await onError({error: new Error(error ?? "An error occurred"), step: 'onApprove'});
+				if (status === "PENDING") {
+					dispatch(destroyCart());
+					setCompleted({query: {
+							pending: true
+						}})
+				} else {
+					await onError({ error: new Error(error ?? "An error occurred"), step: 'onApprove' });
+				}
 			}
 		} catch (error: any) {
 			await onError({error, step: 'onApprove'});
@@ -94,8 +103,8 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async ({error, step}: { error: Record<string, any>, step?: string })=> {
-			if (orderId) {
-				await fetch(`/api/orders/${orderId}/abort`, {
+			if (wooOrder && step === 'createOrder') {
+				await fetch(`/api/orders/${wooOrder.id}/abort`, {
 					method: "PUT",
 				});
 			}
@@ -104,27 +113,30 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				Sentry.setTag('step', step);
 			}
 			Sentry.setContext("checkout", {
-				orderId,
+				orderId: wooOrder?.id,
 				user: user?.user_id,
 				cart,
 				customerNote,
 				invoice,
 			});
 			Sentry.captureException(error);
-			setOrderId(undefined);
+			setWooOrder(undefined);
 			setError(error.message ?? error.details?.[0]?.description ?? "An error occurred");
 		}
 	})
-	// Redirect when checkout is completed
-	useEffect(() => {
-		if (checkoutCompleted) {
-			router.push("/checkout/completed");
-		}
-	}, [checkoutCompleted, router]);
 
 	const createCardOrder = async () => await createOrder.mutateAsync('PayPal - carta di credito')
 	const createPayPalOrder = async () => await createOrder.mutateAsync('PayPal')
 	const onCardError = (error: Record<string, any>) => onError({error, step: 'onCardError'});
+
+	useEffect(() => {
+		if (completed) {
+			router.push({
+				pathname: "/checkout/completed",
+				...completed
+			});
+		}
+	}, [completed, router]);
 
 	return (
 		<PayPalCardFieldsProvider

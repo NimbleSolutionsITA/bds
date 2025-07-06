@@ -165,8 +165,10 @@
     "pay-with":"Pay with",
     "payment-success":"Thank you for your purchase!",
     "payment-failure":"Something went wrong...",
+    "payment-pending": "Payment is under review",
     "payment-success-body":"Your order has been successfully processed. You will soon receive an email with the order details.",
     "payment-failure-body":"It was not possible to complete your order. Please try again later or contact us for more information.",
+    "payment-pending-body": "PayPal is currently reviewing your payment. You will receive a confirmation email once it is completed.",
     "back-home":"Return to Home",
     "vat-included":"Includes <0></0> VAT",
     "coupon-code":"Coupon code",
@@ -341,7 +343,6 @@
           "sentry": "Used for monitoring and diagnosing user experience errors.",
           "googlePay": "Used to manage and track payments made through Google Pay.",
           "applePay": "Used to manage and track payments made through Apple Pay."
-        }
         }
       }
     }

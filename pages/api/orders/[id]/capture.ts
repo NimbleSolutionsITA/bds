@@ -1,22 +1,14 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import {WORDPRESS_SITE_URL} from "../../../../src/utils/endpoints";
-import {generateAccessToken} from "../index";
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { generateAccessToken } from "../index";
 import * as Sentry from "@sentry/nextjs";
+
 const base = process.env.PAYPAL_API_URL;
 
 export type CreateOrderResponse = {
-	success: boolean
-	error?: string
-	wooOrder?: any
-}
-
-const api = new WooCommerceRestApi({
-	url: WORDPRESS_SITE_URL ?? '',
-	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
-	version: "wc/v3"
-});
+	success: boolean;
+	error?: string;
+	status?: string;
+};
 
 export default async function handler(
 	req: NextApiRequest,
@@ -24,52 +16,41 @@ export default async function handler(
 ) {
 	const responseData: CreateOrderResponse = {
 		success: false,
-		wooOrder: null,
-	}
+	};
+
 	try {
 		if (req.method === 'POST') {
 			const paypalOrderId = req.query.id as string;
-			if (!paypalOrderId) {
-				throw new Error('Paypal Order ID is missing')
-			}
-			const captureData = await captureOrder(paypalOrderId)
-			const purchaseUnit = captureData?.purchase_units?.[0]
-			const capture = purchaseUnit?.payments?.captures?.[0]
-			const wooOrderId = purchaseUnit?.reference_id
+			if (!paypalOrderId) throw new Error('Paypal Order ID is missing');
 
-			if (wooOrderId && capture?.status === 'COMPLETED') {
-				const { data: order} = await api.put(`orders/${wooOrderId}`, {
-					set_paid: true,
-					transaction_id: paypalOrderId,
-					payment_data: [
-						{ key: "ppcp_paypal_order_id", value: paypalOrderId },
-						{ key: "ppcp_billing_token", value: "" },
-						{ key: "wc-ppcp-new-payment-method", value: false }
-					]
-				})
-				responseData.success = true
-				responseData.wooOrder = order
+			const captureData = await captureOrder(paypalOrderId);
+			const purchaseUnit = captureData?.purchase_units?.[0];
+			const capture = purchaseUnit?.payments?.captures?.[0];
+			const wooOrderId = purchaseUnit?.reference_id;
+
+			if (wooOrderId) {
+				responseData.success = capture?.status === 'COMPLETED';
+				responseData.status = capture?.status;
 			} else {
-				if (wooOrderId) {
-					await api.put(`orders/${wooOrderId}`, {
-						status: 'failed'
-					})
-				}
+				responseData.error = 'Reference ID (WooCommerce Order ID) not found in PayPal response.';
+			}
+
+			if (!responseData.success) {
 				responseData.error = captureData.details?.[0]?.description ?? (capture ?
 					`Transaction ${capture.status}: ${capture.id}` :
 					'Payment capture was not successful.');
+
 				Sentry.setTag("area", "checkout");
 				Sentry.setTag("step", "capture_order");
 				Sentry.setContext("paypal_capture", {
-					paypalOrderId: req.query.id,
+					paypalOrderId,
 					responseData
 				});
 				Sentry.captureException(responseData.error);
-
 			}
 		}
 	} catch (error) {
-		console.error(error)
+		console.error(error);
 		Sentry.setTag("area", "checkout");
 		Sentry.setTag("step", "capture_order");
 		Sentry.setContext("paypal_capture", {
@@ -77,21 +58,15 @@ export default async function handler(
 			responseData
 		});
 		Sentry.captureException(error);
-		responseData.success = false
-		if (typeof error === "string") {
-			responseData.error = error
-		} else if (error instanceof Error) {
-			responseData.error = error.message
-		}
-		res.status(500)
+
+		responseData.success = false;
+		responseData.error = error instanceof Error ? error.message : String(error);
+		res.status(500);
 	}
-	return res.json(responseData)
+
+	return res.json(responseData);
 }
 
-/**
- * Capture payment for the created order to complete the transaction.
- * @see https://developer.paypal.com/docs/api/orders/v2/#orders_capture
- */
 const captureOrder = async (orderID: string) => {
 	const accessToken = await generateAccessToken();
 
