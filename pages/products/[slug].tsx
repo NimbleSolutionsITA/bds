@@ -5,7 +5,7 @@ import {BaseProduct, Product as ProductType, ProductCategory} from "../../src/ty
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProductsIds} from "../../src/utils/wordpress_api";
-import {getProductMainCategory, LOCALE} from "../../src/utils/utils";
+import {getProductCategoryLink, getProductMainCategory, LOCALE} from "../../src/utils/utils";
 import {WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "../../src/utils/endpoints";
 import {useTranslation} from "next-i18next";
 import PayPalProvider from "../../src/components/PayPalProvider";
@@ -18,9 +18,9 @@ const SeoFooter = dynamic(() => import('../../src/pages/product/SeoFooter'), { s
 
 export type ProductPageProps = PageBaseProps & {
 	product: ProductType,
+	category: ProductCategory,
 }
-export default function Product({ product, layout }: ProductPageProps) {
-	const category = getProductMainCategory(product as unknown as BaseProduct) as ProductCategory
+export default function Product({ product, category, layout }: ProductPageProps) {
 	const { t } = useTranslation('common')
 	const router = useRouter();
 
@@ -57,9 +57,11 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		console.error(e)
 	}
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
+	const category = getProductMainCategory(product as unknown as BaseProduct) as ProductCategory
 	const breadcrumbs = [
 		{ name: 'Home', href: urlPrefix + '/' },
 		{ name: 'Shop', href: urlPrefix + '/shop' },
+		{ name: category.name, href: urlPrefix + getProductCategoryLink(category) },
 		{ name: sanitize(product.name), href: urlPrefix +  '/products/' + slug },
 	]
 	return {
@@ -70,6 +72,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 				seo: seo?.head ?? null,
 			},
 			product,
+			category,
 			...ssrTranslations
 		},
 		revalidate: 10

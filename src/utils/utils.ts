@@ -4,13 +4,14 @@ import {
     BaseProduct,
     BaseVariation,
     Color, LoggedCustomer,
-    Product,
+    Product, ProductCategory,
     Variation, WooOrder, WooProductCategory
 } from "../types/woocommerce";
 import { formatDistance as fd } from 'date-fns';
 import { it } from 'date-fns/locale';
 import {Cart, Item} from "../types/cart-type";
 import {ReadonlyURLSearchParams} from "next/navigation";
+import {DESIGNERS_SUB_PATH} from "./endpoints";
 
 export const sanitize = (html: string) => {
   return sanitizeHtml(html, {
@@ -351,4 +352,8 @@ export const getInvoice = (customer?: LoggedCustomer) => ({
 
 export const getCustomerMetaData = (key: string, fallback: any, customer?: LoggedCustomer) => {
     return customer?.meta_data.find(({key: k}) => k === key)?.value ?? fallback
+}
+
+export const getProductCategoryLink = (category?: ProductCategory) => {
+    return (category && (Object.values(FRAGRANCES_CATEGORY).includes(category.parent as number) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
 }

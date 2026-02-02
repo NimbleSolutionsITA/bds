@@ -11,8 +11,7 @@ import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
 import {
 	EYEWEAR_CATEGORIES,
-	FRAGRANCES_CATEGORY,
-	getDefaultProduct, getIsEU, getVariationFromParams,
+	getDefaultProduct, getIsEU, getProductCategoryLink, getVariationFromParams,
 	sanitize
 } from "../../utils/utils";
 import Link from "../../components/Link";
@@ -75,7 +74,7 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 	const dispatch = useDispatch<AppDispatch>();
 	const { t } = useTranslation('common');
     const cartQuantity = cart?.items?.find(v => [product.id, currentProduct.id].includes(v.id))?.quantity.value ?? 0;
-	const categoryLink = (category && (Object.values(FRAGRANCES_CATEGORY).includes(category.parent as number) ? '/' + category.slug : '/' +  DESIGNERS_SUB_PATH + '/' + category.slug)) ?? ''
+	const categoryLink = getProductCategoryLink(category);
 
 	const handleClickAttribute = async (attribute: AttributeType, slug: string) => {
 		const routeParams = new URLSearchParams({...currentAttributes, [attribute]: slug});
