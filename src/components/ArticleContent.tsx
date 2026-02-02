@@ -5,7 +5,7 @@ import Swiper from "./Swiper";
 import React from "react";
 
 const ArticleContent = ({ article }: {article: AcfArticle}) => {// Function to replace shortcodes with components
-	const renderContentWithComponents = (content: string, shortcodes: AcfArticle['acf']['shortcodes']) => {
+	const renderContentWithComponents = (content: string, shortcodes?: Shortcode[]) => {
 		const regex = /\[\[(.*?)]]/g; // Match [[tagname]]
 		const elements = [];
 		let lastIndex = 0;
@@ -21,7 +21,7 @@ const ArticleContent = ({ article }: {article: AcfArticle}) => {// Function to r
 			}
 
 			// Find the corresponding shortcode object
-			const shortcodeData: Shortcode = shortcodes?.find((s: Shortcode) => s.shortcode === tagName);
+			const shortcodeData = shortcodes?.find((s: Shortcode) => s.shortcode === tagName);
 			if (shortcodeData) {
 				elements.push(
 					<Swiper key={tagName}>
