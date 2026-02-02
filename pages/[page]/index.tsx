@@ -114,9 +114,13 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
     const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, FRAGRANCES_CATEGORY[locale])));
+    const pageIds =  await getAllPagesIds()
+    const categoryIds = productCategories.flat().map(({slug, lang}) => ({ params: { page: slug }, locale: lang }))
     const paths = [
-        productCategories.flat().map(({slug, lang}) => ({ params: { page: slug }, locale: lang })),
-        await getAllPagesIds()
+        categoryIds,
+        pageIds.filter(p => {
+            !categoryIds.find(c => c.locale === p.locale && p.params.page === c.params.page)
+        })
     ].flat().filter((path, index, self) =>
         index === self.findIndex((p) => !PAGES_TO_EXCLUDE.includes(path.params.page) && p.params.page === path.params.page && p.locale === path.locale)
     );
