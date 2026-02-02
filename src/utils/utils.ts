@@ -163,13 +163,14 @@ export function getDefaultProduct(product: BaseProduct | Product, variation?: Ba
     defaultProduct: BaseVariation | Variation,
     defaultAttributes: { [key in AttributeType]?: string }
 } {
-    const defaultProduct = variation ?? product.variations[0] ?? {
+    console.log(product)
+    const defaultProduct = variation ?? product?.variations?.[0] ?? {
         id: product.id,
         stock_status: product.stock_status,
         stock_quantity: product.stock_quantity,
         image: product.image,
         price: product.price,
-        attributes: Object.keys(product.attributes).map((key) => {
+        attributes: Object.keys(product?.attributes ?? {}).map((key) => {
             const attributes = product.attributes[key as AttributeType];
             return ({
                 id: 'pa_' + (key === 'montaturaLenti' ? 'montatura-lenti' : key),
@@ -221,10 +222,10 @@ export function formatDistance(date: Date | number, locale: 'it'|'en') {
 
 export function getProductMainCategory(product: BaseProduct): BaseCategory {
 
-    return product.categories.find((category) =>
+    return product?.categories?.find((category) =>
         category.parent &&
         [...Object.values(EYEWEAR_CATEGORY), ...Object.values(FRAGRANCES_CATEGORY)].includes(category.parent as number)
-    ) ?? product.categories[0];
+    ) ?? product?.categories?.[0];
 }
 export const regExpEmail = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 

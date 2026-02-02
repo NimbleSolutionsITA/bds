@@ -33,7 +33,7 @@ type ProductCardProps = {
 const ProductCard = ({ product }: ProductCardProps) => {
     const { cart } = useSelector((state: RootState) => state.cart);
     const isEU = getIsEU(cart?.customer);
-    const isEyewear = product.categories.find(({parent }) =>
+    const isEyewear = product.categories?.find(({parent }) =>
         parent && Object.values(EYEWEAR_CATEGORY).includes(parent as number)
     ) !== undefined;
     const imageRatio = isEyewear ? 45 : 130;
@@ -50,8 +50,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
         setCurrentProduct(newProduct)
         setCurrentImage(newProduct.image ?? product.image ?? placeholder)
     }
-    const hasAttributes = Object.keys(product.attributes).length > 0
-    const colorAttribute = [...PRODUCT_ATTRIBUTES.color, ...PRODUCT_ATTRIBUTES.image].find(c => product.attributes[c]?.length > 0)
+    const hasAttributes = Object.keys(product.attributes ?? {}).length > 0
+    const colorAttribute = [...PRODUCT_ATTRIBUTES.color, ...PRODUCT_ATTRIBUTES.image].find(c => product.attributes?.[c]?.length > 0)
     const selectedColor = colorAttribute && product.attributes[colorAttribute]?.find(c => c.slug === currentAttributes[colorAttribute])
 
     const urlParams = new URLSearchParams(currentAttributes);
