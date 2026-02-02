@@ -163,7 +163,6 @@ export function getDefaultProduct(product: BaseProduct | Product, variation?: Ba
     defaultProduct: BaseVariation | Variation,
     defaultAttributes: { [key in AttributeType]?: string }
 } {
-    console.log(product)
     const defaultProduct = variation ?? product?.variations?.[0] ?? {
         id: product.id,
         stock_status: product.stock_status,
