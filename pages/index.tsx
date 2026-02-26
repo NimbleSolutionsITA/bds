@@ -106,7 +106,7 @@ export default function Home({page, layout}: HomeProps) {
     );
 }
 
-export async function getStaticProps({ locale }: { locales: string[], locale: LOCALE}) {
+export async function getServerSideProps({ locale }: { locales: string[], locale: LOCALE}) {
     const [
         {ssrTranslations, ...layoutProps},
         { seo, page },
@@ -169,6 +169,5 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
             },
             ...ssrTranslations
         },
-        revalidate: 10
     }
 }
