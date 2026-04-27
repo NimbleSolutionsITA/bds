@@ -4,7 +4,7 @@ import {AppDispatch, RootState} from "../redux/store";
 import {PayPalApplePayConfig, PayPalWithApplePay} from "./PayPalProvider";
 import {Cart, Shipping} from "../types/cart-type";
 import {ShippingData} from "../redux/layoutSlice";
-import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/utils";
+import {getCartItemPrice, getCartTotals, getIsEU, stashPurchaseForCompletedPage} from "../utils/utils";
 import {callCart, PaymentButtonProps} from "./AppleGooglePayButtons";
 import {destroyCart} from "../redux/cartSlice";
 import {useRouter} from "next/router";
@@ -188,7 +188,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 				}
 				const { wooOrder } = orderData;
 
-				gtagPurchase(wooOrder);
+				stashPurchaseForCompletedPage(wooOrder);
 				session.completePayment({
 					status: window.ApplePaySession.STATUS_SUCCESS,
 				});

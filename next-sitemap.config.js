@@ -4,7 +4,8 @@ module.exports = {
     siteUrl: 'https://bottegadisguardi.com',
     changefreq: 'daily',
     priority: 0.7,
-    sitemapSize: 5000,
+    sitemapSize: 50000,
+    generateIndexSitemap: false,
     generateRobotsTxt: true,
     exclude: ['/my-area'],
     // Default transformation function

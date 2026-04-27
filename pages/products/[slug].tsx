@@ -29,7 +29,7 @@ export default function Product({ product, category, layout }: ProductPageProps)
 			<Layout layout={layout}>
 				<ProductView key={JSON.stringify(router.query)} product={product} category={category} shipping={layout.shipping} countries={layout.countries} />
 				<ProductsSlider products={product.related ?? []} title={t('related-products')} />
-				<SeoFooter category={category} />
+				<SeoFooter category={category} product={product} />
 			</Layout>
 		</PayPalProvider>
 	);

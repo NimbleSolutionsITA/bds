@@ -22,6 +22,10 @@ module.exports =  {
             },
         ],
         loader: 'default',
+        // Prefer AVIF over WebP for ~25–35% smaller images where supported; falls back automatically.
+        formats: ['image/avif', 'image/webp'],
+        // Cache optimized images 30 days at the edge so PageSpeed re-runs hit a warm cache.
+        minimumCacheTTL: 60 * 60 * 24 * 30,
     },
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],

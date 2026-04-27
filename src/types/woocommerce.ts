@@ -13,6 +13,9 @@ export type Product = Omit<BaseProduct, 'image' | 'variations' | 'categories'> &
 	image: ImageDetailed;
 	variations: Variation[];
 	link: string;
+	// SEO bottom text (HTML) managed from WooCommerce product ACF.
+	// Populated by the /wp-json/nimble/v1/product endpoint once the ACF field is exposed.
+	bottomText?: string | null;
 }
 
 export type ProductCategory = BaseCategory & { bottomText: string | null }

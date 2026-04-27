@@ -5,7 +5,7 @@ import {ShippingData} from "../redux/layoutSlice";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../redux/store";
 import {useFormContext} from "react-hook-form";
-import {gtagPurchase} from "../utils/utils";
+import {stashPurchaseForCompletedPage} from "../utils/utils";
 import {useRouter} from "next/router";
 import {destroyCart} from "../redux/cartSlice";
 import useAuth from "../utils/useAuth";
@@ -81,7 +81,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			const { status, success, error = null } = await response.json();
 			if (success) {
 				if (wooOrder) {
-					gtagPurchase(wooOrder);
+					stashPurchaseForCompletedPage(wooOrder);
 				}
 				dispatch(destroyCart());
 				setCompleted({})

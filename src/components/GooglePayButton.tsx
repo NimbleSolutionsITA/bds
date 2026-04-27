@@ -13,7 +13,7 @@ import {Country} from "../types/woocommerce";
 import PaymentDataRequestUpdate = google.payments.api.PaymentDataRequestUpdate;
 import CallbackIntent = google.payments.api.CallbackIntent;
 import {useRouter} from "next/router";
-import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/utils";
+import {getCartItemPrice, getCartTotals, getIsEU, stashPurchaseForCompletedPage} from "../utils/utils";
 import TotalPriceStatus = google.payments.api.TotalPriceStatus;
 import useAuth from "../utils/useAuth";
 import * as Sentry from "@sentry/nextjs";
@@ -104,7 +104,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				}
 				const { wooOrder } = orderData;
 
-				gtagPurchase(wooOrder);
+				stashPurchaseForCompletedPage(wooOrder);
 				if (!askForShipping) {
 					dispatch(destroyCart());
 				}

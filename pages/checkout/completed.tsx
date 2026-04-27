@@ -1,7 +1,7 @@
 // File: pages/checkout/completed.tsx
 
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import { getSSRTranslations } from "../../src/utils/wordpress_api";
 import Head from "next/head";
 import { Box, Button, Container, IconButton, Typography } from "@mui/material";
@@ -10,7 +10,7 @@ import Image from "next/image";
 import logo from "../../src/images/bottega-di-sguardi-logo.png";
 import { CheckCircleOutlineSharp, HourglassEmpty } from "@mui/icons-material";
 import { useTranslation } from "next-i18next";
-import { LOCALE } from "../../src/utils/utils";
+import { LOCALE, consumePendingPurchase, gtagPurchase } from "../../src/utils/utils";
 import GoogleAnalytics from "../../src/layout/Analytics/GoogleAnalytics";
 
 export default function CheckoutResult() {
@@ -18,6 +18,18 @@ export default function CheckoutResult() {
 	const { locale, query } = useRouter();
 	const isPending = query.pending === 'true';
 	const Icon = isPending ? HourglassEmpty : CheckCircleOutlineSharp
+
+	useEffect(() => {
+		// Fire the `purchase` dataLayer event on this URL so the Google Ads
+		// conversion tag (triggered on "URL contains checkout/completed") receives
+		// the transaction_id and value. The order was stashed by the payment flow
+		// before navigating here.
+		if (isPending) return;
+		const order = consumePendingPurchase();
+		if (order) {
+			gtagPurchase(order);
+		}
+	}, [isPending]);
 
 	return (
 		<div style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>

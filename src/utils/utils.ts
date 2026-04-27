@@ -332,6 +332,35 @@ export const gtagPurchase = (order: WooOrder) => {
     window.dataLayer.push(event)
 };
 
+// Key used to pass the completed order from the checkout page to /checkout/completed,
+// so the `purchase` dataLayer event fires on the confirmation URL (needed by Google Ads
+// conversion tag configured as "URL contains checkout/completed").
+export const PENDING_PURCHASE_STORAGE_KEY = 'BDS_pending_purchase';
+
+export const stashPurchaseForCompletedPage = (order: WooOrder) => {
+    if (typeof window === 'undefined') return;
+    try {
+        window.sessionStorage.setItem(PENDING_PURCHASE_STORAGE_KEY, JSON.stringify(order));
+    } catch (e) {
+        // sessionStorage might be disabled (private browsing on some browsers):
+        // fall back to firing the event immediately so at least a Custom Event = purchase
+        // trigger in GTM still receives the data.
+        gtagPurchase(order);
+    }
+};
+
+export const consumePendingPurchase = (): WooOrder | null => {
+    if (typeof window === 'undefined') return null;
+    try {
+        const raw = window.sessionStorage.getItem(PENDING_PURCHASE_STORAGE_KEY);
+        if (!raw) return null;
+        window.sessionStorage.removeItem(PENDING_PURCHASE_STORAGE_KEY);
+        return JSON.parse(raw) as WooOrder;
+    } catch {
+        return null;
+    }
+};
+
 type Consent = 'granted' | 'denied'
 export const gtagConsent = (consent: {
     'ad_user_data': Consent,
