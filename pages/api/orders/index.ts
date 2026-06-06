@@ -36,6 +36,10 @@ export default async function handler(
 		if (req.method === 'POST') {
 			const { cart, invoice = null, customerNote = "", customerId = 0, paymentMethod } = req.body
 
+			Sentry.setUser({ id: customerId });
+			Sentry.setTag('payment_method', paymentMethod);
+			Sentry.addBreadcrumb({ category: 'checkout', message: 'Create order request received', data: { paymentMethod, cartTotal: cart?.totals?.total }, level: 'info' });
+
 			if (!cart) {
 				throw new Error('Cart or customer data is missing')
 			}
@@ -44,14 +48,15 @@ export default async function handler(
 				throw new Error('Cart amount is 0')
 			}
 			orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
+			Sentry.addBreadcrumb({ category: 'checkout', message: 'WooCommerce order payload prepared', level: 'info' });
 			const { data: order } = await api.post("orders", orderPayload)
 			responseData.wooOrder = order
+			Sentry.addBreadcrumb({ category: 'checkout', message: 'WooCommerce order created', data: { wooOrderId: order.id, total: order.total }, level: 'info' });
 			const amount = Number(order.total)
 			if (amount === 0) {
-				await api.delete(`/api/orders/${order.id}`, { force: true })
+				await api.delete(`orders/${order.id}`, { force: true })
 				throw new Error('Order amount is 0')
 			}
-			console.log('ORDER', amount, "CART", cart.totals.total)
 			const paypalOrder = await createOrder(order, paymentMethod)
 			responseData.id = paypalOrder.id
 
@@ -96,12 +101,13 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 	] as const;
 	const shippingAddress = requiredFields.every(field => shipping[field]) ? shipping : billing;
 
-	const TOTAL = Number(parseFloat(total).toFixed(2))
-
+	const TOTAL = Number(parseFloat(total).toFixed(2));
 	const shippingTotal = Number(parseFloat((Number(shipping_total) + Number(shipping_tax)).toFixed(2)));
-	const itemTotal = Number(line_items.reduce((sum, item) => sum + (Number(item.subtotal) + Number(item.subtotal_tax)), 0).toFixed(2));
-	const discountTotal = Number(parseFloat((itemTotal + shippingTotal - TOTAL).toFixed(2)));
-	console.log({itemTotal, discountTotal, shippingTotal, TOTAL})
+	// Use WooCommerce discount fields so the breakdown is guaranteed to reconcile with TOTAL
+	// (summing from line items can drift by ±0.01 due to rounding → PayPal AMOUNT_MISMATCH)
+	const discountTotal = Number(parseFloat((Number(discount_total) + Number(discount_tax)).toFixed(2)));
+	const itemTotal = Number(parseFloat((TOTAL + discountTotal - shippingTotal).toFixed(2)));
+	Sentry.addBreadcrumb({ category: 'checkout', message: 'PayPal order breakdown', data: { itemTotal, discountTotal, shippingTotal, TOTAL }, level: 'info' });
 	const payload = {
 		intent: "CAPTURE",
 		purchase_units: [
@@ -179,13 +185,19 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 	const response = await fetch(`${base}/v2/checkout/orders`, {
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${accessToken}`
+			Authorization: `Bearer ${accessToken}`,
 		},
 		method: "POST",
 		body: JSON.stringify(payload),
 	});
-
-	return await response.json();
+	const data = await response.json();
+	if (!response.ok || !data.id) {
+		const details = data.details?.[0]?.description ?? data.message ?? response.statusText;
+		Sentry.addBreadcrumb({ category: 'checkout', message: 'PayPal order creation failed', data: { status: response.status, details, paypalResponse: data }, level: 'error' });
+		throw new Error(`PayPal order creation failed: ${details}`);
+	}
+	Sentry.addBreadcrumb({ category: 'checkout', message: 'PayPal order created', data: { paypalOrderId: data.id, wooOrderId: id }, level: 'info' });
+	return data;
 };
 
 const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: string, customerId?: string, paymentMethod: string = "PayPal") => {
@@ -253,29 +265,29 @@ const getProductEuPrice = (product: {meta_data: {key: string, value: string}[], 
 	return euPrice
 }
 
+let _cachedToken: { value: string; expiresAt: number } | null = null;
+
 /**
  * Generate an OAuth 2.0 access token for authenticating with PayPal REST APIs.
  * @see https://developer.paypal.com/api/rest/authentication/
  */
-export const generateAccessToken = async () => {
-	try {
-		if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-			throw new Error("MISSING_API_CREDENTIALS");
-		}
-		const auth = Buffer.from(
-			PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET,
-		).toString("base64");
-		const response = await fetch(`${base}/v1/oauth2/token`, {
-			method: "POST",
-			body: "grant_type=client_credentials",
-			headers: {
-				Authorization: `Basic ${auth}`,
-			},
-		});
-
-		const data = await response.json();
-		return data.access_token;
-	} catch (error) {
-		console.error("Failed to generate Access Token:", error);
+export const generateAccessToken = async (): Promise<string> => {
+	if (_cachedToken && Date.now() < _cachedToken.expiresAt) {
+		return _cachedToken.value;
 	}
+	if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+		throw new Error("MISSING_API_CREDENTIALS");
+	}
+	const auth = Buffer.from(PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET).toString("base64");
+	const response = await fetch(`${base}/v1/oauth2/token`, {
+		method: "POST",
+		body: "grant_type=client_credentials",
+		headers: { Authorization: `Basic ${auth}` },
+	});
+	if (!response.ok) {
+		throw new Error(`Failed to get PayPal access token: ${response.statusText}`);
+	}
+	const data = await response.json();
+	_cachedToken = { value: data.access_token, expiresAt: Date.now() + ((data.expires_in ?? 32400) - 300) * 1000 };
+	return _cachedToken.value;
 };

@@ -5,7 +5,7 @@ import {PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
-import {getAllProducts} from "../api/products";
+import {getProducts} from "../api/products";
 import {DESIGNERS_SUB_PATH} from "../../src/utils/endpoints";
 import {EYEWEAR_CATEGORY, LOCALE} from "../../src/utils/utils";
 import {cacheGetProductCategories} from "../../src/utils/cache";
@@ -17,18 +17,21 @@ const DesignersBottom = dynamic(() => import("../../src/components/CategoryBotto
 export type DesignerProps = PageBaseProps & {
 	productCategory: WooProductCategory,
 	products: BaseProduct[]
+	locale: LOCALE
 }
 export default function Designer({
-  productCategory, products, layout
+  productCategory, products, layout, locale
 }: DesignerProps) {
 	return (
 		<Layout key={productCategory.slug} layout={layout}>
 			<DesignerTop
 				name={productCategory.name}
-				gallery={productCategory.acf.gallery}
 				description={productCategory.description}
 			/>
-			<DesignerProductGrid products={products} />
+			<DesignerProductGrid
+				products={products}
+				lazyLoad={{ categorySlug: productCategory.slug, lang: locale }}
+			/>
 			<DesignersBottom bottomText={productCategory.acf.bottomText} />
 		</Layout>
 	);
@@ -45,9 +48,10 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			notFound: true
 		}
 	}
-	const products = await getAllProducts({
+	const products = await getProducts({
 		categories: slug,
 		lang: locale,
+		per_page: '24',
 	})
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 	const breadcrumbs = [
@@ -55,14 +59,19 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		{ name: 'Designers', href: urlPrefix + '/'+DESIGNERS_SUB_PATH },
 		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+DESIGNERS_SUB_PATH+'/' + productCategory.slug },
 	]
+	const slimProductCategory = {
+		...productCategory,
+		acf: { bottomText: productCategory.acf?.bottomText ?? '', gallery: [] }
+	}
 	return {
 		props: {
 			layout: {
 				...layout,
 				breadcrumbs,
 			},
-			productCategory,
+			productCategory: slimProductCategory,
 			products,
+			locale,
 			...ssrTranslations
 		},
 		revalidate: 10
@@ -70,9 +79,12 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+	if (process.env.DISABLE_DYNAMIC_BUILD) {
+		return { paths: [], fallback: 'blocking' as const };
+	}
 	const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, EYEWEAR_CATEGORY[locale])));
 	return {
-		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : productCategories.flat().map(({slug, lang}) => ({ params: { slug }, locale: lang })),
-		fallback: 'blocking',
+		paths: productCategories.flat().map(({slug, lang}) => ({ params: { slug }, locale: lang })),
+		fallback: 'blocking' as const,
 	};
 }

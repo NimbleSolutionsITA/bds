@@ -5,7 +5,7 @@ import { PageBaseProps} from "../../src/types/settings";
 import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
-import {getAllProducts} from "../api/products";
+import {getProducts} from "../api/products";
 import {FRAGRANCES_CATEGORY, getFragrancesCategories, LOCALE} from "../../src/utils/utils";
 import {cacheGetProductCategories} from "../../src/utils/cache";
 
@@ -17,17 +17,20 @@ export type FragranceProps = PageBaseProps & {
 	productCategory: WooProductCategory,
 	parentCategory: WooProductCategory,
 	products: BaseProduct[],
+	locale: LOCALE
 }
-export default function Fragrance({ productCategory, parentCategory, products, layout }: FragranceProps) {
+export default function Fragrance({ productCategory, parentCategory, products, layout, locale }: FragranceProps) {
 	return (
 		<Layout key={productCategory.slug} layout={layout}>
 			<FragranceTop
 				name={productCategory.name}
 				brand={parentCategory.name}
-				gallery={productCategory.acf.gallery}
 				description={productCategory.description}
 			/>
-			<FragranceProductGrid products={products} />
+			<FragranceProductGrid
+				products={products}
+				lazyLoad={{ categorySlug: productCategory.slug, lang: locale, fragrances: true }}
+			/>
 			<FragrancesBottom bottomText={productCategory.acf.bottomText} />
 		</Layout>
 	);
@@ -46,10 +49,10 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 				notFound: true
 			}
 		}
-		const products = await getAllProducts({
+		const products = await getProducts({
 			categories: slug,
 			lang: locale,
-			per_page: '99',
+			per_page: '24',
 			fragrances: true
 		})
 		const urlPrefix = locale === 'it' ? '' : '/' + locale;
@@ -60,15 +63,20 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 			{ name: parentCategory?.name, href: urlPrefix + '/'+page },
 			{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+page+'/' + productCategory.slug },
 		]
+		const slimProductCategory = {
+			...productCategory,
+			acf: { bottomText: productCategory.acf?.bottomText ?? '', gallery: [] }
+		}
 		return {
 			props: {
 				layout: {
 					...layout,
 					breadcrumbs,
 				},
-				productCategory,
+				productCategory: slimProductCategory,
 				parentCategory,
 				products,
+				locale,
 				...ssrTranslations
 			},
 			revalidate: 10
@@ -80,6 +88,9 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+	if (process.env.DISABLE_DYNAMIC_BUILD) {
+		return { paths: [], fallback: 'blocking' as const };
+	}
 	const productCategories = await cacheGetProductCategories();
 	const validPaths = [];
 
@@ -101,8 +112,5 @@ export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
 		}
 	}
 
-	return {
-		paths: process.env.DISABLE_DYNAMIC_BUILD === "true" ? [] : validPaths,
-		fallback: 'blocking',
-	};
+	return { paths: validPaths, fallback: 'blocking' as const };
 }

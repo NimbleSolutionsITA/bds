@@ -37,6 +37,7 @@ export default function Index({
 		if (cart && !cart.shipping?.packages?.default?.chosen_method) {
 			dispatch(initCart())
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	useEffect(() => {

@@ -6,9 +6,10 @@ import {
 	mapAcfImage,
 	mapListArticle
 } from "../../src/utils/wordpress_api";
+import {mapArticleToListArticle} from "../../src/utils/mappers";
 import Layout from "../../src/layout/Layout";
 import FeaturedArticles from "../../src/pages/dentro-diaries/FeaturedArticles";
-import {AcfImage, Article, ListArticle} from "../../src/types/woocommerce";
+import {AcfImage, ListArticle} from "../../src/types/woocommerce";
 import TopBanner from "../../src/pages/dentro-diaries/TopBanner";
 import NewsletterTopBar from "../../src/pages/dentro-diaries/NewsletterTopBar";
 import ArticlesRow from "../../src/components/ArticlesRow";
@@ -24,7 +25,7 @@ export type DentroDiariesProps = PageBaseProps & {
 	postsByCategory: {
 		type: string
 		id: number
-		posts: Article[]
+		posts: ListArticle[]
 	}[],
 	title: string
 	content: string
@@ -65,7 +66,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 	))).map(({posts}, index) => ({
 		type: categories[index].name,
 		id: categories[index].id,
-		posts
+		posts: posts.map(mapArticleToListArticle)
 	}));
 	const urlPrefix = locale === 'it' ? '' : '/' + locale;
 

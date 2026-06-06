@@ -59,6 +59,9 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: LOC
 }
 
 export const getStaticPaths = async ({ locales }: { locales: LOCALE[] }) => {
+	if (process.env.DISABLE_DYNAMIC_BUILD) {
+		return { paths: [], fallback: 'blocking' as const };
+	}
 	return {
 		paths: locales.flatMap(locale =>
 			['uomo', 'donna'].map(gender => ({
@@ -66,6 +69,6 @@ export const getStaticPaths = async ({ locales }: { locales: LOCALE[] }) => {
 				locale,
 			})),
 		),
-		fallback: false,
+		fallback: 'blocking' as const,
 	};
 };

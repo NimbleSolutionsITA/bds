@@ -1,4 +1,4 @@
-import React, {ElementRef, RefObject, useEffect, useRef} from "react";
+import React, {ElementRef, RefObject, useCallback, useEffect, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../redux/store";
 import {PayPalApplePayConfig, PayPalWithApplePay} from "./PayPalProvider";
@@ -17,9 +17,8 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 	const buttonRef = useRef<ElementRef<'div'>>(null);
 	const dispatch = useDispatch<AppDispatch>();
 	const router = useRouter();
-	const countryCodes = shipping.countries.map(c => c.code);
-
-	const onClick = async () => {
+	const onClick = useCallback(async () => {
+		const countryCodes = shipping.countries.map(c => c.code);
 		Sentry.setTag("area", "checkout");
 		Sentry.setTag("step", "applepay_click");
 		if (!applePayConfig || !applePayConfig.isEligible || !window.paypal || !checkoutCart?.cart_key) {
@@ -152,9 +151,10 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					session.completePayment({
 						status: window.ApplePaySession.STATUS_FAILURE,
 					});
+					return;
 				}
 
-				const { id } = await orderResponse.json()
+				const { id, wooOrder: createdWooOrder } = await orderResponse.json()
 				/**
 				 * Confirm Payment
 				 */
@@ -176,26 +176,34 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 				});
 
 				if (!response.ok) {
-					session.completePayment({
-						status: window.ApplePaySession.STATUS_FAILURE,
-					});
+					if (createdWooOrder?.id) {
+						await fetch(`/api/orders/${createdWooOrder.id}/abort`, {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ isFailed: true }),
+						});
+					}
+					session.completePayment({ status: window.ApplePaySession.STATUS_FAILURE });
+					return;
 				}
 
 				const orderData = await response.json();
 
 				if (!orderData.success) {
+					if (createdWooOrder?.id) {
+						await fetch(`/api/orders/${createdWooOrder.id}/abort`, {
+							method: "PUT",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({ isFailed: true }),
+						});
+					}
 					throw new Error(orderData.error);
 				}
-				const { wooOrder } = orderData;
 
-				stashPurchaseForCompletedPage(wooOrder);
-				session.completePayment({
-					status: window.ApplePaySession.STATUS_SUCCESS,
-				});
-				if (!askForShipping) {
-					dispatch(destroyCart());
-					router.push('/checkout/completed')
-				}
+				stashPurchaseForCompletedPage(createdWooOrder);
+				session.completePayment({ status: window.ApplePaySession.STATUS_SUCCESS });
+				dispatch(destroyCart());
+				router.push('/checkout/completed');
 			} catch (err) {
 				console.error(err);
 				Sentry.setContext("checkout", {
@@ -217,7 +225,7 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 		}
 
 		session.begin();
-	}
+	}, [applePayConfig, checkoutCart, shipping, askForShipping, customerNote, invoice, user?.user_id, dispatch, router]);
 
 	const updateButtonStyle = (
 		button?: Element | null,
@@ -240,13 +248,13 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 		})
 
 	useEffect(() => {
-		if (buttonRef.current !== null) {
-			buttonRef.current.addEventListener('click', onClick);
+		const button = buttonRef.current;
+		if (button !== null) {
+			button.addEventListener('click', onClick);
 		}
-
 		return () => {
-			if (buttonRef.current !== null) {
-				buttonRef.current.removeEventListener('click', onClick);
+			if (button !== null) {
+				button.removeEventListener('click', onClick);
 			}
 		};
 	}, [onClick]);
@@ -275,7 +283,7 @@ apple-pay-button {
 	--apple-pay-button-box-sizing: border-box;
 }			
 			`}} />
-			{(applePayConfig?.isEligible && window.ApplePaySession) ? createApplePayButton(buttonRef) : null}
+			{(applePayConfig?.isEligible && typeof window !== 'undefined' && window.ApplePaySession) ? createApplePayButton(buttonRef) : null}
 		</>
 	)
 }

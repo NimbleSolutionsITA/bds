@@ -117,6 +117,7 @@ const CheckoutGrid = ({ shipping }: CheckoutGridProps) => {
 		if (defaultStep !== 'ADDRESS') {
 			handleSubmit(onValid(defaultStep))()
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return (

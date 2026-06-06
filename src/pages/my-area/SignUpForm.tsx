@@ -13,6 +13,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogActions from "@mui/material/DialogActions";
 import Dialog from "@mui/material/Dialog";
 import useAuth from "../../utils/useAuth";
+import WithApollo from "../../utils/WithApollo";
 
 const REGISTER_USER = gql`
     mutation registerUser(
@@ -35,7 +36,7 @@ const REGISTER_USER = gql`
     }
 `;
 
-export default function SignUpForm() {
+function SignUpFormContent() {
 	const {subscribeNewsletter} = useAuth();
 	const [register, { data, loading, error }] = useMutation(REGISTER_USER);
 	const wasSignUpSuccessful = Boolean(data?.registerUser?.user?.databaseId);
@@ -154,5 +155,13 @@ export default function SignUpForm() {
 		        </DialogActions>
 	        </Dialog>
         </>
+	);
+}
+
+export default function SignUpForm() {
+	return (
+		<WithApollo>
+			<SignUpFormContent />
+		</WithApollo>
 	);
 }

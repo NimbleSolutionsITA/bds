@@ -23,10 +23,16 @@ export default async function handler(
 			const paypalOrderId = req.query.id as string;
 			if (!paypalOrderId) throw new Error('Paypal Order ID is missing');
 
+			Sentry.setTag("area", "checkout");
+			Sentry.setTag("step", "capture_order");
+			Sentry.addBreadcrumb({ category: 'checkout', message: 'Capture order started', data: { paypalOrderId }, level: 'info' });
+
 			const captureData = await captureOrder(paypalOrderId);
 			const purchaseUnit = captureData?.purchase_units?.[0];
 			const capture = purchaseUnit?.payments?.captures?.[0];
 			const wooOrderId = purchaseUnit?.reference_id;
+
+			Sentry.addBreadcrumb({ category: 'checkout', message: 'PayPal capture response', data: { captureStatus: capture?.status, wooOrderId }, level: 'info' });
 
 			if (wooOrderId) {
 				responseData.success = capture?.status === 'COMPLETED';
@@ -40,23 +46,15 @@ export default async function handler(
 					`Transaction ${capture.status}: ${capture.id}` :
 					'Payment capture was not successful.');
 
-				Sentry.setTag("area", "checkout");
-				Sentry.setTag("step", "capture_order");
-				Sentry.setContext("paypal_capture", {
-					paypalOrderId,
-					responseData
-				});
-				Sentry.captureException(responseData.error);
+				Sentry.setContext("paypal_capture", { paypalOrderId, captureData, responseData });
+				Sentry.captureException(new Error(responseData.error));
 			}
 		}
 	} catch (error) {
 		console.error(error);
 		Sentry.setTag("area", "checkout");
 		Sentry.setTag("step", "capture_order");
-		Sentry.setContext("paypal_capture", {
-			paypalOrderId: req.query.id,
-			responseData
-		});
+		Sentry.setContext("paypal_capture", { paypalOrderId: req.query.id, responseData });
 		Sentry.captureException(error);
 
 		responseData.success = false;
@@ -74,13 +72,16 @@ const captureOrder = async (orderID: string) => {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			Authorization: `Bearer ${accessToken}`
+			Authorization: `Bearer ${accessToken}`,
+			// Idempotency key prevents double-capture if request is retried
+			"PayPal-Request-Id": `capture-${orderID}`,
 		},
 	});
-
+	const data = await response.json();
 	if (!response.ok) {
-		throw new Error(`Failed to capture order: ${response.statusText}`);
+		// Parse PayPal error detail for a meaningful message (e.g. INSTRUMENT_DECLINED)
+		const details = data.details?.[0]?.description ?? data.message ?? response.statusText;
+		throw new Error(details);
 	}
-
-	return await response.json();
+	return data;
 };

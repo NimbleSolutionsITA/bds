@@ -66,6 +66,7 @@ const CookieSettings = () => {
 				clearTimeout(drawerTimer);
 			}
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [saved]);
 
 	useEffect (() => {

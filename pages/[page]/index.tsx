@@ -18,6 +18,7 @@ export type GenericPageProps = PageBaseProps & {
     fragrancePage?: {
         productCategory: WooProductCategory,
         products: BaseProduct[],
+        locale: LOCALE,
     },
     page?: Page
 }
@@ -28,10 +29,12 @@ export default function GenericPage({page, layout, fragrancePage}: GenericPagePr
             {fragrancePage && (<>
                 <FragranceTop
                     name={fragrancePage.productCategory.name}
-                    gallery={fragrancePage.productCategory.acf.gallery}
                     description={fragrancePage.productCategory.description}
                 />
-                <FragranceProductGrid products={fragrancePage.products} />
+                <FragranceProductGrid
+                    products={fragrancePage.products}
+                    lazyLoad={{ categorySlug: fragrancePage.productCategory.slug, lang: fragrancePage.locale, fragrances: true }}
+                />
                 <FragrancesBottom bottomText={fragrancePage.productCategory.acf.bottomText} />
             </>)}
             {page && (
@@ -46,12 +49,17 @@ export default function GenericPage({page, layout, fragrancePage}: GenericPagePr
 export async function getStaticProps({ locale, params: { page: slug } }: { locale: LOCALE, params: {page: string}}) {
     try {
         const { ssrTranslations, ...layoutProps } = await cacheGetLayoutProps(locale);
-        const productCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
+        const isFragranceCategory = layoutProps.categories.find(category => category.id === FRAGRANCES_CATEGORY[locale])?.child_items?.find(category => category.slug === slug);
 
-        if (productCategory) {
-            const { layout: { seo }} = await getCategoryPageProps(locale, slug)
+        if (isFragranceCategory) {
+            const { layout: { seo }, productCategory } = await getCategoryPageProps(locale, slug)
+            if (!productCategory) {
+                return {
+                    notFound: true
+                }
+            }
             const fragranceBrands = getFragrancesCategories(layoutProps.categories).map(({parent}) => parent)
-            if (!productCategory || fragranceBrands.includes(productCategory.id)) {
+            if (fragranceBrands.includes(productCategory.id)) {
                 return {
                     notFound: true
                 }
@@ -59,7 +67,7 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
             const products = await getProducts({
                 categories: productCategory.slug,
                 lang: locale,
-                per_page: '99',
+                per_page: '24',
                 fragrances: true
             })
             const urlPrefix = locale === 'it' ? '' : '/' + locale;
@@ -67,6 +75,10 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
                 { name: 'Home', href: urlPrefix + '/' },
                 { name: productCategory.name, href: urlPrefix + '/'+ productCategory.slug }
             ]
+            const slimProductCategory = {
+                ...productCategory,
+                acf: { bottomText: productCategory.acf?.bottomText ?? '', gallery: [] }
+            }
             return {
                 props: {
                     layout: {
@@ -75,8 +87,9 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
                         breadcrumbs,
                     },
                     fragrancePage: {
-                        productCategory,
-                        products
+                        productCategory: slimProductCategory,
+                        products,
+                        locale
                     },
                     ...ssrTranslations
                 },
@@ -113,8 +126,11 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+    if (process.env.DISABLE_DYNAMIC_BUILD) {
+        return { paths: [], fallback: 'blocking' as const };
+    }
     const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, FRAGRANCES_CATEGORY[locale])));
-    const pageIds =  await getAllPagesIds()
+    const pageIds = await getAllPagesIds()
     const categoryIds = productCategories.flat().map(({slug, lang}) => ({ params: { page: slug }, locale: lang }))
     const paths = [
         categoryIds,
@@ -124,10 +140,7 @@ export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
     ].flat().filter((path, index, self) =>
         index === self.findIndex((p) => !PAGES_TO_EXCLUDE.includes(path.params.page) && p.params.page === path.params.page && p.locale === path.locale)
     );
-    return {
-        paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
-        fallback: 'blocking',
-    };
+    return { paths, fallback: 'blocking' as const };
 }
 
 const PAGES_TO_EXCLUDE = [

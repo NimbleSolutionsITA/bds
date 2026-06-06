@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import Link from "next/link";
 import {CircularProgress, TextField, Typography, Button} from "@mui/material";
+import WithApollo from "../../utils/WithApollo";
 
 const RESET_PASSWORD = gql`
     mutation resetUserPassword(
@@ -28,7 +29,7 @@ interface Props {
 	login: string;
 }
 
-export default function SetPasswordForm({ resetKey: key, login }: Props) {
+function SetPasswordFormContent({ resetKey: key, login }: Props) {
 	const [password, setPassword] = useState('');
 	const [passwordConfirm, setPasswordConfirm] = useState('');
 	const [clientErrorMessage, setClientErrorMessage] = useState('');
@@ -121,5 +122,13 @@ export default function SetPasswordForm({ resetKey: key, login }: Props) {
 				</Button>
 			</fieldset>
 		</form>
+	);
+}
+
+export default function SetPasswordForm(props: Props) {
+	return (
+		<WithApollo>
+			<SetPasswordFormContent {...props} />
+		</WithApollo>
 	);
 }

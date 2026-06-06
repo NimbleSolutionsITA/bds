@@ -1,5 +1,5 @@
 import {GooglePlaces} from "../../pages/api/google-places";
-import {Country, ShippingClass, WooProductCategory} from "./woocommerce";
+import {ShippingClass, WooProductCategory} from "./woocommerce";
 
 export type MenuItem = {
 	id: number
@@ -32,7 +32,6 @@ export type BaseLayoutProps = {
 	googlePlaces: GooglePlaces,
 	breadcrumbs?: BreadCrumb[]
 	shipping: ShippingClass[]
-	countries: Country[]
 	categories: WooProductCategory[]
 	seo: string
 }

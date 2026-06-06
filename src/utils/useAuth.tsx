@@ -224,7 +224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				setLoginChecked(true);
 			}
 		}
-	}, [logIn, loginChecked]);
+	}, [dispatch, logIn, loginChecked]);
 
 	useEffect(() => {
 		if (user?.user_id) {

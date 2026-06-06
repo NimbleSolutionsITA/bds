@@ -1,8 +1,9 @@
 import {Container, Grid2 as Grid} from "@mui/material";
 import {PageBaseProps} from "../../src/types/settings";
 import {getAllPostIds, getSeo} from "../../src/utils/wordpress_api";
+import {mapArticleToListArticle} from "../../src/utils/mappers";
 import Layout from "../../src/layout/Layout";
-import {Article, BaseProduct} from "../../src/types/woocommerce";
+import {Article, BaseProduct, ListArticle} from "../../src/types/woocommerce";
 import ArticleSidebar from "../../src/pages/dentro-diaries/ArticleSidebar";
 import {LOCALE} from "../../src/utils/utils";
 import {cacheGetLayoutProps, cacheGetPostAttributes, cacheGetPosts} from "../../src/utils/cache";
@@ -20,7 +21,7 @@ export type GenericPageProps = PageBaseProps & {
     postsByCategory: {
         type: string
         id: number
-        posts: Article[]
+        posts: ListArticle[]
     }[]
 
 }
@@ -60,7 +61,7 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
     ))).map(({posts}, index) => ({
         type: categories[index].name,
         id: categories[index].id,
-        posts
+        posts: posts.map(mapArticleToListArticle)
     }));
 
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
@@ -87,9 +88,9 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
 }
 
 export async function getStaticPaths() {
+    if (process.env.DISABLE_DYNAMIC_BUILD) {
+        return { paths: [], fallback: 'blocking' as const };
+    }
     const paths = await getAllPostIds();
-    return {
-        paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
-        fallback: 'blocking',
-    };
+    return { paths, fallback: 'blocking' as const };
 }

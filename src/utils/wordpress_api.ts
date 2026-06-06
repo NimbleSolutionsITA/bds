@@ -56,13 +56,24 @@ const mapMenuItems = (item: any): MenuItem => ({
 	child_items: item.child_items ? item.child_items.map(mapMenuItems) : null
 })
 
+const mapProductCategoryForLayout = (categories: WooProductCategory[]) => (category: WooProductCategory): WooProductCategory => ({
+	id: category.id,
+	name: category.name,
+	slug: category.slug,
+	menu_order: category.menu_order,
+	parent: category.parent,
+	lang: category.lang,
+	child_items: categories?.filter(cat => cat.parent === category.id).map(mapProductCategoryForLayout(categories)),
+	// acf, description, image, link, count omitted — not needed in nav/footer
+} as WooProductCategory)
+
 const getCategories = async (categories: WooProductCategory[]) =>
-	categories.filter(cat => cat.parent === 0).map(mapProductCategory(categories))
+	categories.filter(cat => cat.parent === 0).map(mapProductCategoryForLayout(categories))
 
 export const getLayoutProps = async (locale: LOCALE) => {
 	const ssrTranslations = await getSSRTranslations(locale)
 	const productCategories = (await cacheGetProductCategories(locale))
-	const { classes: shipping, countries} = await cacheGetShippingInfo(locale)
+	const { classes: shipping } = await cacheGetShippingInfo(locale)
 	return {
 		menus: {
 			left: await cacheGetMenu(locale, 'menu-left'),
@@ -73,7 +84,6 @@ export const getLayoutProps = async (locale: LOCALE) => {
 		categories: await getCategories(productCategories),
 		googlePlaces,
 		shipping,
-		countries,
 		ssrTranslations
 	}
 }

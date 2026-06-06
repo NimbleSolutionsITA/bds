@@ -1,4 +1,4 @@
-import {Article} from "../../types/woocommerce";
+import {Article, ListArticle} from "../../types/woocommerce";
 import ArticleCardMini from "../../components/ArticleCardMini";
 import ArticleCard from "../../components/ArticleCard";
 import {Typography} from "@mui/material";
@@ -14,7 +14,7 @@ type ArticleSideBarProps = {
 	postsByCategory: {
 		type: string
 		id: number
-		posts: Article[]
+		posts: ListArticle[]
 	}[],
 	tags: Article['tags']
 }

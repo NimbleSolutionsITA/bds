@@ -31,6 +31,7 @@ const usePageState = (initialState: any) => {
 		return () => {
 			window.removeEventListener('scroll', handleScroll);
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
 	return { ...pageState.state, setState }

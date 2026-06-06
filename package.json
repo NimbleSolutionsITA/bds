@@ -8,6 +8,7 @@
     "postbuild": "next-sitemap",
     "start": "dotenv -c -- next start",
     "lint": "next lint",
+    "test": "jest",
     "https": "node server.js"
   },
   "dependencies": {
@@ -65,6 +66,7 @@
   "devDependencies": {
     "@types/gtag.js": "^0.0.20",
     "@types/he": "^1.2.3",
+    "@types/jest": "^30.0.0",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.12",
     "@types/md5": "^2.3.5",
@@ -75,7 +77,10 @@
     "@wordpress/base-styles": "^5.10.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.15",
+    "jest": "^30.3.0",
+    "jest-environment-node": "^30.3.0",
     "sass": "^1.80.3",
+    "ts-jest": "^29.4.9",
     "typescript": "^5.6.3"
   }
 }

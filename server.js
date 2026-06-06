@@ -7,10 +7,13 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-// Read the certificate files
+// Read the certificate files — prefer domain-specific cert if available
+const certBase = fs.existsSync('./www.bottegadisguardi.com.pem')
+    ? './www.bottegadisguardi.com'
+    : './localhost';
 const httpsOptions = {
-    key: fs.readFileSync('./localhost-key.pem'),
-    cert: fs.readFileSync('./localhost.pem'),
+    key: fs.readFileSync(`${certBase}-key.pem`),
+    cert: fs.readFileSync(`${certBase}.pem`),
 };
 
 app.prepare().then(() => {

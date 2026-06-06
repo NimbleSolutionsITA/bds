@@ -55,6 +55,9 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				});
 				const orderData = await response.json();
 				if (!orderData.success) {
+					if (orderData.wooOrder?.id) {
+						await fetch(`/api/orders/${orderData.wooOrder.id}/abort`, { method: "PUT" });
+					}
 					throw new Error(orderData.error);
 				}
 				setWooOrder(orderData.wooOrder);
@@ -76,6 +79,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 			if (!response.ok) {
 				await onError({error: new Error(`Server error: ${response.statusText}`), step: 'onApprove'});
+				return;
 			}
 
 			const { status, success, error = null } = await response.json();
@@ -84,8 +88,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 					stashPurchaseForCompletedPage(wooOrder);
 				}
 				dispatch(destroyCart());
-				setCompleted({})
-				await router.push("/checkout/completed");
+				setCompleted({});
 			} else {
 				if (status === "PENDING") {
 					dispatch(destroyCart());

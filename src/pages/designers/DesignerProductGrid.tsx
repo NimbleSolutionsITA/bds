@@ -1,19 +1,54 @@
 import {BaseAttributes, BaseProduct, Color, ImageColor, TextAttribute} from "../../types/woocommerce";
-import {Box, Container, Grid2 as Grid, MenuItem, Select} from "@mui/material";
+import {Box, Container, Grid2 as Grid, LinearProgress, MenuItem, Select} from "@mui/material";
 import ProductCard from "../../components/ProductCard";
 import {useTranslation} from "next-i18next";
 import usePageState from "../../redux/usePageState";
+import {useQuery} from "@tanstack/react-query";
+import {NEXT_API_ENDPOINT} from "../../utils/endpoints";
 
 type DesignerProductGridProps = {
 	products: BaseProduct[]
+	lazyLoad?: {
+		categorySlug: string
+		lang: string
+		fragrances?: boolean
+	}
 }
 type SortOption = "price-asc" | "price-desc" | "name-asc" | "name-desc"
-const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
+const DesignerProductGrid = ({products: ssrProducts, lazyLoad}: DesignerProductGridProps) => {
 	const { filters, sortOption, setState } = usePageState({
 		filters: {},
 		sortOption: "name-asc"
 	})
 	const { t } = useTranslation('common');
+	const { data: products = ssrProducts, isFetching } = useQuery({
+		queryKey: ['designer-products', lazyLoad?.categorySlug, lazyLoad?.lang, lazyLoad?.fragrances],
+		queryFn: async () => {
+			if (!lazyLoad) return ssrProducts;
+			const params = new URLSearchParams({
+				categories: lazyLoad.categorySlug,
+				lang: lazyLoad.lang,
+				per_page: '99',
+				...(lazyLoad.fragrances ? { fragrances: 'true' } : {}),
+			});
+			const all: BaseProduct[] = [];
+			let page = 1;
+			let lastSize = 99;
+			while (lastSize === 99) {
+				params.set('page', page.toString());
+				const res = await fetch(`${NEXT_API_ENDPOINT}/products?${params.toString()}`);
+				const json = await res.json();
+				const batch: BaseProduct[] = json?.products ?? [];
+				all.push(...batch);
+				lastSize = batch.length;
+				page++;
+			}
+			return all;
+		},
+		enabled: !!lazyLoad,
+		initialData: lazyLoad ? undefined : ssrProducts,
+		staleTime: 60 * 1000,
+	});
 	const availableAttributes = getUniqueAttributeOptions(products)
 	const sortedAndFilteredProducts = products
 		.filter((product) => {
@@ -121,6 +156,7 @@ const DesignerProductGrid = ({products}:DesignerProductGridProps) => {
 					</Grid>
 				))}
 			</Grid>
+			{isFetching && <LinearProgress sx={{mt: '20px'}} />}
 		</Container>
 	)
 }

@@ -2,10 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
 import { WORDPRESS_SITE_URL } from "../../../src/utils/endpoints";
 import axios from "axios";
+import { generateAccessToken } from "./index";
+import * as Sentry from "@sentry/nextjs";
 
 const base = process.env.PAYPAL_API_URL;
-const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
-const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 const PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
 
 const api = new WooCommerceRestApi({
@@ -19,7 +19,6 @@ export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    console.log("req", req.body);
     if (req.method !== 'POST') return res.status(405).end();
 
     const body = req.body;
@@ -44,19 +43,18 @@ export default async function handler(
                 const paypalOrderId = supplementary_data?.related_ids?.order_id
 
                 if (!paypalOrderId) {
-                    console.warn('⚠️ Missing paypal order id in webhook');
+                    Sentry.captureMessage('Webhook: missing PayPal order id in supplementary_data', { level: 'error', extra: { event, resource } });
                     break;
                 }
                 const paypalOrder = await getOrder(paypalOrderId)
                 const wooOrderId = paypalOrder.purchase_units?.[0]?.reference_id;
 
                 if (!wooOrderId) {
-                    console.warn('⚠️ Missing reference_id in paypal order');
+                    Sentry.captureMessage('Webhook: missing reference_id (WooCommerce order) in PayPal order', { level: 'error', extra: { event, paypalOrderId } });
                     break;
                 }
 
-                console.log('paypalOrderId', paypalOrderId);
-                console.log('wooOrderId', wooOrderId);
+                Sentry.addBreadcrumb({ category: 'webhook', message: 'Processing capture event', data: { event, paypalOrderId, wooOrderId }, level: 'info' });
 
                 if (event === 'PAYMENT.CAPTURE.REFUNDED') {
                     await api.put(`orders/${wooOrderId}`, { status: 'refunded' })
@@ -136,7 +134,7 @@ async function verifySignature(req: NextApiRequest, body: any): Promise<boolean>
         `${base}/v1/notifications/verify-webhook-signature`,
         verificationBody,
         { headers: {
-            ContentType: "application/json",
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
         } }
     );
@@ -144,25 +142,3 @@ async function verifySignature(req: NextApiRequest, body: any): Promise<boolean>
     return data.verification_status === 'SUCCESS';
 }
 
-export const generateAccessToken = async () => {
-    try {
-        if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-            throw new Error("MISSING_API_CREDENTIALS");
-        }
-        const auth = Buffer.from(
-            PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET,
-        ).toString("base64");
-        const response = await fetch(`${base}/v1/oauth2/token`, {
-            method: "POST",
-            body: "grant_type=client_credentials",
-            headers: {
-                Authorization: `Basic ${auth}`,
-            },
-        });
-
-        const data = await response.json();
-        return data.access_token;
-    } catch (error) {
-        console.error("Failed to generate Access Token:", error);
-    }
-};

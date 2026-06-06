@@ -1,18 +1,18 @@
-import {Article} from "../types/woocommerce";
+import {ListArticle} from "../types/woocommerce";
 import SectionTitle from "./SectionTitle";
 import ArticleCard from "./ArticleCard";
 import {Grid2 as Grid} from "@mui/material";
 import {useRouter} from "next/router";
 import {WORDPRESS_API_ENDPOINT} from "../utils/endpoints";
-import {mapArticle} from "../utils/mappers";
-import {useState, useEffect} from "react";
+import {mapArticle, mapArticleToListArticle} from "../utils/mappers";
+import {useState, useEffect, useCallback} from "react";
 import {useQuery, useQueryClient} from "@tanstack/react-query";
 
 type ArticlesRowProps = {
 	postsByCategory: {
 		type: string
 		id: number
-		posts: Article[]
+		posts: ListArticle[]
 	}
 }
 
@@ -22,7 +22,7 @@ const ArticlesRow = ({ postsByCategory }: ArticlesRowProps) => {
 	const [totalPages, setTotalPages] = useState<number | undefined>(undefined);
 	const queryClient = useQueryClient();
 
-	const fetchPosts = (page: number) => {
+	const fetchPosts = useCallback((page: number) => {
 		return fetch(`${ WORDPRESS_API_ENDPOINT}/posts?lang=${locale}&page=${page}&per_page=4&categories=${postsByCategory.id}`)
 			.then(response => response.json())
 			.then(data => {
@@ -33,14 +33,14 @@ const ArticlesRow = ({ postsByCategory }: ArticlesRowProps) => {
 
 					setTotalPages(page);
 				}
-				return data.map(mapArticle);
+				return data.map(mapArticle).map(mapArticleToListArticle);
 			})
-			.catch((error) => {
+			.catch(() => {
 				// If we get an error (which means the page is too large), we set totalPages to the current page
 				setTotalPages(page - 1);
 				return []
 			});
-	};
+	}, [locale, postsByCategory.id]);
 
 	const {
 		data,
@@ -74,7 +74,7 @@ const ArticlesRow = ({ postsByCategory }: ArticlesRowProps) => {
 				isLoading={isFetching}
 			/>
 			<Grid container spacing={2}>
-				{data?.map((post:  Article) => (
+				{data?.map((post: ListArticle) => (
 					<Grid key={post.id} component="div" size={{xs: 6, md: 3}}>
 						<ArticleCard key={post.id} article={post} />
 					</Grid>

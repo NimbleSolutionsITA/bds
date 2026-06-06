@@ -9,6 +9,7 @@ import Dialog from "@mui/material/Dialog";
 import React, {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {useTranslation} from "next-i18next";
+import WithApollo from "../../utils/WithApollo";
 
 const SEND_PASSWORD_RESET_EMAIL = gql`
     mutation sendPasswordResetEmail($username: String!) {
@@ -22,7 +23,7 @@ const SEND_PASSWORD_RESET_EMAIL = gql`
     }
 `;
 
-export default function SendPasswordResetEmailForm() {
+function SendPasswordResetEmailFormContent() {
 	const [sendPasswordResetEmail, { loading, error, data }] = useMutation(
 		SEND_PASSWORD_RESET_EMAIL
 	);
@@ -95,5 +96,13 @@ export default function SendPasswordResetEmailForm() {
 				</DialogActions>
 			</Dialog>
 		</form>
+	);
+}
+
+export default function SendPasswordResetEmailForm() {
+	return (
+		<WithApollo>
+			<SendPasswordResetEmailFormContent />
+		</WithApollo>
 	);
 }

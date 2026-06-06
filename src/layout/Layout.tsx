@@ -4,19 +4,14 @@ import NavBarMobile from "./nav/mobile/NavBarMobile";
 import {BaseLayoutProps} from "../types/settings";
 import {useDispatch, useSelector} from "react-redux";
 import CartDrawer from "./cart/CartDrawer";
-import NewsletterDrawer from "./drawers/NewsletterDrawer";
 import {useMediaQuery, useTheme} from "@mui/material";
 import Head from "next/head";
 import parse from "html-react-parser";
-import InStockNotifierDrawer from "./drawers/InStockNotifierDrawer";
 import {openNewsletterDrawer, setConsentReady} from "../redux/layoutSlice";
 import Cookies from "js-cookie";
 import {useRouter} from "next/router";
 import ShippingBannerMobile from "./nav/ShippingBannerMobile";
 import {AppDispatch, RootState} from "../redux/store";
-import SignUpDrawer from "./drawers/SignUpDrawer";
-import LogInDrawer from "./drawers/LogInDrawer";
-import ForgotPasswordDrawer from "./drawers/ForgotPasswordDrawer";
 import CartErrorModal from "./cart/CartErrorModal";
 import WhatsAppButton from "../components/WhatsAppButton";
 import GoogleAnalytics, {COOKIE_CONSENT_NAME} from "./Analytics/GoogleAnalytics";
@@ -29,6 +24,11 @@ type LayoutProps = {
 
 const SearchModal = dynamic(() => import("./drawers/SearchModal"), { ssr: false })
 const Footer = dynamic(() => import("./footer/Footer"), { ssr: false })
+const InStockNotifierDrawer = dynamic(() => import("./drawers/InStockNotifierDrawer"), { ssr: false })
+const NewsletterDrawer = dynamic(() => import("./drawers/NewsletterDrawer"), { ssr: false })
+const LogInDrawer = dynamic(() => import("./drawers/LogInDrawer"), { ssr: false })
+const SignUpDrawer = dynamic(() => import("./drawers/SignUpDrawer"), { ssr: false })
+const ForgotPasswordDrawer = dynamic(() => import("./drawers/ForgotPasswordDrawer"), { ssr: false })
 
 
 export default function Layout({children, layout: {

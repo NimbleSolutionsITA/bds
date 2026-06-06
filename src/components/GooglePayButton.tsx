@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../redux/store";
 import {PayPalWithGooglePay} from "./PayPalProvider";
@@ -22,7 +22,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 	const { googlePayConfig } = useSelector((state: RootState) => state.cart);
 	const { user } = useAuth();
 	const [paymentsClient, setPaymentsClient] = useState<google.payments.api.PaymentsClient>();
-	const paypal = window.paypal as PayPalWithGooglePay;
+	const paypal = (typeof window !== 'undefined' ? window.paypal : undefined) as PayPalWithGooglePay;
 	const cartKey = cart.cart_key;
 	const dispatch = useDispatch<AppDispatch>();
 	const router = useRouter();
@@ -36,11 +36,9 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 			}
 			const googlePay = new paypal.Googlepay();
 			/* Create Order */
-			const {id} = await fetch(`/api/orders`, {
+			const orderCreateResponse = await fetch(`/api/orders`, {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					cart: {
 						...cart,
@@ -51,7 +49,12 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 					customerId: user?.user_id,
 					paymentMethod: "PayPal - GooglePay",
 				}),
-			}).then((res) => res.json());
+			});
+			const orderCreateData = await orderCreateResponse.json();
+			if (!orderCreateResponse.ok || !orderCreateData.success) {
+				throw new Error(orderCreateData.error ?? `Failed to create order: ${orderCreateResponse.statusText}`);
+			}
+			const { id, wooOrder: createdWooOrder } = orderCreateData;
 
 			const {status} = await googlePay.confirmOrder({
 				orderId: id,
@@ -59,8 +62,14 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 			});
 
 			Sentry.setTag("step", "googlepay_confirm_order");
+			Sentry.addBreadcrumb({ category: 'checkout', message: 'Google Pay confirmOrder', data: { status, paypalOrderId: id }, level: 'info' });
 
-			if (status === "APPROVED") {
+			// 3DS challenge: buyer must authenticate before capture
+			if (status === "PAYER_ACTION_REQUIRED") {
+				await googlePay.initiatePayerAction();
+			}
+
+			if (status === "APPROVED" || status === "PAYER_ACTION_REQUIRED") {
 				/* Capture the Order */
 				const response = await fetch(`/api/orders/${id}/capture`, {
 					method: "POST",
@@ -102,12 +111,8 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 						},
 					};
 				}
-				const { wooOrder } = orderData;
-
-				stashPurchaseForCompletedPage(wooOrder);
-				if (!askForShipping) {
-					dispatch(destroyCart());
-				}
+				stashPurchaseForCompletedPage(createdWooOrder);
+				dispatch(destroyCart());
 				router.push('/checkout/completed')
 				return {transactionState: "SUCCESS"};
 			} else {
@@ -136,7 +141,10 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 			};
 		}
 
-	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal?.Googlepay, router, user?.user_id])
+	}, [askForShipping, cart, cartKey, customerNote, dispatch, invoice, paypal?.Googlepay, router, user?.user_id])
+
+	const processPaymentRef = useRef(processPayment);
+	useEffect(() => { processPaymentRef.current = processPayment; }, [processPayment]);
 
 	useEffect(() => {
 		function onPaymentDataChanged(paymentData: IntermediatePaymentData): Promise<PaymentDataRequestUpdate> {
@@ -179,8 +187,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 								reject(error)
 							})
 						})
-					}
-					else if (paymentData.callbackTrigger === "SHIPPING_OPTION") {
+					} else if (paymentData.callbackTrigger === "SHIPPING_OPTION") {
 						callCart(cartKey, '/v1/shipping-methods', "POST", undefined, {
 							key: paymentData.shippingOptionData?.id
 						}).then(() => {
@@ -197,20 +204,21 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 								reject(error)
 							})
 						})
+					} else {
+						resolve({})
 					}
-				}
-				else {
+				} else {
 					resolve({})
 				}
 			});
 		}
 		function onPaymentAuthorized(paymentData: PaymentData): Promise<PaymentAuthorizationResult> {
-			return new Promise(function (resolve, reject) {
+			return new Promise(function (resolve) {
 				Sentry.setTag("area", "checkout");
 				Sentry.setTag("step", "googlepay_onPaymentAuthorized");
-				processPayment(paymentData)
+				processPaymentRef.current(paymentData)
 					.then(function (data) {
-						resolve({ transactionState: "SUCCESS" });
+						resolve(data as PaymentAuthorizationResult);
 					})
 					.catch(function (errDetails) {
 						Sentry.setContext("checkout", {
@@ -242,7 +250,8 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 			getGooglePaymentsClient();
 		}
 
-	}, [askForShipping, cartKey, googlePayConfig, paymentsClient, processPayment])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [askForShipping, cartKey, googlePayConfig, paymentsClient])
 
 	useEffect(() => {
 		const onGooglePaymentButtonClicked = (paymentsClient: google.payments.api.PaymentsClient) => async () => {
@@ -294,6 +303,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				console.error(err);
 			});
 
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [askForShipping, cart, googlePayConfig, paymentsClient, router.locale, shipping.countries]);
 
 	return <div id="google-pay-container" style={{width: '100%', height: "47px"}} />
@@ -308,7 +318,7 @@ const getGoogleTransactionInfo = (cart: Cart, googlePayConfig: CartState['google
 		})),
 		{
 			label: cart.shipping?.packages.default.package_name ?? "Shipping",
-			type: "SHIPPING_OPTION" as const,
+			type: "LINE_ITEM" as const,
 			price: (Number(cart.totals.shipping_total) / 100).toString(),
 		},
 		{
@@ -354,7 +364,7 @@ const getShippingOptionParameters = (shippingPackage: Package) => ({
 const mapPaymentDataToCartCustomer = (paymentData: PaymentData): Customer => {
 	const [ firstName, ...lastNameArray] = paymentData.paymentMethodData.info?.billingAddress?.name?.split(" ") ?? [" ", " "]
 	const lastName = lastNameArray.join(" ")
-	const [ shippingFirstName, ...shippingLastNameArray] = paymentData.paymentMethodData.info?.billingAddress?.name?.split(" ") ?? [" ", " "]
+	const [ shippingFirstName, ...shippingLastNameArray] = paymentData.shippingAddress?.name?.split(" ") ?? [" ", " "]
 	const shippingLastName = shippingLastNameArray.join(" ")
 	return {
 		billing_address: {

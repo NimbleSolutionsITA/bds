@@ -74,6 +74,7 @@ const ProductsGrid = ({ products, isSunglasses, isOptical, isMan, isWoman, searc
 
 	useEffect(() => {
 		setState({pages: data?.pages, pageParams: data?.pageParams})
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [data?.pages, data?.pageParams]);
 
 	return (

@@ -73,6 +73,7 @@ interface GooglePayInstance {
 	config: () => Promise<PayPalGooglePayConfig>;
 	validateMerchant: (options: ValidateMerchantPayload) => Promise<ValidateMerchantResult>;
 	confirmOrder: (options: ConfirmOrderPayloadGooglePay) => Promise<ConfirmOrderResponse>;
+	initiatePayerAction: () => Promise<void>;
 }
 
 interface GooglePayConstructor {
@@ -119,6 +120,8 @@ const PayPalGooglePayConfig = () => {
 			const googlepay = new paypal.Googlepay();
 			googlepay.config().then((config) => {
 				dispatch(setGooglePayConfig(config))
+			}).catch((err: any) => {
+				console.error("Failed to load Google Pay config:", err);
 			})
 		}
 	}, [dispatch, isResolved]);
@@ -135,6 +138,8 @@ const PayPalApplePayConfig = () => {
 			const applepay = new paypal.Applepay();
 			applepay.config().then((config) => {
 				dispatch(setApplePayConfig(config))
+			}).catch((err: any) => {
+				console.error("Failed to load Apple Pay config:", err);
 			})
 		}
 	}, [dispatch, isResolved]);
