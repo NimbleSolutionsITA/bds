@@ -91,14 +91,23 @@ export const SHOP_CATEGORIES = {
     optical: { it: 2796, en: 9604 },
     sunglasses: { it: 2990, en: 9602 }
 }
-export const EYEWEAR_CATEGORIES = [
-    SUNGLASSES_CATEGORY.it,
-    SUNGLASSES_CATEGORY.en,
-    OPTICAL_CATEGORY.it,
-    OPTICAL_CATEGORY.en,
-    EYEWEAR_CATEGORY.it,
-    EYEWEAR_CATEGORY.en,
-];
+const FRAGRANCE_CATEGORY_IDS = Object.values(FRAGRANCES_CATEGORY); // [15787, 15789]
+
+// Una fragranza e un prodotto che appartiene all'albero fragranze. L'albero fragranze e
+// "pulito" (solo le due root it/en) e ogni prodotto fragranza porta sempre la root nel
+// proprio array di categorie (oltre a brand/sottocategorie), quindi basta controllare che
+// una categoria sia la root o ne abbia la root come parent -> copre qualsiasi livello.
+export const isFragranceProduct = (product: Pick<BaseProduct, 'categories'>): boolean =>
+    product.categories?.some(({id, parent}) =>
+        FRAGRANCE_CATEGORY_IDS.includes(id) || FRAGRANCE_CATEGORY_IDS.includes(parent as number)
+    ) ?? false;
+
+// Regola inversa (piu robusta dell'enumerare le categorie eyewear): e eyewear tutto cio
+// che NON e una fragranza. Le categorie occhiali sono sparse e disomogenee (eyewear root,
+// modello, optical...), quindi enumerarle e fragile e lasciava fuori prodotti come quelli
+// messi direttamente sotto optical (es. 180-vista) -> resi col formato verticale da fragranza.
+export const isEyewearProduct = (product: Pick<BaseProduct, 'categories'>): boolean =>
+    !isFragranceProduct(product);
 
 export const getDesignersCategories = (categories: WooProductCategory[]) =>
     categories.find(c => Object.values(EYEWEAR_CATEGORY).includes(c.id))?.child_items?.sort((a,b) => {

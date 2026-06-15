@@ -6,9 +6,8 @@ import {
 } from "../types/woocommerce";
 import {Box, Button, Card, CardContent, CircularProgress, Typography, useMediaQuery, useTheme} from "@mui/material";
 import {
-    EYEWEAR_CATEGORY,
     findVariationFromAttributes,
-    getDefaultProduct, getIsEU, getProductMainCategory, PRODUCT_ATTRIBUTES,
+    getDefaultProduct, getIsEU, getProductMainCategory, isEyewearProduct, PRODUCT_ATTRIBUTES,
     sanitize
 } from "../utils/utils";
 import CartIcon from "../icons/CartIcon";
@@ -33,9 +32,7 @@ type ProductCardProps = {
 const ProductCard = ({ product }: ProductCardProps) => {
     const { cart } = useSelector((state: RootState) => state.cart);
     const isEU = getIsEU(cart?.customer);
-    const isEyewear = product.categories?.find(({parent }) =>
-        parent && Object.values(EYEWEAR_CATEGORY).includes(parent as number)
-    ) !== undefined;
+    const isEyewear = isEyewearProduct(product);
     const imageRatio = isEyewear ? 45 : 130;
     const { defaultProduct, defaultAttributes} = getDefaultProduct(product);
     const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);

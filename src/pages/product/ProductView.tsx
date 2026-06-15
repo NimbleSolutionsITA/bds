@@ -10,8 +10,8 @@ import {Button, Container, Grid2 as Grid, Tooltip, Typography} from "@mui/materi
 import Carousel from "react-material-ui-carousel";
 import ZoomableImage from "../../components/ZoomableImage";
 import {
-	EYEWEAR_CATEGORIES,
 	getDefaultProduct, getIsEU, getProductCategoryLink, getVariationFromParams,
+	isEyewearProduct,
 	sanitize
 } from "../../utils/utils";
 import Link from "../../components/Link";
@@ -62,9 +62,7 @@ const ProductView = ({product, category, shipping, countries}: ProductViewProps)
 	const { cart } = useSelector((state: RootState) => state.cart);
 	const isEU = getIsEU(cart?.customer)
 	const init = getDefaultProduct(product, getVariationFromParams(product, params));
-	const isEyewear = product.categories.find(({id, parent }) =>
-		EYEWEAR_CATEGORIES.includes(id) || EYEWEAR_CATEGORIES.includes(parent as number)
-	) !== undefined;
+	const isEyewear = isEyewearProduct(product);
 	const defaultProduct = init.defaultProduct as Variation;
 	const {defaultAttributes} = init;
 	const [currentAttributes, setCurrentAttributes] = useState(defaultAttributes);
