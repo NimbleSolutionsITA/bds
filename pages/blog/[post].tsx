@@ -1,6 +1,7 @@
 import {Container, Grid2 as Grid} from "@mui/material";
 import {PageBaseProps} from "../../src/types/settings";
 import {getAllPostIds, getSeo} from "../../src/utils/wordpress_api";
+import {BLOG_POST_SUB_PATH, buildHrefAlternates} from "../../src/utils/endpoints";
 import Layout from "../../src/layout/Layout";
 import {Article, BaseProduct} from "../../src/types/woocommerce";
 import ArticleSidebar from "../../src/pages/dentro-diaries/ArticleSidebar";
@@ -65,6 +66,7 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
 
     const urlPrefix = locale === 'it' ? '' : '/' + locale;
     const seo = await getSeo(post.link);
+    const alternates = buildHrefAlternates(post.translations, (s) => `/${BLOG_POST_SUB_PATH}/${s}`);
     return post ? {
         props: {
             post,
@@ -76,7 +78,8 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
                     { name: 'Home', href: urlPrefix + '/' },
                     { name: 'Dentro Diaries', href: urlPrefix + '/blog' },
                     { name: post.title, href: urlPrefix + '/blog/' + post.slug },
-                ]
+                ],
+                ...(alternates ? { alternates } : {}),
             },
             ...ssrTranslations
         },

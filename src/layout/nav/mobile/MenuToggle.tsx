@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 
-// @ts-ignore
-const Path = (props) => (
+const Path = (props: React.ComponentProps<typeof motion.path>) => (
     <motion.path
         fill="transparent"
         strokeLinecap="round"
@@ -12,8 +11,7 @@ const Path = (props) => (
 
 const transition = { duration: 0.3 };
 
-// @ts-ignore
-export function MenuToggle({ isOpen }) {
+export function MenuToggle({ isOpen }: { isOpen: boolean }) {
     return (
         <svg width="20" height="20" viewBox="0 0 20 20">
             <Path

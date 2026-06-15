@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useSelector} from "react-redux";
 import {RootState} from "../redux/store";
-import axios from "axios";
+import {httpRequest} from "../utils/http";
 import {AddItemToCartPayload, getCoCartAxiosParams} from "../redux/cartSlice";
 import {Cart} from "../types/cart-type";
 import {ShippingData} from "../redux/layoutSlice";
@@ -67,7 +67,7 @@ export const callCart = async (
 	payload?: {[key: string]: any},
 	singleItemMode = true
 ): Promise<Cart> => {
-	const response = await axios(getCoCartAxiosParams(url, method, params, payload, cartKey, singleItemMode));
+	const response = await httpRequest<Cart>(getCoCartAxiosParams(url, method, params, payload, cartKey, singleItemMode));
 	if (!response.data) {
 		throw new Error("No data returned from CoCart");
 	}

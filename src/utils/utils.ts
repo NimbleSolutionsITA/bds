@@ -34,6 +34,19 @@ export const PRODUCT_ATTRIBUTES = {
     text: ['calibro', 'formato', 'calibro-ponte'] as const
 }
 
+/** Mappa una chiave attributo JS sul nome della tassonomia WooCommerce (pa_*). */
+export const attributeKeyToTaxonomy = (key: string): string =>
+    'pa_' + (key === 'montaturaLenti' ? 'montatura-lenti' : key);
+
+/** Inverso di attributeKeyToTaxonomy: dal nome tassonomia (pa_*) alla chiave JS. */
+export const taxonomyToAttributeKey = (id: string): string => {
+    const key = id.replace('pa_', '');
+    return key === 'montatura-lenti' ? 'montaturaLenti' : key;
+};
+
+/** Attributi usati per individuare la variante corrispondente a una selezione. */
+export const VARIATION_MATCH_ATTRIBUTES = ['colore', 'lente', 'modello', 'montatura', 'montaturaLenti', 'calibro', 'formato'] as const;
+
 export const EYEWEAR_CATEGORY = {
   it: 188,
   en: 496
@@ -172,15 +185,14 @@ export function getDefaultProduct(product: BaseProduct | Product, variation?: Ba
         attributes: Object.keys(product?.attributes ?? {}).map((key) => {
             const attributes = product.attributes[key as AttributeType];
             return ({
-                id: 'pa_' + (key === 'montaturaLenti' ? 'montatura-lenti' : key),
+                id: attributeKeyToTaxonomy(key),
                 name: attributes && attributes[0].name,
                 option: attributes && attributes[0].slug
             })
         })
     }
     const defaultAttributes: {  [key in AttributeType]?: string } = defaultProduct.attributes ? defaultProduct.attributes.reduce((obj, item) => {
-        const key = item.id.toString().replace("pa_", ""); // remove "pa_" prefix from id
-        obj[key === 'montatura-lenti' ? 'montaturaLenti': key] = item.option;
+        obj[taxonomyToAttributeKey(item.id.toString())] = item.option;
         return obj;
     }, {} as {[key: string]: string}) : {};
 
@@ -189,18 +201,13 @@ export function getDefaultProduct(product: BaseProduct | Product, variation?: Ba
 
 export function findVariationFromAttributes(product: BaseProduct | Product, attributes: {  [key in AttributeType]?: string }): Variation | BaseVariation | undefined {
     const variations = product.variations as BaseVariation[];
-    return variations?.find(
-        (variation: Variation | BaseVariation) => {
-            return (
-                (!attributes.colore || variation.attributes?.find((attribute) => attribute.id === 'pa_colore')?.option === attributes.colore) &&
-                (!attributes.lente || variation.attributes?.find((attribute) => attribute.id === 'pa_lente')?.option === attributes.lente) &&
-                (!attributes.modello || variation.attributes?.find((attribute) => attribute.id === 'pa_modello')?.option === attributes.modello) &&
-                (!attributes.montatura || variation.attributes?.find((attribute) => attribute.id === 'pa_montatura')?.option === attributes.montatura) &&
-                (!attributes.montaturaLenti || variation.attributes?.find((attribute) => attribute.id === 'pa_montatura-lenti')?.option === attributes.montaturaLenti) &&
-                (!attributes.calibro || variation.attributes?.find((attribute) => attribute.id === 'pa_calibro')?.option === attributes.calibro) &&
-                (!attributes.formato || variation.attributes?.find((attribute) => attribute.id === 'pa_formato')?.option === attributes.formato)
-            )
-        }
+    return variations?.find((variation: Variation | BaseVariation) =>
+        VARIATION_MATCH_ATTRIBUTES.every((key) => {
+            const wanted = attributes[key];
+            if (!wanted) return true;
+            const taxonomyId = attributeKeyToTaxonomy(key);
+            return variation.attributes?.find((attribute) => attribute.id === taxonomyId)?.option === wanted;
+        })
     )
 }
 

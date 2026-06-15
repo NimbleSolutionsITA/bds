@@ -17,8 +17,13 @@ import {getCartItemPrice, getCartTotals, getIsEU, gtagPurchase} from "../utils/u
 import TotalPriceStatus = google.payments.api.TotalPriceStatus;
 import useAuth from "../utils/useAuth";
 import * as Sentry from "@sentry/nextjs";
+import {useTranslation} from "next-i18next";
+import {getPaymentErrorMessage} from "../utils/paymentErrors";
+import ErrorDialog from "./ErrorDialog";
 
 const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}: PaymentButtonProps) => {
+	const { t } = useTranslation('common');
+	const [error, setError] = useState<string>();
 	const { googlePayConfig } = useSelector((state: RootState) => state.cart);
 	const { user } = useAuth();
 	const [paymentsClient, setPaymentsClient] = useState<google.payments.api.PaymentsClient>();
@@ -30,13 +35,32 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 	const processPayment = useCallback(async (paymentData: PaymentData) => {
 		Sentry.setTag("area", "checkout");
 		Sentry.setTag("step", "googlepay_process_payment");
+		// Elimina l'ordine pending se il flusso non va a buon fine (idempotente).
+		let createdWooOrderId: number | undefined;
+		const abortOrder = () => createdWooOrderId
+			? fetch(`/api/orders/${createdWooOrderId}/abort`, { method: "PUT" }).catch(() => {})
+			: Promise.resolve();
+		// Mostra l'errore nella modale condivisa (come gli altri metodi) e lo ritorna
+		// anche a Google Pay per chiudere la sheet.
+		const fail = (raw: any): PaymentAuthorizationResult => {
+			const message = getPaymentErrorMessage(raw, t);
+			setError(message);
+			return {
+				transactionState: "ERROR",
+				error: {
+					reason: "PAYMENT_DATA_INVALID",
+					intent: "PAYMENT_AUTHORIZATION",
+					message,
+				},
+			};
+		};
 		try {
 			if (!paypal.Googlepay) {
 				throw new Error("Google Pay not available");
 			}
 			const googlePay = new paypal.Googlepay();
 			/* Create Order */
-			const {id} = await fetch(`/api/orders`, {
+			const {id, wooOrder} = await fetch(`/api/orders`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -52,6 +76,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 					paymentMethod: "PayPal - GooglePay",
 				}),
 			}).then((res) => res.json());
+			createdWooOrderId = wooOrder?.id;
 
 			const {status} = await googlePay.confirmOrder({
 				orderId: id,
@@ -77,40 +102,36 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 						cartKey,
 					});
 					Sentry.captureException(`Server error: ${response.statusText}`);
-					return {
-						transactionState: "ERROR",
-						error: {
-							message: `Server error: ${response.statusText}`
-						},
-					};
+					return fail(`Server error: ${response.statusText}`);
 				}
 
 				const orderData = await response.json();
 
-				if (!orderData.success) {
-					Sentry.setContext("checkout", {
-						userId: user?.user_id,
-						invoice,
-						customerNote,
-						cartKey,
-					});
-					Sentry.captureException(`Server error: ${response.statusText}`);
-					return {
-						transactionState: "ERROR",
-						error: {
-							message: orderData.error ?? `Server error: ${response.statusText}`
-						},
-					};
+				if (orderData.success || orderData.status === 'PENDING') {
+					// success = pagato; PENDING = accettato ma in revisione (ordine on-hold
+					// lato server). Entrambi sono SUCCESS per Google Pay.
+					if (orderData.success && wooOrder) gtagPurchase(wooOrder);
+					if (!askForShipping) {
+						dispatch(destroyCart());
+					}
+					router.push(orderData.status === 'PENDING'
+						? { pathname: '/checkout/completed', query: { pending: true } }
+						: '/checkout/completed')
+					return {transactionState: "SUCCESS"};
 				}
-				const { wooOrder } = orderData;
 
-				gtagPurchase(wooOrder);
-				if (!askForShipping) {
-					dispatch(destroyCart());
-				}
-				router.push('/checkout/completed')
-				return {transactionState: "SUCCESS"};
+				// Fallimento: l'ordine e gia stato eliminato lato server (capture-fail).
+				Sentry.setContext("checkout", {
+					userId: user?.user_id,
+					invoice,
+					customerNote,
+					cartKey,
+				});
+				Sentry.captureException(`Capture failed: ${orderData.error}`);
+				return fail(orderData.error);
 			} else {
+				// confirmOrder non approvato: l'ordine e creato ma non catturato -> elimina.
+				await abortOrder();
 				Sentry.setContext("checkout", {
 					userId: user?.user_id,
 					invoice,
@@ -118,9 +139,10 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 					cartKey,
 				});
 				Sentry.captureException(`Status error: ${status}`);
-				return {transactionState: "ERROR"};
+				return fail(`Status error: ${status}`);
 			}
 		} catch (err: any) {
+			await abortOrder();
 			Sentry.setContext("checkout", {
 				userId: user?.user_id,
 				invoice,
@@ -128,15 +150,10 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				cartKey,
 			});
 			Sentry.captureException(err);
-			return {
-				transactionState: "ERROR",
-				error: {
-					message: err.message,
-				},
-			};
+			return fail(err);
 		}
 
-	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal?.Googlepay, router, user?.user_id])
+	}, [askForShipping, cart, customerNote, dispatch, invoice, paypal?.Googlepay, router, user?.user_id, t])
 
 	useEffect(() => {
 		function onPaymentDataChanged(paymentData: IntermediatePaymentData): Promise<PaymentDataRequestUpdate> {
@@ -296,7 +313,12 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 
 	}, [askForShipping, cart, googlePayConfig, paymentsClient, router.locale, shipping.countries]);
 
-	return <div id="google-pay-container" style={{width: '100%', height: "47px"}} />
+	return (
+		<>
+			<div id="google-pay-container" style={{width: '100%', height: "47px"}} />
+			<ErrorDialog open={!!error} message={error} onClose={() => setError(undefined)} />
+		</>
+	)
 }
 
 const getGoogleTransactionInfo = (cart: Cart, googlePayConfig: CartState['googlePayConfig'], status: TotalPriceStatus): TransactionInfo => ({

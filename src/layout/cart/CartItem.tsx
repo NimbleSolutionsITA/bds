@@ -39,6 +39,7 @@ const CartItem = ({item, loading}: CartItemProps) => {
 						src={item.featured_image}
 						alt={item.name}
 						fill
+						sizes="120px"
 						style={{objectFit: 'contain'}}
 
 					/>

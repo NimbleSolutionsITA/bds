@@ -63,6 +63,9 @@ interface ApplePayInstance {
 
 interface PayPalProviderProps {
 	children: React.ReactNode | React.ReactNode[];
+	// Componenti del SDK PayPal da caricare. Default = set completo (checkout). La pagina
+	// prodotto ha solo il one-click Apple/Google Pay, quindi puo caricare meno -> SDK piu leggero.
+	components?: string;
 }
 
 interface ApplePayConstructor {
@@ -94,12 +97,12 @@ const LOCALES = {
 	en: "en_US"
 }
 
-const PayPalProvider = ({ children }: PayPalProviderProps) => {
+const PayPalProvider = ({ children, components = "buttons,applepay,googlepay,card-fields,messages" }: PayPalProviderProps) => {
 	const { locale } = useRouter()
 	return PAYPAL_CLIENT_ID ? (
 		<PayPalScriptProvider options={{
 			clientId: PAYPAL_CLIENT_ID,
-			components: "buttons,applepay,googlepay,card-fields,messages",
+			components,
 			currency: "EUR",
 			locale: LOCALES[locale as LOCALE]
 		}}>

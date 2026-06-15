@@ -169,6 +169,7 @@ const CartItem = ({item}: {item: WooLineItem}) => {
 					src={item.image.src}
 					alt={item.name}
 					fill
+					sizes="120px"
 					style={{objectFit: 'contain'}}
 
 				/>

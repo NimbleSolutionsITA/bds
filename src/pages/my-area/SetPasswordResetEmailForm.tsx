@@ -1,4 +1,4 @@
-import { useMutation, gql } from "@apollo/client";
+import { useGraphQLMutation } from "../../utils/graphql";
 import {CircularProgress, TextField, Typography, Button} from "@mui/material";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -10,7 +10,7 @@ import React, {useEffect} from "react";
 import {useDispatch} from "react-redux";
 import {useTranslation} from "next-i18next";
 
-const SEND_PASSWORD_RESET_EMAIL = gql`
+const SEND_PASSWORD_RESET_EMAIL = `
     mutation sendPasswordResetEmail($username: String!) {
         sendPasswordResetEmail(
             input: { username: $username }
@@ -23,7 +23,7 @@ const SEND_PASSWORD_RESET_EMAIL = gql`
 `;
 
 export default function SendPasswordResetEmailForm() {
-	const [sendPasswordResetEmail, { loading, error, data }] = useMutation(
+	const [sendPasswordResetEmail, { loading, error, data }] = useGraphQLMutation(
 		SEND_PASSWORD_RESET_EMAIL
 	);
 	const [completedModalOpen, setCompletedModalOpen] = React.useState(false);

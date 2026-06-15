@@ -17,6 +17,7 @@ const BannerContact = ({ data }: BannerContactProps) => (
 					src={data.image}
 					alt="Negozio Bottega di Sguardi"
 					fill
+					sizes="(max-width: 900px) 100vw, 50vw"
 					style={{objectFit: 'cover', objectPosition: 'center center'}}
 				/>
 			</div>

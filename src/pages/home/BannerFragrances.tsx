@@ -5,6 +5,7 @@ import Link from "../../components/Link";
 import {BannerGallery} from "../../../pages";
 import Carousel from "react-material-ui-carousel";
 import Image from "next/image";
+import blur from "../../images/blur.jpg";
 
 const BannerFragrances = ({isActive, title, body, ctaText, gallery}: BannerGallery) => isActive ? (
 	<Box sx={{backgroundColor: "#f0e9e5"}}>
@@ -34,6 +35,8 @@ const BannerFragrances = ({isActive, title, body, ctaText, gallery}: BannerGalle
 								height={768}
 								objectFit={"cover"}
 								layout={"responsive"}
+								placeholder="blur"
+								blurDataURL={blur.blurDataURL}
 							/>
 						))}
 					</Carousel>

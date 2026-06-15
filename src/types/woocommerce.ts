@@ -13,6 +13,7 @@ export type Product = Omit<BaseProduct, 'image' | 'variations' | 'categories'> &
 	image: ImageDetailed;
 	variations: Variation[];
 	link: string;
+	translations?: { [locale: string]: string };
 }
 
 export type ProductCategory = BaseCategory & { bottomText: string | null }
@@ -129,6 +130,7 @@ export type WooProductCategory = BaseCategory & Category & {
 	menu_order: number;
 	link: string;
 	child_items?: WooProductCategory[]
+	translations?: { [locale: string]: string }
 }
 
 export type BaseCategory = {
@@ -320,10 +322,7 @@ export type WPPage = {
 	content: {
 		rendered: string;
 	};
-	translations: {
-		it: number
-		eb: number
-	}
+	translations: { [locale: string]: string }
 	link: string;
 	acf: any
 	lang: LOCALE
@@ -353,10 +352,7 @@ export type Page = {
 	title: string;
 	slug: string;
 	content: string
-	translations: {
-		it: number
-		eb: number
-	}
+	translations: { [locale: string]: string }
 	link: string;
 	acf: any
 }

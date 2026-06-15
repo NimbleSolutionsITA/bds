@@ -1,18 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import {WORDPRESS_SITE_URL} from "../../../../src/utils/endpoints";
+import { wooApi as api } from "../../../../src/utils/woocommerce";
 
 export type CreateOrderResponse = {
 	success: boolean
 	error?: string
 }
 
-const api = new WooCommerceRestApi({
-	url: WORDPRESS_SITE_URL ?? '',
-	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
-	version: "wc/v3"
-});
 
 export default async function handler(
 	req: NextApiRequest,

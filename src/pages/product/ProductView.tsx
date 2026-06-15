@@ -293,6 +293,7 @@ const TooltipImage = ({image}: {image: ImageDetailed}) => {
 			<Image
 				src={img}
 				fill
+				sizes="250px"
 				alt={image.alt}
 				style={{objectFit: 'contain'}}
 				onError={() => setImg(placeholder.src)}

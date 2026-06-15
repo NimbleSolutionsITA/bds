@@ -1,4 +1,4 @@
-import React, {ElementRef, RefObject, useEffect, useRef} from "react";
+import React, {ElementRef, RefObject, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppDispatch, RootState} from "../redux/store";
 import {PayPalApplePayConfig, PayPalWithApplePay} from "./PayPalProvider";
@@ -10,10 +10,15 @@ import {destroyCart} from "../redux/cartSlice";
 import {useRouter} from "next/router";
 import useAuth from "../utils/useAuth";
 import * as Sentry from "@sentry/nextjs";
+import {useTranslation} from "next-i18next";
+import {getPaymentErrorMessage} from "../utils/paymentErrors";
+import ErrorDialog from "./ErrorDialog";
 
 const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, askForShipping}: PaymentButtonProps) => {
 	const { applePayConfig } = useSelector((state: RootState) => state.cart);
 	const { user } = useAuth();
+	const { t } = useTranslation('common');
+	const [error, setError] = useState<string>();
 	const buttonRef = useRef<ElementRef<'div'>>(null);
 	const dispatch = useDispatch<AppDispatch>();
 	const router = useRouter();
@@ -138,6 +143,8 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 
 		session.onpaymentauthorized = async (event) => {
 			Sentry.setTag("step", "applepay_authorize");
+			// Elimina l'ordine pending se il flusso non va a buon fine (idempotente).
+			let createdWooOrderId: number | undefined;
 			try {
 				const cart = askForShipping ? await callCart(cartKey, '/v2/cart', "GET") : checkoutCart
 				/* Create Order on the Server Side */
@@ -148,16 +155,14 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					},
 					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id, paymentMethod: 'PayPal - ApplePay' })
 				})
-				if(!orderResponse.ok) {
-					session.completePayment({
-						status: window.ApplePaySession.STATUS_FAILURE,
-					});
+				const orderData = await orderResponse.json()
+				createdWooOrderId = orderData.wooOrder?.id;
+				if (!orderResponse.ok || !orderData.success) {
+					throw new Error(orderData.error ?? `Server error: ${orderResponse.statusText}`);
 				}
+				const { id, wooOrder } = orderData;
 
-				const { id } = await orderResponse.json()
-				/**
-				 * Confirm Payment
-				 */
+				/* Confirm Payment */
 				await applepay.confirmOrder({
 					orderId: id,
 					token: event.payment.token,
@@ -165,39 +170,41 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 					shippingContact: event.payment.shippingContact
 				});
 
-				/*
-				* Capture order (must currently be made on server)
-				*/
+				/* Capture order (must currently be made on server) */
 				const response = await fetch(`/api/orders/${id}/capture`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",
 					},
 				});
+				const captureData = await response.json();
 
-				if (!response.ok) {
-					session.completePayment({
-						status: window.ApplePaySession.STATUS_FAILURE,
-					});
-				}
-
-				const orderData = await response.json();
-
-				if (!orderData.success) {
-					throw new Error(orderData.error);
-				}
-				const { wooOrder } = orderData;
-
-				gtagPurchase(wooOrder);
-				session.completePayment({
-					status: window.ApplePaySession.STATUS_SUCCESS,
-				});
-				if (!askForShipping) {
-					dispatch(destroyCart());
+				if (response.ok && captureData.success) {
+					// Pagato: chiudi la sessione Apple come SUCCESS e vai alla conferma.
+					if (wooOrder) gtagPurchase(wooOrder);
+					session.completePayment({ status: window.ApplePaySession.STATUS_SUCCESS });
+					if (!askForShipping) {
+						dispatch(destroyCart());
+					}
 					router.push('/checkout/completed')
+				} else if (captureData.status === 'PENDING') {
+					// In revisione: il pagamento e accettato (ordine on-hold lato server),
+					// NON e un fallimento. Per Apple e SUCCESS; mostriamo la pagina "in attesa".
+					session.completePayment({ status: window.ApplePaySession.STATUS_SUCCESS });
+					if (!askForShipping) {
+						dispatch(destroyCart());
+					}
+					router.push({ pathname: '/checkout/completed', query: { pending: true } })
+				} else {
+					throw new Error(captureData.error ?? 'Payment capture failed');
 				}
 			} catch (err) {
 				console.error(err);
+				// L'ordine puo essere stato creato ma non catturato (es. confirmOrder
+				// fallito): eliminalo per non lasciare un pending orfano.
+				if (createdWooOrderId) {
+					await fetch(`/api/orders/${createdWooOrderId}/abort`, { method: "PUT" }).catch(() => {});
+				}
 				Sentry.setContext("checkout", {
 					userId: user?.user_id,
 					invoice,
@@ -208,6 +215,9 @@ const ApplePayButton = ({cart: checkoutCart, shipping, invoice, customerNote, as
 				session.completePayment({
 					status: window.ApplePaySession.STATUS_FAILURE,
 				});
+				// Mostra l'errore nella modale condivisa (come gli altri metodi): la sheet
+				// Apple si chiude e l'utente vede il motivo del fallimento sulla pagina.
+				setError(getPaymentErrorMessage(err, t));
 			}
 		};
 
@@ -276,6 +286,7 @@ apple-pay-button {
 }			
 			`}} />
 			{(applePayConfig?.isEligible && window.ApplePaySession) ? createApplePayButton(buttonRef) : null}
+			<ErrorDialog open={!!error} message={error} onClose={() => setError(undefined)} />
 		</>
 	)
 }

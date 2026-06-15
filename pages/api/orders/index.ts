@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import {WORDPRESS_SITE_URL} from "../../../src/utils/endpoints";
+import { wooApi as api } from "../../../src/utils/woocommerce";
 import {getIsEU} from "../../../src/utils/utils";
 import {Cart, Item} from "../../../src/types/cart-type";
 import {WooOrder} from "../../../src/types/woocommerce";
@@ -17,12 +16,6 @@ export type CreateOrderResponse = {
 	wooOrder?: WooOrder
 }
 
-const api = new WooCommerceRestApi({
-	url: WORDPRESS_SITE_URL ?? '',
-	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
-	version: "wc/v3"
-});
 
 export default async function handler(
 	req: NextApiRequest,
@@ -34,7 +27,7 @@ export default async function handler(
 	let orderPayload = {}
 	try {
 		if (req.method === 'POST') {
-			const { cart, invoice = null, customerNote = "", customerId = 0, paymentMethod } = req.body
+			const { cart, invoice = null, customerNote = "", customerId = 0, paymentMethod, wooOrderId } = req.body
 
 			if (!cart) {
 				throw new Error('Cart or customer data is missing')
@@ -43,25 +36,37 @@ export default async function handler(
 			if (cartAmount === 0) {
 				throw new Error('Cart amount is 0')
 			}
-			orderPayload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
-			const { data: order } = await api.post("orders", orderPayload)
+			// Riusa l'ordine pending del tentativo precedente (stesso carrello) o ne crea
+			// uno nuovo. Evita orfani/pile-up: un solo ordine per sessione di checkout.
+			const order = await getOrCreateOrder(cart, invoice, customerNote, customerId, paymentMethod, wooOrderId)
 			responseData.wooOrder = order
-			const amount = Number(order.total)
-			if (amount === 0) {
-				await api.delete(`/api/orders/${order.id}`, { force: true })
+			if (Number(order.total) === 0) {
+				await api.delete(`orders/${order.id}`, { force: true })
 				throw new Error('Order amount is 0')
 			}
-			console.log('ORDER', amount, "CART", cart.totals.total)
-			const paypalOrder = await createOrder(order, paymentMethod)
-			responseData.id = paypalOrder.id
 
-			responseData.success = true
+			try {
+				const paypalOrder = await createOrder(order, paymentMethod)
+				responseData.id = paypalOrder.id
+				responseData.success = true
+			} catch (paypalError) {
+				// Creazione ordine PayPal fallita: elimina subito l'ordine WC orfano
+				// (cleanup affidabile server-side, non dipende dal client).
+				await api.delete(`orders/${order.id}`, { force: true }).catch(() => {})
+				throw paypalError
+			}
 			return res.json(responseData)
 		}
 	} catch (error) {
 		console.error(error)
 		Sentry.setTag("area", "checkout");
 		Sentry.setTag("step", "create_order");
+		// Dettaglio errore PayPal (issue/description/debug_id/breakdown), se presente:
+		// e' il "motivo esatto" della mancata transazione, utile per diagnosticare i
+		// fallimenti sugli ordini grandi (es. mismatch del breakdown importi).
+		if (error && typeof error === "object" && "paypal" in error) {
+			Sentry.setContext("paypal_error", (error as any).paypal);
+		}
 		Sentry.setContext("paypal_create", {
 			orderPayload,
 			body: req.body,
@@ -96,12 +101,32 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 	] as const;
 	const shippingAddress = requiredFields.every(field => shipping[field]) ? shipping : billing;
 
-	const TOTAL = Number(parseFloat(total).toFixed(2))
+	const round2 = (n: number) => Number(n.toFixed(2));
+	const TOTAL = round2(parseFloat(total));
+	const shippingTotal = round2(Number(shipping_total) + Number(shipping_tax));
 
-	const shippingTotal = Number(parseFloat((Number(shipping_total) + Number(shipping_tax)).toFixed(2)));
-	const itemTotal = Number(line_items.reduce((sum, item) => sum + (Number(item.subtotal) + Number(item.subtotal_tax)), 0).toFixed(2));
-	const discountTotal = Number(parseFloat((itemTotal + shippingTotal - TOTAL).toFixed(2)));
-	console.log({itemTotal, discountTotal, shippingTotal, TOTAL})
+	// unit_amount arrotondato per unita; item_total = somma(unit*qty) cosi da combaciare
+	// col ricalcolo di PayPal ed evitare ITEM_TOTAL_MISMATCH (frequente sugli ordini con
+	// quantita multiple, causa dei fallimenti silenziosi). L'importo addebitato NON cambia.
+	const items = line_items.map((item) => {
+		const unit = round2((Number(item.subtotal) + Number(item.subtotal_tax)) / item.quantity);
+		return {
+			name: item.name,
+			sku: item.sku,
+			unit_amount: { currency_code: "EUR", value: unit.toFixed(2) },
+			quantity: item.quantity + "",
+			lineTotal: round2(unit * item.quantity),
+		};
+	});
+	const itemTotal = round2(items.reduce((sum, i) => sum + i.lineTotal, 0));
+
+	// Bilancia il breakdown all'importo esatto (TOTAL) senza modificarlo: la differenza
+	// va in "discount" (totale < item+spedizione) o in "handling" (caso opposto, raro,
+	// solo arrotondamento), entrambi >= 0 -> la somma del breakdown e sempre valida.
+	const diff = round2(itemTotal + shippingTotal - TOTAL);
+	const discountTotal = diff > 0 ? diff : 0;
+	const handlingTotal = diff < 0 ? round2(-diff) : 0;
+
 	const payload = {
 		intent: "CAPTURE",
 		purchase_units: [
@@ -109,32 +134,29 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 				reference_id: id,
 				amount: {
 					currency_code: "EUR",
-					value: TOTAL + "",
+					value: TOTAL.toFixed(2),
 					breakdown: {
 						item_total: {
 							currency_code: "EUR",
-							value: itemTotal + "",
+							value: itemTotal.toFixed(2),
 						},
 						shipping: {
 							currency_code: "EUR",
-							value: shippingTotal + "",
+							value: shippingTotal.toFixed(2),
 						},
 						discount: {
 							currency_code: "EUR",
-							value: discountTotal + "",
-						}
+							value: discountTotal.toFixed(2),
+						},
+						...(handlingTotal > 0 ? {
+							handling: {
+								currency_code: "EUR",
+								value: handlingTotal.toFixed(2),
+							}
+						} : {})
 					}
 				},
-				items: line_items.map((item) => ({
-					name: item.name,
-					sku: item.sku,
-					unit_amount: {
-						currency_code: "EUR",
-						value: ((Number(item.subtotal) + Number(item.subtotal_tax)) / item.quantity).toFixed(2) + "",
-					},
-					quantity: item.quantity + ""
-
-				})),
+				items: items.map(({ lineTotal, ...rest }) => rest),
 				shipping: {
 					type: shipping_lines[0].method_id === "local_pickup" ? "PICKUP_IN_STORE" : "SHIPPING",
 					name: {
@@ -185,8 +207,50 @@ const createOrder = async (order: WooOrder, paymentMethod: string) => {
 		body: JSON.stringify(payload),
 	});
 
-	return await response.json();
+	const paypalOrder = await response.json();
+
+	// PRIMA non si controllava l'esito: su errore (es. breakdown/importo non valido,
+	// frequente sugli ordini grandi) si restituiva il body d'errore con id undefined e
+	// l'handler impostava comunque success=true -> il pagamento falliva SENZA errore.
+	// Ora lanciamo, esponendo l'issue PayPal (per messaggio utente + diagnosi Sentry).
+	if (!response.ok || !paypalOrder?.id) {
+		const detail = paypalOrder?.details?.[0];
+		const err: any = new Error(detail?.issue ?? paypalOrder?.name ?? 'PAYPAL_ORDER_CREATE_FAILED');
+		err.paypal = {
+			status: response.status,
+			name: paypalOrder?.name,
+			issue: detail?.issue,
+			description: detail?.description,
+			debug_id: paypalOrder?.debug_id,
+			breakdown: payload.purchase_units?.[0]?.amount,
+		};
+		throw err;
+	}
+
+	return paypalOrder;
 };
+
+/**
+ * Riusa l'ordine pending del tentativo precedente quando corrisponde al carrello
+ * corrente (stesso totale), altrimenti elimina quello stale e ne crea uno nuovo.
+ * Garantisce un solo ordine WooCommerce per sessione di checkout (no pile-up).
+ */
+const getOrCreateOrder = async (cart: Cart, invoice: any, customerNote: string, customerId: any, paymentMethod: string, wooOrderId?: number | string) => {
+	if (wooOrderId) {
+		const { data: existing } = await api.get(`orders/${wooOrderId}`).catch(() => ({ data: null }))
+		if (existing && existing.status === 'pending') {
+			const cartTotal = (Number(cart.totals.total) / 100).toFixed(2)
+			if (Number(existing.total).toFixed(2) === cartTotal) {
+				return existing // carrello invariato: riusa lo stesso ordine
+			}
+			// carrello cambiato: elimina lo stale e ricrea, evitando dati obsoleti
+			await api.delete(`orders/${wooOrderId}`, { force: true }).catch(() => {})
+		}
+	}
+	const payload = await prepareOrderPayload(cart, invoice, customerNote, customerId, paymentMethod)
+	const { data: order } = await api.post("orders", payload)
+	return order
+}
 
 const prepareOrderPayload = async (cart: Cart, invoice?: any, customerNote?: string, customerId?: string, paymentMethod: string = "PayPal") => {
 	const selectedShipping = cart.shipping?.packages.default.rates[cart.shipping.packages.default.chosen_method]

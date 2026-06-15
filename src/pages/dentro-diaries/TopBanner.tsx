@@ -1,4 +1,5 @@
 import Image from "next/image";
+import blur from "../../images/blur.jpg";
 import {Box, Typography} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
 import {AcfImage} from "../../types/woocommerce";
@@ -69,6 +70,8 @@ const TopBanner = ({gallery, title, content}: TopBannerProps) => {
 								}}
 								src={image.url}
 								alt={image.alt}
+								placeholder="blur"
+								blurDataURL={blur.blurDataURL}
 							/>
 						</SwiperSlide>
 					))}

@@ -58,7 +58,8 @@ const SubmitPayment = () => {
 		const formState = await cardFieldsForm.getState();
 
 		if (!formState.isFormValid) {
-			return alert("The payment form is invalid");
+			onError({ error: 'FORM_INVALID', step: 'cardFormInvalid' });
+			return;
 		}
 		setIsPaying(true);
 

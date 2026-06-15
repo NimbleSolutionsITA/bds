@@ -106,7 +106,7 @@ export default function Home({page, layout}: HomeProps) {
     );
 }
 
-export async function getServerSideProps({ locale }: { locales: string[], locale: LOCALE}) {
+export async function getStaticProps({ locale }: { locales: string[], locale: LOCALE}) {
     const [
         {ssrTranslations, ...layoutProps},
         { seo, page },
@@ -169,5 +169,9 @@ export async function getServerSideProps({ locale }: { locales: string[], locale
             },
             ...ssrTranslations
         },
+        // ISR: la home era SSR (un fetch a WP per ogni richiesta). Ora e cache-able e
+        // condivisa tra i worker PM2 (filesystem .next/cache). Le selezioni prodotti si
+        // aggiornano comunque on-demand via /api/revalidate al cambio prodotto.
+        revalidate: 300,
     }
 }

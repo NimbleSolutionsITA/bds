@@ -35,4 +35,10 @@ export type BaseLayoutProps = {
 	countries: Country[]
 	categories: WooProductCategory[]
 	seo: string
+	alternates?: HrefLangAlternate[]
+}
+
+export type HrefLangAlternate = {
+	locale: string
+	href: string
 }

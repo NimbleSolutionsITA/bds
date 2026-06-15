@@ -60,16 +60,27 @@ const getCategories = async (categories: WooProductCategory[]) =>
 	categories.filter(cat => cat.parent === 0).map(mapProductCategory(categories))
 
 export const getLayoutProps = async (locale: LOCALE) => {
-	const ssrTranslations = await getSSRTranslations(locale)
-	const productCategories = (await cacheGetProductCategories(locale))
-	const { classes: shipping, countries} = await cacheGetShippingInfo(locale)
+	// These fetches are independent, so we run them in parallel instead of
+	// awaiting them one after another (previously the 4 menus alone were serial).
+	const [
+		ssrTranslations,
+		productCategories,
+		{ classes: shipping, countries },
+		left,
+		right,
+		mobile,
+		privacy,
+	] = await Promise.all([
+		getSSRTranslations(locale),
+		cacheGetProductCategories(locale),
+		cacheGetShippingInfo(locale),
+		cacheGetMenu(locale, 'menu-left'),
+		cacheGetMenu(locale, 'menu-right'),
+		cacheGetMenu(locale, 'menu-mobile'),
+		cacheGetMenu(locale, 'policy'),
+	])
 	return {
-		menus: {
-			left: await cacheGetMenu(locale, 'menu-left'),
-			right: await cacheGetMenu(locale, 'menu-right'),
-			mobile: await cacheGetMenu(locale, 'menu-mobile'),
-			privacy: await cacheGetMenu(locale, 'policy')
-		},
+		menus: { left, right, mobile, privacy },
 		categories: await getCategories(productCategories),
 		googlePlaces,
 		shipping,
@@ -305,7 +316,10 @@ export const mapProductCategory = (categories: WooProductCategory[]) => (categor
 		image: category.image ? mapImage(category.image) : null,
 		menu_order: category.menu_order,
 		count: category.count,
-		acf: category.acf,
+		// L'albero categorie viene incluso nelle props di OGNI pagina (nav/footer) ma la
+		// nav non usa acf: lo escludiamo qui (era ~170KB di bottomText HTML per pagina).
+		// Le pagine categoria usano getProductCategory, che restituisce l'acf completo.
+		acf: { bottomText: '', gallery: [] },
 		parent: category.parent,
 		link: category.link,
 		child_items: categories?.filter(cat => cat.parent === category.id).map(mapProductCategory(categories)),

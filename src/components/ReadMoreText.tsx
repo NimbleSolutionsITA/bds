@@ -33,7 +33,6 @@ const ReadMoreText: React.FC<ReadMoreProps> = ({ text }) => {
 				const textHeight = tempDiv.clientHeight;
 				const collapseHeight = parseFloat("4.5em") * parseFloat(window.getComputedStyle(document.documentElement).fontSize); // Convert em to pixels
 				document.body.removeChild(tempDiv);
-				console.log(textHeight, collapseHeight);
 
 				// If the text height exceeds the collapse height, mark it as expandable
 				setIsExpandable(textHeight > collapseHeight);

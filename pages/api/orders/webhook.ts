@@ -1,19 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
-import { WORDPRESS_SITE_URL } from "../../../src/utils/endpoints";
-import axios from "axios";
+import { wooApi as api } from "../../../src/utils/woocommerce";
+import { httpRequest } from "../../../src/utils/http";
 
 const base = process.env.PAYPAL_API_URL;
 const PAYPAL_CLIENT_ID = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET;
 const PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID;
 
-const api = new WooCommerceRestApi({
-    url: WORDPRESS_SITE_URL ?? '',
-    consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-    consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
-    version: "wc/v3"
-});
 
 export default async function handler(
     req: NextApiRequest,
@@ -132,14 +125,15 @@ async function verifySignature(req: NextApiRequest, body: any): Promise<boolean>
         webhook_event: body,
     }
 
-    const { data } = await axios.post(
-        `${base}/v1/notifications/verify-webhook-signature`,
-        verificationBody,
-        { headers: {
-            ContentType: "application/json",
+    const { data } = await httpRequest({
+        method: "POST",
+        url: `${base}/v1/notifications/verify-webhook-signature`,
+        data: verificationBody,
+        headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`
-        } }
-    );
+        }
+    });
 
     return data.verification_status === 'SUCCESS';
 }

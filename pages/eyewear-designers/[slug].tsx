@@ -6,7 +6,7 @@ import {BaseProduct, WooProductCategory} from "../../src/types/woocommerce";
 import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProducts} from "../api/products";
-import {DESIGNERS_SUB_PATH} from "../../src/utils/endpoints";
+import {DESIGNERS_SUB_PATH, buildHrefAlternates} from "../../src/utils/endpoints";
 import {EYEWEAR_CATEGORY, LOCALE} from "../../src/utils/utils";
 import {cacheGetProductCategories} from "../../src/utils/cache";
 
@@ -55,11 +55,13 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		{ name: 'Designers', href: urlPrefix + '/'+DESIGNERS_SUB_PATH },
 		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+DESIGNERS_SUB_PATH+'/' + productCategory.slug },
 	]
+	const alternates = buildHrefAlternates(productCategory.translations, (s) => `/${DESIGNERS_SUB_PATH}/${s}`);
 	return {
 		props: {
 			layout: {
 				...layout,
 				breadcrumbs,
+				...(alternates ? { alternates } : {}),
 			},
 			productCategory,
 			products,

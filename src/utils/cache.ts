@@ -55,8 +55,12 @@ export const cacheGetPosts = async (locale: LOCALE, page?: number, perPage?: num
 		`posts_${locale}_${page}_${perPage}_${slug ?? ""}_${JSON.stringify(categories ?? [])}`
 	)
 
+// Niente cache in-memory sul prodotto: stock e prezzo devono essere freschi a ogni
+// rigenerazione (ISR/on-demand). E' un singolo fetch leggero. Caching della scheda lo
+// fa gia l'ISR (.next/cache, condivisa tra i worker PM2); la freschezza arriva da
+// /api/revalidate al cambio prodotto.
 export const cacheGetProduct = async (locale: LOCALE, slug: string): Promise<ReturnType<typeof getProduct>> =>
-	cacheFunction(async () => await getProduct(locale, slug), `product_${locale}_${slug}`)
+	getProduct(locale, slug)
 
 export const cacheGetPostAttributes = async (locale: LOCALE): Promise<ReturnType<typeof getPostsAttributes>> =>
 	cacheFunction(async () => await getPostsAttributes(locale), `postAttributes_${locale}`, true);

@@ -1,4 +1,4 @@
-import React, {Fragment, useEffect} from "react";
+import React, {Fragment, useEffect, useRef} from "react";
 import {getCheckoutPageProps} from "../../src/utils/wordpress_api";
 import dynamic from "next/dynamic";
 import {Backdrop, CircularProgress} from "@mui/material";
@@ -33,6 +33,20 @@ export default function Index({
 	const isCheckoutReady = cart && loginChecked && !logInDrawerOpen && !initLoading
 	const cartEmpty = cart ? cart.item_count === 0 : true
 
+	// A pagamento riuscito i pulsanti svuotano il carrello (destroyCart) e navigano a
+	// /checkout/completed. Senza questa guardia, il carrello vuoto farebbe scattare il
+	// redirect a "/" qui sotto, "vincendo" sulla navigazione alla pagina di conferma.
+	const completingPayment = useRef(false);
+	useEffect(() => {
+		const onRouteChange = (url: string) => {
+			if (url.includes('/checkout/completed')) {
+				completingPayment.current = true;
+			}
+		};
+		router.events.on('routeChangeStart', onRouteChange);
+		return () => router.events.off('routeChangeStart', onRouteChange);
+	}, [router]);
+
 	useEffect(() => {
 		if (cart && !cart.shipping?.packages?.default?.chosen_method) {
 			dispatch(initCart())
@@ -46,7 +60,7 @@ export default function Index({
 	}, [loginChecked, loggedIn, dispatch])
 
 	useEffect(() => {
-		if (isCheckoutReady && cartEmpty) {
+		if (isCheckoutReady && cartEmpty && !completingPayment.current) {
 			router.push('/')
 		}
 	}, [cartEmpty, isCheckoutReady, router]);

@@ -3,6 +3,7 @@ import { Box } from '@mui/system';
 import { motion } from 'framer-motion';
 import Image from "next/image";
 import placeholder from "../images/placeholder.jpg";
+import blur from "../images/blur.jpg";
 
 interface ZoomProps {
 	img: string;
@@ -67,8 +68,11 @@ const Zoom: React.FC<ZoomProps> = ({ img, zoomScale = 3.0, transitionTime = 0.1,
 					src={image}
 					unoptimized
 					fill
+					sizes="(max-width: 900px) 100vw, 50vw"
 					alt="product gallery image"
 					style={{objectFit: 'cover', objectPosition: 'center center'}}
+					placeholder="blur"
+					blurDataURL={blur.blurDataURL}
 					onError={() => setImage(placeholder.src)}
 				/>
 			</motion.div>

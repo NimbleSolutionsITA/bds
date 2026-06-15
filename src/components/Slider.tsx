@@ -8,8 +8,7 @@ type SliderProps = {
 	slides?: number
 }
 
-// @ts-ignore
-const translateXForElement = (element) => {
+const translateXForElement = (element: HTMLElement) => {
 	const transform = element.style.transform;
 
 	if (!transform || transform.indexOf('translateX(') < 0) {
@@ -24,15 +23,14 @@ const translateXForElement = (element) => {
 }
 
 const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
-	const ref = useRef(null);
+	const ref = useRef<HTMLDivElement>(null);
 	const [constraint, setConstraint] = useState(0);
 	const [activeSlide, setActiveSlide] = useState(0);
 	const animation = useAnimation()
 
 	useEffect(() => {
 		const calcConstraint = () => {
-			// @ts-ignore
-			setConstraint(ref?.current?.scrollWidth - ref?.current?.offsetWidth);
+			setConstraint((ref.current?.scrollWidth ?? 0) - (ref.current?.offsetWidth ?? 0));
 		};
 		calcConstraint()
 		window.addEventListener("resize", calcConstraint);
@@ -42,8 +40,7 @@ const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 
 	const goToSlide = (index: number) => {
 		setActiveSlide(index)
-		// @ts-ignore
-		const slideWidth = (ref?.current?.offsetWidth - gap * (slides - 1)) / slides
+		const slideWidth = ((ref.current?.offsetWidth ?? 0) - gap * (slides - 1)) / slides
 		return animation.start({ x: -(index * (slideWidth+gap)) })
 	}
 
@@ -60,9 +57,8 @@ const Slider = ({children, slides = 3, gap = 10}: SliderProps) => {
 				style={{display: 'flex', gap: gap}}
 				animate={animation}
 				onDragTransitionEnd={() => {
-					const xPos = translateXForElement(ref.current);
-					// @ts-ignore
-					const slideWidth = (ref.current.offsetWidth - gap * (slides - 1)) / slides + gap
+					const xPos = ref.current ? translateXForElement(ref.current) : 0;
+					const slideWidth = ((ref.current?.offsetWidth ?? 0) - gap * (slides - 1)) / slides + gap
 					const targetX = -Math.abs(Math.round(xPos / (slideWidth)) * slideWidth)
 					setActiveSlide(Math.abs(Math.round(xPos / (slideWidth))))
 					return animation.start({ x: targetX, transition: { type: "spring" } });

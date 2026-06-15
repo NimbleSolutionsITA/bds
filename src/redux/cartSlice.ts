@@ -1,11 +1,11 @@
 import {createAsyncThunk, createSlice} from '@reduxjs/toolkit'
 import { Cart } from "../types/cart-type";
 import {WORDPRESS_SITE_URL} from "../utils/endpoints";
-import axios, {AxiosRequestConfig, AxiosResponse} from "axios";
+import {httpRequest, HttpRequestConfig, HttpResponse} from "../utils/http";
 import {gtagAddToCart} from "../utils/utils";
 import {PayPalApplePayConfig, PayPalGooglePayConfig} from "../components/PayPalProvider";
 
-type CoCartError = {error: string, message: string}
+export type CoCartError = {error: string, message: string}
 
 export type CartState = {
 	error: CoCartError|null
@@ -126,8 +126,9 @@ type UpdateCartCustomer = {
 
 export const updateCartCustomer = createAsyncThunk('cart/updateCartCustomer', async (payload: UpdateCartCustomer, thunkAPI) => {
 	try {
-		await callCartData('/v2/cart/update', "POST", payload, {namespace: 'update-customer'});
-		const cartData = await callCartData('/v2/cart', "GET")
+		// CoCart /v2/cart/update ritorna già il cart aggiornato (get_cart_contents),
+		// quindi non serve una GET /v2/cart separata.
+		const cartData = await callCartData('/v2/cart/update', "POST", payload, {namespace: 'update-customer'});
 		return {...(payload.s_address_1 ? getCartData(cartData, payload.s_address_1) : cartData), ship_to_different_address: payload.ship_to_different_address}
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
@@ -159,8 +160,8 @@ type SetCouponPayload = {
 
 export const setCoupon = createAsyncThunk('cart/setCoupon', async (payload: SetCouponPayload, thunkAPI) => {
 	try {
-		await callCartData('/v2/cart/apply-coupon', "POST", {code: payload.code})
-		return await callCartData('/v2/cart', "GET")
+		// apply-coupon ritorna già il cart aggiornato → nessuna GET separata.
+		return await callCartData('/v2/cart/apply-coupon', "POST", {code: payload.code})
 	} catch (error: any) {
 		return thunkAPI.rejectWithValue({
 			error: error?.response?.data?.code ?? error?.code ?? 'generic_error',
@@ -366,16 +367,16 @@ const callCartData = async (url: string, method: 'GET' | 'POST' | 'DELETE', payl
 	// get cart key from local storage
 	const cartKey = localStorage.getItem('cart_key') ?? undefined;
 
-	let response: AxiosResponse<Cart>
+	let response: HttpResponse<Cart>
 
 	try {
-		response = await axios(getCoCartAxiosParams(url, method, params, payload, cartKey));
+		response = await httpRequest(getCoCartAxiosParams(url, method, params, payload, cartKey));
 		if (!!response.data.cart_key) {
 			localStorage.setItem('cart_key', response.data.cart_key as string)
 		}
 	} catch (error) {
 		console.error('cart error', error)
-		response = await axios(getCoCartAxiosParams(url, method, params, payload));
+		response = await httpRequest(getCoCartAxiosParams(url, method, params, payload));
 		localStorage.removeItem('cart_key');
 	}
 
@@ -393,7 +394,7 @@ const getCartData = (cart: Cart, address: string) => ({
 	}
 })
 
-export const getCoCartAxiosParams = (url: string, method: 'GET' | 'POST' | 'DELETE', params?: {[key: string]: any,}, payload?: {[key: string]: any}, cartKey?: string, guestMode = false):  AxiosRequestConfig<{}> => {
+export const getCoCartAxiosParams = (url: string, method: 'GET' | 'POST' | 'DELETE', params?: {[key: string]: any,}, payload?: {[key: string]: any}, cartKey?: string, guestMode = false):  HttpRequestConfig => {
 	const key = localStorage.getItem('cocart_key');
 	const auth = (!guestMode && key) ? {username: atob(key).split(':')[0], password: atob(key).split(':')[1]} : undefined;
 	const p = {

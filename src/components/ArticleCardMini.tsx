@@ -34,6 +34,7 @@ const ArticleCardMini = ({article}: ArticleCardProps) => {
 						src={article.image.medium}
 						alt={article.title}
 						fill
+						sizes="70px"
 						style={{objectFit: 'cover', objectPosition: 'center center'}}
 						placeholder="blur"
 						blurDataURL={blur.blurDataURL}

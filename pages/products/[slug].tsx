@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProductsIds} from "../../src/utils/wordpress_api";
 import {getProductCategoryLink, getProductMainCategory, LOCALE} from "../../src/utils/utils";
-import {WORDPRESS_RANK_MATH_SEO_ENDPOINT} from "../../src/utils/endpoints";
+import {PRODUCT_SUB_PATH, WORDPRESS_RANK_MATH_SEO_ENDPOINT, buildHrefAlternates} from "../../src/utils/endpoints";
 import {useTranslation} from "next-i18next";
 import PayPalProvider from "../../src/components/PayPalProvider";
 import {cacheGetLayoutProps, cacheGetProduct} from "../../src/utils/cache";
@@ -25,7 +25,9 @@ export default function Product({ product, category, layout }: ProductPageProps)
 	const router = useRouter();
 
 	return (
-		<PayPalProvider>
+		// La scheda prodotto usa solo il one-click Apple/Google Pay: carichiamo solo quei
+		// componenti del SDK PayPal (buttons/card-fields/messages servono al checkout).
+		<PayPalProvider components="applepay,googlepay">
 			<Layout layout={layout}>
 				<ProductView key={JSON.stringify(router.query)} product={product} category={category} shipping={layout.shipping} countries={layout.countries} />
 				<ProductsSlider products={product.related ?? []} title={t('related-products')} />
@@ -64,18 +66,25 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		{ name: category.name, href: urlPrefix + getProductCategoryLink(category) },
 		{ name: sanitize(product.name), href: urlPrefix +  '/products/' + slug },
 	]
+	// hreflang: gli slug differiscono per lingua (Polylang), quindi usiamo gli slug
+	// tradotti esposti dal payload invece di anteporre il prefisso allo stesso slug.
+	const alternates = buildHrefAlternates(product.translations, (s) => `/${PRODUCT_SUB_PATH}/${s}`);
 	return {
 		props: {
 			layout: {
 				...layoutProps,
 				breadcrumbs,
 				seo: seo?.head ?? null,
+				...(alternates ? { alternates } : {}),
 			},
 			product,
 			category,
 			...ssrTranslations
 		},
-		revalidate: 10
+		// La freschezza di stock/prezzo arriva on-demand via /api/revalidate al cambio
+		// prodotto; questo e solo una rete di sicurezza -> intervallo piu ampio = meno
+		// rigenerazioni/carico WP. (Lo stock all'acquisto e comunque validato da CoCart.)
+		revalidate: 300
 	}
 }
 

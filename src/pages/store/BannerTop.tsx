@@ -4,6 +4,7 @@ import FullPageSlider from "../../components/FullPageSlider";
 import {StorePageProps} from "../../../pages/negozi-ottica-firenze";
 import Image from "next/image";
 import Link from "next/link";
+import blur from "../../images/blur.jpg";
 
 type SliderWithTextProps = {
 	data: StorePageProps['acf']['bannerTop']
@@ -43,7 +44,10 @@ const SliderWithText = ({data: {
 					src={image}
 					alt="Bottega di Sguardi home slider image"
 					fill
+					sizes="(max-width: 900px) 100vw, 50vw"
 					style={{objectFit: 'cover', objectPosition: 'center center'}}
+					placeholder="blur"
+					blurDataURL={blur.blurDataURL}
 				/>
 			</Grid>
 			<Grid item xs={12} md={6} lg={3} sx={{display: 'flex', paddingRight: {xs: '1%' , lg: 0}, paddingLeft: {xs: 0 , lg: '1%'}, minHeight: '500px'}}>

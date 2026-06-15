@@ -14,6 +14,7 @@ const ArticlePreview = ({ article }: { article: ListArticle }) => {
 					src={article.image.full}
 					alt={article.title}
 					fill
+					sizes="(max-width: 900px) 100vw, 50vw"
 					style={{
 						objectFit: 'cover',
 						objectPosition: 'center center',

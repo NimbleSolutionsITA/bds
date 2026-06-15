@@ -1,4 +1,4 @@
-import React, {createContext, useContext, useEffect, useState} from "react";
+import React, {createContext, useContext, useEffect, useRef, useState} from "react";
 import {OnApproveActions, OnApproveData, PayPalCardFieldsStyleOptions} from "@paypal/paypal-js";
 import {PayPalCardFieldsProvider} from "@paypal/react-paypal-js";
 import {ShippingData} from "../redux/layoutSlice";
@@ -13,6 +13,8 @@ import PaymentErrorDialog from "../pages/checkout/PaymentErrorDialog";
 import {useMutation} from "@tanstack/react-query";
 import * as Sentry from "@sentry/nextjs";
 import {WooOrder} from "../types/woocommerce";
+import {useTranslation} from "next-i18next";
+import {getPaymentErrorMessage} from "../utils/paymentErrors";
 
 interface PayPalProviderProps {
 	children: React.ReactNode | React.ReactNode[];
@@ -34,16 +36,19 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 	const [wooOrder, setWooOrder] = useState<WooOrder>();
 	const [isPaying, setIsPaying] = useState(false);
 	const [completed, setCompleted] = useState<{query?: {pending: boolean}}>();
+	// Id dell'ordine WC del tentativo corrente: passato al server per riusarlo sui
+	// retry (no pile-up) e per il cleanup affidabile in caso di annullamento.
+	const wooOrderIdRef = useRef<number | undefined>(undefined);
 	const { user } = useAuth();
 	const { cart, customerNote } = useSelector((state: RootState) => state.cart);
 	const { watch } = useFormContext()
 	const { invoice } = watch()
 	const router = useRouter();
 	const dispatch = useDispatch<AppDispatch>()
+	const { t } = useTranslation('common')
 
 	const createOrder = useMutation({
 		mutationFn: async (paymentMethod: string) => {
-			setWooOrder(undefined);
 			setIsPaying(true);
 			try {
 				const response = await fetch("/api/orders", {
@@ -51,9 +56,13 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id, paymentMethod }),
+					// wooOrderId: riusa l'ordine pending del tentativo precedente (server-side)
+					body: JSON.stringify({ cart, customerNote, invoice, customerId: user?.user_id, paymentMethod, wooOrderId: wooOrderIdRef.current }),
 				});
 				const orderData = await response.json();
+				if (orderData.wooOrder?.id) {
+					wooOrderIdRef.current = orderData.wooOrder.id;
+				}
 				if (!orderData.success) {
 					throw new Error(orderData.error);
 				}
@@ -83,11 +92,15 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 				if (wooOrder) {
 					gtagPurchase(wooOrder);
 				}
+				wooOrderIdRef.current = undefined; // ordine finalizzato (pagato)
 				dispatch(destroyCart());
 				setCompleted({})
 				await router.push("/checkout/completed");
 			} else {
 				if (status === "PENDING") {
+					// Pagamento in revisione: l'ordine resta (on-hold lato server), non va
+					// ripulito. Mostriamo la pagina "in attesa".
+					wooOrderIdRef.current = undefined;
 					dispatch(destroyCart());
 					setCompleted({query: {
 							pending: true
@@ -103,10 +116,14 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 
 	const {mutateAsync: onError} = useMutation({
 		mutationFn: async ({error, step}: { error: Record<string, any>, step?: string })=> {
-			if (wooOrder && step === 'createOrder') {
-				await fetch(`/api/orders/${wooOrder.id}/abort`, {
+			// Cleanup affidabile dell'ordine pending non finalizzato (annullamento o
+			// fallimento). L'abort elimina solo ordini 'pending' (idempotente), quindi
+			// e sicuro anche se il server lo ha gia ripulito.
+			if (wooOrderIdRef.current) {
+				await fetch(`/api/orders/${wooOrderIdRef.current}/abort`, {
 					method: "PUT",
-				});
+				}).catch(() => {});
+				wooOrderIdRef.current = undefined;
 			}
 			Sentry.setTag("area", "checkout");
 			if (step) {
@@ -121,7 +138,7 @@ export const PayPalCheckoutProvider = ({children, shipping}: PayPalProviderProps
 			});
 			Sentry.captureException(error);
 			setWooOrder(undefined);
-			setError(error.message ?? error.details?.[0]?.description ?? "An error occurred");
+			setError(getPaymentErrorMessage(error, t));
 		}
 	})
 

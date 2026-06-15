@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { useMutation, gql } from "@apollo/client";
+import { useGraphQLMutation } from "../../utils/graphql";
 import Link from "next/link";
 import {CircularProgress, TextField, Typography, Button} from "@mui/material";
 
-const RESET_PASSWORD = gql`
+const RESET_PASSWORD = `
     mutation resetUserPassword(
         $key: String!
         $login: String!
@@ -32,7 +32,7 @@ export default function SetPasswordForm({ resetKey: key, login }: Props) {
 	const [password, setPassword] = useState('');
 	const [passwordConfirm, setPasswordConfirm] = useState('');
 	const [clientErrorMessage, setClientErrorMessage] = useState('');
-	const [resetPassword, { data, loading, error }] = useMutation(RESET_PASSWORD);
+	const [resetPassword, { data, loading, error }] = useGraphQLMutation(RESET_PASSWORD);
 	const wasPasswordReset = Boolean(data?.resetUserPassword?.user?.databaseId);
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {

@@ -8,6 +8,7 @@ import sanitize from "sanitize-html";
 import {getAllProducts} from "../api/products";
 import {FRAGRANCES_CATEGORY, getFragrancesCategories, LOCALE} from "../../src/utils/utils";
 import {cacheGetProductCategories} from "../../src/utils/cache";
+import {NEXT_SITE_URL} from "../../src/utils/endpoints";
 
 const FragranceTop = dynamic(() => import("../../src/components/CategoryTop"))
 const FragranceProductGrid = dynamic(() => import("../../src/pages/designers/DesignerProductGrid"))
@@ -60,11 +61,23 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 			{ name: parentCategory?.name, href: urlPrefix + '/'+page },
 			{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+page+'/' + productCategory.slug },
 		]
+		// hreflang: path annidato /{parentSlug}/{childSlug}, entrambi tradotti via Polylang.
+		// Emettiamo l'alternate solo per le lingue in cui esistono entrambe le traduzioni.
+		const alternatesList = productCategory.translations
+			? Object.entries(productCategory.translations)
+				.filter(([loc]) => parentCategory?.translations?.[loc])
+				.map(([loc, childSlug]) => ({
+					locale: loc,
+					href: `${NEXT_SITE_URL}${loc === 'it' ? '' : '/' + loc}/${parentCategory!.translations![loc]}/${childSlug}`,
+				}))
+			: [];
+		const alternates = alternatesList.length ? alternatesList : undefined;
 		return {
 			props: {
 				layout: {
 					...layout,
 					breadcrumbs,
+					...(alternates ? { alternates } : {}),
 				},
 				productCategory,
 				parentCategory,

@@ -4,7 +4,7 @@ import {LoggedCustomer, WooOrder} from "../types/woocommerce";
 import {useDispatch} from "react-redux";
 import {initCart} from "../redux/cartSlice";
 import {AppDispatch} from "../redux/store";
-import axios from "axios";
+import {httpRequest} from "./http";
 import {WORDPRESS_SITE_URL} from "./endpoints";
 import {closeLogInDrawer} from "../redux/layoutSlice";
 import * as Sentry from "@sentry/nextjs";
@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const { mutateAsync: logIn, isPending: logInLoading, error: logInError } = useMutation({
 		mutationKey: ['login'],
 		mutationFn: async ({ username, password}: {username: string, password: string}) => {
-			const response = await axios({
+			const response = await httpRequest({
 				method: "POST",
 				url: `${WORDPRESS_SITE_URL}/wp-json/cocart/v2/login`,
 				headers: {
@@ -97,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const { mutateAsync: logOut, isPending: logOutLoading, error: logOutError } = useMutation({
 		mutationKey: ['login'],
 		mutationFn: async () => {
-			const response = await axios({
+			const response = await httpRequest({
 				method: "POST",
 				url: `${WORDPRESS_SITE_URL}/wp-json/cocart/v2/logout`,
 				headers: {

@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import WooCommerceRestApi from "@woocommerce/woocommerce-rest-api";
+import { wooApi as api } from "../../../../src/utils/woocommerce";
 import {ShippingZone} from "../../../../src/types/woocommerce";
-import {WORDPRESS_SITE_URL} from "../../../../src/utils/endpoints";
 
 type Data = {
 	success: boolean
@@ -9,12 +8,6 @@ type Data = {
 	error?: string
 }
 
-const api = new WooCommerceRestApi({
-	url: WORDPRESS_SITE_URL ?? '',
-	consumerKey: process.env.WC_CONSUMER_KEY ?? '',
-	consumerSecret: process.env.WC_CONSUMER_SECRET ?? '',
-	version: "wc/v3"
-});
 
 export default async function handler(
 	req: NextApiRequest,

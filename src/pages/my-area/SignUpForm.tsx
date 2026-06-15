@@ -1,4 +1,4 @@
-import { useMutation, gql } from "@apollo/client";
+import { useGraphQLMutation } from "../../utils/graphql";
 import Link from "next/link";
 import {TextField, Typography, Button, CircularProgress, Switch, FormControlLabel} from "@mui/material";
 import HtmlBlock from "../../components/HtmlBlock";
@@ -14,7 +14,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Dialog from "@mui/material/Dialog";
 import useAuth from "../../utils/useAuth";
 
-const REGISTER_USER = gql`
+const REGISTER_USER = `
     mutation registerUser(
         $email: String!
         $firstName: String!
@@ -37,7 +37,7 @@ const REGISTER_USER = gql`
 
 export default function SignUpForm() {
 	const {subscribeNewsletter} = useAuth();
-	const [register, { data, loading, error }] = useMutation(REGISTER_USER);
+	const [register, { data, loading, error }] = useGraphQLMutation(REGISTER_USER);
 	const wasSignUpSuccessful = Boolean(data?.registerUser?.user?.databaseId);
 	const [completedModalOpen, setCompletedModalOpen] = React.useState(false);
 	const { t } = useTranslation();

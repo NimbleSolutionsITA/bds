@@ -159,7 +159,6 @@ const InStockNotifierDrawer = () => {
 							{isError && error ? (
 								<Typography color="error" sx={{marginTop: '10px'}}>
 									{
-										// @ts-ignore
 										error.message ?? t('error')
 									}
 								</Typography>

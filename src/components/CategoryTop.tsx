@@ -3,6 +3,7 @@ import {sanitize} from "../utils/utils";
 import Carousel from "react-material-ui-carousel";
 import Image from "next/image";
 import ReadMoreText from "./ReadMoreText";
+import blur from "../images/blur.jpg";
 
 type DesignerTopProps = {
 	name: string
@@ -47,7 +48,10 @@ const CategoryTop = ({name, brand, description}: DesignerTopProps) => {
 								src={image}
 								alt={name}
 								fill
+								sizes="100vw"
 								style={{objectFit: 'cover', objectPosition: 'center center'}}
+								placeholder="blur"
+								blurDataURL={blur.blurDataURL}
 							/>
 						</Box>
 					))}

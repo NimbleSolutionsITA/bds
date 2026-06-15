@@ -17,11 +17,15 @@ module.exports =  {
     images: {
         remotePatterns:[
             {
-                protocol: 'https',
+                protocol: process.env.NEXT_PUBLIC_SITE_PROTOCOL,
                 hostname: WORDPRESS_HOSTNAME,
             },
         ],
         loader: 'default',
+        // Serve formati moderni (AVIF poi WebP): immagini molto piu leggere su tutto il sito.
+        formats: ['image/avif', 'image/webp'],
+        // Cache delle immagini ottimizzate lato server (riduce il lavoro dell'optimizer).
+        minimumCacheTTL: 60 * 60 * 24 * 30,
     },
     sassOptions: {
         includePaths: [path.join(__dirname, 'styles')],

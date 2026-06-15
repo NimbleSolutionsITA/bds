@@ -24,6 +24,7 @@ const StaffBanner = ({staff}: SliderWithTextProps) => {
 									src={staffMember.photo}
 									alt={staffMember.name}
 									fill
+									sizes="(max-width: 900px) 100vw, 50vw"
 									style={{objectFit: 'cover', objectPosition: 'center center'}}
 								/>
 							</div>

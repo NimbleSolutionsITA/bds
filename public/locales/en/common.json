@@ -1,350 +1,373 @@
 {
-  "ourProduction": "Our production",
-  "cards": "Credit cards",
-  "liquides-imaginaires":"Liquides Imaginaries",
-  "profumum-roma":"Profumum Roma",
-  "maison-gabriella-chieffo":"Maison Gabriella Chieffo",
-  "buy-now":"Buy now",
-  "explore-section":"Explore the section",
-  "read-reviews":"Read all the reviews",
-  "review-on-us":"review on us",
-  "subscribe":"Subscribe",
-  "search-by-name":"Search by name",
-  "gender":"gender",
-  "lens-type":"lens type",
-  "styles":"styles",
-  "materials":"materials",
-  "colors":"colors",
-  "frame-size":"frame size",
-  "price":"price",
-  "frame-size-bridge":"Frame size and bridge",
-  "size":"size",
-  "name":"Name",
-  "ascending":"ascending",
-  "descending":"decending",
-  "sort-by":"sort by",
-  "most-popular":"most popular",
-  "quantity":"quantity",
-  "product":"product",
-  "products":"products",
-  "total":"total",
-  "subtotal":"subtotal",
-  "discount": "discount",
-  "man":"man",
-  "woman":"woman",
-  "optical":"optical",
-  "optical_long":"optical",
-  "sunglasses":"sunglasses",
-  "sunglasses_long":"sunglasses",
-  "up-to":"up to",
-  "over":"over",
-  "search":"search",
-  "read-more":"Read more",
-  "featured-news": "Featured news",
-  "fragrances": "Fragrances",
-  "perfumes": "Perfumes",
-  "eyewear": "Eyewear",
-  "designers": "Designers",
-  "related-products": "Related products",
-  "close": "close",
-  "addToCart": "Add to cart",
-  "order": "order",
-  "order-details": "Order placed on <1>{{date}}</1> at <3>{{time}}</3> and paid with <5>{{paymentMethod}}</5>",
-  "edit-password": "Edit password",
-  "confirm-password": "Confirm password",
-  "upon-request": "Upon request",
-  "my-area": {
-    "profile": "Profile",
-    "billing": "Billing",
-    "shipping": "Shipping",
-    "orders": "Orders",
-    "logout": "Logout",
-    "login": "Login",
-    "register": "Register",
-    "invoice": "Invoice"
-  },
-  "cart":{
-    "title":"Your shopping bag",
-    "cta":"Go to checkout",
-    "empty":{
-      "title":"Your shopping bag is empty.",
-      "subtitle":"Explore our products by starting to select one of the categories below."
-    },
-    "add": "Add to shopping bag"
-  },
-  "filter-colors":{
-    "black":"Black",
-    "darkGray":"Charcoal Gray",
-    "lightGray":"Pearl Gray",
-    "white":"White",
-    "red":"Red",
-    "brightRed":"Fire Engine Red",
-    "yellow":"Yellow",
-    "brightYellow":"Lemon Yellow",
-    "brightGreen":"Lime Green",
-    "green":"Green",
-    "cyan":"Cyan",
-    "brightCyan":"Turquoise",
-    "brightBlue":"Electric Blue",
-    "blue":"Blue",
-    "magenta":"Magenta",
-    "brightMagenta":"Fuchsia"
-  },
-  "attributes":{
-    "pa_colore":"color",
-    "pa_color":"color",
-    "pa_calibro":"frame size",
-    "pa_calibro-ponte":"frame and bridge",
-    "pa_formato":"shape",
-    "pa_lente":"lens type",
-    "pa_modello":"model",
-    "pa_montatura":"frame",
-    "pa_montatura-lenti":"frame and lens"
-  },
-  "search-designer":"Search for a designer",
-  "minutes-read_one":"{{count}} minute read",
-  "minutes-read_other":"{{count}} minutes read",
-  "notify-me":"Notify me",
-  "edit":"Edit",
-  "cookie-policy":{
-    "body":"We use cookies to gather data and save your browsing preferences on the site. You have the ability to disable such cookies in your browser settings and remove those already present. We invite you to consult our Privacy and Cookie Policy for further details.",
-    "edit":"Edit preferences",
-    "saved":"Preferences saved successfully"
-  },
-  "accept":"accept",
-  "notifier":{
-    "success":"Request sent successfully,\nyou will receive a message as soon as the product is available again",
-    "title":"If you wish, we can order it for you and let you know when it will be available again",
-    "consentText":"With this request, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes."
-  },
-  "error":"error",
-  "validation":{
-    "required":"{{field}} is required",
-    "nameRequired":"Name is required",
-    "emailRequired":"Email is required",
-    "emailValid":"Enter a valid email address"
-  },
-  "newsletter":{
-    "title":"Sign up for 10% off your first order",
-    "subtitle": "Not valid on fragrances and limited editions.",
-    "body":"Subscribe to our newsletter to get updates on exclusive previews of collections, exceptional events, and seasonal offers.",
-    "consentText":"By subscribing to the newsletter, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes.",
-    "cta":"Notify me",
-    "promo-text": "<0>Subscribe to our newsletter</0> and get <0>10% discount</0> on next order!",
-    "promo-banner": "<0>10% discount on all models</0> with promo code SCONTO10 (not valid on fragrances and limited editions).",
-    "success": "Congratulations, you are now subscribed to our newsletter!"
-  },
-  "shop":"{{address}} SHOP",
-  "shipping":{
-    "line": "FREE SHIPPING EU over 150€",
-    "line1":"DELIVERY EXPRESS ITA (24-48h)",
-    "line2":"DELIVERY EXPRESS EU (2-4 days)",
-    "lineb":"<0>FREE SHIPPING EU</0> over 150€.",
-    "line1b":"<0>DELIVERY EXPRESS ITA</0> 24/48h",
-    "line2b":"<0>DELIVERY EXPRESS EU</0> 2-4 days"
-  },
-  "sorting": {
-    "price-desc": "Price: Low to High",
-    "price-asc": "Price: High to Low",
-    "name-asc": "Name: A-Z",
-    "name-desc": "Name: Z-A"
-  },
-  "checkout":{
-    "different-address":"I want to ship to a different address",
-    "billing":"Billing",
-    "billing-shipping":"Billing and shipping",
-    "shipping":"Shipping",
-    "address":"Address",
-    "payment":"Payment",
-    "select-payment":"Select a payment method",
-    "pay-now":"Pay now",
-    "ship-to":"Ship to",
-    "contact":"Contact",
-    "bill-to":"Bill to",
-    "secured":"All transactions are secure and encrypted.",
-    "pay-with":"Pay with",
-    "payment-success":"Thank you for your purchase!",
-    "payment-failure":"Something went wrong...",
-    "payment-pending": "Payment is under review",
-    "payment-success-body":"Your order has been successfully processed. You will soon receive an email with the order details.",
-    "payment-failure-body":"It was not possible to complete your order. Please try again later or contact us for more information.",
-    "payment-pending-body": "PayPal is currently reviewing your payment. You will receive a confirmation email once it is completed.",
-    "back-home":"Return to Home",
-    "vat-included":"Includes <0></0> VAT",
-    "coupon-code":"Coupon code",
-    "apply":"Apply",
-    "go-to-invoice":"Proceed to Invoice",
-    "go-to-payment":"Proceed to Payment",
-    "remove": "Remove",
-    "customer-notes": "Special instructions for seller",
-    "invoice": "Invoice",
-    "pay-with-card": "Pay with credit card",
-    "item-recap": "Cart items",
-    "addresses-recap": "Shipping and billing addresses",
-    "payment-method": "Payment method",
-    "payment-methods": {
-      "card": "Credit Card",
-      "paypal": "PayPal",
-      "applepay": "Apple Pay",
-      "googlepay": "Google Pay"
-    }
-  },
-  "form":{
-    "name":"First Name",
-    "lastname":"Last Name",
-    "country":"Country",
-    "city":"City",
-    "address":"Address",
-    "zip":"Postal Code",
-    "phone":"Phone Number",
-    "vat":"VAT Number",
-    "company":"Company (optional)",
-    "state":"State",
-    "tax": "Tax Code",
-    "sdi": "SDI Code or PEC address",
-    "billingChoice": "Type of billing",
-    "invoiceType": "Client type"
-  },
-  "billingChoice": {
-    "invoice": "Invoice",
-    "receipt": "Receipt"
-  },
-  "invoiceType": {
-    "private": "Private",
-    "company": "Company",
-    "freelance": "Freelance"
-  },
-  "available":"Available",
-  "cookies": {
-    "title": "Cookie Preferences",
-    "mandatory": "Functional Cookies (not optional)",
-    "mandatory-body": "Cookies are pieces of information saved in small text files on your browser when you visit a website. These cookies allow the sender to identify your device during the validity period of consent, which is usually one year.",
-    "analytics": "Analytical Cookies",
-    "analytics-body": "Other cookies are used to analyze the behavior of visitors and monitor site performance. By accepting these cookies, you help us to improve our website and provide an optimal browsing experience.",
-    "profiling": "Advertising Profiling Cookies",
-    "profiling-body": "Furthermore, there are cookies that allow Bottega di Sguardi to show you advertisements based on your preferences, in line with the information collected during your navigation. These cookies are set by both us and carefully selected third parties. If you disable these cookies, the ads you will see may be less relevant to your personal interests.",
-    "usage": "Cookies to personalize your experience on Bottega di Sguardi",
-    "usage-body": "Finally, there are cookies that collect information about how the user uses the site in order to improve its quality, customize its features, and ensure an optimized browsing experience.",
-    "save": "Save preferences",
-    "accept": "Accept all"
-  },
-  "log-in": {
-    "title": "Login",
-    "forgot-password": "Forgot your password?",
-    "register": "Don't have an account yet?",
-    "error": {
-      "email": "Invalid email. Please try again.",
-      "password": "Invalid password. Please try again."
-    },
-    "logging-in": "Logging in...",
-    "guest": {
-      "title": "Don't want to register?",
-      "button": "Continue as guest"
-    }
-  },
-  "register": {
-    "title": "Sign up",
-    "existing": "You're already signed up!",
-    "existing2": "Already have an account?",
-    "completed": {
-      "title": "Registration completed",
-      "body": "Thank you for registering. You will soon receive an email with the confirmation link to activate your account."
-    },
-    "sign-up": "Sign up",
-    "signing-up": "Signing up..."
-  },
-  "forgot-password": {
-    "title": "Reset password",
-    "body": "Enter the email associated with your account and you'll be sent a link to reset your password.",
-    "reset": "Send password reset email",
-    "resetting": "Sending...",
-    "completed": {
-      "title": "Warning",
-      "body": "Please check your email. A password reset link has been sent to you."
-    }
-  },
-  "order-status": {
-    "processing": "Processing",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "refunded": "Refunded",
-    "failed": "Failed",
-    "on-hold": "On hold",
-    "pending": "Pending"
-  },
-  "consent": {
-    "title": "Manage your cookie preferences",
-    "description": "We use cookies to improve your experience, deliver personalized content, analyze traffic, and show targeted ads. You can manage your preferences or accept all cookies.",
-    "acceptAll": "Accept all",
-    "saveSettings": "Save settings",
-    "manageTitle": "Consent management",
-    "functionalTitle": "Functional cookies (required)",
-    "functionalDescription": "These cookies are essential for the website to function properly and cannot be disabled. They are usually set in response to actions such as setting privacy preferences, logging in, or filling out forms. Includes: PayPal Checkout, WordPress CMS, security, and load balancing.",
-    "adUserDataTitle": "User data for advertising purposes",
-    "adUserDataDescription": "Allows data collection and sharing with advertising providers for performance measurement and ad delivery. Technologies involved: Google Ads, Facebook Pixel, Google Merchant Center.",
-    "adPersonalizationTitle": "Ad personalization",
-    "adPersonalizationDescription": "Enables personalized ads based on your interests and browsing behavior. Includes remarketing and audience building via Google Ads and Facebook Ads.",
-    "analyticsTitle": "Measurement and analytics",
-    "analyticsDescription": "These cookies help us understand how visitors interact with the website by collecting and reporting anonymous information. Technologies used: Google Analytics, Facebook Pixel, Google Tag Manager.",
-    "personalizationTitle": "Personalized experience",
-    "personalizationDescription": "These cookies allow the site to remember choices you make (such as language or region) and provide enhanced, personalized features. Includes client-side tools like Sentry for user experience monitoring."
-  },
-  "privacyPolicy": {
-    "title": "Privacy Policy",
-    "intro": "This policy describes how we collect, use and protect your personal data in accordance with the General Data Protection Regulation (GDPR - EU Regulation 2016/679).",
-    "controllerTitle": "Data Controller",
-    "controller": "The data controller is Bottega Di Sguardi Srl, registered office at Via di Parione, 54/R\n50123 Florence (FI), Italy. Email: info@bottegadisguardi.com",
-    "dataCollectedTitle": "Personal data collected",
-    "dataCollected": "We collect data such as name, email, IP address, browsing data, shopping preferences, and any data provided during purchase or registration. Some data is collected via cookies, analytics tools, and marketing tags.",
-    "purposeTitle": "Purpose of processing",
-    "purpose": "Your data is used to: complete orders, provide customer support, statistical analysis (Google Analytics, Facebook Pixel), personalized advertising (Google Ads, Facebook), error monitoring (Sentry), security and user experience enhancement.",
-    "legalBasisTitle": "Legal basis",
-    "legalBasis": "The processing is based on consent (Art. 6.1.a GDPR), performance of a contract (Art. 6.1.b), legal obligations (Art. 6.1.c), and legitimate interest (Art. 6.1.f).",
-    "dataSharingTitle": "Data recipients",
-    "dataSharing": "Your data may be shared with external service providers, such as payment processors (e.g., PayPal), analytics services (Google, Meta), and ad platforms, in compliance with data protection laws.",
-    "retentionTitle": "Data retention",
-    "retention": "Your data will be retained for as long as necessary to fulfill the purposes for which it was collected, in compliance with legal obligations.",
-    "rightsTitle": "Your rights",
-    "rights": "You have the right to access, rectify, erase, restrict or object to processing, and the right to data portability. You may also withdraw consent at any time.",
-    "cookiesTitle": "Use of cookies",
-    "cookies": "We use technical, analytics, and marketing cookies. You can manage your preferences through the cookie banner or the dedicated section.",
-    "managePreferences": "To manage your cookie preferences:",
-    "openCookieSettings": "Open cookie settings",
-    "cookieTables": {
-      "columns": {
-        "name": "Cookie Name",
-        "purpose": "Purpose",
-        "duration": "Duration",
-        "provider": "Provider"
-      },
-      "duration": {
-        "session": "Session",
-        "1year": "1 year",
-        "3months": "3 months",
-        "2years": "2 years"
-      },
-      "necessary": {
-        "title": "Necessary Cookies",
-        "description": "These cookies are essential for the website to function properly and cannot be switched off in our systems.",
-        "purpose": {
-          "session": "Maintains the user's session during navigation.",
-          "csrf": "Protects against CSRF attacks.",
-          "language": "Stores the user's selected language.",
-          "newsletter": "Stores the user's preference for newsletter subscription."
-        }
-      },
-      "advertising": {
-        "title": "Advertising Cookies",
-        "description": "These cookies are used to deliver advertisements more relevant to the user's interests.",
-        "purpose": {
-          "facebook": "Used by Facebook to deliver a series of advertisement products.",
-          "analytics": "Used by Google Analytics to distinguish users.",
-          "googleAds": "Used by Google Ads to re-engage visitors.",
-          "sentry": "Used for monitoring and diagnosing user experience errors.",
-          "googlePay": "Used to manage and track payments made through Google Pay.",
-          "applePay": "Used to manage and track payments made through Apple Pay."
-        }
-      }
-    }
-  }
+	"ourProduction": "Our production",
+	"cards": "Credit cards",
+	"liquides-imaginaires": "Liquides Imaginaries",
+	"profumum-roma": "Profumum Roma",
+	"maison-gabriella-chieffo": "Maison Gabriella Chieffo",
+	"buy-now": "Buy now",
+	"explore-section": "Explore the section",
+	"read-reviews": "Read all the reviews",
+	"review-on-us": "review on us",
+	"subscribe": "Subscribe",
+	"search-by-name": "Search by name",
+	"gender": "gender",
+	"lens-type": "lens type",
+	"styles": "styles",
+	"materials": "materials",
+	"colors": "colors",
+	"frame-size": "frame size",
+	"price": "price",
+	"frame-size-bridge": "Frame size and bridge",
+	"size": "size",
+	"name": "Name",
+	"ascending": "ascending",
+	"descending": "decending",
+	"sort-by": "sort by",
+	"most-popular": "most popular",
+	"quantity": "quantity",
+	"product": "product",
+	"products": "products",
+	"total": "total",
+	"subtotal": "subtotal",
+	"discount": "discount",
+	"man": "man",
+	"woman": "woman",
+	"optical": "optical",
+	"optical_long": "optical",
+	"sunglasses": "sunglasses",
+	"sunglasses_long": "sunglasses",
+	"up-to": "up to",
+	"over": "over",
+	"search": "search",
+	"read-more": "Read more",
+	"featured-news": "Featured news",
+	"fragrances": "Fragrances",
+	"perfumes": "Perfumes",
+	"eyewear": "Eyewear",
+	"designers": "Designers",
+	"related-products": "Related products",
+	"close": "close",
+	"addToCart": "Add to cart",
+	"order": "order",
+	"order-details": "Order placed on <1>{{date}}</1> at <3>{{time}}</3> and paid with <5>{{paymentMethod}}</5>",
+	"edit-password": "Edit password",
+	"confirm-password": "Confirm password",
+	"upon-request": "Upon request",
+	"my-area": {
+		"profile": "Profile",
+		"billing": "Billing",
+		"shipping": "Shipping",
+		"orders": "Orders",
+		"logout": "Logout",
+		"login": "Login",
+		"register": "Register",
+		"invoice": "Invoice"
+	},
+	"cart": {
+		"title": "Your shopping bag",
+		"cta": "Go to checkout",
+		"empty": {
+			"title": "Your shopping bag is empty.",
+			"subtitle": "Explore our products by starting to select one of the categories below."
+		},
+		"add": "Add to shopping bag",
+		"errors": {
+			"title": "Cart error",
+			"generic": "Something went wrong with your cart. Please try again.",
+			"coupon_not_exist": "The coupon code you entered does not exist.",
+			"coupon_already_applied": "This coupon has already been applied to your cart.",
+			"coupon_invalid": "The coupon is invalid or not applicable to this order.",
+			"quantity_invalid": "The requested quantity is not available for this product.",
+			"out_of_stock": "This product is not available in the requested quantity.",
+			"invalid_product": "This product cannot be added to the cart.",
+			"session_expired": "Your session has expired. Please log in again and retry."
+		}
+	},
+	"filter-colors": {
+		"black": "Black",
+		"darkGray": "Charcoal Gray",
+		"lightGray": "Pearl Gray",
+		"white": "White",
+		"red": "Red",
+		"brightRed": "Fire Engine Red",
+		"yellow": "Yellow",
+		"brightYellow": "Lemon Yellow",
+		"brightGreen": "Lime Green",
+		"green": "Green",
+		"cyan": "Cyan",
+		"brightCyan": "Turquoise",
+		"brightBlue": "Electric Blue",
+		"blue": "Blue",
+		"magenta": "Magenta",
+		"brightMagenta": "Fuchsia"
+	},
+	"attributes": {
+		"pa_colore": "color",
+		"pa_color": "color",
+		"pa_calibro": "frame size",
+		"pa_calibro-ponte": "frame and bridge",
+		"pa_formato": "shape",
+		"pa_lente": "lens type",
+		"pa_modello": "model",
+		"pa_montatura": "frame",
+		"pa_montatura-lenti": "frame and lens"
+	},
+	"search-designer": "Search for a designer",
+	"minutes-read_one": "{{count}} minute read",
+	"minutes-read_other": "{{count}} minutes read",
+	"notify-me": "Notify me",
+	"edit": "Edit",
+	"cookie-policy": {
+		"body": "We use cookies to gather data and save your browsing preferences on the site. You have the ability to disable such cookies in your browser settings and remove those already present. We invite you to consult our Privacy and Cookie Policy for further details.",
+		"edit": "Edit preferences",
+		"saved": "Preferences saved successfully"
+	},
+	"accept": "accept",
+	"notifier": {
+		"success": "Request sent successfully,\nyou will receive a message as soon as the product is available again",
+		"title": "If you wish, we can order it for you and let you know when it will be available again",
+		"consentText": "With this request, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes."
+	},
+	"error": "error",
+	"validation": {
+		"required": "{{field}} is required",
+		"nameRequired": "Name is required",
+		"emailRequired": "Email is required",
+		"emailValid": "Enter a valid email address"
+	},
+	"newsletter": {
+		"title": "Sign up for 10% off your first order",
+		"subtitle": "Not valid on fragrances and limited editions.",
+		"body": "Subscribe to our newsletter to get updates on exclusive previews of collections, exceptional events, and seasonal offers.",
+		"consentText": "By subscribing to the newsletter, you confirm that you have read the <0>Privacy Policy</0> and consent to the processing of your personal data for marketing purposes.",
+		"cta": "Notify me",
+		"promo-text": "<0>Subscribe to our newsletter</0> and get <0>10% discount</0> on next order!",
+		"promo-banner": "<0>10% discount on all models</0> with promo code SCONTO10 (not valid on fragrances and limited editions).",
+		"success": "Congratulations, you are now subscribed to our newsletter!"
+	},
+	"shop": "{{address}} SHOP",
+	"shipping": {
+		"line": "FREE SHIPPING EU over 150€",
+		"line1": "DELIVERY EXPRESS ITA (24-48h)",
+		"line2": "DELIVERY EXPRESS EU (2-4 days)",
+		"lineb": "<0>FREE SHIPPING EU</0> over 150€.",
+		"line1b": "<0>DELIVERY EXPRESS ITA</0> 24/48h",
+		"line2b": "<0>DELIVERY EXPRESS EU</0> 2-4 days"
+	},
+	"sorting": {
+		"price-desc": "Price: Low to High",
+		"price-asc": "Price: High to Low",
+		"name-asc": "Name: A-Z",
+		"name-desc": "Name: Z-A"
+	},
+	"checkout": {
+		"different-address": "I want to ship to a different address",
+		"billing": "Billing",
+		"billing-shipping": "Billing and shipping",
+		"shipping": "Shipping",
+		"address": "Address",
+		"payment": "Payment",
+		"select-payment": "Select a payment method",
+		"pay-now": "Pay now",
+		"ship-to": "Ship to",
+		"contact": "Contact",
+		"bill-to": "Bill to",
+		"secured": "All transactions are secure and encrypted.",
+		"pay-with": "Pay with",
+		"payment-success": "Thank you for your purchase!",
+		"payment-failure": "Something went wrong...",
+		"payment-pending": "Payment is under review",
+		"payment-success-body": "Your order has been successfully processed. You will soon receive an email with the order details.",
+		"payment-failure-body": "It was not possible to complete your order. Please try again later or contact us for more information.",
+		"payment-pending-body": "PayPal is currently reviewing your payment. You will receive a confirmation email once it is completed.",
+		"back-home": "Return to Home",
+		"vat-included": "Includes <0></0> VAT",
+		"coupon-code": "Coupon code",
+		"apply": "Apply",
+		"go-to-invoice": "Proceed to Invoice",
+		"go-to-payment": "Proceed to Payment",
+		"remove": "Remove",
+		"customer-notes": "Special instructions for seller",
+		"invoice": "Invoice",
+		"pay-with-card": "Pay with credit card",
+		"item-recap": "Cart items",
+		"addresses-recap": "Shipping and billing addresses",
+		"payment-method": "Payment method",
+		"payment-methods": {
+			"card": "Credit Card",
+			"paypal": "PayPal",
+			"applepay": "Apple Pay",
+			"googlepay": "Google Pay"
+		},
+		"errors": {
+			"title": "Payment failed",
+			"generic": "There was a problem with your payment. Please try again or use another method.",
+			"instrument_declined": "Your card was declined. Check your details or try another card or payment method.",
+			"insufficient_funds": "Insufficient funds on the card.",
+			"card_expired": "The card has expired.",
+			"invalid_card": "The card details are invalid. Please check the number, expiry date and security code (CVC).",
+			"authentication_failed": "Card authentication (3D Secure) failed. Please try again or use another method.",
+			"transaction_refused": "The payment was refused by the card network. Please try another payment method.",
+			"form_invalid": "Please fill in all card fields correctly.",
+			"not_authorized": "We couldn't authorize the payment (authentication failed). Please try again or use another method."
+		}
+	},
+	"form": {
+		"name": "First Name",
+		"lastname": "Last Name",
+		"country": "Country",
+		"city": "City",
+		"address": "Address",
+		"zip": "Postal Code",
+		"phone": "Phone Number",
+		"vat": "VAT Number",
+		"company": "Company (optional)",
+		"state": "State",
+		"tax": "Tax Code",
+		"sdi": "SDI Code or PEC address",
+		"billingChoice": "Type of billing",
+		"invoiceType": "Client type"
+	},
+	"billingChoice": {
+		"invoice": "Invoice",
+		"receipt": "Receipt"
+	},
+	"invoiceType": {
+		"private": "Private",
+		"company": "Company",
+		"freelance": "Freelance"
+	},
+	"available": "Available",
+	"cookies": {
+		"title": "Cookie Preferences",
+		"mandatory": "Functional Cookies (not optional)",
+		"mandatory-body": "Cookies are pieces of information saved in small text files on your browser when you visit a website. These cookies allow the sender to identify your device during the validity period of consent, which is usually one year.",
+		"analytics": "Analytical Cookies",
+		"analytics-body": "Other cookies are used to analyze the behavior of visitors and monitor site performance. By accepting these cookies, you help us to improve our website and provide an optimal browsing experience.",
+		"profiling": "Advertising Profiling Cookies",
+		"profiling-body": "Furthermore, there are cookies that allow Bottega di Sguardi to show you advertisements based on your preferences, in line with the information collected during your navigation. These cookies are set by both us and carefully selected third parties. If you disable these cookies, the ads you will see may be less relevant to your personal interests.",
+		"usage": "Cookies to personalize your experience on Bottega di Sguardi",
+		"usage-body": "Finally, there are cookies that collect information about how the user uses the site in order to improve its quality, customize its features, and ensure an optimized browsing experience.",
+		"save": "Save preferences",
+		"accept": "Accept all"
+	},
+	"log-in": {
+		"title": "Login",
+		"forgot-password": "Forgot your password?",
+		"register": "Don't have an account yet?",
+		"error": {
+			"email": "Invalid email. Please try again.",
+			"password": "Invalid password. Please try again."
+		},
+		"logging-in": "Logging in...",
+		"guest": {
+			"title": "Don't want to register?",
+			"button": "Continue as guest"
+		}
+	},
+	"register": {
+		"title": "Sign up",
+		"existing": "You're already signed up!",
+		"existing2": "Already have an account?",
+		"completed": {
+			"title": "Registration completed",
+			"body": "Thank you for registering. You will soon receive an email with the confirmation link to activate your account."
+		},
+		"sign-up": "Sign up",
+		"signing-up": "Signing up..."
+	},
+	"forgot-password": {
+		"title": "Reset password",
+		"body": "Enter the email associated with your account and you'll be sent a link to reset your password.",
+		"reset": "Send password reset email",
+		"resetting": "Sending...",
+		"completed": {
+			"title": "Warning",
+			"body": "Please check your email. A password reset link has been sent to you."
+		}
+	},
+	"order-status": {
+		"processing": "Processing",
+		"completed": "Completed",
+		"cancelled": "Cancelled",
+		"refunded": "Refunded",
+		"failed": "Failed",
+		"on-hold": "On hold",
+		"pending": "Pending"
+	},
+	"consent": {
+		"title": "Manage your cookie preferences",
+		"description": "We use cookies to improve your experience, deliver personalized content, analyze traffic, and show targeted ads. You can manage your preferences or accept all cookies.",
+		"acceptAll": "Accept all",
+		"saveSettings": "Save settings",
+		"manageTitle": "Consent management",
+		"functionalTitle": "Functional cookies (required)",
+		"functionalDescription": "These cookies are essential for the website to function properly and cannot be disabled. They are usually set in response to actions such as setting privacy preferences, logging in, or filling out forms. Includes: PayPal Checkout, WordPress CMS, security, and load balancing.",
+		"adUserDataTitle": "User data for advertising purposes",
+		"adUserDataDescription": "Allows data collection and sharing with advertising providers for performance measurement and ad delivery. Technologies involved: Google Ads, Facebook Pixel, Google Merchant Center.",
+		"adPersonalizationTitle": "Ad personalization",
+		"adPersonalizationDescription": "Enables personalized ads based on your interests and browsing behavior. Includes remarketing and audience building via Google Ads and Facebook Ads.",
+		"analyticsTitle": "Measurement and analytics",
+		"analyticsDescription": "These cookies help us understand how visitors interact with the website by collecting and reporting anonymous information. Technologies used: Google Analytics, Facebook Pixel, Google Tag Manager.",
+		"personalizationTitle": "Personalized experience",
+		"personalizationDescription": "These cookies allow the site to remember choices you make (such as language or region) and provide enhanced, personalized features. Includes client-side tools like Sentry for user experience monitoring."
+	},
+	"privacyPolicy": {
+		"title": "Privacy Policy",
+		"intro": "This policy describes how we collect, use and protect your personal data in accordance with the General Data Protection Regulation (GDPR - EU Regulation 2016/679).",
+		"controllerTitle": "Data Controller",
+		"controller": "The data controller is Bottega Di Sguardi Srl, registered office at Via di Parione, 54/R\n50123 Florence (FI), Italy. Email: info@bottegadisguardi.com",
+		"dataCollectedTitle": "Personal data collected",
+		"dataCollected": "We collect data such as name, email, IP address, browsing data, shopping preferences, and any data provided during purchase or registration. Some data is collected via cookies, analytics tools, and marketing tags.",
+		"purposeTitle": "Purpose of processing",
+		"purpose": "Your data is used to: complete orders, provide customer support, statistical analysis (Google Analytics, Facebook Pixel), personalized advertising (Google Ads, Facebook), error monitoring (Sentry), security and user experience enhancement.",
+		"legalBasisTitle": "Legal basis",
+		"legalBasis": "The processing is based on consent (Art. 6.1.a GDPR), performance of a contract (Art. 6.1.b), legal obligations (Art. 6.1.c), and legitimate interest (Art. 6.1.f).",
+		"dataSharingTitle": "Data recipients",
+		"dataSharing": "Your data may be shared with external service providers, such as payment processors (e.g., PayPal), analytics services (Google, Meta), and ad platforms, in compliance with data protection laws.",
+		"retentionTitle": "Data retention",
+		"retention": "Your data will be retained for as long as necessary to fulfill the purposes for which it was collected, in compliance with legal obligations.",
+		"rightsTitle": "Your rights",
+		"rights": "You have the right to access, rectify, erase, restrict or object to processing, and the right to data portability. You may also withdraw consent at any time.",
+		"cookiesTitle": "Use of cookies",
+		"cookies": "We use technical, analytics, and marketing cookies. You can manage your preferences through the cookie banner or the dedicated section.",
+		"managePreferences": "To manage your cookie preferences:",
+		"openCookieSettings": "Open cookie settings",
+		"cookieTables": {
+			"columns": {
+				"name": "Cookie Name",
+				"purpose": "Purpose",
+				"duration": "Duration",
+				"provider": "Provider"
+			},
+			"duration": {
+				"session": "Session",
+				"1year": "1 year",
+				"3months": "3 months",
+				"2years": "2 years"
+			},
+			"necessary": {
+				"title": "Necessary Cookies",
+				"description": "These cookies are essential for the website to function properly and cannot be switched off in our systems.",
+				"purpose": {
+					"session": "Maintains the user's session during navigation.",
+					"csrf": "Protects against CSRF attacks.",
+					"language": "Stores the user's selected language.",
+					"newsletter": "Stores the user's preference for newsletter subscription."
+				}
+			},
+			"advertising": {
+				"title": "Advertising Cookies",
+				"description": "These cookies are used to deliver advertisements more relevant to the user's interests.",
+				"purpose": {
+					"facebook": "Used by Facebook to deliver a series of advertisement products.",
+					"analytics": "Used by Google Analytics to distinguish users.",
+					"googleAds": "Used by Google Ads to re-engage visitors.",
+					"sentry": "Used for monitoring and diagnosing user experience errors.",
+					"googlePay": "Used to manage and track payments made through Google Pay.",
+					"applePay": "Used to manage and track payments made through Apple Pay."
+				}
+			}
+		}
+	}
 }

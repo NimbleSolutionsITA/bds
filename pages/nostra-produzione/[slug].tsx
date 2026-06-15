@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 import sanitize from "sanitize-html";
 import {getAllProducts,} from "../api/products";
 import {EYEWEAR_CATEGORY, LOCALE, OUR_PRODUCTION_CATEGORIES} from "../../src/utils/utils";
-import { OUR_PRODUCTION_SUB_PATH} from "../../src/utils/endpoints";
+import { OUR_PRODUCTION_SUB_PATH, buildHrefAlternates} from "../../src/utils/endpoints";
 import {cacheGetProductCategories} from "../../src/utils/cache";
 
 const DesignerTop = dynamic(() => import("../../src/components/CategoryTop"))
@@ -55,11 +55,13 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 		{ name: 'Nostra Produzione', href: urlPrefix + '/'+OUR_PRODUCTION_SUB_PATH },
 		{ name: sanitize(productCategory.name), href: urlPrefix +  '/'+OUR_PRODUCTION_SUB_PATH+'/' + productCategory.slug },
 	]
+	const alternates = buildHrefAlternates(productCategory.translations, (s) => `/${OUR_PRODUCTION_SUB_PATH}/${s}`);
 	return {
 		props: {
 			layout: {
 				...layout,
 				breadcrumbs,
+				...(alternates ? { alternates } : {}),
 			},
 			productCategory,
 			products,

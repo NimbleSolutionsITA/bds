@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import Image from "next/image";
 import Carousel from "react-material-ui-carousel";
 import React, {useState, useEffect, useRef} from "react";
+import blur from "../images/blur.jpg";
 
 type FullPageSliderProps = {
 	images: string[];
@@ -84,6 +85,10 @@ const FullPageSlider = ({ images, disableFullPage, onLoadComplete }: FullPageSli
 						fill
 						style={{ objectFit: 'cover', objectPosition: 'center center' }}
 						sizes="100vw"
+						// La prima slide e l'immagine LCP (above-the-fold): caricala subito.
+						priority={index === 0}
+						placeholder="blur"
+						blurDataURL={blur.blurDataURL}
 						ref={(node) => {
 							if (node) imgRefs.current[index] = node;
 						}}

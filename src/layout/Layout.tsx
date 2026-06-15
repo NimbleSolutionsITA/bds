@@ -32,7 +32,7 @@ const Footer = dynamic(() => import("./footer/Footer"), { ssr: false })
 
 
 export default function Layout({children, layout: {
-    seo, breadcrumbs, googlePlaces, menus, shipping, categories
+    seo, breadcrumbs, googlePlaces, menus, shipping, categories, alternates
 }}: LayoutProps) {
     const {locale} = useRouter()
     const dispatch = useDispatch<AppDispatch>()
@@ -59,10 +59,16 @@ export default function Layout({children, layout: {
     return (
         <>
             <Head>
-                 Set HTML language attribute
+                {/* Set HTML language attribute */}
                 <meta httpEquiv="content-language" content={locale} />
                 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
                 <meta name="google-site-verification" content="naCuv5Smbv41i9JsZ1jkeY1XjWAH7_68WlvqcyDuxUI" />
+                {alternates?.map((alt) => (
+                    <link key={alt.locale} rel="alternate" hrefLang={alt.locale} href={alt.href} />
+                ))}
+                {alternates?.find((alt) => alt.locale === 'it') && (
+                    <link rel="alternate" hrefLang="x-default" href={alternates.find((alt) => alt.locale === 'it')!.href} />
+                )}
                 {seo && parse(seo)}
             </Head>
 

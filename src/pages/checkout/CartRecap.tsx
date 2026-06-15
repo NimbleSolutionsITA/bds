@@ -36,6 +36,7 @@ const CartRecap = () => {
 							src={item.featured_image}
 							alt={item.name}
 							fill
+							sizes="120px"
 							style={{objectFit: 'contain'}}
 
 						/>

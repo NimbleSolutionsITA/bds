@@ -24,6 +24,10 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
                 {/* PWA primary color */}
                 <meta name="theme-color" content={theme.palette.primary.main}/>
                 <link rel="shortcut icon" href="/favicon.ico"/>
+                {/* Preload dei font critici above-the-fold (body Apercu + heading Ogg Roman):
+                    riduce FOUT/CLS e velocizza il rendering del testo (LCP/SEO). */}
+                <link rel="preload" href="/fonts/Apercu-Light.woff2" as="font" type="font/woff2" crossOrigin="anonymous"/>
+                <link rel="preload" href="/fonts/OggRoman-Regular.woff2" as="font" type="font/woff2" crossOrigin="anonymous"/>
                 <meta name="emotion-insertion-point" content=""/>
                 {emotionStyleTags}
             </Head>
