@@ -28,14 +28,17 @@ const Hero = ({ images, video, buttonVariant, buttonColor, onLoadComplete }: Her
 	}, [video, onLoadComplete]);
 
 	return (
-		// minHeight riserva lo spazio dell'hero gia in SSR: evita che la barra CTA
-		// (position:absolute bottom:10%) salti prima che il Carousel/immagine imposti
-		// l'altezza -> azzera il principale culprit di CLS della home.
-		<Box position="relative" sx={{ minHeight: { xs: 'calc(100vh - 101px)', md: 'calc(100vh - 160px)' } }}>
+		// Altezza FISSA + overflow:hidden: il Carousel, prima dell'hydration, impila
+		// tutte le slide in verticale (ognuna ~100vh) facendo gonfiare il contenitore
+		// a migliaia di px; poi collassa a una slide e la barra CTA (absolute bottom:10%)
+		// salta su -> e' il culprit CLS 0.155. Con height fissa il box resta stabile
+		// gia in SSR e l'overflow nasconde lo stacking, quindi la CTA non si muove mai.
+		// minHeight non bastava perche' le slide impilate superano il "floor".
+		<Box position="relative" sx={{ height: { xs: 'calc(100vh - 101px)', md: 'calc(100vh - 160px)' }, overflow: 'hidden' }}>
 			{video ? (
 				<video
 					ref={videoRef}
-					style={{ width: '100%', height: 'calc(100vh - 130px)', objectFit: "cover" }}
+					style={{ width: '100%', height: '100%', objectFit: "cover" }}
 					preload="auto"
 					autoPlay
 					muted
