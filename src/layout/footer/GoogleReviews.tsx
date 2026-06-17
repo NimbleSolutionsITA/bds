@@ -35,7 +35,9 @@ const GoogleReviews = ({address}: {address: GooglePlaces['main']}) => {
 				sx={{
 					marginTop: '10px',
 					fontSize: '12px',
-					backgroundColor: '#427fed',
+					// #427fed dava 3.82:1 su testo bianco (< 4.5 WCAG AA);
+					// #0b57d0 e il blu Google accessibile (~5.6:1).
+					backgroundColor: '#0b57d0',
 					borderRadius: '27px',
 					padding: '8px 20px 10px',
 					textTransform: 'none',
@@ -54,7 +56,7 @@ const GoogleReviews = ({address}: {address: GooglePlaces['main']}) => {
 				rel="noopener"
 				target="_blank"
 				onClick={(e) => openSmallWindow(`https://search.google.com/local/reviews?placeid=${process.env.NEXT_PUBLIC_GOOGLE_PLACE_ID}`, e)}
-				sx={{color: '#2c7cff', textTransform: 'none', fontSize: '12px'}}
+				sx={{color: '#0b57d0', textTransform: 'none', fontSize: '12px'}}
 			>
 				{t('read-reviews')}
 			</Button>

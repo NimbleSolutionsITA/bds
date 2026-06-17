@@ -22,12 +22,12 @@ const SectionTitle = ({ title, onNext, onPrev, disableNext, disablePrev, isLoadi
 		</Typography>
 		<Box flexGrow={1} borderBottom={1} ml={2} mr={1} borderColor="text.primary"/>
 		{onPrev && (
-			<IconButton color="primary" size="small" onClick={onPrev} sx={{padding: 0}} disabled={isLoading || disablePrev}>
+			<IconButton aria-label="Precedente" color="primary" size="small" onClick={onPrev} sx={{padding: 0}} disabled={isLoading || disablePrev}>
 				<NavigateBeforeSharp sx={{fontSize: '30px'}}/>
 			</IconButton>
 		)}
 		{onNext && (
-			<IconButton color="primary" size="small" onClick={onNext} sx={{padding: 0}} disabled={isLoading || disableNext}>
+			<IconButton aria-label="Successivo" color="primary" size="small" onClick={onNext} sx={{padding: 0}} disabled={isLoading || disableNext}>
 				<NavigateNextSharp sx={{fontSize: '30px'}} />
 			</IconButton>
 		)}
