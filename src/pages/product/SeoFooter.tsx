@@ -7,11 +7,12 @@ type SeoFooterProps = {
 	category: ProductCategory
 }
 const SeoFooter = ({category}: SeoFooterProps) => {
+	// Testo SEO in fondo alla scheda prodotto: ora VISIBILE (prima era reso ma
+	// nascosto via CSS, quindi inutile per la SEO). Renderizza solo se c'e' testo.
+	if (!category.bottomText) return null;
 	return (
-		<Container maxWidth="lg" sx={{ marginBottom: "40px", visibility: "hidden", height: 0, overflow: "hidden" }}>
-			{category.bottomText && (
-				<HtmlBlock html={category.bottomText}/>
-			)}
+		<Container maxWidth="lg" sx={{ marginBottom: "40px" }}>
+			<HtmlBlock html={category.bottomText}/>
 		</Container>
 	)
 }

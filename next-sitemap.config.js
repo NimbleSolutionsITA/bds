@@ -5,6 +5,9 @@ module.exports = {
     changefreq: 'daily',
     priority: 0.7,
     sitemapSize: 5000,
+    // File unico: niente indice + sitemap-0, ma un solo /sitemap.xml con tutti
+    // gli URL (sotto sitemapSize) -> Google fa una sola richiesta.
+    generateIndexSitemap: false,
     generateRobotsTxt: true,
     exclude: ['/my-area'],
     // Default transformation function
