@@ -89,9 +89,16 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths() {
+	// DISABLE_DYNAMIC_BUILD: salta del tutto getAllProductsIds (fetch pesante a
+	// WP di TUTTI gli id prodotto) invece di chiamarla e scartarne il risultato.
+	// Cosi' la fase "Collecting page data" non dipende dal backend e non va in
+	// timeout (60s) quando WP e' lento. Le schede restano on-demand (fallback).
+	if (process.env.DISABLE_DYNAMIC_BUILD) {
+		return { paths: [], fallback: 'blocking' };
+	}
 	const paths = await getAllProductsIds();
 	return {
-		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,
+		paths,
 		fallback: 'blocking',
 	};
 }

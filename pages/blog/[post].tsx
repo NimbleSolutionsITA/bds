@@ -90,6 +90,11 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
 }
 
 export async function getStaticPaths() {
+    // Salta la fetch pesante quando i path verrebbero comunque scartati (vedi
+    // products/[slug]): evita il timeout 60s in "Collecting page data".
+    if (process.env.DISABLE_DYNAMIC_BUILD) {
+        return { paths: [], fallback: 'blocking' };
+    }
     const paths = await getAllPostIds();
     return {
         paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : paths,

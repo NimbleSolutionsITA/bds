@@ -72,6 +72,11 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+	// Salta la fetch pesante quando i path verrebbero comunque scartati (vedi
+	// products/[slug]): evita il timeout 60s in "Collecting page data".
+	if (process.env.DISABLE_DYNAMIC_BUILD) {
+		return { paths: [], fallback: 'blocking' };
+	}
 	const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, EYEWEAR_CATEGORY[locale])));
 	return {
 		paths: process.env.DISABLE_DYNAMIC_BUILD ? [] : productCategories.flat().filter(({id, lang}) => OUR_PRODUCTION_CATEGORIES[lang].includes(id)).map(({slug, lang}) => ({

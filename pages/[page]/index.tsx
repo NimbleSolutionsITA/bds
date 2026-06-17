@@ -113,6 +113,11 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+    // Salta le fetch pesanti quando i path verrebbero comunque scartati (vedi
+    // products/[slug]): evita il timeout 60s in "Collecting page data".
+    if (process.env.DISABLE_DYNAMIC_BUILD) {
+        return { paths: [], fallback: 'blocking' };
+    }
     const productCategories = await Promise.all(locales.map(async (locale) => await cacheGetProductCategories(locale, FRAGRANCES_CATEGORY[locale])));
     const pageIds =  await getAllPagesIds()
     const categoryIds = productCategories.flat().map(({slug, lang}) => ({ params: { page: slug }, locale: lang }))

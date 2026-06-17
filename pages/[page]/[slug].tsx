@@ -93,6 +93,11 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 }
 
 export async function getStaticPaths({ locales }: { locales: LOCALE[] }) {
+	// Salta la fetch pesante quando i path verrebbero comunque scartati (vedi
+	// products/[slug]): evita il timeout 60s in "Collecting page data".
+	if (process.env.DISABLE_DYNAMIC_BUILD === "true") {
+		return { paths: [], fallback: 'blocking' };
+	}
 	const productCategories = await cacheGetProductCategories();
 	const validPaths = [];
 
