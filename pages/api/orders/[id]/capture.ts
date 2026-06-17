@@ -42,6 +42,7 @@ export default async function handler(
 					await wooApi.put(`orders/${wooOrderId}`, {
 						transaction_id: capture.id,
 						set_paid: true,
+						meta_data: ppcpMeta(paypalOrderId),
 					});
 				} catch (updateError) {
 					Sentry.setTag("area", "checkout");
@@ -59,6 +60,7 @@ export default async function handler(
 					await wooApi.put(`orders/${wooOrderId}`, {
 						transaction_id: capture?.id,
 						status: 'on-hold',
+						meta_data: ppcpMeta(paypalOrderId),
 					});
 				} catch (updateError) {
 					Sentry.setTag("area", "checkout");
@@ -113,6 +115,19 @@ export default async function handler(
 
 	return res.json(responseData);
 }
+
+/**
+ * Meta che il plugin ufficiale "WooCommerce PayPal Payments" (ppcp-gateway) scrive sugli
+ * ordini creati dal suo flusso nativo. Replicandoli sugli ordini headless il plugin li
+ * "riconosce" come propri: in particolare _ppcp_paypal_order_id e cio che il suo
+ * RefundProcessor legge per ritrovare la capture e rimborsare dall'admin WooCommerce.
+ * Additivo: non incide su importo/stato, solo metadati.
+ */
+const ppcpMeta = (paypalOrderId: string) => [
+	{ key: '_ppcp_paypal_order_id', value: paypalOrderId },
+	{ key: '_ppcp_paypal_intent', value: 'CAPTURE' },
+	{ key: '_ppcp_paypal_payment_mode', value: base?.includes('sandbox') ? 'sandbox' : 'live' },
+];
 
 const captureOrder = async (orderID: string) => {
 	const accessToken = await generateAccessToken();
