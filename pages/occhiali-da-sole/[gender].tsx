@@ -59,6 +59,13 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: LOC
 }
 
 export const getStaticPaths = async ({ locales }: { locales: LOCALE[] }) => {
+	// In build con DISABLE_DYNAMIC_BUILD NON pre-generiamo le pagine gender: il
+	// loro getStaticProps fa fetch prodotti pesanti a WP e, se il backend e'
+	// lento/irraggiungibile, va in connect-timeout facendo fallire la build.
+	// Si generano on-demand (fallback 'blocking') e poi restano in ISR-cache.
+	if (process.env.DISABLE_DYNAMIC_BUILD) {
+		return { paths: [], fallback: 'blocking' as const };
+	}
 	return {
 		paths: locales.flatMap(locale =>
 			['uomo', 'donna'].map(gender => ({
