@@ -8,7 +8,13 @@ const GoogleAddress = ({address, name, whatsApp}: {whatsApp: string, name: strin
 	return (
 		<>
 			<Typography sx={{...pStyle, fontWeight: 'bold'}}>{name}</Typography>
-			<Typography sx={pStyle}>
+			<Typography sx={{
+				...pStyle,
+				// i link contatto erano alti ~14px: target tap sotto i 24x24 WCAG.
+				// inline-block + line-box 24px porta l'area cliccabile a >=24px
+				// (la larghezza e gia ampia) senza ristrutturare il blocco.
+				'& a': { display: 'inline-block', lineHeight: '24px' },
+			}}>
 				{street} {streetNumber}<br />
 				{cityCap} - {country}<br />
 				<a href={`tel:${address.formatted_phone_number.replaceAll(' ', '')}`}>{address.formatted_phone_number}</a><br />

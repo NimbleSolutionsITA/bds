@@ -65,7 +65,12 @@ const Footer = ({googlePlaces, categories, mobileMenu: [opticalMan, sunglassesMa
 							))}
 						</Grid>
 						<Grid size={{xs: 12, sm:8, md: 6}} sx={{padding: '0 14px', margin: { xs: '20px 0', md: '0 0 20px'}}}>
-							<h5>NEWSLETTER</h5>
+							{/* Era <h5>: nel footer (condiviso da ogni pagina) un heading
+							    numerato rompe sempre l'ordine (h2 sezioni -> h5). E un'etichetta
+							    del form, non una sezione del documento: reso come <p> con le
+							    stesse metriche del default h5 -> look identico, fuori dall'albero
+							    degli heading su tutte le pagine. */}
+							<p style={{fontSize: '0.83em', fontWeight: 'bold', margin: '1.67em 0'}}>NEWSLETTER</p>
 							<Typography sx={{fontStyle: 'italic', fontSize: '13px', lineHeight: '1.3', margin: '10px 0'}}>
 								{t('newsletter.body')}
 							</Typography>
