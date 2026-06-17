@@ -6,7 +6,7 @@ const WhatsAppButton = () => {
 	return (
 		<Box sx={{position: "fixed", zIndex: 999999, bottom: '30px', right: '15px'}}>
 			<a id="wa__widget_simple" className="wa__stt wa__stt_online" target="_blank"
-			   href="https://api.whatsapp.com/send?phone=393496393775" rel="nofollow noopener noreferrer">
+			   aria-label="WhatsApp" href="https://api.whatsapp.com/send?phone=393496393775" rel="nofollow noopener noreferrer">
 				<Box
 					sx={{
 						position: "relative",

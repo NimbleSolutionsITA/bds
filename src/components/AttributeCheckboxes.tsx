@@ -79,7 +79,7 @@ const AttributeTitle = ({attribute, value}: {attribute: string, value?: string})
 	</Typography>
 )
 
-const ColorBox = ({ productColor, ...checkBoxProps }: { productColor: Color } & CheckboxProps) => {
+const ColorBox = ({ productColor, title, ...checkBoxProps }: { productColor: Color } & CheckboxProps) => {
 	return (
 		<Checkbox
 			icon={<Box sx={{ height: '10px', width: '30px', backgroundColor: productColor.code }} />}
@@ -90,28 +90,34 @@ const ColorBox = ({ productColor, ...checkBoxProps }: { productColor: Color } & 
 				padding: 0,
 				margin: 0
 			}}
+			// gli swatch sono solo grafici: senza aria-label l'input checkbox resta senza
+			// nome accessibile (audit "label" Lighthouse). Riusiamo il title gia descrittivo.
+			title={title}
+			inputProps={{ 'aria-label': title ?? productColor.name }}
 			{...checkBoxProps}
 		/>
 	)
 }
 
-const ImageBox = ({ productColor, ...checkBoxProps }: { productColor: ImageColor } & CheckboxProps) => {
+const ImageBox = ({ productColor, title, ...checkBoxProps }: { productColor: ImageColor } & CheckboxProps) => {
 	return (
 		<Checkbox
-			icon={<Image src={productColor.image} alt={productColor.name} width="30" height="10" />}
+			icon={<Image src={productColor.image} alt="" width="30" height="10" />}
 			checkedIcon={<div style={{ border: '1px solid #000', padding: '2px', height: '16px', width: '36px'}}>
-				<Image src={productColor.image} width="30" height="10" style={{display: 'block'}} alt={productColor.name} />
+				<Image src={productColor.image} width="30" height="10" style={{display: 'block'}} alt="" />
 			</div>}
 			sx={{
 				padding: 0,
 				margin: 0
 			}}
+			title={title}
+			inputProps={{ 'aria-label': title ?? productColor.name }}
 			{...checkBoxProps}
 		/>
 	)
 }
 
-const TextBox = ({ attribute, ...checkBoxProps }: { attribute: TextAttribute } & CheckboxProps) => {
+const TextBox = ({ attribute, title, ...checkBoxProps }: { attribute: TextAttribute } & CheckboxProps) => {
 	const AttributeBox = ({isChecked}: {isChecked?: boolean}) => (
 		<Box sx={{
 			height: isChecked ? '16px' : '14px',
@@ -137,6 +143,8 @@ const TextBox = ({ attribute, ...checkBoxProps }: { attribute: TextAttribute } &
 				padding: 0,
 				margin: 0
 			}}
+			title={title}
+			inputProps={{ 'aria-label': title ?? attribute.name }}
 			{...checkBoxProps}
 		/>
 	)
