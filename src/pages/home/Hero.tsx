@@ -28,7 +28,10 @@ const Hero = ({ images, video, buttonVariant, buttonColor, onLoadComplete }: Her
 	}, [video, onLoadComplete]);
 
 	return (
-		<Box position="relative">
+		// minHeight riserva lo spazio dell'hero gia in SSR: evita che la barra CTA
+		// (position:absolute bottom:10%) salti prima che il Carousel/immagine imposti
+		// l'altezza -> azzera il principale culprit di CLS della home.
+		<Box position="relative" sx={{ minHeight: { xs: 'calc(100vh - 101px)', md: 'calc(100vh - 160px)' } }}>
 			{video ? (
 				<video
 					ref={videoRef}
