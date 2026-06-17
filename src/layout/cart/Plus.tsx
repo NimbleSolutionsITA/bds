@@ -14,6 +14,7 @@ const Plus = ({item, disabled}:CartButtonProps) => {
 	const dispatch = useDispatch<AppDispatch>()
 	return (
 		<IconButton
+			aria-label="Aumenta quantità"
 			disabled={item.quantity.value >= item.quantity.max_purchase || disabled}
 			size="small"
 			onClick={() => dispatch(updateCartItem({key: item.item_key, quantity: item.quantity.value + 1}))}

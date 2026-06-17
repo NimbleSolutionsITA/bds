@@ -37,7 +37,7 @@ const NewsletterDrawer = () => {
 			onOpen={() => dispatch(openNewsletterDrawer())}
 		>
 			<Container sx={{display: 'flex', flexDirection: 'column', position: 'relative'}}>
-				<IconButton onClick={() => dispatch(closeNewsletterDrawer())} sx={{position: 'absolute', right: '20px', top: '2px', padding: '4px'}}>
+				<IconButton aria-label="Chiudi" onClick={() => dispatch(closeNewsletterDrawer())} sx={{position: 'absolute', right: '20px', top: '2px', padding: '4px'}}>
 					<CloseSharp />
 				</IconButton>
 				<Typography sx={{fontFamily: 'Ogg Roman', fontSize: '22px', marginTop: '20px'}}>

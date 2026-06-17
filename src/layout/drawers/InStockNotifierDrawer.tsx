@@ -86,7 +86,7 @@ const InStockNotifierDrawer = () => {
 			onOpen={() => {}}
 		>
 			<Container sx={{display: 'flex', flexDirection: 'column', position: 'relative'}}>
-				<IconButton onClick={handleClose} sx={{position: 'absolute', right: '20px', top: '2px', padding: '4px'}}>
+				<IconButton aria-label="Chiudi" onClick={handleClose} sx={{position: 'absolute', right: '20px', top: '2px', padding: '4px'}}>
 					<CloseSharp />
 				</IconButton>
 				<Typography sx={{fontFamily: 'Ogg Roman', fontSize: '22px'}}>

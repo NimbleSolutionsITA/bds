@@ -61,7 +61,7 @@ export default function Layout({children, layout: {
             <Head>
                 {/* Set HTML language attribute */}
                 <meta httpEquiv="content-language" content={locale} />
-                <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+                <meta name='viewport' content='width=device-width, initial-scale=1' />
                 <meta name="google-site-verification" content="naCuv5Smbv41i9JsZ1jkeY1XjWAH7_68WlvqcyDuxUI" />
                 {alternates?.map((alt) => (
                     <link key={alt.locale} rel="alternate" hrefLang={alt.locale} href={alt.href} />
@@ -88,7 +88,7 @@ export default function Layout({children, layout: {
             <CartDrawer shipping={shipping} categories={categories} />
             <CartErrorModal />
             <SearchModal categories={categories} />
-            {children}
+            <main>{children}</main>
             <Footer googlePlaces={googlePlaces} categories={categories} mobileMenu={menus.mobile} />
         </>
     )

@@ -14,7 +14,7 @@ const CartIndicator = ({buttonProps, iconProps}: CartIndicatorProps) => {
 	const { cart, loading } = useSelector((state: RootState) => state.cart);
 	const dispatch = useDispatch()
 	return (
-		<IconButton {...buttonProps} onClick={() => dispatch(toggleCartDrawer())}>
+		<IconButton aria-label="Apri il carrello" {...buttonProps} onClick={() => dispatch(toggleCartDrawer())}>
 			<Badge
 				badgeContent={cart?.items?.length ?? 0}
 				overlap="circular"

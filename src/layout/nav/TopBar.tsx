@@ -29,10 +29,10 @@ export default function TopBar() {
             }}>
                 <div style={{display: 'flex'}}>
                     <LanguageButton color="#FFF" />
-                    <IconButton size="small" component="a" target="_blank" href={FACEBOOK_LINK} sx={{color: '#FFF'}}>
+                    <IconButton size="small" component="a" target="_blank" href={FACEBOOK_LINK} aria-label="Facebook" sx={{color: '#FFF'}}>
                         <Facebook fontSize="small" />
                     </IconButton>
-                    <IconButton size="small" component="a" target="_blank" href={INSTAGRAM_LINK} sx={{color: '#FFF'}}>
+                    <IconButton size="small" component="a" target="_blank" href={INSTAGRAM_LINK} aria-label="Instagram" sx={{color: '#FFF'}}>
                         <Instagram fontSize="small" />
                     </IconButton>
                 </div>
@@ -57,7 +57,7 @@ export default function TopBar() {
                 </div>
                 <div style={{display: 'flex'}}>
                     <UserMenu />
-                    <IconButton onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}>
+                    <IconButton aria-label="Cerca" onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}>
                         <SearchIcon sx={{color: '#FFF'}} />
                     </IconButton>
                     <CartIndicator buttonProps={{sx: {color: '#FFF'}}} />

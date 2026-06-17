@@ -64,6 +64,7 @@ const CartItem = ({item, loading}: CartItemProps) => {
 					{t('quantity').toUpperCase()}: <Minus disabled={loading} item={item} />{item.quantity.value}<Plus disabled={loading} item={item} />
 				</Typography>
 				<IconButton
+					aria-label="Rimuovi articolo"
 					size="small"
 					onClick={() => dispatch(deleteCartItem({key: item.item_key}))}
 					sx={{position: 'absolute', bottom: '5px', right: '5px'}}

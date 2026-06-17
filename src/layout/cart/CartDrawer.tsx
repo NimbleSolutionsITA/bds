@@ -57,7 +57,7 @@ const CartDrawer = ({categories}: CartDrawerProps) => {
 					<Typography variant="h6">
 						{t('cart.title')} ({totalItems} {totalItems === 1 ? t('product') : t('products')})
 					</Typography>
-					<IconButton size="small" onClick={() => dispatch(closeCartDrawer())}>
+					<IconButton aria-label="Chiudi" size="small" onClick={() => dispatch(closeCartDrawer())}>
 						<CloseOutlined fontSize="small" />
 					</IconButton>
 				</div>

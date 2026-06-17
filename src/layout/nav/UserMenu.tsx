@@ -46,6 +46,7 @@ export function UserMenu() {
 		<>
 			<IconButton
 				id="user-button"
+				aria-label="Account"
 				aria-controls={open ? 'user-menu' : undefined}
 				aria-haspopup="true"
 				aria-expanded={open ? 'true' : undefined}

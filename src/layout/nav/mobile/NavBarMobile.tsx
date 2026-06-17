@@ -82,12 +82,13 @@ export default function NavBarMobile({
                         router.push('/')
 
                     }} />
-                    <IconButton onClick={() => setOpen(open => !open)}>
+                    <IconButton aria-label="Apri menu di navigazione" onClick={() => setOpen(open => !open)}>
                         <MenuToggle isOpen={open} />
                     </IconButton>
                     <div>
                         <UserMenu />
                         <IconButton
+                            aria-label="Cerca"
                             onClick={() => dispatch(searchDrawerOpen ? closeSearchDrawer() : openSearchDrawer())}
                         >
                             <SearchIcon fontSize="medium" />
@@ -155,10 +156,10 @@ export default function NavBarMobile({
                     <div style={{flexGrow: 1}} />
                     <div style={{width: '100%', textAlign: 'left'}}>
                         <LanguageButton onClick={() => setOpen(false)} />
-                        <IconButton size="small" component="a" target="_blank" href={FACEBOOK_LINK}>
+                        <IconButton aria-label="Facebook" size="small" component="a" target="_blank" href={FACEBOOK_LINK}>
                             <Facebook fontSize="small" />
                         </IconButton>
-                        <IconButton size="small" component="a" target="_blank" href={INSTAGRAM_LINK}>
+                        <IconButton aria-label="Instagram" size="small" component="a" target="_blank" href={INSTAGRAM_LINK}>
                             <Instagram fontSize="small" />
                         </IconButton>
                     </div>

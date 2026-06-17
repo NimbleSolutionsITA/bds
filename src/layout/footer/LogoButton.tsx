@@ -8,7 +8,7 @@ import React from "react";
 const LogoButton = (props: IconButtonProps) => {
 	const router = useRouter()
 	return (
-		<IconButton onClick={() => router.push('/')} {...props}>
+		<IconButton aria-label="Bottega di Sguardi - home" onClick={() => router.push('/')} {...props}>
 			<Image
 				src={logo}
 				alt="Logo Bottega di Sguardi"

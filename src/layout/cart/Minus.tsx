@@ -14,6 +14,7 @@ const Minus = ({item, disabled}: CartButtonProps) => {
 	const dispatch = useDispatch<AppDispatch>()
 	return (
 		<IconButton
+			aria-label="Diminuisci quantità"
 			size="small"
 			disabled={item.quantity.value <= 1 || disabled}
 			onClick={() => dispatch(updateCartItem({key: item.item_key, quantity: item.quantity.value - 1}))}

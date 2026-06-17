@@ -23,7 +23,7 @@ export default function CheckoutResult() {
 		<div style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
 			<Head>
 				<meta httpEquiv="content-language" content={locale} />
-				<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
+				<meta name='viewport' content='width=device-width, initial-scale=1' />
 				<title>Bottega di Sguardi - Pagamento completato</title>
 			</Head>
 			<GoogleAnalytics />
