@@ -443,6 +443,24 @@ module.exports =  {
             },
         ]
     },
+    // Header di sicurezza (Lighthouse Best Practices). COOP = same-origin-allow-popups
+    // per NON rompere i popup di PayPal/Google Pay (con same-origin si spezzerebbe
+    // window.opener -> checkout a rischio). CSP/Trusted-Types omessi di proposito:
+    // richiedono una policy testata per non bloccare PayPal/GTM/Sentry/MUI inline.
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+                    { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+                    { key: 'X-Content-Type-Options', value: 'nosniff' },
+                    { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+                    { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+                ],
+            },
+        ]
+    },
 }
 
 // Injected content via Sentry wizard below
