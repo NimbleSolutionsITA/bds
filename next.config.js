@@ -456,7 +456,13 @@ module.exports =  {
                     { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
                     { key: 'X-Content-Type-Options', value: 'nosniff' },
                     { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-                    { key: 'Cross-Origin-Opener-Policy', value: 'same-origin-allow-popups' },
+                    // NB: Cross-Origin-Opener-Policy RIMOSSO. Anche con
+                    // 'same-origin-allow-popups' rompeva il flusso Payment Request
+                    // di Google Pay sulla scheda prodotto ("Unable to download
+                    // payment manifest https://pay.google.com/about/redirect/" e
+                    // bottone non renderizzato). Gli altri header restano: sono
+                    // hardening innocuo per i pagamenti. Referrer-Policy qui
+                    // coincide col default dei browser moderni (nessun effetto).
                 ],
             },
         ]
