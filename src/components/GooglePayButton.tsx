@@ -262,6 +262,17 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 	}, [askForShipping, cartKey, googlePayConfig, paymentsClient, processPayment])
 
 	useEffect(() => {
+		if (!googlePayConfig || !paymentsClient) { return }
+		// isReadyToPay innesca il download del payment manifest di Google: in
+		// produzione puo' fallire/tornare false in modo transitorio appena dopo
+		// il mount (era questo a richiedere "vari refresh" per vedere il bottone).
+		// Ritentiamo con backoff finche' il bottone compare, annullando se l'effetto
+		// viene rieseguito o il componente smonta. La logica di pagamento e' invariata.
+		let cancelled = false;
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		const MAX_ATTEMPTS = 4;
+		const RETRY_DELAY = 700;
+
 		const onGooglePaymentButtonClicked = (paymentsClient: google.payments.api.PaymentsClient) => async () => {
 			if (googlePayConfig && cart.shipping) {
 				const { isEligible, countryCode, ...config} = googlePayConfig;
@@ -276,6 +287,7 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 			}
 		}
 		function addGooglePayButton(paymentsClient: google.payments.api.PaymentsClient) {
+			if (cancelled) return;
 			const button = paymentsClient.createButton({
 				onClick: onGooglePaymentButtonClicked(paymentsClient),
 				buttonSizeMode: "fill",
@@ -289,28 +301,42 @@ const GooglePayButton = ({cart, shipping, invoice, customerNote, askForShipping}
 				element.appendChild(button);
 			}
 		}
-		if (!googlePayConfig || !paymentsClient) { return }
 		const { allowedPaymentMethods, apiVersion, apiVersionMinor } = googlePayConfig;
-		paymentsClient
-			.isReadyToPay({ allowedPaymentMethods, apiVersion, apiVersionMinor })
-			.then(function (response) {
-				if (response.result) {
-					addGooglePayButton(paymentsClient);
-				}
-			})
-			.catch(function (err) {
-				Sentry.setTag("area", "checkout");
-				Sentry.setTag("step", "googlepay_addButton");
-				Sentry.setContext("checkout", {
-					userId: user?.user_id,
-					invoice,
-					customerNote,
-					cartKey,
+		const tryIsReadyToPay = (attempt: number) => {
+			paymentsClient
+				.isReadyToPay({ allowedPaymentMethods, apiVersion, apiVersionMinor })
+				.then(function (response) {
+					if (cancelled) return;
+					if (response.result) {
+						addGooglePayButton(paymentsClient);
+					} else if (attempt < MAX_ATTEMPTS) {
+						timer = setTimeout(() => tryIsReadyToPay(attempt + 1), RETRY_DELAY);
+					}
+				})
+				.catch(function (err) {
+					if (cancelled) return;
+					if (attempt < MAX_ATTEMPTS) {
+						timer = setTimeout(() => tryIsReadyToPay(attempt + 1), RETRY_DELAY);
+						return;
+					}
+					Sentry.setTag("area", "checkout");
+					Sentry.setTag("step", "googlepay_addButton");
+					Sentry.setContext("checkout", {
+						userId: user?.user_id,
+						invoice,
+						customerNote,
+						cartKey,
+					});
+					Sentry.captureException(err);
+					console.error(err);
 				});
-				Sentry.captureException(err);
-				console.error(err);
-			});
+		};
+		tryIsReadyToPay(0);
 
+		return () => {
+			cancelled = true;
+			if (timer) clearTimeout(timer);
+		};
 	}, [askForShipping, cart, googlePayConfig, paymentsClient, router.locale, shipping.countries]);
 
 	return (
