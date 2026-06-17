@@ -25,9 +25,9 @@ export default function Product({ product, category, layout }: ProductPageProps)
 	const router = useRouter();
 
 	return (
-		// La scheda prodotto usa solo il one-click Apple/Google Pay: carichiamo solo quei
-		// componenti del SDK PayPal (buttons/card-fields/messages servono al checkout).
-		<PayPalProvider components="applepay,googlepay">
+		// NB: caricare il set completo del SDK PayPal (default). Limitarlo a "applepay,googlepay"
+		// rompeva la comparsa dei bottoni one-click Apple/Google Pay sulla scheda prodotto.
+		<PayPalProvider>
 			<Layout layout={layout}>
 				<ProductView key={JSON.stringify(router.query)} product={product} category={category} shipping={layout.shipping} countries={layout.countries} />
 				<ProductsSlider products={product.related ?? []} title={t('related-products')} />
