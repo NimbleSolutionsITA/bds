@@ -321,25 +321,67 @@ const getProductEuPrice = (product: {meta_data: {key: string, value: string}[], 
  * Generate an OAuth 2.0 access token for authenticating with PayPal REST APIs.
  * @see https://developer.paypal.com/api/rest/authentication/
  */
-export const generateAccessToken = async () => {
-	try {
-		if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-			throw new Error("MISSING_API_CREDENTIALS");
-		}
-		const auth = Buffer.from(
-			PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET,
-		).toString("base64");
-		const response = await fetch(`${base}/v1/oauth2/token`, {
-			method: "POST",
-			body: "grant_type=client_credentials",
-			headers: {
-				Authorization: `Basic ${auth}`,
-			},
-		});
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-		const data = await response.json();
-		return data.access_token;
-	} catch (error) {
-		console.error("Failed to generate Access Token:", error);
+export const generateAccessToken = async () => {
+	if (!base) {
+		throw new Error("MISSING_PAYPAL_API_URL");
 	}
+	if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+		throw new Error("MISSING_API_CREDENTIALS");
+	}
+	const auth = Buffer.from(
+		PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET,
+	).toString("base64");
+
+	// PRIMA: su errore si faceva solo console.error e si ritornava undefined -> la
+	// create order partiva con "Bearer undefined" e PayPal rispondeva 401 con un body
+	// OAuth ({error, error_description}) privo di name/details, finendo nel fallback
+	// generico PAYPAL_ORDER_CREATE_FAILED (motivo illeggibile, vedi Sentry 18/06 12:35).
+	//
+	// ORA: ritentiamo il fetch del token (OAuth client_credentials e' idempotente e
+	// read-only -> zero rischio di doppi addebiti) per assorbire i blip di rete in
+	// uscita del server (gli stessi 'fetch failed'/timeout verso WP) che restituendo
+	// un token undefined facevano fallire il checkout. I 4xx di autenticazione
+	// (credenziali/URL errati) NON sono transitori: si fallisce subito esponendo
+	// l'errore OAuth reale (es. invalid_client) a Sentry e al messaggio utente.
+	const MAX_ATTEMPTS = 3;
+	let lastErr: any;
+	for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+		let response: Response;
+		let data: any;
+		try {
+			response = await fetch(`${base}/v1/oauth2/token`, {
+				method: "POST",
+				body: "grant_type=client_credentials",
+				headers: {
+					Authorization: `Basic ${auth}`,
+				},
+			});
+			data = await response.json();
+		} catch (networkErr) {
+			// fetch/parse fallito = errore di rete transitorio: ritenta.
+			lastErr = networkErr;
+			if (attempt === MAX_ATTEMPTS) throw networkErr;
+			await sleep(300 * attempt);
+			continue;
+		}
+
+		if (response.ok && data?.access_token) {
+			return data.access_token;
+		}
+
+		const err: any = new Error(data?.error_description ?? data?.error ?? "PAYPAL_AUTH_FAILED");
+		err.paypal = {
+			status: response.status,
+			error: data?.error,
+			error_description: data?.error_description,
+		};
+		// Transitori (5xx / 408 / 429): ritenta. Tutto il resto (4xx auth): fallisci ora.
+		const transient = response.status >= 500 || response.status === 408 || response.status === 429;
+		if (!transient || attempt === MAX_ATTEMPTS) throw err;
+		lastErr = err;
+		await sleep(300 * attempt);
+	}
+	throw lastErr ?? new Error("PAYPAL_AUTH_FAILED");
 };
