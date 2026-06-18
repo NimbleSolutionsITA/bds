@@ -36,6 +36,6 @@ export async function getStaticProps({ locale }: { locales: LOCALE[], locale: LO
 	const props =  await cacheGetShopPageProps(locale)
 	return {
 		props,
-		revalidate: 10
+		revalidate: 600
 	}
 }

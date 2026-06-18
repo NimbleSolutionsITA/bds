@@ -105,6 +105,6 @@ export async function getStaticProps({ locale }: { locales: string[], locale: LO
 			shipping,
 			...ssrTranslations
 		},
-		revalidate: 10
+		revalidate: 600
 	}
 }

@@ -67,7 +67,7 @@ export async function getStaticProps({ locale, params: {slug} }: { locales: stri
 			products,
 			...ssrTranslations
 		},
-		revalidate: 10
+		revalidate: 600
 	}
 }
 

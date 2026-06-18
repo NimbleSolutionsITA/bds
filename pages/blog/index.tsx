@@ -93,7 +93,7 @@ export async function getStaticProps({ locale }: { locale: 'it' | 'en'}) {
 			content: page.content,
 			...ssrTranslations
 		},
-		revalidate: 10
+		revalidate: 600
 	} : {
 		notFound: true,
 	}

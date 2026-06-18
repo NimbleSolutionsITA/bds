@@ -54,7 +54,7 @@ export async function getStaticProps({ locale, params: {gender} }: { locale: LOC
 			},
 			isMan: man
 		},
-		revalidate: 10
+		revalidate: 600
 	}
 }
 

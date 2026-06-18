@@ -83,7 +83,7 @@ export async function getStaticProps({ locale, params: { post: slug } }: { local
             },
             ...ssrTranslations
         },
-        revalidate: 10
+        revalidate: 600
     } : {
         notFound: true,
     }

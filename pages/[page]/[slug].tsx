@@ -84,7 +84,7 @@ export async function getStaticProps({ locale, params: {page, slug} }: { locales
 				products,
 				...ssrTranslations
 			},
-			revalidate: 10
+			revalidate: 600
 		}
 	} catch (error) {
 		console.error('Error fetching category:', error);

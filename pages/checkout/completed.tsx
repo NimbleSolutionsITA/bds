@@ -71,6 +71,6 @@ export async function getStaticProps({ locale }: { locale: LOCALE, params: { id:
 		props: {
 			...ssrTranslations
 		},
-		revalidate: 10
+		revalidate: 600
 	};
 }

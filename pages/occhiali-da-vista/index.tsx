@@ -27,6 +27,6 @@ export async function getStaticProps({ locale }: { locale: LOCALE }) {
 				]
 			}
 		},
-		revalidate: 10
+		revalidate: 600
 	}
 }

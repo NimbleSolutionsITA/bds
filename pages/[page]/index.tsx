@@ -80,7 +80,7 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
                     },
                     ...ssrTranslations
                 },
-                revalidate: 10
+                revalidate: 600
             }
         }
 
@@ -100,7 +100,7 @@ export async function getStaticProps({ locale, params: { page: slug } }: { local
                 },
                 ...ssrTranslations
             },
-            revalidate: 10
+            revalidate: 600
         } : {
             notFound: true,
         }

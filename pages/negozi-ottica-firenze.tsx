@@ -68,7 +68,7 @@ export async function getStaticProps({ locale}: { locale: LOCALE}) {
 			},
 			...ssrTranslations
 		},
-		revalidate: 10
+		revalidate: 600
 	}
 }
 
