@@ -323,6 +323,14 @@ const getProductEuPrice = (product: {meta_data: {key: string, value: string}[], 
  */
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Cache del token a livello di processo. L'access token PayPal vale ~9h: rigenerarlo
+// a ogni creazione ordine moltiplica le chiamate all'endpoint OAuth e, sommato al
+// cluster PM2 (instances:'max') e ai retry sui fallimenti, ha fatto flaggare l'IP del
+// server da PayPal/Cloudflare (429 Too Many Requests -> token vuoto -> 401 sulla create
+// order -> PAYPAL_ORDER_CREATE_FAILED). Riusare il token finche' valido azzera quasi del
+// tutto le chiamate OAuth. Cache per-worker (sufficiente; uno shared store non serve).
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
 export const generateAccessToken = async () => {
 	if (!base) {
 		throw new Error("MISSING_PAYPAL_API_URL");
@@ -330,21 +338,23 @@ export const generateAccessToken = async () => {
 	if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
 		throw new Error("MISSING_API_CREDENTIALS");
 	}
+
+	// Riusa il token in cache (margine 60s) prima di ricontattare l'OAuth.
+	if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) {
+		return cachedToken.value;
+	}
+
 	const auth = Buffer.from(
 		PAYPAL_CLIENT_ID + ":" + PAYPAL_CLIENT_SECRET,
 	).toString("base64");
 
 	// PRIMA: su errore si faceva solo console.error e si ritornava undefined -> la
-	// create order partiva con "Bearer undefined" e PayPal rispondeva 401 con un body
-	// OAuth ({error, error_description}) privo di name/details, finendo nel fallback
-	// generico PAYPAL_ORDER_CREATE_FAILED (motivo illeggibile, vedi Sentry 18/06 12:35).
-	//
-	// ORA: ritentiamo il fetch del token (OAuth client_credentials e' idempotente e
-	// read-only -> zero rischio di doppi addebiti) per assorbire i blip di rete in
-	// uscita del server (gli stessi 'fetch failed'/timeout verso WP) che restituendo
-	// un token undefined facevano fallire il checkout. I 4xx di autenticazione
-	// (credenziali/URL errati) NON sono transitori: si fallisce subito esponendo
-	// l'errore OAuth reale (es. invalid_client) a Sentry e al messaggio utente.
+	// create order partiva con "Bearer undefined" e PayPal rispondeva con un body privo
+	// di name/details, finendo nel fallback generico PAYPAL_ORDER_CREATE_FAILED.
+	// ORA: ritentiamo solo i transitori di rete e i 5xx (OAuth client_credentials e'
+	// idempotente -> zero rischio doppi addebiti). I 4xx di autenticazione e il 429
+	// (rate-limit) NON sono ritentati: ritentare amplificherebbe il throttle dell'IP;
+	// si fallisce subito esponendo l'errore reale a Sentry e al messaggio utente.
 	const MAX_ATTEMPTS = 3;
 	let lastErr: any;
 	for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
@@ -368,6 +378,10 @@ export const generateAccessToken = async () => {
 		}
 
 		if (response.ok && data?.access_token) {
+			cachedToken = {
+				value: data.access_token,
+				expiresAt: Date.now() + (Number(data.expires_in) || 3000) * 1000,
+			};
 			return data.access_token;
 		}
 
@@ -377,9 +391,9 @@ export const generateAccessToken = async () => {
 			error: data?.error,
 			error_description: data?.error_description,
 		};
-		// Transitori (5xx / 408 / 429): ritenta. Tutto il resto (4xx auth): fallisci ora.
-		const transient = response.status >= 500 || response.status === 408 || response.status === 429;
-		if (!transient || attempt === MAX_ATTEMPTS) throw err;
+		// Solo i 5xx sono transitori e si ritentano. 4xx (auth) e 429 (rate-limit):
+		// fallisci subito col motivo reale, senza aggiungere carico all'endpoint.
+		if (response.status < 500 || attempt === MAX_ATTEMPTS) throw err;
 		lastErr = err;
 		await sleep(300 * attempt);
 	}
