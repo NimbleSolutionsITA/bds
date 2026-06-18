@@ -359,7 +359,7 @@ export const generateAccessToken = async () => {
 	let lastErr: any;
 	for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
 		let response: Response;
-		let data: any;
+		let raw: string;
 		try {
 			response = await fetch(`${base}/v1/oauth2/token`, {
 				method: "POST",
@@ -368,14 +368,21 @@ export const generateAccessToken = async () => {
 					Authorization: `Basic ${auth}`,
 				},
 			});
-			data = await response.json();
+			// Leggiamo il body come TESTO e poi parsiamo: quando l'IP e' rate-limitato,
+			// Cloudflare risponde con una PAGINA HTML ("<!doctype html>..."), non JSON.
+			// Un response.json() diretto lanciava SyntaxError "Unexpected token '<'" che
+			// veniva scambiato per errore di rete e ritentato (amplificando il throttle).
+			raw = await response.text();
 		} catch (networkErr) {
-			// fetch/parse fallito = errore di rete transitorio: ritenta.
+			// fetch/lettura body fallita = errore di rete transitorio: ritenta.
 			lastErr = networkErr;
 			if (attempt === MAX_ATTEMPTS) throw networkErr;
 			await sleep(300 * attempt);
 			continue;
 		}
+
+		let data: any = null;
+		try { data = raw ? JSON.parse(raw) : null; } catch { /* body non-JSON (es. HTML di Cloudflare) */ }
 
 		if (response.ok && data?.access_token) {
 			cachedToken = {
@@ -385,11 +392,15 @@ export const generateAccessToken = async () => {
 			return data.access_token;
 		}
 
-		const err: any = new Error(data?.error_description ?? data?.error ?? "PAYPAL_AUTH_FAILED");
+		const reason = data?.error_description ?? data?.error
+			?? (response.status === 429 ? "PAYPAL_RATE_LIMITED" : "PAYPAL_AUTH_FAILED");
+		const err: any = new Error(reason);
 		err.paypal = {
 			status: response.status,
 			error: data?.error,
 			error_description: data?.error_description,
+			// se il body non era JSON (HTML di blocco) ne salviamo un estratto per la diagnosi
+			bodySnippet: data ? undefined : raw.slice(0, 120),
 		};
 		// Solo i 5xx sono transitori e si ritentano. 4xx (auth) e 429 (rate-limit):
 		// fallisci subito col motivo reale, senza aggiungere carico all'endpoint.
